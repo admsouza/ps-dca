@@ -9,6 +9,7 @@ requires-python = ">=3.11"
 dependencies = [
     "pyyaml>=6.0",
     "jsonschema>=4.25",
+    "requests>=2.32",   # adapters MSC (SICONFI e PublicSoft); fora do núcleo de domínio
 ]
 
 [project.optional-dependencies]

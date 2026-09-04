@@ -55,38 +55,106 @@ anexo — na DCA é um service parametrizado.
 ## 1. PLAN/ARCH
 
 - [x] 1.1 `design.md` revisado após C1–C4 e assinado pelo PO em 2026-09-04.
-- [ ] 1.2 Confirmar as dependências da F1: runtime `pyyaml` + `requests`; dev `pytest`, `ruff`. Sem
-      pandas no núcleo (D2). FastAPI é F2; `arq`, `redis`, `sqlmodel` e `alembic` são F3.
-- [ ] 1.3 Esqueleto mínimo da F1: `docker-compose.yml` com o app na rede externa `ps-infra`,
-      `.env.example`, `ruff.toml`, `pytest.ini`. Sem serviço de banco e sem worker.
+- [x] 1.2 Dependências da F1 fixadas em `pyproject.toml` (2026-09-04): runtime `pyyaml`,
+      `jsonschema` e `requests`; dev `pytest`, `ruff`, `pymupdf`. Sem pandas (D2). FastAPI é F2;
+      `arq`, `redis`, `sqlmodel` e `alembic` são F3.
+- [x] 1.3 Esqueleto da F1: `.env.example` criado; `ruff` e `pytest` configurados no
+      `pyproject.toml` — **um arquivo em vez de três**, ao contrário do `ruff.toml` + `pytest.ini`
+      separados do RGF.
+      **`docker-compose.yml` adiado para a F2, deliberadamente.** A F1 não tem processo servido:
+      é núcleo mais CLI, roda com `python -m`. Um compose agora declararia serviço sem nada para
+      servir — scaffolding para depois, que a F2 cria junto com a API que o justifica. A rede
+      externa `ps-infra` e o Redis continuam previstos em `plataforma-pipeline-dca` § 5.
 
 ## 2. TEST — antes do código
 
-- [ ] 2.1 Traduzir cada cenário do delta spec em teste de comportamento.
-- [ ] 2.2 Fixture do exemplo documental do IPC07 p. 8 (`L2` — Impostos, Taxas e Contribuições de
-      Melhoria) com registros literais, cobrindo conta credora, conta devedora e coluna derivada.
-- [ ] 2.3 Teste que falha se a direção do saldo passar a ser inferida da classe ou do prefixo —
-      ancorado em `621310100`/`621390000`, que a heurística de classe inverte.
-- [ ] 2.4 Teste que falha se `522139900` entrar na coluna de `L29` por casamento de prefixo.
-- [ ] 2.5 Teste de vigência: o carregador recebe o exercício; exercício sem vigência falha
-      nomeando as disponíveis.
-- [ ] 2.6 Teste de procedência e diagnóstico: o resultado identifica edição do IPC, versão das
-      tabelas STN e as células não apuradas.
-- [ ] 2.7 Rodar e confirmar que falham pelo motivo esperado.
+- [x] 2.1 Os **33** cenários do delta spec traduzidos em 45 testes, escritos em 2026-09-04:
+      · `tests/bo/test_saldo.py` — direção do saldo, composição da célula, casamento de conta
+      · `tests/bo/test_apuracao.py` — leitura da MSC, adapters, ordem de apuração, vigência,
+        procedência e diagnóstico
+      · `tests/bo/test_caso_joao_pessoa.py` — os 11 valores do caso de referência
+      A cobertura é verificada por `tests/test_cobertura_spec.py`, agora parametrizado por
+      capability: falha se um cenário ficar sem teste ou se a contagem mudar sem decisão.
+- [x] 2.2 `tests/bo/conftest.py` — fixture `exemplo_l2` com os registros do item 23 do IPC 07
+      (p. 8), cobrindo numa só passagem conta credora (`521110000`, `621200000`), conta devedora
+      (`621310100`) e coluna derivada (`saldo = c − b`). Mais os dublês `FonteFake`,
+      `FonteVazia` e `DirecaoFake` das duas portas do domínio.
+- [x] 2.3 `test_heuristica_de_classe_e_rejeitada` falha se o módulo de saldo passar a conhecer
+      conjunto de classes credoras; `test_contas_de_mesmo_prefixo_com_direcoes_opostas` e
+      `test_deducoes_de_classe_6_sao_devedoras_no_pcasp` ancoram em `621310100`/`621390000`.
+- [x] 2.4 `test_conta_irma_de_controle_paralelo_nao_entra` — falha se `522139900` inflar a
+      coluna de `L29` em R$ 729.036.483,90.
+- [x] 2.5 `test_exercicio_e_parametro_da_carga_de_regras` e `test_exercicio_descoberto`, que
+      exige a falha nomeando o exercício e as vigências disponíveis.
+- [x] 2.6 `test_divergencia_explicavel_pelo_resultado` (edição, documento, `versao_regras`,
+      hashes das tabelas STN e regras aplicadas) e
+      `test_apuracao_sem_pendencia_declara_diagnostico_vazio`.
+- [x] 2.7 Suíte executada em 2026-09-04: **93 passed · 4 failed · 41 errors**, e
+      `ruff check .` → `All checks passed!`. Os 45 vermelhos são todos
+      `ModuleNotFoundError: No module named 'app'` — o pacote da F1 não existe. Nenhuma falha
+      por erro de escrita do teste. Os 93 verdes são a base canônica, já entregue.
 
 ## 3. IMPLEMENT — F1 (núcleo)
 
-- [ ] 3.1 `domain/bo/modelo.py` e `portas.py` — contratos, sem I/O.
-- [ ] 3.2 `infra/pcasp/natureza.py` — direção por conta folha, lida da tabela.
-- [ ] 3.3 `domain/bo/saldo.py` — saldo da célula com direção injetada.
-- [ ] 3.4 `domain/bo/matriz.py` — os 3 passos, reusando `formula` e `dag` do RGF.
-- [ ] 3.5 `infra/msc/` — os dois adapters e a normalização de colunas.
-- [ ] 3.6 `infra/regras/carregador.py` — recebe o **exercício** e devolve o mapa vigente (P8 da
-      change de plataforma). Na F1 a implementação é de YAML; na F3 entra a de banco
-      (`dca_regra_mapeamento`, P10) atrás da mesma porta, e o YAML fica como seed e fixture. E
-      `services/bo/quadro_principal.py`, que devolve matriz + procedência + diagnóstico (P9).
-- [ ] 3.7 CLI `python -m app.cli.bo <ente> <ano>` — apura e imprime a matriz. É o que roda a
-      verificação 5.3–5.5 sem depender de rota nem de banco.
+- [x] 3.1 `domain/bo/modelo.py` (Registro · ContaCC · Filtro · Coluna · Linha · MapaBO ·
+      Matriz · NaoApurada · Residuo) e `portas.py` (`DirecaoSaldo`, `FonteSaldos`).
+- [x] 3.2 `infra/pcasp/natureza.py` — direção por conta folha e por grupo, lida do `PCASP.md`
+      (6.053 contas com natureza declarada).
+- [x] 3.3 `domain/bo/saldo.py` — saldo da conta, casamento por prefixo com coringa, filtros,
+      grupos de exclusão e saldo da célula com direção injetada.
+- [x] 3.4 `domain/bo/matriz.py` — os 3 passos e o detector de ciclo. O parser de fórmula do RGF
+      **não** foi reusado: as expressões do BO são listas de referências com sinal, já
+      estruturadas no YAML — não há texto de fórmula para interpretar, e um parser `ast` aqui
+      seria complexidade sem uso.
+- [x] 3.5 `infra/msc/` — `siconfi.py` (paginação ORDS), `publicsoft.py` (gate de auditoria) e
+      `normalizacao.py` (contrato único, camelCase e latin-1).
+- [x] 3.6 `infra/regras/carregador.py` — recebe o **exercício**, resolve a vigência e devolve o
+      mapa com `versao_regras` (hash canônico, P-D7) e os hashes das tabelas STN. E
+      `services/bo/quadro_principal.py`, síncrono e sem estado, devolvendo matriz + procedência
+      + diagnóstico (P9).
+- [x] 3.7 CLI `python -m app.cli.bo <ente> <exercicio> [--fonte] [--json]`. Executado contra a
+      API real do SICONFI em 2026-09-04.
+
+## 3bis. Verificação com dados reais (2026-09-04)
+
+`python -m app.cli.bo 2507507 2025` — API pública do SICONFI, sem mock. **Todos os valores do
+gabarito conferem em centavos**, apurados pelo código e não por script de análise:
+
+| Linha | Coluna | Apurado | Gabarito |
+|---|---|---|---|
+| `L40` SUBTOTAL DAS DESPESAS | dotação inicial | 5.314.144.648,00 | ✓ |
+| | dotação atualizada | 6.043.181.131,90 | ✓ |
+| | empenhadas | 4.850.356.845,30 | ✓ |
+| | liquidadas | 4.569.049.735,78 | ✓ |
+| | pagas | 4.529.794.533,11 | ✓ |
+| `L16` SUBTOTAL DAS RECEITAS | previsão inicial | 5.301.644.648,00 | ✓ |
+| | previsão atualizada | 5.560.342.799,26 | ✓ |
+| `L27` Saldos de Exerc. Anteriores | previsão atualizada | 482.338.332,64 | ✓ |
+| `L28` Recursos Arrecadados | previsão inicial | 12.000.000,00 | ✓ |
+| `L29` Superávit Financeiro | previsão atualizada | 470.338.332,64 | ✓ |
+| `L51` Reserva do RPPS | — | sem coluna de valor | ✓ |
+
+Os R$ 12.000.000,00 de natureza `9.9.9.0.00.0.0` ficam **fora** do total (`L16`) e dentro de
+`L28`, exatamente como o STN publica — confirmando B5 e B6 pelo código.
+
+### Descoberta que mudou o desenho
+
+O saldo de cada conta é tomado **na direção da coluna**, não na da própria conta. No PCASP a
+conta redutora tem natureza oposta à do grupo e `(-)` no título — `522190400 (-) CANCELAMENTO DE
+DOTAÇÕES` é credora entre devedoras; `621310100 (-) FUNDEB` é devedora entre credoras. Somar cada
+uma na direção dela devolveria a redutora positiva e inflaria a coluna: a dotação atualizada sairia
+6.303.210.688,18 em vez de 6.043.181.131,90, e a receita realizada viria bruta em vez de líquida.
+
+A direção do grupo vem da primeira conta **não redutora** sob o prefixo — o marcador `(-)` é dado
+da tabela, não heurística. Contar por maioria erraria em `5.2.1.1`, onde há mais contas de dedução
+do que de previsão.
+
+## 3ter. Pendências abertas — decisão do PO
+
+| # | Pendência | Efeito hoje |
+|---|---|---|
+| **C5** | `L25`, `L26`, `L49` e `L50` cruzam receita e despesa, e os dois blocos não têm nenhuma coluna em comum (4 de receita × 6 de despesa). O IPC 07 não diz em qual coluna essas linhas são apresentadas. | As 4 linhas saem **não apuradas**, com aviso nomeando a pendência. Nada é presumido. |
+| **C6** | A base canônica não declara `natureza_saldo` nas contas: o schema de `rule.json` não tem o campo. Sem ele, a exceção histórica B1 (`5.3.1.3.0.00.00`, fora do PCASP atual) não tem como ser resolvida. | Só afeta exercícios com escrituração em `5.3.1.3` — em JP 2025 não há (C3). Fechar exige uma change pequena na base canônica. |
 
 ## 4. REVIEW
 
