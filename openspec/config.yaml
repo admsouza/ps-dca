@@ -1,0 +1,32 @@
+schema: spec-driven
+
+context: |
+  Projeto: ps-dca — processamento da DCA (Declaração de Contas Anuais, SICONFI/STN).
+  Estado: FASE DE SPEC. Sem código, sem arquitetura definida, sem migrations.
+  Escopo: DCA municipal anual (periodicidade=A, periodo=1, co_poder=-),
+  anexos DCA-Anexo I-AB, I-C, I-D, I-E, I-F, I-G, I-HI.
+  Stack alvo (a confirmar): Python 3.11, FastAPI, Pydantic v2, arq, Redis,
+  SQLAlchemy 2.x, Alembic, PostgreSQL.
+  Contrato canônico para agentes: AGENTS.md na raiz.
+  Specs (fonte de verdade): openspec/specs/. Ativas: openspec/changes/.
+  Concluídas: openspec/changes/archive/.
+  Referência normativa: docs/referencia/ipc/ (IPC 04 BP, 05 DVP, 06 BF, 07 BO, 08 DFC).
+  Projetos irmãos: regras-rreo-api, regras-rgf-api. Importação XBRL: prd-audite (fonte da verdade).
+
+rules:
+  proposal:
+    - Declarar o anexo DCA afetado e a base normativa (MCASP / IPC / layout SICONFI).
+    - Incluir ao menos um exemplo real (ente, exercício, valor esperado).
+    - Front entra apenas como consumidor da API — não se implementa front neste repo.
+    - Nenhuma proposta avança para PLAN/ARCH sem aprovação explícita do PO.
+  design:
+    - Listar os arquivos a criar/alterar e as decisões numeradas D1..Dn com a alternativa descartada.
+    - Replicar o padrão de regras-rreo-api / regras-rgf-api antes de criar abstração nova (YAGNI).
+    - Explicitar impacto em banco, cache, filas e APIs externas.
+  tasks:
+    - Ordem por tarefa de comportamento: teste falhando -> implementação -> refatoração.
+    - "Incluir comandos de validação reais: python -m pytest, python -m ruff check ., alembic upgrade head."
+  specs:
+    - Usar ADDED/MODIFIED/REMOVED e cenários Gherkin em '#### Scenario:'.
+    - "RFC 2119: SHALL/MUST para comportamento obrigatório."
+    - Critério de aceite precisa de número medível; aceite da DCA é espelho 1:1 contra tt/dca.
