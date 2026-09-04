@@ -154,35 +154,51 @@ do que de previsão.
 | # | Pendência | Efeito hoje |
 |---|---|---|
 | **C5** | `L25`, `L26`, `L49` e `L50` cruzam receita e despesa, e os dois blocos não têm nenhuma coluna em comum (4 de receita × 6 de despesa). O IPC 07 não diz em qual coluna essas linhas são apresentadas. | As 4 linhas saem **não apuradas**, com aviso nomeando a pendência. Nada é presumido. |
+| **C7** | `L29` Superávit Financeiro é apurada com **previsão inicial** de R$ 470.338.332,64 (saldo inicial de `5.2.2.1.3.01.00`), e por `L27 = L28 + L29 + L30` leva `L27` a 482.338.332,64. O STN **não publica** `PREVISÃO INICIAL` para `SuperavitFinanceiro` no `RREO-Anexo 01`, e publica `L27` PREVISÃO INICIAL = 12.000.000,00 (só `L28`). O IPC 07 não diz se a coluna de previsão inicial se aplica a `L29`. | Divergência de R$ 470.338.332,64 em `L27.previsao_inicial` contra o RREO. Descoberta na task 5.5. Única divergência de valor em 123 células conferidas. |
 | **C6** | A base canônica não declara `natureza_saldo` nas contas: o schema de `rule.json` não tem o campo. Sem ele, a exceção histórica B1 (`5.3.1.3.0.00.00`, fora do PCASP atual) não tem como ser resolvida. | Só afeta exercícios com escrituração em `5.3.1.3` — em JP 2025 não há (C3). Fechar exige uma change pequena na base canônica. |
 
 ## 4. REVIEW
 
-- [ ] 4.1 Nenhuma heurística de sinal por classe ou prefixo no diff.
-- [ ] 4.2 Nenhum `0` no lugar de célula não apurada.
-- [ ] 4.3 Núcleo sem import de `requests`, `pandas` ou `yaml`.
-- [ ] 4.4 Nenhuma conta ou regra fora do que a change `ipc07-bo-regras-canonicas` entregou.
-- [ ] 4.5 Nenhuma chamada que carregue regra sem receber o exercício.
-- [ ] 4.6 A apuração devolve procedência e diagnóstico — não só valores.
+- [x] 4.1 Nenhuma heurística de sinal por classe ou prefixo no diff.
+- [x] 4.2 Nenhum `0` no lugar de célula não apurada.
+- [x] 4.3 Núcleo sem import de `requests`, `pandas` ou `yaml`.
+- [x] 4.4 Nenhuma conta ou regra fora do que a change `ipc07-bo-regras-canonicas` entregou.
+- [x] 4.5 Nenhuma chamada que carregue regra sem receber o exercício.
+- [x] 4.6 A apuração devolve procedência e diagnóstico — não só valores.
+
+Verificado em 2026-09-04: núcleo sem `requests`/`pandas`/`yaml`/`sqlalchemy`/`fastapi`; direção do
+saldo vem do marcador `(-)` do PCASP, não de classe contábil; os únicos literais `0` em
+`domain/bo/` são estados do DFS de `matriz.py`, não células; `carregador.carregar(exercicio, ...)`
+exige o exercício na assinatura; a saída traz `procedencia` (documento, edição, `versao_regras`,
+hashes das 7 tabelas STN) e `diagnostico` (`nao_apuradas` com motivo, `residuos`, `duracao_ms`,
+`sem_dados`).
 
 ## 5. VERIFY
 
-- [ ] 5.1 `python -m pytest` — reportar `N passed / M failed`.
-- [ ] 5.2 `python -m ruff check .` — reportar resultado real.
-- [ ] 5.3 Apurar o quadro principal de JP 12/2025 e reportar quantas células saíram `None`, com o
-      motivo de cada uma.
-- [ ] 5.4 Reconferir os 11 valores de `docs/validacao-bo-jp-2025.md` pelo código, não por script
-      de análise.
-- [ ] 5.5 Apurar o quadro principal completo e conferir contra `RREO-Anexo 01` de JP 2025, linha a
-      linha, reportando cada divergência.
+- [x] 5.1 `python -m pytest` → **134 passed / 4 failed**. As 4 falhas são C5 (3) e C6 (1).
+- [x] 5.2 `python -m ruff check .` → **All checks passed!**
+- [x] 5.3 JP 12/2025 apurado em 4.448 ms: **0 células `None`** e **0 resíduos**. As 4 linhas de C5
+      (`L25`, `L26`, `L49`, `L50`) saem **sem coluna alguma**, cada uma em `nao_apuradas` com o
+      motivo "referências sem coluna em comum … (pendência C5)".
+- [x] 5.4 Os 11 valores conferidos pelo código, via `python -m app.cli.bo 2507507 2025 --json`
+      contra a API pública: zero diferença. `L40` = 5.314.144.648,00 · 6.043.181.131,90 ·
+      4.850.356.845,30 · 4.569.049.735,78 · 4.529.794.533,11; `L16` = 5.301.644.648,00 ·
+      5.560.342.799,26; `L27`/`L28`/`L29` previsão atualizada = 482.338.332,64 · 12.000.000,00 ·
+      470.338.332,64. A escrituração real de JP em `522130900` compõe a dotação atualizada sem
+      ajuste — a ressalva de `tests/bo/test_caso_joao_pessoa.py` está resolvida.
+- [x] 5.5 Feito — relatório em `docs/verificacao-5.5-rreo-jp-2025.md`. **123 células comparáveis:
+      108 conferem em centavos, 14 divergem só no sinal por convenção do próprio IPC 07, 1
+      divergência real de valor** (`L27.previsao_inicial`, registrada como **C7** em § 3ter).
 
 ## 6. F2 e F3 — changes próprias
 
 - [ ] 6.0 F2 e F3 são implementadas conforme a change `plataforma-pipeline-dca`, que especifica o
       ciclo, a infra e a organização em camadas. Não desenhar pipeline aqui.
-- [ ] 6.1 Ao fim da F1, confirmar que `services/bo/quadro_principal.apurar(...)` satisfaz o
-      requisito "serviço chamável por rota, worker e CLI" daquele delta spec — é o que evita
-      reescrita na F2.
+- [x] 6.1 Confirmado. `apurar(ente, exercicio, fonte, direcao=None, mapa=None)` é síncrona, sem
+      estado e sem I/O próprio: a fonte de MSC, a direção do PCASP e o mapa de regras entram por
+      parâmetro (`fonte` é `Protocol`, os outros dois têm default carregado). Devolve `Resultado`
+      com `matriz`, `procedencia` e `diagnostico` — serializável. `app/cli/bo.py` já é o terceiro
+      chamador, ao lado de rota e worker previstos na F2/F3. Sem reescrita à vista.
 
 ## 7. Arquivamento
 

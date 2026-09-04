@@ -1,86 +1,138 @@
-# Ponto de parada — 2026-09-03
+# Ponto de parada — 2026-09-04 (sessão 2)
 
-Estado do repositório ao fim da sessão. Fase de **spec**: nenhum código foi escrito.
+Estado ao fim da sessão. A fase de spec fechou, a base canônica do IPC 07 foi entregue e o núcleo
+de apuração do Balanço Orçamentário **já reproduz o gabarito do STN com dados reais**.
 
-## Onde paramos
+## Onde paramos, em uma frase
 
-Duas changes ativas. A primeira está pronta e só aguarda assinatura; a segunda tem uma decisão de
-escopo aberta que precisa vir antes do delta spec.
+A F1 do BO está implementada, **REVIEW e VERIFY fechados** (tasks 4.1–4.6, 5.1–5.5 e 6.1), e a
+conferência linha a linha contra o `RREO-Anexo 01` fecha **108 de 123 células em centavos**;
+o que resta são **três pendências normativas — C5, C6 e a nova C7 —** que dependem de decisão do
+PO, não de código. As 17 tasks abertas da change do BO caíram para 5 (a 6.0 e o arquivamento).
 
-### 1. `ipc07-bo-regras-canonicas` — pronta, aguarda aprovação
+## Verificação real, reproduzível agora
 
-Todas as pendências de conteúdo foram fechadas hoje:
+```bash
+python -m pytest                              # 134 passed · 4 failed (as pendências abaixo)
+python -m ruff check .                        # All checks passed!
+python -m scripts.validate_rules knowledge    # exit 0 · 51 · 9 · 9 = 69 regras
+python -m scripts.check_sources knowledge     # ✓ Fontes íntegras
+python -m app.cli.bo 2507507 2025             # apura contra a API pública do SICONFI
+```
 
-| # | Decisão |
+O CLI bate **em centavos** com o gabarito, apurado pelo código e não por script de análise:
+
+| Linha | Coluna | Valor |
+|---|---|---|
+| `L40` Subtotal das Despesas | dotação inicial · atualizada | 5.314.144.648,00 · 6.043.181.131,90 |
+| | empenhadas · liquidadas · pagas | 4.850.356.845,30 · 4.569.049.735,78 · 4.529.794.533,11 |
+| `L16` Subtotal das Receitas | previsão inicial · atualizada | 5.301.644.648,00 · 5.560.342.799,26 |
+| `L27` · `L28` · `L29` | previsão | 482.338.332,64 · 12.000.000,00 · 470.338.332,64 |
+| `L51` Reserva do RPPS | — | sem coluna de valor |
+
+Os R$ 12.000.000,00 de natureza `9.9.9.0.00.0.0` ficam fora do total e dentro de `L28` — B5 e B6
+confirmados pelo código.
+
+## Verificação 5.5 — contra o `RREO-Anexo 01`, feita nesta sessão
+
+Relatório completo em `docs/verificacao-5.5-rreo-jp-2025.md`.
+
+| | |
 |---|---|
-| **B6** | `L27`–`L30` têm as 4 colunas de receita; `L51` não tem coluna de valor |
-| **B2 / B4** | exceção declarada — as tabelas de `docs/contas-stn/` não são completadas nesta change |
-| **0.7** | exemplo com ente/exercício/valor fora de escopo — pertence à change de ligação DCA |
-| **1.3** | `pydantic` retirado; runtime fica `pyyaml` + `jsonschema` |
+| Células comparáveis | **123** |
+| Conferem em centavos | **108** |
+| Divergem só no sinal, por convenção do IPC 07 | **14** |
+| Divergência real de valor | **1** → pendência **C7** |
 
-Resultado: **0** regras `review_required` (antes eram 5), as 69 linhas transcritíveis.
+As 14 de sinal **não são erro**: o IPC 07 define a coluna de saldo da receita como
+`SALDO (d) = (c-b)` (realizada − previsão) e o RREO publica `SALDO (a-c)` (previsão − realizada).
+Magnitude idêntica em centavos nas 14. A coluna de despesa não sofre disso e confere.
 
-**Único item aberto: task 0.11** — aprovação formal do PO em `proposal.md` e no delta spec, com
-data. É o gate para PLAN/ARCH. Nada mais bloqueia.
+## As três pendências que dependem do PO
 
-### 2. `bo-quadro-principal-processamento` — nova, criada hoje
+| # | Pendência | Efeito | Onde |
+|---|---|---|---|
+| **C5** | `L25`, `L26`, `L49` e `L50` cruzam receita e despesa, e os blocos não têm coluna em comum (4 × 6). O IPC 07 não diz em qual coluna essas linhas são apresentadas. | As 4 linhas saem **não apuradas**, com aviso. Nada é presumido. Derruba `test_exercicio_superavitario`, `test_recursos_arrecadados_em_exercicios_anteriores` e `test_apuracao_sem_pendencia_declara_diagnostico_vazio`. | `tasks.md` § 3ter |
+| **C7** | `L29` Superávit Financeiro sai com previsão inicial de R$ 470.338.332,64 (saldo inicial de `5.2.2.1.3.01.00`, a conta que B5 mandou declarar) e por `L27 = L28 + L29 + L30` leva `L27` a 482.338.332,64. O STN **não publica** `PREVISÃO INICIAL` para `SuperavitFinanceiro`, e publica `L27` PREVISÃO INICIAL = 12.000.000,00 — só `L28`. O IPC 07 não diz se a coluna se aplica a `L29`. | Única divergência de valor em 123 células. Leitura plausível: superávit financeiro só é conhecido com o exercício fechado, logo não cabe em previsão inicial — **não aplicada**, é interpretação normativa. Nenhum teste vermelho. | `docs/verificacao-5.5-rreo-jp-2025.md` |
+| **C6** | O schema `knowledge/schemas/rule.json` não tem `natureza_saldo` na conta, então a exceção B1 (`5.3.1.3.0.00.00`, fora do PCASP atual) não pode ser declarada. | Só afeta exercícios com escrituração em `5.3.1.3` — JP 2025 não tem. Derruba `test_excecao_historica_usa_a_natureza_declarada`. Fechar exige change pequena na base canônica, que está arquivada. | idem |
 
-Proposal e design escritos: contrato das duas fontes MSC, regra de débito/crédito, `ending_balance`
-na DCA e a estrutura de apuração (Clean Architecture, núcleo sem I/O).
+**Não resolver essas três por conta própria.** São interpretação normativa; o processo manda
+declarar, não escolher.
 
-C1, C2 e C3 resolvidos. **C4 está aberta e bloqueia o delta spec** (task 0.10).
+## A descoberta que mudou o desenho, e não deve ser revertida
 
-## A decisão que falta — C4
-
-Os 7 anexos da DCA (universo completo, medido) publicam **posição** e **execução realizada**.
-Nenhum publica previsão da receita ou dotação. O Balanço Orçamentário do IPC 07 é o
-**`RREO-Anexo 01`**, cujas 12 colunas correspondem uma a uma à matriz do IPC.
-
-**Pergunta ao PO:** este demonstrativo pertence ao `ps-dca` ou ao `regras-rreo-api`?
-
-A resposta muda o repositório de destino, não o desenho: a estrutura e a regra de saldo valem nos
-dois casos.
-
-## O que ficou provado com dado real
-
-João Pessoa `2507507`, 12/2025, `MSCC`, `ending_balance`, classes 5 e 6 (4.600 + 4.320 registros)
-contra `DCA-Anexo I-C`, `I-D` e `RREO-Anexo 01`: **11 valores, zero diferença em centavos.**
-
-A regra validada:
+O saldo de cada conta é tomado **na direção da coluna**, não na direção da própria conta. No PCASP
+a conta redutora tem natureza oposta à do grupo **e** `(-)` no título:
 
 ```
-saldo(conta) = Σ C − Σ D   se a conta é credora no PCASP
-             = Σ D − Σ C   se a conta é devedora no PCASP
+522110100  Devedora   CREDITO INICIAL
+522190400  Credora    (-) CANCELAMENTO DE DOTAÇÕES
+621200000  Credora    RECEITA REALIZADA
+621310100  Devedora   (-) FUNDEB
 ```
 
-Direção resolvida **por conta folha de 9 dígitos** na tabela `PCASP.md`, pela conta do registro —
-nunca pela classe contábil, nunca pelo prefixo declarado na regra.
+Somar cada conta na direção dela faz a redutora somar em vez de reduzir: a dotação atualizada sai
+`6.303.210.688,18` em vez de `6.043.181.131,90`, e a receita vem bruta em vez de líquida.
 
-Três coisas que a medição decidiu e que não devem ser reabertas sem nova medição:
+A direção do grupo vem da **primeira conta não redutora** sob o prefixo
+(`infra/pcasp/natureza.py::credora_prefixo`). Contar por maioria erra em `5.2.1.1`, que tem mais
+contas de dedução do que de previsão. O marcador `(-)` é dado da tabela, não heurística.
 
-1. **A heurística de classe do `regras-rgf-api` não serve.** `621310100` e `621390000` são classe 6
-   e devedoras; tratadas como credoras saem com sinal invertido contra o STN.
-2. **`522139900` não pode entrar por prefixo.** É irmã de `522130100` (a conta de `L29`); o prefixo
-   `5.2.2.1.3` a captura e infla a coluna em R$ 729.036.483,90.
-3. **O resíduo tem de ser medido.** Os R$ 12.000.000,00 de natureza `9.9.9.0.00.0.0` não pertencem
-   ao total das receitas — vão para a linha de saldos de exercícios anteriores. Isso confirmou B5 e
-   B6 contra o publicado.
+Duas formulações equivalentes existem — (a) saldo na direção da coluna, implementada; (b) saldo na
+direção da conta com sinal negativo explícito nas contas `(-)`. O PO foi consultado em 2026-09-04 e
+**não escolheu**; a troca é pequena e dá o mesmo número.
+
+## O que existe no repositório
+
+```text
+app/domain/bo/        modelo · portas (Protocol) · saldo · matriz     ← núcleo puro, sem I/O
+app/infra/pcasp/      natureza do saldo, lida do PCASP.md
+app/infra/msc/        siconfi (paginação ORDS) · publicsoft (gate de auditoria) · normalizacao
+app/infra/regras/     carregador: recebe o exercício, devolve o mapa vigente + versao_regras
+app/services/bo/      quadro_principal.apurar() — síncrono, sem estado, serve rota/worker/CLI
+app/cli/bo.py         python -m app.cli.bo <ente> <exercicio> [--fonte] [--json]
+knowledge/            69 regras · 2 policies · schemas · sources (hashes) · índice
+scripts/              validate_rules · check_sources · build_index · load_stn_tables · extract_ipc
+tests/                138 testes; tests/bo/ é a F1
+```
+
+## Changes
+
+| Change | Fase | Situação |
+|---|---|---|
+| `ipc07-bo-regras-canonicas` | **arquivada** | `openspec/changes/archive/2026-09-04-…`; spec em `openspec/specs/dca/base-canonica-regras/spec.md` |
+| `bo-quadro-principal-processamento` | IMPLEMENT | F1 entregue; REVIEW/VERIFY/6.1 fechados. **5 tasks abertas**: 6.0 e arquivamento 7.1–7.4, que aguardam C5/C6/C7 |
+| `plataforma-pipeline-dca` | PLAN/ARCH | SPEC aprovada; 59 tasks abertas. Fase TEST não começou — por isso `test_cobertura_spec.py` só confere a contagem dela |
+
+Decisões já tomadas pelo PO e que **não** devem ser reabertas: C1–C4, P1–P10, P-D1 a P-D8, B1/B3/B5/B6.
 
 ## Por onde retomar
 
-1. Assinar a task 0.11 de `ipc07-bo-regras-canonicas` (ou apontar o que falta) — libera PLAN/ARCH.
-2. Responder C4 — libera o delta spec de `bo-quadro-principal-processamento`.
-3. Com as duas respostas: escrever o delta spec e só então a fase TEST.
+1. **Levar C5, C6 e C7 ao PO.** É o único bloqueio real. Com C5 respondida, 3 testes fecham; C7 não
+   derruba teste, mas é a última divergência contra o STN.
+2. Com as três respondidas, fechar o **arquivamento** (tasks 7.1–7.4) — merge do delta em
+   `openspec/specs/dca/balanco-orcamentario/spec.md` e mover para `archive/`.
+3. Só então **F2** (FastAPI, rota fina) e **F3** (job ARQ, cache, mapeamento em banco), ambas
+   especificadas em `plataforma-pipeline-dca`.
 
-## Artefatos desta sessão
+## Convenções que o próximo agente precisa respeitar
 
-| Arquivo | Conteúdo |
-|---|---|
-| `docs/validacao-bo-jp-2025.md` | os 11 valores conferidos, com as contas e a reprodução |
-| `docs/anexos-siconfi-inventario.md` | o que cada anexo publica; onde está o gabarito do BO |
-| `openspec/changes/bo-quadro-principal-processamento/` | proposal · design · tasks |
-| `openspec/changes/ipc07-bo-regras-canonicas/` | B6, B2/B4, 0.7 e 1.3 registrados |
-| `docs/source-analysis-ipc07.md` | §B6, §5.1–5.4 atualizados com as decisões |
-| `openspec/AGENTS.md` | tabela "Change ativa" com as duas changes |
+- **Antes de qualquer migration ou escrita em banco, pedir o schema real ao PO.** O Postgres
+  `db-ps-rreo-rgf-dca` é compartilhado com RREO e RGF; separação por prefixo `dca_*` e
+  `alembic_version_dca`, **não** por schema. Advisory lock `43812/1001` — conferir em
+  `plataforma-pipeline-dca/design.md` § 5.
+- `REDIS_PREFIX=msc_cache:` é **compartilhado** de propósito (cache de MSC serve os três
+  pipelines). O que se isola é o estado de execução: fila `arq:queue:dca`, chaves `dca:`.
+- Núcleo (`app/domain/`) não importa `requests`, `pandas`, `yaml`, `sqlalchemy` nem `fastapi`.
+- Nada de heurística de sinal por classe contábil. Célula sem direção conhecida é `None` com aviso,
+  nunca `0`.
+- Todo teste declara no docstring `Scenario:` ou `Requisito:` — `tests/test_cobertura_spec.py`
+  falha caso contrário.
+- `.env.example` só é gravável por shell (regra de permissão bloqueia a ferramenta de escrita).
 
-Nada foi comitado. `git status` mostra os arquivos novos e modificados.
+## Estado do git
+
+Tudo comitado até `7b51ac5`. Esta sessão alterou apenas documentação e o `tasks.md` da change:
+`openspec/changes/bo-quadro-principal-processamento/tasks.md`,
+`docs/verificacao-5.5-rreo-jp-2025.md` (novo) e este arquivo. Nenhuma linha de `app/` foi tocada —
+`134 passed / 4 failed` e `ruff` limpo seguem valendo. **Não comitado**, aguardando o PO.
