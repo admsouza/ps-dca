@@ -48,18 +48,19 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 ## Change ativa
 
-Todas as fases SPEC foram **aprovadas pelo PO em 2026-09-04**. As três estão liberadas para
-PLAN/ARCH; nenhuma linha de código foi escrita.
+SPEC das três aprovada pelo PO em 2026-09-04. A base canônica do IPC 07 está **implementada e
+verificada** (89 testes, ruff limpo, validador exit 0) e foi arquivada; as duas restantes seguem
+em PLAN/ARCH.
 
 | Change | Capability | Fase | Status |
 |---|---|---|---|
 | `plataforma-pipeline-dca` | `pipeline/plataforma` (nova) | **PLAN/ARCH** | SPEC aprovada em 2026-09-04. 22 requisitos / 63 cenários: ciclo requisição→cache→job→worker, camadas e regra de dependência, cache e lock únicos, `versao_regras` por hash canônico, mapeamento vigente em banco INSERT-only, reprocessamento forçado, procedência e diagnóstico. Infra: Postgres e Redis do hub, prefixo `dca_*`, `alembic_version_dca`, advisory lock `43812/1001`, fila `arq:queue:dca`. Implementada nas fases F2/F3 do BO. |
 | `bo-quadro-principal-processamento` | `dca/balanco-orcamentario` (nova) | **PLAN/ARCH** | SPEC aprovada em 2026-09-04. 15 requisitos / 33 cenários. C1–C4 decididos; regra de saldo validada 1:1 em centavos contra JP 12/2025 (11 valores). Ordem F1 núcleo → F2 transporte → F3 pipeline. Depende das 51 regras de `ipc07-bo-regras-canonicas`. |
-| `ipc07-bo-regras-canonicas` | `dca/base-canonica-regras` (nova) | **PLAN/ARCH** | SPEC aprovada em 2026-09-04. As 69 linhas do IPC 07 transcritíveis, 0 `review_required`. B1, B3, B5 decididos em 2026-08-27; B6, B2, B4 e dependências em 2026-09-03. |
-| `knowledge-base-ipc` | `dca/base-canonica-regras` (nova) | SPEC — suspensa | Sucedida por changes separadas por IPC, começando por `ipc07-bo-regras-canonicas`. Não avançar nem arquivar até o PO confirmar o destino dos artefatos compartilhados. |
 
 ### Ordem de execução acordada
 
+0. ~~Base canônica do IPC 07~~ — **concluída em 2026-09-04**. As 51 regras do Quadro Principal que
+   a F1 do BO consome já existem em `knowledge/rules/bo/quadro_principal.yaml`.
 1. **F1 do BO** — núcleo puro (`domain/` + adapters + carregador YAML + service + CLI), verificável
    sem Postgres, Redis ou container. Aceite: os 11 valores de `docs/validacao-bo-jp-2025.md`.
 2. **F2** — FastAPI e rota fina, conforme `plataforma-pipeline-dca`.
@@ -69,7 +70,8 @@ PLAN/ARCH; nenhuma linha de código foi escrita.
 
 | Data | Change |
 |---|---|
-| — | — |
+| 2026-09-04 | `ipc07-bo-regras-canonicas` — base canônica do IPC 07 entregue: 69 regras em `knowledge/rules/bo/`, 2 policies, schemas, validador e índice. 89 testes verdes; `review_required` 0. Spec em `openspec/specs/dca/base-canonica-regras/spec.md`. |
+| 2026-09-04 | `knowledge-base-ipc` — sucedida por changes separadas por IPC; nunca implementada. Artefatos compartilhados (`knowledge/schemas/`, `knowledge/sources/`, `scripts/check_sources.py`) passaram para `ipc07-bo-regras-canonicas`. |
 
 ## Antes de codar (regras do projeto)
 

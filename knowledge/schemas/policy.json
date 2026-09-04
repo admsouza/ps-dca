@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ps-dca/knowledge/schemas/policy.json",
+  "title": "Regra geral de demonstrativo (policy)",
+  "description": "Regra que vale para um demonstrativo, quadro ou grupo inteiro, referenciada pelas regras de linha. Escopo desta edição: IPC 07.",
+  "type": "object",
+  "required": ["policy_id", "descricao", "aplica_a", "source", "evidence", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "policy_id": { "type": "string", "pattern": "^[a-z0-9]+(\\.[a-z0-9_]+)+$" },
+    "descricao": { "type": "string", "minLength": 1 },
+    "aplica_a": {
+      "type": "object",
+      "required": ["demonstrativo"],
+      "additionalProperties": false,
+      "properties": {
+        "demonstrativo": { "type": "string", "minLength": 1 },
+        "quadro": { "type": "string" },
+        "grupo": { "type": "string" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["document", "document_version", "page", "section"],
+      "additionalProperties": false,
+      "properties": {
+        "document": { "type": "string", "minLength": 1 },
+        "document_version": { "type": "string", "minLength": 1 },
+        "page": { "type": "integer", "minimum": 1 },
+        "section": { "type": "string", "minLength": 1 },
+        "item": { "type": "string" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["page", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "page": { "type": "integer", "minimum": 1 },
+        "text": { "type": "string", "minLength": 1 }
+      }
+    },
+    "status": { "enum": ["draft", "extracted", "review_required", "validated", "deprecated"] }
+  }
+}

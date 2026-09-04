@@ -70,15 +70,18 @@ openspec/
 
 ## Comandos de validação
 
-Ainda **não existem** — serão adotados na fase IMPLEMENT:
+Disponíveis desde 2026-09-04 (`pyproject.toml`):
 
 ```bash
-python -m pytest
+python -m pytest                              # 89 testes
 python -m ruff check .
-alembic upgrade head
+python -m scripts.validate_rules knowledge    # gate da base canônica
+python -m scripts.check_sources knowledge     # integridade do PDF e das tabelas da STN
+python -m scripts.build_index knowledge       # regenera o índice de regras
 ```
 
-Não inventar comando que não esteja no repositório.
+`alembic upgrade head` só existirá na fase F3 (change `plataforma-pipeline-dca`), quando houver
+tabela. Não inventar comando que não esteja no repositório.
 
 ## Projetos irmãos
 

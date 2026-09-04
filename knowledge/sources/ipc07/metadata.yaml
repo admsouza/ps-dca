@@ -1,0 +1,10 @@
+# Fonte normativa do Balanço Orçamentário. O PDF vive em docs/referencia/ipc/ e nunca é
+# copiado para dentro de knowledge/ — scripts/check_sources.py falha se isso acontecer.
+document: IPC07
+title: "IPC 07 — Balanço Orçamentário"
+file: "IPC07 - BO atualizacoes - 20200117.pdf"
+path: "docs/referencia/ipc/IPC07 - BO atualizacoes - 20200117.pdf"
+pages: 17
+edition: "2020-01"
+published_at: "2020-01-17"
+sha256: "51b9eeddcfb523aea3ddb1c57d65b2027c82a3d66783165750b746446209b862"

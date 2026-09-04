@@ -248,6 +248,55 @@ line_account_override  false | true  (true somente em L29 e L30)
 `equals`, `not_equals`, `starts_with`, `contains`, comparadores numéricos, `is_null`,
 `unresolved[]`, `parametric`. Cada um entra na change do IPC que o exigir, com o caso real citado.
 
+### Contrato dos scripts
+
+Fixado pelos testes da fase TEST (2026-09-04). Cada script é importável e tem `main()` fino por
+cima — os testes chamam a função, o CI chama o CLI.
+
+```python
+# scripts/validate_rules.py
+def validar(base: Path) -> Relatorio
+
+# scripts/check_sources.py
+def verificar(base: Path) -> Relatorio
+
+# scripts/build_index.py
+def construir(base: Path) -> dict          # rule_id -> {file, demonstrativo, quadro, document, page}
+
+# scripts/load_stn_tables.py
+def carregar(raiz_docs: Path) -> dict[str, set[str]]
+```
+
+`base` é o diretório `knowledge/`, com `rules/`, `policies/`, `sources/`, `schemas/` e `indexes/` —
+receber o caminho, em vez de resolvê-lo internamente, é o que permite validar uma árvore de teste
+sem tocar na do repositório.
+
+```python
+@dataclass(frozen=True)
+class Erro:
+    rule_id: str | None
+    mensagem: str
+    arquivo: str | None
+    linha: int | None
+
+@dataclass(frozen=True)
+class Relatorio:
+    erros: list[Erro]
+    contagens: dict     # rule_ids · por_quadro · por_status · valid_until · excecoes_dominio · total
+    exit_code: int      # 0 sem erro, 1 com erro
+```
+
+**Formato do arquivo de regras.** Cada YAML é um mapeamento com a chave `rules:` (uma lista), e o de
+policy com `policies:`. Documento YAML com uma lista solta na raiz não é aceito: a chave nomeada
+deixa espaço para metadado de arquivo sem quebrar quem já lê a base.
+
+```yaml
+# knowledge/rules/bo/quadro_principal.yaml
+rules:
+  - rule_id: bo.quadro_principal.receitas.l1
+    ...
+```
+
 ### Contrato do validador
 
 ```text
@@ -266,10 +315,14 @@ $ python scripts/validate_rules.py
 Regras por quadro    quadro_principal 51 · rp_nao_processados 9 · rp_processados 9   (total 69)
 Regras por status    validated 0 · extracted 69 · review_required 0 · draft 0
 Bloqueios            nenhum
-Decisões do PO       B1 1 padrão / 9 linhas · B3 8 padrões / 5 linhas · B5 2 linhas
+Decisões do PO       B1 1 código / 6 linhas · B3 16 grafias (8 padrões) / 5 linhas · B5 2 linhas
                      B6 5 linhas (L27–L30 com 4 colunas · L51 sem coluna)
-Exceções de domínio  B2 13 códigos / 13 linhas · B4 13 códigos / 17 linhas
+Exceções de domínio  B2 13 códigos / 13 linhas · B4 13 códigos / 21 linhas
 exit 0
+
+> Contagens conferidas contra a base gerada em 2026-09-04. As previsões anteriores de B1 (9 linhas),
+> B3 (8 padrões) e B4 (17 linhas) eram estimativas da descoberta; a diferença é de contagem, não de
+> conteúdo — detalhe em `tasks.md` § "Medições da base gerada".
 ```
 
 Em erro, uma entrada por problema, sempre com `rule_id` + `arquivo:linha`:

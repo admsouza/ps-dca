@@ -1,0 +1,468 @@
+# Execução dos Restos a Pagar Não Processados — IPC 07, p. 12.
+# 9 linhas, 6 colunas.
+# Gerado por transcrição assistida a partir de knowledge/sources/ipc07/extracted.md.
+# A fonte canônica é este arquivo; o PDF é a origem normativa.
+rules:
+- rule_id: bo.rp_nao_processados.l1
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: RP_NAO_PROCESSADOS
+    descricao: Execução de Restos a Pagar Não Processados
+  linha:
+    codigo: L1
+    descricao: Despesas Correntes
+    nivel: 1
+    ordem: 1
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro da Execução dos Restos a Pagar Não Processados
+    row: L1
+  evidence:
+    page: 12
+    text: L1 Despesas Correntes (L2 + L3 + L4)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.rp_nao_processados.l2
+      sign: +
+    - rule: bo.rp_nao_processados.l3
+      sign: +
+    - rule: bo.rp_nao_processados.l4
+      sign: +
+- rule_id: bo.rp_nao_processados.l2
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: RP_NAO_PROCESSADOS
+    descricao: Execução de Restos a Pagar Não Processados
+  linha:
+    codigo: L2
+    descricao: Pessoal e Encargos Sociais
+    nivel: 2
+    ordem: 2
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro da Execução dos Restos a Pagar Não Processados
+    row: L2
+  evidence:
+    page: 12
+    text: 'L2 Pessoal e Encargos Sociais ND: 3.1.00.00'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B1
+    reading:
+      adopted_from_page: 12
+      note: B1 — 5.3.1.3.0.00.00 consta na fórmula da coluna (a) mas não no PCASP atual; conta descontinuada
+        em edições posteriores a 2019, preservada por decisão do PO.
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 3.1.00.00
+      pattern: '31'
+  columns: &id001
+    inscritos_exerc_anteriores:
+      label: Inscritos — Em Exercícios Anteriores (a)
+      accounts:
+      - literal: 5.3.1.2.0.00.00
+        pattern: '5312'
+        sign: +
+      - literal: 5.3.1.3.0.00.00
+        pattern: '5313'
+        sign: +
+      - literal: 5.3.1.6.0.00.00
+        pattern: '5316'
+        sign: +
+      - literal: 6.3.1.6.0.00.00
+        pattern: '6316'
+        sign: '-'
+    inscritos_31_dez:
+      label: Inscritos — Em 31 de Dezembro do Exercício Anterior (b)
+      accounts:
+      - literal: 5.3.1.1.0.00.00
+        pattern: '5311'
+        sign: +
+    liquidados:
+      label: Liquidados (c)
+      accounts:
+      - literal: 6.3.1.3.0.00.00
+        pattern: '6313'
+        sign: +
+      - literal: 6.3.1.4.0.00.00
+        pattern: '6314'
+        sign: +
+    pagos:
+      label: Pagos (d)
+      accounts:
+      - literal: 6.3.1.4.0.00.00
+        pattern: '6314'
+        sign: +
+    cancelados:
+      label: Cancelados (e)
+      accounts:
+      - literal: 6.3.1.9.0.00.00
+        pattern: '6319'
+        sign: +
+    saldo_a_pagar:
+      label: Saldo a Pagar f = (a+b-d-e)
+      calculation:
+        references:
+        - column: inscritos_exerc_anteriores
+          sign: +
+        - column: inscritos_31_dez
+          sign: +
+        - column: pagos
+          sign: '-'
+        - column: cancelados
+          sign: '-'
+- rule_id: bo.rp_nao_processados.l3
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: RP_NAO_PROCESSADOS
+    descricao: Execução de Restos a Pagar Não Processados
+  linha:
+    codigo: L3
+    descricao: Juros e Encargos da Dívida
+    nivel: 2
+    ordem: 3
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro da Execução dos Restos a Pagar Não Processados
+    row: L3
+  evidence:
+    page: 12
+    text: 'L3 Juros e Encargos da Dívida ND: 3.2.00.00'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B1
+    reading:
+      adopted_from_page: 12
+      note: B1 — 5.3.1.3.0.00.00 consta na fórmula da coluna (a) mas não no PCASP atual; conta descontinuada
+        em edições posteriores a 2019, preservada por decisão do PO.
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 3.2.00.00
+      pattern: '32'
+  columns: *id001
+- rule_id: bo.rp_nao_processados.l4
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: RP_NAO_PROCESSADOS
+    descricao: Execução de Restos a Pagar Não Processados
+  linha:
+    codigo: L4
+    descricao: Outras Despesas Correntes
+    nivel: 2
+    ordem: 4
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro da Execução dos Restos a Pagar Não Processados
+    row: L4
+  evidence:
+    page: 12
+    text: 'L4 Outras Despesas Correntes ND: 3.3.00.00'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B1
+    reading:
+      adopted_from_page: 12
+      note: B1 — 5.3.1.3.0.00.00 consta na fórmula da coluna (a) mas não no PCASP atual; conta descontinuada
+        em edições posteriores a 2019, preservada por decisão do PO.
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 3.3.00.00
+      pattern: '33'
+  columns: *id001
+- rule_id: bo.rp_nao_processados.l5
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: RP_NAO_PROCESSADOS
+    descricao: Execução de Restos a Pagar Não Processados
+  linha:
+    codigo: L5
+    descricao: Despesas De Capital
+    nivel: 1
+    ordem: 5
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro da Execução dos Restos a Pagar Não Processados
+    row: L5
+  evidence:
+    page: 12
+    text: L5 Despesas De Capital (L6 + L7 + L8)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.rp_nao_processados.l6
+      sign: +
+    - rule: bo.rp_nao_processados.l7
+      sign: +
+    - rule: bo.rp_nao_processados.l8
+      sign: +
+- rule_id: bo.rp_nao_processados.l6
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: RP_NAO_PROCESSADOS
+    descricao: Execução de Restos a Pagar Não Processados
+  linha:
+    codigo: L6
+    descricao: Investimentos
+    nivel: 2
+    ordem: 6
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro da Execução dos Restos a Pagar Não Processados
+    row: L6
+  evidence:
+    page: 12
+    text: 'L6 Investimentos ND: 4.4.00.00'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B1
+    reading:
+      adopted_from_page: 12
+      note: B1 — 5.3.1.3.0.00.00 consta na fórmula da coluna (a) mas não no PCASP atual; conta descontinuada
+        em edições posteriores a 2019, preservada por decisão do PO.
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 4.4.00.00
+      pattern: '44'
+  columns: *id001
+- rule_id: bo.rp_nao_processados.l7
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: RP_NAO_PROCESSADOS
+    descricao: Execução de Restos a Pagar Não Processados
+  linha:
+    codigo: L7
+    descricao: Inversões Financeiras
+    nivel: 2
+    ordem: 7
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro da Execução dos Restos a Pagar Não Processados
+    row: L7
+  evidence:
+    page: 12
+    text: 'L7 Inversões Financeiras ND: 4.5.00.00'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B1
+    reading:
+      adopted_from_page: 12
+      note: B1 — 5.3.1.3.0.00.00 consta na fórmula da coluna (a) mas não no PCASP atual; conta descontinuada
+        em edições posteriores a 2019, preservada por decisão do PO.
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 4.5.00.00
+      pattern: '45'
+  columns: *id001
+- rule_id: bo.rp_nao_processados.l8
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: RP_NAO_PROCESSADOS
+    descricao: Execução de Restos a Pagar Não Processados
+  linha:
+    codigo: L8
+    descricao: Amortização Da Dívida
+    nivel: 2
+    ordem: 8
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro da Execução dos Restos a Pagar Não Processados
+    row: L8
+  evidence:
+    page: 12
+    text: 'L8 Amortização Da Dívida ND: 4.6.00.00'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B1
+    reading:
+      adopted_from_page: 12
+      note: B1 — 5.3.1.3.0.00.00 consta na fórmula da coluna (a) mas não no PCASP atual; conta descontinuada
+        em edições posteriores a 2019, preservada por decisão do PO.
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 4.6.00.00
+      pattern: '46'
+  columns: *id001
+- rule_id: bo.rp_nao_processados.l9
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: RP_NAO_PROCESSADOS
+    descricao: Execução de Restos a Pagar Não Processados
+  linha:
+    codigo: L9
+    descricao: TOTAL
+    nivel: 1
+    ordem: 9
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro da Execução dos Restos a Pagar Não Processados
+    row: L9
+  evidence:
+    page: 12
+    text: L9 TOTAL (L1 + L5)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.rp_nao_processados.l1
+      sign: +
+    - rule: bo.rp_nao_processados.l5
+      sign: +

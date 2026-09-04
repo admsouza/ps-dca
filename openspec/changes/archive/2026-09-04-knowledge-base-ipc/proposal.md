@@ -1,3 +1,18 @@
+> **ARQUIVADA EM 2026-09-04 — SUCEDIDA, NAO IMPLEMENTADA.**
+>
+> Esta change foi substituida por changes separadas por documento, comecando pela
+> `ipc07-bo-regras-canonicas` (SPEC aprovada pelo PO em 2026-09-04). O motivo: as 309 linhas dos 5
+> IPCs num unico escopo tornavam o gate de aprovacao grande demais para ser decidido de uma vez, e
+> as ambiguidades de cada documento so aparecem quando ele e transcrito.
+>
+> **Destino dos artefatos compartilhados** (decisao do PO, 2026-09-04): `knowledge/schemas/*.json`,
+> `knowledge/sources/<ipc>/metadata.yaml`, `knowledge/sources/stn/metadata.yaml` e
+> `scripts/check_sources.py` sao criados pela `ipc07-bo-regras-canonicas` (tasks 3.1 e 3.2), que e a
+> primeira a precisar deles. As changes dos IPC 04, 05, 06 e 08 os estendem, nao os recriam.
+>
+> O conteudo abaixo permanece como registro da analise de descoberta que originou as changes por
+> IPC. Nada aqui e escopo ativo.
+
 # Proposal — Base canônica de regras contábeis a partir dos IPC 04–08
 
 **Status:** proposta

@@ -1,0 +1,39 @@
+# Regras gerais do Balanço Orçamentário — IPC 07, p. 6.
+policies:
+- policy_id: ipc07.receita_liquida_de_deducoes
+  descricao: No Quadro Principal, as receitas são informadas pelos valores líquidos das respectivas deduções
+    (restituições, descontos, retificações, deduções para o Fundeb, repartições de receita tributária
+    entre entes), quando registradas como dedução.
+  aplica_a:
+    demonstrativo: BO
+    quadro: QUADRO_PRINCIPAL
+    grupo: RECEITAS
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 6
+    section: INSTRUÇÕES PARA PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '19'
+  evidence:
+    page: 6
+    text: as receitas são informadas pelos valores líquidos das respectivas deduções, tais como restituições,
+      descontos, retificações, deduções para o Fundeb e repartições de receita tributária entre os entes
+      da Federação, quando registradas como dedução
+  status: extracted
+- policy_id: ipc07.refinanciamento_destacado
+  descricao: Os valores de refinanciamento da dívida mobiliária e de outras dívidas constam destacadamente
+    nas receitas de operações de crédito e, no mesmo nível de agregação, nas despesas de amortização da
+    dívida.
+  aplica_a:
+    demonstrativo: BO
+    quadro: QUADRO_PRINCIPAL
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 6
+    section: INSTRUÇÕES PARA PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '15'
+  evidence:
+    page: 6
+    text: o refinanciamento ... constam destacadamente ... no mesmo nível de agregação
+  status: extracted

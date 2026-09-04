@@ -1,0 +1,2722 @@
+# Quadro Principal do Balanço Orçamentário — IPC 07, pp. 8–11.
+# 51 linhas: L1–L30 receitas (4 colunas), L31–L51 despesas (6 colunas).
+# Gerado por transcrição assistida a partir de knowledge/sources/ipc07/extracted.md.
+# A fonte canônica é este arquivo; o PDF é a origem normativa.
+rules:
+- rule_id: bo.quadro_principal.receitas.l1
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L1
+    descricao: Receitas Correntes (I)
+    nivel: 1
+    ordem: 1
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L1
+  evidence:
+    page: 8
+    text: L1 Receitas Correntes (I) (L2 + L3 + L4 + L5 + L6 + L7+ L8 + L9)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.receitas.l2
+      sign: +
+    - rule: bo.quadro_principal.receitas.l3
+      sign: +
+    - rule: bo.quadro_principal.receitas.l4
+      sign: +
+    - rule: bo.quadro_principal.receitas.l5
+      sign: +
+    - rule: bo.quadro_principal.receitas.l6
+      sign: +
+    - rule: bo.quadro_principal.receitas.l7
+      sign: +
+    - rule: bo.quadro_principal.receitas.l8
+      sign: +
+    - rule: bo.quadro_principal.receitas.l9
+      sign: +
+- rule_id: bo.quadro_principal.receitas.l2
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L2
+    descricao: Impostos, Taxas e Contribuições de Melhoria
+    nivel: 2
+    ordem: 2
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L2
+  evidence:
+    page: 8
+    text: L2 Impostos, Taxas e Contribuições de Melhoria 1100.00.00; 7100.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 1100.00.00
+      pattern: '11'
+    - literal: 7100.00.00
+      pattern: '71'
+  columns: &id001
+    previsao_inicial:
+      label: Previsão Inicial (a)
+      accounts:
+      - literal: 5.2.1.1.0.00.00
+        pattern: '5211'
+        sign: +
+    previsao_atualizada:
+      label: Previsão Atualizada (b)
+      accounts:
+      - literal: 5.2.1.1.0.00.00
+        pattern: '5211'
+        sign: +
+      - literal: 5.2.1.2.0.00.00
+        pattern: '5212'
+        sign: +
+    receitas_realizadas:
+      label: Receitas Realizadas (c)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo: &id002
+      label: SALDO (d) = (c-b)
+      calculation:
+        references:
+        - column: receitas_realizadas
+          sign: +
+        - column: previsao_atualizada
+          sign: '-'
+- rule_id: bo.quadro_principal.receitas.l3
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L3
+    descricao: Receita de Contribuições
+    nivel: 2
+    ordem: 3
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L3
+  evidence:
+    page: 8
+    text: L3 Receita de Contribuições 1200.00.00; 7200.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 1200.00.00
+      pattern: '12'
+    - literal: 7200.00.00
+      pattern: '72'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l4
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L4
+    descricao: Receita Patrimonial
+    nivel: 2
+    ordem: 4
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L4
+  evidence:
+    page: 8
+    text: L4 Receita Patrimonial 1300.00.00; 7300.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 1300.00.00
+      pattern: '13'
+    - literal: 7300.00.00
+      pattern: '73'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l5
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L5
+    descricao: Receita Agropecuária
+    nivel: 2
+    ordem: 5
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L5
+  evidence:
+    page: 8
+    text: L5 Receita Agropecuária 1400.00.00; 7400.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 1400.00.00
+      pattern: '14'
+    - literal: 7400.00.00
+      pattern: '74'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l6
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L6
+    descricao: Receita Industrial
+    nivel: 2
+    ordem: 6
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L6
+  evidence:
+    page: 8
+    text: L6 Receita Industrial 1500.00.00; 7500.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 1500.00.00
+      pattern: '15'
+    - literal: 7500.00.00
+      pattern: '75'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l7
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L7
+    descricao: Receita de Serviços
+    nivel: 2
+    ordem: 7
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L7
+  evidence:
+    page: 8
+    text: L7 Receita de Serviços 1600.00.00; 7600.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 1600.00.00
+      pattern: '16'
+    - literal: 7600.00.00
+      pattern: '76'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l8
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L8
+    descricao: Transferências Correntes
+    nivel: 2
+    ordem: 8
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L8
+  evidence:
+    page: 8
+    text: L8 Transferências Correntes 1700.00.00; 7700.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 1700.00.00
+      pattern: '17'
+    - literal: 7700.00.00
+      pattern: '77'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l9
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L9
+    descricao: Outras Receitas Correntes
+    nivel: 2
+    ordem: 9
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L9
+  evidence:
+    page: 8
+    text: L9 Outras Receitas Correntes 1900.00.00; 7900.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 1900.00.00
+      pattern: '19'
+    - literal: 7900.00.00
+      pattern: '79'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l10
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L10
+    descricao: Receitas de Capital (II)
+    nivel: 1
+    ordem: 10
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L10
+  evidence:
+    page: 9
+    text: L10 Receitas de Capital (II) (L11 + L12 + L13 + L14 + L15)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.receitas.l11
+      sign: +
+    - rule: bo.quadro_principal.receitas.l12
+      sign: +
+    - rule: bo.quadro_principal.receitas.l13
+      sign: +
+    - rule: bo.quadro_principal.receitas.l14
+      sign: +
+    - rule: bo.quadro_principal.receitas.l15
+      sign: +
+- rule_id: bo.quadro_principal.receitas.l11
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L11
+    descricao: Operações de Crédito
+    nivel: 2
+    ordem: 11
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L11
+  evidence:
+    page: 9
+    text: L11 Operações de Crédito 2100.00.00; 8100.00.00 | 2111.00.20;8111.00.20; 2118.01.60;8118.01.60;
+      2121.00.20;8121.00.20; 2128.01.60;8128.01.60
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B3
+    reading:
+      adopted_from_page: 9
+      note: 'Os 8 códigos de exclusão são padrões de conta PCASP do refinanciamento, não naturezas de
+        receita (decisão B3 do PO). Ausentes do PCASP atual: exceção histórica da edição 2019.'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 2100.00.00
+      pattern: '21'
+    - literal: 8100.00.00
+      pattern: '81'
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2111.00.20
+      pattern: '2111002'
+    - literal: 8111.00.20
+      pattern: '8111002'
+    - literal: 2118.01.60
+      pattern: '2118016'
+    - literal: 8118.01.60
+      pattern: '8118016'
+    - literal: 2121.00.20
+      pattern: '2121002'
+    - literal: 8121.00.20
+      pattern: '8121002'
+    - literal: 2128.01.60
+      pattern: '2128016'
+    - literal: 8128.01.60
+      pattern: '8128016'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l12
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L12
+    descricao: Alienação de Bens
+    nivel: 2
+    ordem: 12
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L12
+  evidence:
+    page: 9
+    text: L12 Alienação de Bens 2200.00.00; 8200.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 2200.00.00
+      pattern: '22'
+    - literal: 8200.00.00
+      pattern: '82'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l13
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L13
+    descricao: Amortização de Empréstimos
+    nivel: 2
+    ordem: 13
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L13
+  evidence:
+    page: 9
+    text: L13 Amortização de Empréstimos 2300.00.00; 8300.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 2300.00.00
+      pattern: '23'
+    - literal: 8300.00.00
+      pattern: '83'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l14
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L14
+    descricao: Transferências de Capital
+    nivel: 2
+    ordem: 14
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L14
+  evidence:
+    page: 9
+    text: L14 Transferências de Capital 2400.00.00; 8400.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 2400.00.00
+      pattern: '24'
+    - literal: 8400.00.00
+      pattern: '84'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l15
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L15
+    descricao: Outras Receitas de Capital
+    nivel: 2
+    ordem: 15
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L15
+  evidence:
+    page: 9
+    text: L15 Outras Receitas de Capital 2900.00.00; 8900.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc07.receita_liquida_de_deducoes
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 2900.00.00
+      pattern: '29'
+    - literal: 8900.00.00
+      pattern: '89'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l16
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L16
+    descricao: SUBTOTAL DAS RECEITAS (III) = (I + II)
+    nivel: 1
+    ordem: 16
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L16
+  evidence:
+    page: 9
+    text: L16 SUBTOTAL DAS RECEITAS (III) = (I + II) (L1 + L10)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.receitas.l1
+      sign: +
+    - rule: bo.quadro_principal.receitas.l10
+      sign: +
+- rule_id: bo.quadro_principal.receitas.l17
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L17
+    descricao: Operações de Crédito/Refinanciamento (IV)
+    nivel: 1
+    ordem: 17
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L17
+  evidence:
+    page: 9
+    text: L17 Operações de Crédito/ Refinanciamento (IV) (L18 + L21)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.receitas.l18
+      sign: +
+    - rule: bo.quadro_principal.receitas.l21
+      sign: +
+- rule_id: bo.quadro_principal.receitas.l18
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L18
+    descricao: Operações de Crédito Internas
+    nivel: 1
+    ordem: 18
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L18
+  evidence:
+    page: 9
+    text: L18 Operações de Crédito Internas (L19 + L20)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.receitas.l19
+      sign: +
+    - rule: bo.quadro_principal.receitas.l20
+      sign: +
+- rule_id: bo.quadro_principal.receitas.l19
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L19
+    descricao: Mobiliária
+    nivel: 3
+    ordem: 19
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L19
+  evidence:
+    page: 9
+    text: L19 Mobiliária 2111.00.2.0;8111.00.2.0
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B3
+    reading:
+      adopted_from_page: 9
+      note: Padrão de conta PCASP do refinanciamento (B3); a grafia com ponto extra normaliza para os
+        mesmos dígitos da exclusão de L11 (R6).
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: conta_contabil
+    operator: in
+    values:
+    - literal: 2111.00.2.0
+      pattern: '2111002'
+    - literal: 8111.00.2.0
+      pattern: '8111002'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l20
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L20
+    descricao: Contratual
+    nivel: 3
+    ordem: 20
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L20
+  evidence:
+    page: 9
+    text: L20 Contratual 2118.01.6.0;8118.01.6.0
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B3
+    reading:
+      adopted_from_page: 9
+      note: Padrão de conta PCASP do refinanciamento (B3); a grafia com ponto extra normaliza para os
+        mesmos dígitos da exclusão de L11 (R6).
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: conta_contabil
+    operator: in
+    values:
+    - literal: 2118.01.6.0
+      pattern: '2118016'
+    - literal: 8118.01.6.0
+      pattern: '8118016'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l21
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L21
+    descricao: Operações de Crédito Externas
+    nivel: 1
+    ordem: 21
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L21
+  evidence:
+    page: 9
+    text: L21 Operações de Crédito Externas (L22 + L23)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.receitas.l22
+      sign: +
+    - rule: bo.quadro_principal.receitas.l23
+      sign: +
+- rule_id: bo.quadro_principal.receitas.l22
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L22
+    descricao: Mobiliária
+    nivel: 3
+    ordem: 22
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L22
+  evidence:
+    page: 9
+    text: L22 Mobiliária 2121.00.2.0;8121.00.2.0
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B3
+    reading:
+      adopted_from_page: 9
+      note: Padrão de conta PCASP do refinanciamento (B3); a grafia com ponto extra normaliza para os
+        mesmos dígitos da exclusão de L11 (R6).
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: conta_contabil
+    operator: in
+    values:
+    - literal: 2121.00.2.0
+      pattern: '2121002'
+    - literal: 8121.00.2.0
+      pattern: '8121002'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l23
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L23
+    descricao: Contratual
+    nivel: 3
+    ordem: 23
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L23
+  evidence:
+    page: 9
+    text: L23 Contratual 2128.01.6.0;8128.01.6.0
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B3
+    reading:
+      adopted_from_page: 9
+      note: Padrão de conta PCASP do refinanciamento (B3); a grafia com ponto extra normaliza para os
+        mesmos dígitos da exclusão de L11 (R6).
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: conta_contabil
+    operator: in
+    values:
+    - literal: 2128.01.6.0
+      pattern: '2128016'
+    - literal: 8128.01.6.0
+      pattern: '8128016'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l24
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L24
+    descricao: SUBTOTAL COM REFINANCIAMENTO (V) = (III + IV)
+    nivel: 1
+    ordem: 24
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L24
+  evidence:
+    page: 9
+    text: L24 SUBTOTAL COM REFINANCIAMENTO (V) = (III + IV) (L16+ L17)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.receitas.l16
+      sign: +
+    - rule: bo.quadro_principal.receitas.l17
+      sign: +
+- rule_id: bo.quadro_principal.receitas.l25
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L25
+    descricao: Déficit (VI)
+    nivel: 1
+    ordem: 25
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L25
+  evidence:
+    page: 9
+    text: L25 Déficit (VI) (L48 - L24) Somente quando o resultado for deficitário
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.despesas.l48
+      sign: +
+    - rule: bo.quadro_principal.receitas.l24
+      sign: '-'
+    condition:
+      when: result_positive
+- rule_id: bo.quadro_principal.receitas.l26
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L26
+    descricao: TOTAL (VII) = (V + VI)
+    nivel: 1
+    ordem: 26
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L26
+  evidence:
+    page: 9
+    text: L26 TOTAL (VII) = (V + VI) (L24 + L25)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.receitas.l24
+      sign: +
+    - rule: bo.quadro_principal.receitas.l25
+      sign: +
+- rule_id: bo.quadro_principal.receitas.l27
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L27
+    descricao: Saldos de Exercícios Anteriores
+    nivel: 1
+    ordem: 27
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L27
+  evidence:
+    page: 9
+    text: L27 Saldos de Exercícios Anteriores (L28 + L29 + L30)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B6
+    reading:
+      adopted_from_page: 9
+      note: A ESTRUTURA (p. 15) não marca coluna para L28–L30; a seção REGRAS prevalece por decisão B6
+        do PO (2026-09-03).
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.receitas.l28
+      sign: +
+    - rule: bo.quadro_principal.receitas.l29
+      sign: +
+    - rule: bo.quadro_principal.receitas.l30
+      sign: +
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l28
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L28
+    descricao: Recursos Arrecadados em Exercícios Anteriores
+    nivel: 2
+    ordem: 28
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L28
+  evidence:
+    page: 9
+    text: L28 Recursos Arrecadados em Exercícios Anteriores 9990.00.00
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B6
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: 9990.00.00
+      pattern: '999'
+  columns: *id001
+- rule_id: bo.quadro_principal.receitas.l29
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L29
+    descricao: Superávit Financeiro
+    nivel: 2
+    ordem: 29
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L29
+  evidence:
+    page: 9
+    text: 'L29 Superávit Financeiro Conta contábil: 5.2.2.1.3.01.00'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B6
+    reading:
+      adopted_from_page: 9
+      note: B5 — a conta declarada na linha substitui as contas padrão da coluna. B6 — mantém as 4 colunas
+        de receita.
+  status: extracted
+  review:
+    required: true
+  columns:
+    previsao_inicial:
+      label: Previsão Inicial (a)
+      accounts:
+      - literal: 5.2.2.1.3.01.00
+        pattern: '5221301'
+        sign: +
+    previsao_atualizada:
+      label: Previsão Atualizada (b)
+      accounts:
+      - literal: 5.2.2.1.3.01.00
+        pattern: '5221301'
+        sign: +
+    receitas_realizadas:
+      label: Receitas Realizadas (c)
+      accounts:
+      - literal: 5.2.2.1.3.01.00
+        pattern: '5221301'
+        sign: +
+    saldo: *id002
+  line_account_override: true
+- rule_id: bo.quadro_principal.receitas.l30
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RECEITAS
+    descricao: Receitas Orçamentárias
+  linha:
+    codigo: L30
+    descricao: Reabertura de Créditos Adicionais
+    nivel: 2
+    ordem: 30
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L30
+  evidence:
+    page: 9
+    text: 'L30 Reabertura de Créditos Adicionais Contas contábeis: 5.2.2.1.2.02.02; 5.2.2.1.2.03.02; 5.2.2.1.2.02.03;
+      5.2.2.1.2.03.03'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B6
+    reading:
+      adopted_from_page: 9
+      note: B5 — contas da linha substituem as da coluna. B6 — mantém as 4 colunas.
+  status: extracted
+  review:
+    required: true
+  columns:
+    previsao_inicial:
+      label: Previsão Inicial (a)
+      accounts:
+      - literal: 5.2.2.1.2.02.02
+        pattern: '522120202'
+        sign: +
+      - literal: 5.2.2.1.2.03.02
+        pattern: '522120302'
+        sign: +
+      - literal: 5.2.2.1.2.02.03
+        pattern: '522120203'
+        sign: +
+      - literal: 5.2.2.1.2.03.03
+        pattern: '522120303'
+        sign: +
+    previsao_atualizada:
+      label: Previsão Atualizada (b)
+      accounts:
+      - literal: 5.2.2.1.2.02.02
+        pattern: '522120202'
+        sign: +
+      - literal: 5.2.2.1.2.03.02
+        pattern: '522120302'
+        sign: +
+      - literal: 5.2.2.1.2.02.03
+        pattern: '522120203'
+        sign: +
+      - literal: 5.2.2.1.2.03.03
+        pattern: '522120303'
+        sign: +
+    receitas_realizadas:
+      label: Receitas Realizadas (c)
+      accounts:
+      - literal: 5.2.2.1.2.02.02
+        pattern: '522120202'
+        sign: +
+      - literal: 5.2.2.1.2.03.02
+        pattern: '522120302'
+        sign: +
+      - literal: 5.2.2.1.2.02.03
+        pattern: '522120203'
+        sign: +
+      - literal: 5.2.2.1.2.03.03
+        pattern: '522120303'
+        sign: +
+    saldo: *id002
+  line_account_override: true
+- rule_id: bo.quadro_principal.despesas.l31
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L31
+    descricao: Despesas Correntes (VIII)
+    nivel: 1
+    ordem: 1
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L31
+  evidence:
+    page: 10
+    text: L31 Despesas Correntes (-VIII) (L32 + L33 + L34)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.despesas.l32
+      sign: +
+    - rule: bo.quadro_principal.despesas.l33
+      sign: +
+    - rule: bo.quadro_principal.despesas.l34
+      sign: +
+- rule_id: bo.quadro_principal.despesas.l32
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L32
+    descricao: Pessoal e Encargos Sociais
+    nivel: 2
+    ordem: 2
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L32
+  evidence:
+    page: 10
+    text: 'L32 Pessoal e Encargos Sociais ND: 3.1.00.00.00'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 3.1.00.00.00
+      pattern: '31'
+  columns: &id003
+    dotacao_inicial:
+      label: Dotação Inicial (e)
+      accounts:
+      - literal: 5.2.2.1.1.00.00
+        pattern: '52211'
+        sign: +
+    dotacao_atualizada:
+      label: Dotação Atualizada (f)
+      accounts:
+      - literal: 5.2.2.1.1.00.00
+        pattern: '52211'
+        sign: +
+      - literal: 5.2.2.1.2.00.00
+        pattern: '52212'
+        sign: +
+      - literal: 5.2.2.1.9.00.00
+        pattern: '52219'
+        sign: +
+    empenhadas:
+      label: Despesas Empenhadas (g)
+      accounts:
+      - literal: 6.2.2.1.3.01.00
+        pattern: '6221301'
+        sign: +
+      - literal: 6.2.2.1.3.02.00
+        pattern: '6221302'
+        sign: +
+      - literal: 6.2.2.1.3.03.00
+        pattern: '6221303'
+        sign: +
+      - literal: 6.2.2.1.3.04.00
+        pattern: '6221304'
+        sign: +
+      - literal: 6.2.2.1.3.05.00
+        pattern: '6221305'
+        sign: +
+      - literal: 6.2.2.1.3.06.00
+        pattern: '6221306'
+        sign: +
+      - literal: 6.2.2.1.3.07.00
+        pattern: '6221307'
+        sign: +
+    liquidadas:
+      label: Despesas Liquidadas (h)
+      accounts:
+      - literal: 6.2.2.1.3.03.00
+        pattern: '6221303'
+        sign: +
+      - literal: 6.2.2.1.3.04.00
+        pattern: '6221304'
+        sign: +
+      - literal: 6.2.2.1.3.07.00
+        pattern: '6221307'
+        sign: +
+    pagas:
+      label: Despesas Pagas (i)
+      accounts:
+      - literal: 6.2.2.1.3.04.00
+        pattern: '6221304'
+        sign: +
+    saldo_dotacao:
+      label: Saldo da Dotação (j) = (f-g)
+      calculation:
+        references:
+        - column: dotacao_atualizada
+          sign: +
+        - column: empenhadas
+          sign: '-'
+- rule_id: bo.quadro_principal.despesas.l33
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L33
+    descricao: Juros e Encargos da Dívida
+    nivel: 2
+    ordem: 3
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L33
+  evidence:
+    page: 10
+    text: 'L33 Juros e Encargos da Dívida ND: 3.2.00.00.00'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 3.2.00.00.00
+      pattern: '32'
+  columns: *id003
+- rule_id: bo.quadro_principal.despesas.l34
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L34
+    descricao: Outras Despesas Correntes
+    nivel: 2
+    ordem: 4
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L34
+  evidence:
+    page: 10
+    text: 'L34 Outras Despesas Correntes ND: 3.3.00.00.00'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 3.3.00.00.00
+      pattern: '33'
+  columns: *id003
+- rule_id: bo.quadro_principal.despesas.l35
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L35
+    descricao: Despesas de Capital (IX)
+    nivel: 1
+    ordem: 5
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L35
+  evidence:
+    page: 10
+    text: L35 Despesas de Capital (IX) (L36 + L37 + L38)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.despesas.l36
+      sign: +
+    - rule: bo.quadro_principal.despesas.l37
+      sign: +
+    - rule: bo.quadro_principal.despesas.l38
+      sign: +
+- rule_id: bo.quadro_principal.despesas.l36
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L36
+    descricao: Investimentos
+    nivel: 2
+    ordem: 6
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L36
+  evidence:
+    page: 10
+    text: 'L36 Investimentos ND: 4.4.00.00.00'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 4.4.00.00.00
+      pattern: '44'
+  columns: *id003
+- rule_id: bo.quadro_principal.despesas.l37
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L37
+    descricao: Inversões Financeiras
+    nivel: 2
+    ordem: 7
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L37
+  evidence:
+    page: 10
+    text: 'L37 Inversões Financeiras ND: 4.5.00.00.00'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 4.5.00.00.00
+      pattern: '45'
+  columns: *id003
+- rule_id: bo.quadro_principal.despesas.l38
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L38
+    descricao: Amortização da Dívida
+    nivel: 2
+    ordem: 8
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L38
+  evidence:
+    page: 10
+    text: 'L38 Amortização da Dívida ND: 4.6.00.00.00 | ND: 46.xx.76, Função: 28.841, 28.842, 28.843,
+      28.844 | ND: 46.xx.77, Função: 28.841, 28.842, 28.843, 28.844 e 28.846'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    reading:
+      adopted_from_page: 10
+      note: 'Dois grupos independentes (D2): achatar as listas excluiria o produto cartesiano, mais do
+        que o documento manda. A união dos grupos é exatamente o que L43, L44, L46 e L47 capturam (R7).'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 4.6.00.00.00
+      pattern: '46'
+  exclusion_groups:
+  - - field: natureza_despesa
+      operator: not_in
+      values:
+      - literal: 46.xx.76
+        pattern: 46xx76
+    - field: funcao
+      operator: not_in
+      values:
+      - literal: '28.841'
+        pattern: '28'
+    - field: subfuncao
+      operator: not_in
+      values:
+      - literal: '28.841'
+        pattern: '841'
+      - literal: '28.842'
+        pattern: '842'
+      - literal: '28.843'
+        pattern: '843'
+      - literal: '28.844'
+        pattern: '844'
+  - - field: natureza_despesa
+      operator: not_in
+      values:
+      - literal: 46.xx.77
+        pattern: 46xx77
+    - field: funcao
+      operator: not_in
+      values:
+      - literal: '28.841'
+        pattern: '28'
+    - field: subfuncao
+      operator: not_in
+      values:
+      - literal: '28.841'
+        pattern: '841'
+      - literal: '28.842'
+        pattern: '842'
+      - literal: '28.843'
+        pattern: '843'
+      - literal: '28.844'
+        pattern: '844'
+      - literal: '28.846'
+        pattern: '846'
+  columns: *id003
+- rule_id: bo.quadro_principal.despesas.l39
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L39
+    descricao: Reserva de Contingência (X)
+    nivel: 2
+    ordem: 9
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L39
+  evidence:
+    page: 10
+    text: 'L39 Reserva de Contingência (X) ND: 9.9.00.00.00, Função: 99.999'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 9.9.00.00.00
+      pattern: '99'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '99.999'
+      pattern: '99'
+  - field: subfuncao
+    operator: in
+    values:
+    - literal: '99.999'
+      pattern: '999'
+  columns: *id003
+- rule_id: bo.quadro_principal.despesas.l40
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L40
+    descricao: SUBTOTAL DAS DESPESAS (XI) = (VIII + IX + X)
+    nivel: 1
+    ordem: 10
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L-40
+  evidence:
+    page: 10
+    text: L-40 SUBTOTAL DAS DESPESAS (XI) = (VII + IX + X) (L31 + L35 + L39 + -)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    reading:
+      adopted_from_page: 15
+      note: 'R1: o hífen de `L-40` é espúrio, único entre as 69 linhas — preservado em source.row e evidence.
+        R3: a p. 10 grafa (VII + IX + X), mas VII é o TOTAL das receitas; a p. 15 grafa (VIII + IX + X),
+        a única leitura coerente. R4: o `+ -` final não é um quarto componente.'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.despesas.l31
+      sign: +
+    - rule: bo.quadro_principal.despesas.l35
+      sign: +
+    - rule: bo.quadro_principal.despesas.l39
+      sign: +
+- rule_id: bo.quadro_principal.despesas.l41
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L41
+    descricao: Amortização da Dívida / Refinanciamento (XII)
+    nivel: 1
+    ordem: 11
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L41
+  evidence:
+    page: 11
+    text: L41 Amortização da Dívida / Refinanciamento ( XII) (L42 + L45)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.despesas.l42
+      sign: +
+    - rule: bo.quadro_principal.despesas.l45
+      sign: +
+- rule_id: bo.quadro_principal.despesas.l42
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L42
+    descricao: Amortização da Dívida Interna
+    nivel: 1
+    ordem: 12
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L42
+  evidence:
+    page: 11
+    text: L42 Amortização da Dívida Interna (L43 + L44)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.despesas.l43
+      sign: +
+    - rule: bo.quadro_principal.despesas.l44
+      sign: +
+- rule_id: bo.quadro_principal.despesas.l43
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L43
+    descricao: Dívida Mobiliária
+    nivel: 3
+    ordem: 13
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L43
+  evidence:
+    page: 11
+    text: 'L43 Dívida Mobiliária ND: 46.xx.76, Função: 28.841 e 28.843'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 46.xx.76
+      pattern: 46xx76
+  - field: funcao
+    operator: in
+    values:
+    - literal: '28.841'
+      pattern: '28'
+  - field: subfuncao
+    operator: in
+    values:
+    - literal: '28.841'
+      pattern: '841'
+    - literal: '28.843'
+      pattern: '843'
+  columns: *id003
+- rule_id: bo.quadro_principal.despesas.l44
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L44
+    descricao: Outras Dívidas
+    nivel: 3
+    ordem: 14
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L44
+  evidence:
+    page: 11
+    text: 'L44 Outras Dívidas ND: 46.xx.77, Função: 28.841 e 28.843'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 46.xx.77
+      pattern: 46xx77
+  - field: funcao
+    operator: in
+    values:
+    - literal: '28.841'
+      pattern: '28'
+  - field: subfuncao
+    operator: in
+    values:
+    - literal: '28.841'
+      pattern: '841'
+    - literal: '28.843'
+      pattern: '843'
+  columns: *id003
+- rule_id: bo.quadro_principal.despesas.l45
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L45
+    descricao: Amortização da Dívida Externa
+    nivel: 1
+    ordem: 15
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L45
+  evidence:
+    page: 11
+    text: L45 Amortização da Dívida Externa (L46+ L47)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.despesas.l46
+      sign: +
+    - rule: bo.quadro_principal.despesas.l47
+      sign: +
+- rule_id: bo.quadro_principal.despesas.l46
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L46
+    descricao: Dívida Mobiliária
+    nivel: 3
+    ordem: 16
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L46
+  evidence:
+    page: 11
+    text: 'L46 Dívida Mobiliária ND: 46.xx.76, Função: 28.842 e 28.844'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 46.xx.76
+      pattern: 46xx76
+  - field: funcao
+    operator: in
+    values:
+    - literal: '28.842'
+      pattern: '28'
+  - field: subfuncao
+    operator: in
+    values:
+    - literal: '28.842'
+      pattern: '842'
+    - literal: '28.844'
+      pattern: '844'
+  columns: *id003
+- rule_id: bo.quadro_principal.despesas.l47
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L47
+    descricao: Outras Dívidas
+    nivel: 3
+    ordem: 17
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L47
+  evidence:
+    page: 11
+    text: 'L47 Outras Dívidas ND: 46.xx.77, Função: 28.842, - 28.844 e 28.846'
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    reading:
+      adopted_from_page: 11
+      note: 'R5: o hífen antes de 28.844 é espúrio — a leitura é 842, 844 e 846, sustentada pela simetria
+        com L44 e pela exclusão de L38.'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 46.xx.77
+      pattern: 46xx77
+  - field: funcao
+    operator: in
+    values:
+    - literal: '28.842'
+      pattern: '28'
+  - field: subfuncao
+    operator: in
+    values:
+    - literal: '28.842'
+      pattern: '842'
+    - literal: '28.844'
+      pattern: '844'
+    - literal: '28.846'
+      pattern: '846'
+  columns: *id003
+- rule_id: bo.quadro_principal.despesas.l48
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L48
+    descricao: SUBTOTAL COM REFINANCIAMENTO (XIII) = (XI + XII)
+    nivel: 1
+    ordem: 18
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L48
+  evidence:
+    page: 11
+    text: L48 SUBTOTAL COM REFINANCIAMENTO (XIII)= (XI+ XII) (L40 + L41)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.despesas.l40
+      sign: +
+    - rule: bo.quadro_principal.despesas.l41
+      sign: +
+- rule_id: bo.quadro_principal.despesas.l49
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L49
+    descricao: Superávit (XIV)
+    nivel: 1
+    ordem: 19
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L49
+  evidence:
+    page: 11
+    text: L49 Superávit ( XIV) (L24 - L48) Somente quando o resultado for superavitário
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.receitas.l24
+      sign: +
+    - rule: bo.quadro_principal.despesas.l48
+      sign: '-'
+    condition:
+      when: result_positive
+- rule_id: bo.quadro_principal.despesas.l50
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L50
+    descricao: TOTAL (XV) = (XIII + XIV)
+    nivel: 1
+    ordem: 20
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L50
+  evidence:
+    page: 11
+    text: L50 TOTAL ( XV) = ( XIII + XIV) (L48 + L49)
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bo.quadro_principal.despesas.l48
+      sign: +
+    - rule: bo.quadro_principal.despesas.l49
+      sign: +
+- rule_id: bo.quadro_principal.despesas.l51
+  demonstrativo:
+    codigo: BO
+    descricao: Balanço Orçamentário
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DESPESAS
+    descricao: Despesas Orçamentárias
+  linha:
+    codigo: L51
+    descricao: Reserva do RPPS
+    nivel: 2
+    ordem: 21
+  source:
+    document: IPC07
+    document_version: 2020-01
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO ORÇAMENTÁRIO
+    item: '23'
+    table: Quadro Principal
+    row: L51
+  evidence:
+    page: 11
+    text: L51 Reserva do RPPS ND 9.9.00.00.00 Função 99.997
+  version:
+    source_document: IPC07
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-04'
+    decision: B6
+    reading:
+      adopted_from_page: 15
+      note: 'A ESTRUTURA põe L51 depois de TOTAL (XV), sem coluna. Decisão B6 do PO (2026-09-03): L51
+        não tem coluna de valor; os filtros são preservados.'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: 9.9.00.00.00
+      pattern: '99'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '99.997'
+      pattern: '99'
+  - field: subfuncao
+    operator: in
+    values:
+    - literal: '99.997'
+      pattern: '997'
+  columns: {}

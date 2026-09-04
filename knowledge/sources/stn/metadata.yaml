@@ -1,0 +1,24 @@
+# Tabelas oficiais da STN usadas como domínio de validação.
+# Lidas, nunca alteradas. Hash divergente = erro, não aviso.
+tables:
+  - file: "docs/contas-stn/complemento-fonte.md"
+    records: 50
+    sha256: "83717ba6cdbb6760d5bdf1996e84866b7a8405fe3333cb2bf8d75ddeba81bfd7"
+  - file: "docs/contas-stn/fonte-recursos.md"
+    records: 101
+    sha256: "f9c5f0c9d01c40dd071d4d50d4f5a1f4b7dcb911445f00ea047a5fa056435469"
+  - file: "docs/contas-stn/funcao-subfuncao.md"
+    records: 117
+    sha256: "bb3b2d84ff401683d1b691e317ab8c3393bbf979bb7e24e8a7cb3b9c5f23853e"
+  - file: "docs/contas-stn/natureza-receita.md"
+    records: 4504
+    sha256: "21b6c701ada26312f829f0b076e458f9fad2d94cdc5a89faab0550ae6cb167a3"
+  - file: "docs/contas-stn/natureza_despesa.md"
+    records: 172
+    sha256: "4ebe9d2ead56befdc7d79a169d1ff457b93bcf233054d11be7f8dd4adff1c41e"
+  - file: "docs/contas-stn/PCASP.md"
+    records: 6119
+    sha256: "1e690ea5009fd9f162c982eba90d033aea23b0de2694b141be4d4f7f1df033a0"
+  - file: "docs/contas-stn/poder-orgao.md"
+    records: 92
+    sha256: "5453b474c8daa1c7b521e1f7ea7260b0245c6c27e21d1a6845081bbbaa7e17c1"

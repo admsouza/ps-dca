@@ -1,0 +1,485 @@
+{
+  "bo.quadro_principal.despesas.l31": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 10
+  },
+  "bo.quadro_principal.despesas.l32": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 10
+  },
+  "bo.quadro_principal.despesas.l33": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 10
+  },
+  "bo.quadro_principal.despesas.l34": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 10
+  },
+  "bo.quadro_principal.despesas.l35": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 10
+  },
+  "bo.quadro_principal.despesas.l36": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 10
+  },
+  "bo.quadro_principal.despesas.l37": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 10
+  },
+  "bo.quadro_principal.despesas.l38": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 10
+  },
+  "bo.quadro_principal.despesas.l39": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 10
+  },
+  "bo.quadro_principal.despesas.l40": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 10
+  },
+  "bo.quadro_principal.despesas.l41": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 11
+  },
+  "bo.quadro_principal.despesas.l42": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 11
+  },
+  "bo.quadro_principal.despesas.l43": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 11
+  },
+  "bo.quadro_principal.despesas.l44": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 11
+  },
+  "bo.quadro_principal.despesas.l45": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 11
+  },
+  "bo.quadro_principal.despesas.l46": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 11
+  },
+  "bo.quadro_principal.despesas.l47": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 11
+  },
+  "bo.quadro_principal.despesas.l48": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 11
+  },
+  "bo.quadro_principal.despesas.l49": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 11
+  },
+  "bo.quadro_principal.despesas.l50": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 11
+  },
+  "bo.quadro_principal.despesas.l51": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 11
+  },
+  "bo.quadro_principal.receitas.l1": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 8
+  },
+  "bo.quadro_principal.receitas.l10": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l11": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l12": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l13": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l14": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l15": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l16": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l17": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l18": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l19": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l2": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 8
+  },
+  "bo.quadro_principal.receitas.l20": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l21": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l22": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l23": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l24": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l25": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l26": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l27": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l28": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l29": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l3": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 8
+  },
+  "bo.quadro_principal.receitas.l30": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 9
+  },
+  "bo.quadro_principal.receitas.l4": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 8
+  },
+  "bo.quadro_principal.receitas.l5": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 8
+  },
+  "bo.quadro_principal.receitas.l6": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 8
+  },
+  "bo.quadro_principal.receitas.l7": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 8
+  },
+  "bo.quadro_principal.receitas.l8": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 8
+  },
+  "bo.quadro_principal.receitas.l9": {
+    "file": "rules/bo/quadro_principal.yaml",
+    "demonstrativo": "BO",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC07",
+    "page": 8
+  },
+  "bo.rp_nao_processados.l1": {
+    "file": "rules/bo/rp_nao_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_NAO_PROCESSADOS",
+    "document": "IPC07",
+    "page": 12
+  },
+  "bo.rp_nao_processados.l2": {
+    "file": "rules/bo/rp_nao_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_NAO_PROCESSADOS",
+    "document": "IPC07",
+    "page": 12
+  },
+  "bo.rp_nao_processados.l3": {
+    "file": "rules/bo/rp_nao_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_NAO_PROCESSADOS",
+    "document": "IPC07",
+    "page": 12
+  },
+  "bo.rp_nao_processados.l4": {
+    "file": "rules/bo/rp_nao_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_NAO_PROCESSADOS",
+    "document": "IPC07",
+    "page": 12
+  },
+  "bo.rp_nao_processados.l5": {
+    "file": "rules/bo/rp_nao_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_NAO_PROCESSADOS",
+    "document": "IPC07",
+    "page": 12
+  },
+  "bo.rp_nao_processados.l6": {
+    "file": "rules/bo/rp_nao_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_NAO_PROCESSADOS",
+    "document": "IPC07",
+    "page": 12
+  },
+  "bo.rp_nao_processados.l7": {
+    "file": "rules/bo/rp_nao_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_NAO_PROCESSADOS",
+    "document": "IPC07",
+    "page": 12
+  },
+  "bo.rp_nao_processados.l8": {
+    "file": "rules/bo/rp_nao_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_NAO_PROCESSADOS",
+    "document": "IPC07",
+    "page": 12
+  },
+  "bo.rp_nao_processados.l9": {
+    "file": "rules/bo/rp_nao_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_NAO_PROCESSADOS",
+    "document": "IPC07",
+    "page": 12
+  },
+  "bo.rp_processados.l1": {
+    "file": "rules/bo/rp_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_PROCESSADOS",
+    "document": "IPC07",
+    "page": 13
+  },
+  "bo.rp_processados.l2": {
+    "file": "rules/bo/rp_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_PROCESSADOS",
+    "document": "IPC07",
+    "page": 13
+  },
+  "bo.rp_processados.l3": {
+    "file": "rules/bo/rp_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_PROCESSADOS",
+    "document": "IPC07",
+    "page": 13
+  },
+  "bo.rp_processados.l4": {
+    "file": "rules/bo/rp_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_PROCESSADOS",
+    "document": "IPC07",
+    "page": 13
+  },
+  "bo.rp_processados.l5": {
+    "file": "rules/bo/rp_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_PROCESSADOS",
+    "document": "IPC07",
+    "page": 13
+  },
+  "bo.rp_processados.l6": {
+    "file": "rules/bo/rp_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_PROCESSADOS",
+    "document": "IPC07",
+    "page": 13
+  },
+  "bo.rp_processados.l7": {
+    "file": "rules/bo/rp_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_PROCESSADOS",
+    "document": "IPC07",
+    "page": 13
+  },
+  "bo.rp_processados.l8": {
+    "file": "rules/bo/rp_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_PROCESSADOS",
+    "document": "IPC07",
+    "page": 13
+  },
+  "bo.rp_processados.l9": {
+    "file": "rules/bo/rp_processados.yaml",
+    "demonstrativo": "BO",
+    "quadro": "RP_PROCESSADOS",
+    "document": "IPC07",
+    "page": 13
+  }
+}

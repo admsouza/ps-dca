@@ -1,0 +1,31 @@
+[project]
+name = "ps-dca"
+version = "0.1.0"
+description = "Processamento da DCA (Declaração de Contas Anuais — SICONFI/STN)"
+requires-python = ">=3.11"
+
+# Runtime da fase atual: base canônica de regras (ipc07-bo-regras-canonicas).
+# FastAPI/arq/SQLAlchemy entram nas fases F2 e F3 (change plataforma-pipeline-dca).
+dependencies = [
+    "pyyaml>=6.0",
+    "jsonschema>=4.25",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.16",
+    "pymupdf>=1.24",  # extração geométrica do PDF; uso manual, fora do CI
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
