@@ -1,7 +1,8 @@
 """Apuração da matriz — três passos, nesta ordem.
 
     (a) células     contas da coluna × filtros da linha
-    (b) agregações  linhas compostas, coluna a coluna, em ordem topológica
+    (b) agregações  linhas compostas, coluna a coluna, em ordem topológica — e, na mesma passagem,
+                    a guarda condicional da linha, para que quem a agregar já leia o estado final
     (c) derivadas   colunas calculadas de outras colunas da mesma linha
 
 Derivadas **depois** das agregações mantém `saldo = c − b` verdadeira também nos totais por
@@ -38,13 +39,11 @@ def apurar(mapa: MapaBO, registros: Sequence[Registro], direcao) -> Matriz:
         linha = linhas[rule_id]
         if linha.composta:
             matriz.valores[rule_id] = _agregar(linha, matriz, derivadas)
+        if linha.condicao:
+            _aplicar_condicao(linha, matriz)   # antes de quem a agrega ler o valor
 
     for linha in mapa.linhas:                                   # (c)
         _derivar(linha, matriz, derivadas)
-
-    for linha in mapa.linhas:
-        if linha.condicao:
-            _aplicar_condicao(linha, matriz)
 
     return matriz
 
@@ -108,9 +107,15 @@ def _agregar(linha: Linha, matriz: Matriz, derivadas: dict) -> dict[str, Decimal
         total = ZERO
         indeterminada = False
         for referencia in linha.referencias:
-            parcela = (matriz.valores.get(referencia.regra) or {}).get(coluna)
+            valores = matriz.valores.get(referencia.regra) or {}
+            lida = referencia.coluna or coluna
+            if lida not in valores:
+                continue                # a linha não declara a coluna: a parcela não existe
+            parcela = valores[lida]
             if parcela is None:
-                indeterminada = True    # None não é zero: propaga
+                if (referencia.regra, lida) in matriz.suprimidas:
+                    continue            # suprimida pela condição: contribui zero
+                indeterminada = True    # não apurada: `None` não é zero, propaga
                 break
             total += parcela if referencia.sinal == "+" else -parcela
         resultado[coluna] = None if indeterminada else total
@@ -124,9 +129,12 @@ def _agregar(linha: Linha, matriz: Matriz, derivadas: dict) -> dict[str, Decimal
 def _colunas_das_filhas(linha: Linha, matriz: Matriz) -> list[str]:
     """Colunas que a linha composta pode agregar: as presentes em **todas** as referências.
 
-    Interseção, não união. `L25 Déficit = L48 − L24` cruza os blocos de despesa e de receita,
-    cujas colunas não coincidem — somar por união produziria uma coluna com uma parcela só,
-    passando por total. Interseção vazia é reportada uma vez, como pendência.
+    Interseção, não união, para quem não declara: somar por união produziria coluna com uma
+    parcela só, passando por total.
+
+    As linhas que cruzam receita e despesa — `L25`, `L26`, `L49`, `L50` — **declaram** suas
+    colunas, medidas no publicado do STN, e por isso não passam pela interseção. Interseção vazia
+    em linha que não declara segue reportada como pendência.
     """
     if linha.colunas:
         return [c.id for c in linha.colunas]
@@ -163,15 +171,38 @@ def _derivar(linha: Linha, matriz: Matriz, derivadas: dict) -> None:
 # ─── condição de apresentação ────────────────────────────────────────────────
 
 def _aplicar_condicao(linha: Linha, matriz: Matriz) -> None:
-    """Déficit e superávit só aparecem quando a condição vale — e nunca os dois juntos."""
+    """Déficit e superávit só aparecem quando a condição vale — e nunca os dois juntos.
+
+    A célula suprimida vira `None` na apresentação e entra em `matriz.suprimidas`. É o conjunto
+    que permite ao total que a agrega somar **zero** em vez de propagar indeterminação: medido, o
+    STN publica `TotalDespesasComSuperavit` mesmo em ente deficitário, onde `Superavit` fica em
+    branco.
+    """
     celulas = matriz.valores.get(linha.id) or {}
-    for coluna, valor in celulas.items():
-        if valor is None:
-            continue
+
+    def suprimir(coluna: str) -> None:
+        celulas[coluna] = None
+        matriz.suprimidas.add((linha.id, coluna))
+
+    def vale(valor: Decimal) -> bool:
         positivo = valor > 0
-        vale = positivo if linha.condicao == "result_positive" else not positivo
-        if not vale:
-            celulas[coluna] = None
+        return positivo if linha.condicao == "result_positive" else not positivo
+
+    if linha.condicao_coluna:
+        # O resultado orçamentário é decidido **uma vez**, na coluna declarada, e vale para a
+        # linha inteira. Medido em São Paulo 2025: déficit contra a empenhada e superávit contra
+        # liquidadas e pagas, e o STN deixa `Superavit` em branco nas três. Decidir célula a
+        # célula publicaria as duas outras.
+        decisor = celulas.get(linha.condicao_coluna)
+        if decisor is None or not vale(decisor):
+            for coluna in list(celulas):
+                if celulas[coluna] is not None:
+                    suprimir(coluna)
+        return
+
+    for coluna, valor in list(celulas.items()):
+        if valor is not None and not vale(valor):
+            suprimir(coluna)
 
 
 # ─── ordem topológica ────────────────────────────────────────────────────────

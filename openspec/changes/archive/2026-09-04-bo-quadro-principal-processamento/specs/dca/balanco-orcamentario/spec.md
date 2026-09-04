@@ -23,8 +23,9 @@ A direção do saldo de uma conta SHALL ser lida da coluna `NATUREZA DO SALDO` d
 inferir a direção da classe contábil, do prefixo declarado na regra, nem do campo `natureza_conta`
 do registro — esse campo descreve o lançamento, não a conta.
 
-`natureza_saldo` declarado na regra SHALL ser consultado **somente** quando a conta estiver ausente
-da tabela (exceções históricas B1/B3).
+Conta ausente da tabela SHALL tornar a célula não apurada, com aviso — nunca zero. Não há
+mecanismo de direção declarada na regra: a decisão B1, único caso que o exigiria, foi revogada em
+2026-09-04 (change `ipc07-b1-remocao-termo-5313`), e B3 usa os padrões em filtro, não em coluna.
 
 #### Scenario: conta devedora de classe 6
 
@@ -122,12 +123,14 @@ emitir `0`, NÃO DEVE presumir direção e NÃO DEVE abortar as demais células.
 - **THEN** o valor é `Decimal("0.00")`, não `None`
 - **AND** nenhum aviso é emitido
 
-#### Scenario: exceção histórica usa a natureza declarada
+#### Scenario: escrituração em conta descontinuada não apaga a célula
 
-- **GIVEN** `5.3.1.3.0.00.00`, ausente do PCASP atual, cuja regra declara `natureza_saldo`
-- **WHEN** a célula é apurada
-- **THEN** a direção declarada é usada
-- **AND** a célula não sai `None`
+- **GIVEN** um ente que escriture saldo em `5.3.1.3.0.00.00`, conta descontinuada e não declarada
+  em nenhuma coluna
+- **WHEN** o quadro de RP Não Processados é apurado
+- **THEN** a coluna (a) é apurada a partir das 3 contas declaradas, com valor, **não** `None`
+- **AND** o registro não é somado a essa coluna e não gera aviso: `residuos` classifica por
+  natureza de receita e de despesa, não por conta contábil
 
 ### Requirement: Leitura da MSC fixa em ending_balance, MSCC, classes 5 e 6
 
@@ -243,12 +246,33 @@ Linha com `calculation.condition` SHALL ter valor apresentado apenas quando a co
 satisfeita; caso contrário a célula SHALL ficar sem valor, distinta de `0` e de não apurada.
 As linhas de déficit e superávit NÃO DEVEM aparecer simultaneamente com valor.
 
+A condição SHALL ser aplicada **antes** de a linha ser agregada por seus dependentes, e a célula
+suprimida SHALL contribuir **zero** para o total que a agrega — o total tem valor mesmo quando a
+linha de ajuste não se aplica. Medido: em ente deficitário o STN deixa `Superavit` em branco e
+publica `TotalDespesasComSuperavit` igual a `TotalDespesas` (SP e GO, exatos em centavos);
+simétrico em ente superavitário com `Deficit` e `TotalReceitasComDeficit`.
+
+A célula suprimida NÃO DEVE gerar aviso de não apurada: "não se aplica" e "não sei" são estados
+distintos, e só o segundo é defeito de apuração.
+
 #### Scenario: exercício superavitário
 
 - **GIVEN** `L25 Déficit = L48 − L24` com resultado negativo
 - **WHEN** a matriz é apurada
-- **THEN** `L25` fica sem valor
-- **AND** `L49 Superávit = L24 − L48` é apresentada com o valor positivo
+- **THEN** `L25` fica sem valor, e sem aviso de célula não apurada
+- **AND** `L49 Superávit` é apresentada com valor positivo em `empenhadas`, `liquidadas` e `pagas`
+- **AND** `L26 TOTAL (VII)` tem valor, com a parcela de `L25` valendo zero
+- **AND** em João Pessoa 2025 `L49.empenhadas` = 267.518.451,03 e `L50.empenhadas` =
+  5.117.875.296,33, a receita realizada
+
+#### Scenario: exercício deficitário
+
+- **GIVEN** um ente cuja despesa empenhada supera a receita realizada — medido em São Paulo (`35`)
+  2025, `L48.empenhadas` = 385.042.592.630,74 contra `L24.receitas_realizadas` = 372.818.667.132,35
+- **WHEN** a matriz é apurada
+- **THEN** `L25.receitas_realizadas` = 12.223.925.498,39, a única coluna que a linha tem
+- **AND** `L49` fica sem valor nas três colunas, e sem aviso
+- **AND** `L50` tem valor igual a `L48` em cada uma das suas cinco colunas
 
 ### Requirement: Resíduo de classificação é medido e reportado
 

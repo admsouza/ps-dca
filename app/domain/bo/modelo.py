@@ -33,7 +33,6 @@ class ContaCC(NamedTuple):
 
     cc: str                       # dígitos, sem separadores
     operacao: str = "+"
-    natureza_saldo: str | None = None   # só para exceção histórica ausente do PCASP (B1/B3)
 
 
 class Filtro(NamedTuple):
@@ -50,6 +49,7 @@ class RefColuna(NamedTuple):
 class RefLinha(NamedTuple):
     regra: str
     sinal: str
+    coluna: str | None = None   # lê esta coluna da linha referenciada, em vez da calculada
 
 
 class Coluna(NamedTuple):
@@ -70,6 +70,7 @@ class Linha(NamedTuple):
     colunas: tuple[Coluna, ...] = ()
     referencias: tuple[RefLinha, ...] = ()
     condicao: str | None = None                      # result_positive | result_negative
+    condicao_coluna: str | None = None               # coluna que decide, para a linha inteira
 
     @property
     def composta(self) -> bool:
@@ -139,3 +140,9 @@ class Matriz:
     nao_apuradas: list[NaoApurada] = field(default_factory=list)
     residuos: list[Residuo] = field(default_factory=list)
     vigencia: Vigencia | None = None
+
+    # `(rule_id, coluna)` das células que a condição suprimiu. Em `valores` elas são `None`, como
+    # as não apuradas; é este conjunto que separa "não se aplica" de "não sei". Célula suprimida
+    # contribui **zero** no total que a agrega — medido: o STN publica o total mesmo quando a
+    # linha de ajuste fica em branco.
+    suprimidas: set[tuple[str, str]] = field(default_factory=set)

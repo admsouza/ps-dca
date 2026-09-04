@@ -48,14 +48,13 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 ## Change ativa
 
-SPEC das três aprovada pelo PO em 2026-09-04. A base canônica do IPC 07 está **implementada e
-verificada** (89 testes, ruff limpo, validador exit 0) e foi arquivada; as duas restantes seguem
-em PLAN/ARCH.
+A base canônica do IPC 07 e a F1 do Balanço Orçamentário estão **implementadas, verificadas e
+arquivadas**, com as três pendências normativas (C5, C6, C7) encerradas por medição contra o
+publicado do STN. **Suíte: 153 passed / 0 failed.** Resta uma change ativa: a plataforma.
 
 | Change | Capability | Fase | Status |
 |---|---|---|---|
 | `plataforma-pipeline-dca` | `pipeline/plataforma` (nova) | **PLAN/ARCH** | SPEC aprovada em 2026-09-04. 22 requisitos / 63 cenários: ciclo requisição→cache→job→worker, camadas e regra de dependência, cache e lock únicos, `versao_regras` por hash canônico, mapeamento vigente em banco INSERT-only, reprocessamento forçado, procedência e diagnóstico. Infra: Postgres e Redis do hub, prefixo `dca_*`, `alembic_version_dca`, advisory lock `43812/1001`, fila `arq:queue:dca`. Implementada nas fases F2/F3 do BO. |
-| `bo-quadro-principal-processamento` | `dca/balanco-orcamentario` (nova) | **PLAN/ARCH** | SPEC aprovada em 2026-09-04. 15 requisitos / 33 cenários. C1–C4 decididos; regra de saldo validada 1:1 em centavos contra JP 12/2025 (11 valores). Ordem F1 núcleo → F2 transporte → F3 pipeline. Depende das 51 regras de `ipc07-bo-regras-canonicas`. |
 
 ### Ordem de execução acordada
 
@@ -70,6 +69,9 @@ em PLAN/ARCH.
 
 | Data | Change |
 |---|---|
+| 2026-09-04 | `bo-quadro-principal-processamento` — **F1 do BO entregue e verificada.** Núcleo puro (`domain/` + adapters + carregador YAML + service + CLI), sem Postgres nem Redis. Aceite 1:1 em centavos contra JP 12/2025 e conferência linha a linha contra o `RREO-Anexo 01`. Spec em `openspec/specs/dca/balanco-orcamentario/spec.md` — 15 requisitos / 34 cenários. F2 e F3 são trabalho de `plataforma-pipeline-dca`. |
+| 2026-09-04 | `ipc07-c5-c7-linhas-cruzadas` — **C5 e C7 fechadas.** `L25`, `L26`, `L49` e `L50` passam a ser apuradas, com colunas medidas no publicado do STN e referência que nomeia a coluna lida; `L29` perde `previsao_inicial` (B6 restringida). Motor: 3 casos distintos na parcela agregada e condição decidida por linha. **Suíte 153 passed / 0 failed** — verde pela primeira vez. Aceite: JP 13/13 em centavos, SP e GO conferidos. Evidência: `docs/evidencia-c5-deficit-superavit.md`. |
+| 2026-09-04 | `ipc07-b1-remocao-termo-5313` — `5.3.1.3.0.00.00` removida da coluna (a) do quadro de RP Não Processados: descontinuada, com o conteúdo em `5.3.1.2`, já primeiro termo da fórmula. Revoga a decisão B1 de 2026-08-27. **Encerra a pendência C6 sem alteração de schema.** Regressão bit a bit: 0 células divergentes em 69 linhas. Removido de passagem o código morto de `natureza_saldo` e a função `_direcao_da_conta`, nunca chamada. Evidência: `docs/evidencia-c6-c7.md`. |
 | 2026-09-04 | `ipc07-bo-regras-canonicas` — base canônica do IPC 07 entregue: 69 regras em `knowledge/rules/bo/`, 2 policies, schemas, validador e índice. 89 testes verdes; `review_required` 0. Spec em `openspec/specs/dca/base-canonica-regras/spec.md`. |
 | 2026-09-04 | `knowledge-base-ipc` — sucedida por changes separadas por IPC; nunca implementada. Artefatos compartilhados (`knowledge/schemas/`, `knowledge/sources/`, `scripts/check_sources.py`) passaram para `ipc07-bo-regras-canonicas`. |
 

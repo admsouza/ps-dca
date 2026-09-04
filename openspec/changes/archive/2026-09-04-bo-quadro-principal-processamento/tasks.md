@@ -153,9 +153,9 @@ do que de previsão.
 
 | # | Pendência | Efeito hoje |
 |---|---|---|
-| **C5** | `L25`, `L26`, `L49` e `L50` cruzam receita e despesa, e os dois blocos não têm nenhuma coluna em comum (4 de receita × 6 de despesa). O IPC 07 não diz em qual coluna essas linhas são apresentadas. | As 4 linhas saem **não apuradas**, com aviso nomeando a pendência. Nada é presumido. |
-| **C7** | `L29` Superávit Financeiro é apurada com **previsão inicial** de R$ 470.338.332,64 (saldo inicial de `5.2.2.1.3.01.00`), e por `L27 = L28 + L29 + L30` leva `L27` a 482.338.332,64. O STN **não publica** `PREVISÃO INICIAL` para `SuperavitFinanceiro` no `RREO-Anexo 01`, e publica `L27` PREVISÃO INICIAL = 12.000.000,00 (só `L28`). O IPC 07 não diz se a coluna de previsão inicial se aplica a `L29`. | Divergência de R$ 470.338.332,64 em `L27.previsao_inicial` contra o RREO. Descoberta na task 5.5. Única divergência de valor em 123 células conferidas. |
-| **C6** | A base canônica não declara `natureza_saldo` nas contas: o schema de `rule.json` não tem o campo. Sem ele, a exceção histórica B1 (`5.3.1.3.0.00.00`, fora do PCASP atual) não tem como ser resolvida. | Só afeta exercícios com escrituração em `5.3.1.3` — em JP 2025 não há (C3). Fechar exige uma change pequena na base canônica. |
+| ~~**C5**~~ | **ENCERRADA em 2026-09-04** pela change `ipc07-c5-c7-linhas-cruzadas`. As 4 linhas são apuradas: superávit em 3 colunas de execução, déficit em 1, contra a empenhada — assimétricas, medido. | Fechou os 3 testes vermelhos. Aceite em JP: 13 de 13 células em centavos. |
+| ~~**C7**~~ | **ENCERRADA em 2026-09-04** pela mesma change. `L29` não declara `previsao_inicial` — zero de 25 entes publicam essa coluna. B6 restringida. | `L27.previsao_inicial` = 12.000.000,00, batendo com o STN. |
+| ~~**C6**~~ | **ENCERRADA em 2026-09-04** pela change `ipc07-b1-remocao-termo-5313`. O PO decidiu que `5.3.1.3.0.00.00` foi descontinuada e o conteúdo está em `5.3.1.2`, já primeiro termo da mesma fórmula — o termo saiu da regra e não há mais conta ausente do PCASP em coluna de valor. **Não foi preciso alterar o schema.** `natureza_saldo` perdeu o único caso de uso e saiu do domínio: o mecanismo nunca funcionava de ponta a ponta, porque `saldo.py:109` rejeitava o registro mesmo com a direção declarada. | Fechou `test_excecao_historica_usa_a_natureza_declarada` — a suíte foi de 4 para 3 vermelhos. |
 
 ## 4. REVIEW
 
@@ -192,8 +192,9 @@ hashes das 7 tabelas STN) e `diagnostico` (`nao_apuradas` com motivo, `residuos`
 
 ## 6. F2 e F3 — changes próprias
 
-- [ ] 6.0 F2 e F3 são implementadas conforme a change `plataforma-pipeline-dca`, que especifica o
-      ciclo, a infra e a organização em camadas. Não desenhar pipeline aqui.
+- [x] 6.0 Confirmado e **transferido**: F2 e F3 são trabalho da change `plataforma-pipeline-dca`,
+      que especifica ciclo, infra e camadas. Nada de pipeline foi desenhado aqui, e nada nesta
+      change bloqueia aquela. Não é tarefa pendente desta change.
 - [x] 6.1 Confirmado. `apurar(ente, exercicio, fonte, direcao=None, mapa=None)` é síncrona, sem
       estado e sem I/O próprio: a fonte de MSC, a direção do PCASP e o mapa de regras entram por
       parâmetro (`fonte` é `Protocol`, os outros dois têm default carregado). Devolve `Resultado`
@@ -202,7 +203,10 @@ hashes das 7 tabelas STN) e `diagnostico` (`nao_apuradas` com motivo, `residuos`
 
 ## 7. Arquivamento
 
-- [ ] 7.1 `tasks.md` 100% atualizado.
-- [ ] 7.2 Mesclar o delta em `openspec/specs/dca/balanco-orcamentario/spec.md`.
-- [ ] 7.3 Mover para `openspec/changes/archive/AAAA-MM-DD-bo-quadro-principal-processamento/`.
-- [ ] 7.4 Atualizar a tabela "Change ativa" em `openspec/AGENTS.md`.
+- [x] 7.1 Atualizado. As três pendências normativas — C5, C6 e C7 — foram encerradas por duas
+      changes próprias, e a suíte está verde.
+- [x] 7.2 Mesclado: 15 requisitos / **34 cenários** (era 33; `exceção histórica usa a natureza
+      declarada` deu lugar a `escrituração em conta descontinuada não apaga a célula`, e
+      `exercício deficitário` entrou com a C5).
+- [x] 7.3 Movida para `openspec/changes/archive/2026-09-04-bo-quadro-principal-processamento/`.
+- [x] 7.4 Atualizada — sai das ativas, entra nas arquivadas.

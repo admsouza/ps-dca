@@ -22,8 +22,8 @@ OPENSPEC = RAIZ_REPO / "openspec"
 # Contagem de cenários por capability, conferida quando a spec foi aprovada. Mudança aqui é
 # mudança de escopo: só com decisão registrada na change correspondente.
 CENARIOS_ESPERADOS = {
-    "dca/base-canonica-regras": 49,
-    "dca/balanco-orcamentario": 33,
+    "dca/base-canonica-regras": 51,
+    "dca/balanco-orcamentario": 34,
     "pipeline/plataforma": 63,
 }
 

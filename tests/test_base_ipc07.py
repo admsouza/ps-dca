@@ -93,8 +93,12 @@ def test_coluna_com_contas_de_sinal_negativo():
     """
     r = rule("bo.rp_nao_processados.l2")
     mapa = sinais(r, "inscritos_exerc_anteriores")
-    assert mapa["5312"] == "+" and mapa["5313"] == "+" and mapa["5316"] == "+"
+    assert mapa["5312"] == "+" and mapa["5316"] == "+"
     assert mapa["6316"] == "-"
+    # `5.3.1.3` está no literal do IPC 07, mas foi descontinuada e o conteúdo está em `5.3.1.2`,
+    # que já é o primeiro termo — declarar as duas duplicaria a conta.
+    assert "5313" not in mapa
+    assert len(mapa) == 3
 
 
 @pytest.mark.parametrize("quadro", ["rp_nao_processados", "rp_processados"])
@@ -268,15 +272,24 @@ def test_refinanciamento_usa_padroes_de_conta_pcasp():
         assert r["status"] != "review_required"
 
 
-def test_conta_531_historica_e_preservada():
-    """Scenario: conta 531 histórica é preservada (B1, 9 regras de RPNP)."""
+def test_conta_531_descontinuada_nao_e_declarada():
+    """Scenario: a fórmula fica simétrica à do quadro de RP Processados.
+
+    Substitui `test_conta_531_historica_e_preservada`: a decisão B1 de 2026-08-27 foi revogada em
+    2026-09-04, e `5.3.1.3` deixou de ser declarada. O literal de 4 termos segue registrado na
+    nota de proveniência da regra.
+    """
     regras = [r for rid, r in _base().items() if rid.startswith("bo.rp_nao_processados.")]
     assert len(regras) == 9
-    com_531 = [r for r in regras if "5313" in str(r)]
-    assert com_531, "a fórmula deve manter 5.3.1.3"
-    for r in com_531:
-        assert r["provenance"].get("decision") == "B1"
+    for r in regras:
+        for coluna in (r.get("columns") or {}).values():
+            padroes = [a.get("pattern") for a in (coluna.get("accounts") or [])]
+            assert "5313" not in padroes, "5.3.1.3 não é mais declarada em coluna"
+        assert (r.get("provenance") or {}).get("decision") != "B1"
         assert r["status"] != "review_required"
+    # O literal normativo não foi apagado.
+    notas = " ".join(str((r.get("provenance") or {}).get("reading", "")) for r in regras)
+    assert "5.3.1.3.0.00.00" in notas
 
 
 @pytest.mark.parametrize("rule_id", [
@@ -298,14 +311,27 @@ def test_override_nao_aparece_em_nenhuma_outra_regra():
 
 @pytest.mark.parametrize("rule_id", [
     "bo.quadro_principal.receitas.l27", "bo.quadro_principal.receitas.l28",
-    "bo.quadro_principal.receitas.l29", "bo.quadro_principal.receitas.l30",
+    "bo.quadro_principal.receitas.l30",
 ])
-def test_l27_a_l30_tem_as_quatro_colunas_de_receita(rule_id):
-    """Scenario: L27 a L30 têm as quatro colunas de receita (B6)."""
+def test_l27_l28_l30_tem_as_quatro_colunas_de_receita(rule_id):
+    """Scenario: L27, L28 e L30 têm as quatro colunas de receita, e L29 tem três."""
     r = rule(rule_id)
     assert set(r["columns"]) == {
         "previsao_inicial", "previsao_atualizada", "receitas_realizadas", "saldo"
     }
+    assert r["provenance"].get("decision") == "B6"
+    assert r["status"] != "review_required"
+
+
+def test_l29_nao_declara_previsao_inicial():
+    """Scenario: L27, L28 e L30 têm as quatro colunas de receita, e L29 tem três.
+
+    B6 restringida em 2026-09-04: zero de 25 entes publicam `PREVISÃO INICIAL` para
+    `SuperavitFinanceiro`. Um superávit financeiro é apurado sobre o exercício fechado.
+    """
+    r = rule("bo.quadro_principal.receitas.l29")
+    assert set(r["columns"]) == {"previsao_atualizada", "receitas_realizadas", "saldo"}
+    assert "previsao_inicial" not in r["columns"]
     assert r["provenance"].get("decision") == "B6"
     assert r["status"] != "review_required"
 

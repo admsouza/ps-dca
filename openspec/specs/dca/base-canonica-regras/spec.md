@@ -80,6 +80,12 @@ NÃO DEVE existir uma regra por célula.
 O número de colunas de valor por quadro SHALL ser: Quadro Principal — receitas **4**; Quadro
 Principal — despesas **6**; RP Não Processados **6**; RP Processados **5**.
 
+A coluna NÃO DEVE declarar conta ausente do PCASP vigente para o exercício, nem a mesma conta duas
+vezes: a apuração soma por conta declarada, sem deduplicar, e a repetição dobraria o valor. Quando
+um termo do literal do IPC07 é descontinuado do PCASP e seu conteúdo passa a estar em outra conta
+**já declarada na mesma coluna**, o termo SHALL ser removido da regra, e o literal original SHALL
+permanecer legível na nota de proveniência.
+
 #### Scenario: linha de receita com quatro colunas
 
 - **GIVEN** o IPC07 p. 8, Quadro Principal, linha `L2`
@@ -103,11 +109,13 @@ Principal — despesas **6**; RP Não Processados **6**; RP Processados **5**.
 #### Scenario: coluna com contas de sinal negativo
 
 - **GIVEN** o IPC07 p. 12, quadro de RP Não Processados, coluna
-  "Inscritos — Em Exercícios Anteriores (a)", cuja regra é
+  "Inscritos — Em Exercícios Anteriores (a)", cujo literal é
   `5.3.1.2.0.00.00 + 5.3.1.3.0.00.00 + 5.3.1.6.0.00.00 (-) 6.3.1.6.0.00.00`
-- **WHEN** a regra de qualquer linha desse quadro é lida
-- **THEN** a coluna declara `5.3.1.2`, `5.3.1.3` e `5.3.1.6` com sinal `+`, e `6.3.1.6` com sinal
-  `-`
+- **WHEN** a regra de qualquer linha de filtro desse quadro é lida
+- **THEN** a coluna declara **exatamente 3** contas: `5.3.1.2` e `5.3.1.6` com sinal `+`, e
+  `6.3.1.6` com sinal `-`
+- **AND** `5.3.1.3` NÃO é declarada, por estar descontinuada e ter o conteúdo em `5.3.1.2`
+- **AND** o literal de 4 termos permanece legível na nota de proveniência da regra
 
 #### Scenario: quadro sem coluna de exclusões
 
@@ -177,6 +185,26 @@ para `rule_id` existentes, com o sinal de cada componente. A regra composta NÃO
 filtros nem as contas das regras referenciadas. Referência entre grupos do mesmo quadro SHALL ser
 permitida. A validação SHALL rejeitar referência a `rule_id` inexistente e SHALL rejeitar ciclo.
 
+Uma referência PODE nomear a **coluna** lida na linha referenciada, quando a coluna que está sendo
+calculada tem outro nome. Sem esse campo, a coluna lida é a mesma que está sendo calculada. Com
+ele, a linha cruzada entre receita e despesa se torna calculável: os dois blocos não têm coluna em
+comum, e a interseção vazia é o que mantinha `L25`, `L26`, `L49` e `L50` sem apurar.
+
+Linha cujas referências não compartilham coluna SHALL declarar explicitamente suas colunas. A
+validação SHALL rejeitar referência que nomeie coluna ausente na linha referenciada.
+
+Ao agregar uma coluna, a apuração SHALL distinguir **três** situações na parcela:
+
+| Situação na linha referenciada | Contribuição | Efeito no total |
+|---|---|---|
+| **não declara** a coluna | nenhuma — a parcela não existe | o total é a soma das demais parcelas |
+| declara e a célula foi **suprimida pela condição** | **zero** | o total tem valor |
+| declara e a célula está **não apurada** | indeterminada | o total sai `None`, com aviso |
+
+Colapsar as duas primeiras em `None` é o que faria `L27.previsao_inicial` sair não apurada quando
+`L29` não tem a coluna, e `L26`/`L50` saírem em branco quando a linha de ajuste não se aplica — os
+dois contra o publicado do STN.
+
 #### Scenario: soma de linhas
 
 - **GIVEN** o IPC07 p. 8, `L1 Receitas Correntes (I) = (L2 + L3 + L4 + L5 + L6 + L7 + L8 + L9)`
@@ -189,8 +217,9 @@ permitida. A validação SHALL rejeitar referência a `rule_id` inexistente e SH
 - **GIVEN** o IPC07 p. 9, `L25 Déficit (VI) = (L48 - L24)`, onde `L48` pertence ao bloco de
   despesas
 - **WHEN** a regra `bo.quadro_principal.receitas.l25` é lida
-- **THEN** ela referencia `bo.quadro_principal.despesas.l48` com sinal `+` e
-  `bo.quadro_principal.receitas.l24` com sinal `-`
+- **THEN** ela referencia `bo.quadro_principal.despesas.l48` com sinal `+`, nomeando a coluna
+  `empenhadas`, e `bo.quadro_principal.receitas.l24` com sinal `-`, na coluna calculada
+- **AND** declara **uma** coluna própria: `receitas_realizadas`
 - **AND** a validação aceita a referência entre grupos
 - **AND** NÃO detecta ciclo, porque `L24 = (L16 + L17)` e `L48 = (L40 + L41)` não dependem de `L25`
 
@@ -198,6 +227,15 @@ permitida. A validação SHALL rejeitar referência a `rule_id` inexistente e SH
 
 - **WHEN** uma regra referencia `bo.quadro_principal.receitas.l99`, que não existe
 - **THEN** o erro nomeia o `rule_id` órfão, a regra de origem e o `arquivo:linha`, e o exit é `1`
+
+#### Scenario: referência nomeia coluna ausente é rejeitada
+
+- **GIVEN** uma regra cuja referência nomeia a coluna `pagas` de `bo.quadro_principal.receitas.l24`,
+  que só tem colunas de receita
+- **WHEN** a validação é executada
+- **THEN** o erro nomeia a regra de origem, a linha referenciada, a coluna pedida e as colunas
+  disponíveis, e o exit é `1`
+- **AND** nenhuma célula é apurada com zero no lugar da coluna ausente
 
 #### Scenario: ciclo de dependência é rejeitado
 
@@ -211,12 +249,18 @@ Quando o documento condicionar a linha ao sinal do resultado, a regra SHALL decl
 `calculation.condition`, legível por máquina. A regra NÃO DEVE registrar a condição apenas como
 texto descritivo.
 
+As colunas em que a linha condicional é apresentada SHALL ser as medidas no publicado do STN, e
+**não são simétricas** entre déficit e superávit: cada bloco recebe tantas células de ajuste
+quantas colunas de realização ele tem — a receita tem uma, a despesa tem três.
+
 #### Scenario: déficit orçamentário
 
 - **GIVEN** o IPC07 p. 9, `L25 Déficit (VI) = (L48 - L24)`, "Somente quando o resultado for
   deficitário"
 - **WHEN** a regra é lida
-- **THEN** o cálculo declara `L48` com sinal `+` e `L24` com sinal `-`
+- **THEN** o cálculo declara `L48` com sinal `+`, na coluna `empenhadas`, e `L24` com sinal `-`
+- **AND** declara **uma** coluna: `receitas_realizadas` — medido em 11 dos 12 estados deficitários
+  de 2025, exato em centavos contra `Deficit` do `RREO-Anexo 01`
 - **AND** declara que o valor só é apresentado quando o resultado dessa subtração for positivo
 - **AND** `evidence.text` contém a frase literal do documento
 
@@ -225,8 +269,22 @@ texto descritivo.
 - **GIVEN** o IPC07 p. 11, `L49 Superávit (XIV) = (L24 - L48)`, "Somente quando o resultado for
   superavitário"
 - **WHEN** a regra é lida
-- **THEN** a condição é declarada de forma simétrica à de `L25`
+- **THEN** o cálculo declara `L24` com sinal `+`, na coluna `receitas_realizadas`, e `L48` com
+  sinal `-`, na coluna calculada
+- **AND** declara **três** colunas: `empenhadas`, `liquidadas` e `pagas` — medido em João Pessoa
+  2025, exato em centavos nas três contra `Superavit` do `RREO-Anexo 01`
+- **AND** a condição é declarada de forma simétrica à de `L25`, mas o **conjunto de colunas não é**
 - **AND** as duas regras coexistem sem que uma anule a outra
+
+#### Scenario: total que agrega linha condicional declara as colunas do publicado
+
+- **GIVEN** `L26 TOTAL (VII) = (L24 + L25)` e `L50 TOTAL (XV) = (L48 + L49)`
+- **WHEN** as duas regras são lidas
+- **THEN** `L26` declara `previsao_inicial`, `previsao_atualizada` e `receitas_realizadas`, e
+  **não** declara `saldo`
+- **AND** `L50` declara `dotacao_inicial`, `dotacao_atualizada`, `empenhadas`, `liquidadas` e
+  `pagas`, e **não** declara `saldo_dotacao`
+- **AND** nenhuma das duas declara conta contábil própria
 
 ### Requirement: Ambiguidade interna do documento resolvida por evidência da própria peça
 
@@ -285,6 +343,18 @@ decidido. A validação SHALL rejeitar a ampliação dessas exceções para outr
 domínios. A decisão NÃO DEVE apagar o literal do IPC07 nem alterar as tabelas de
 `docs/contas-stn/`.
 
+Decisão revogada por decisão posterior SHALL ter a revogação registrada, e a decisão anterior NÃO
+DEVE ser apagada do histórico em `docs/source-analysis-ipc07.md`. A decisão **B1** de 2026-08-27 —
+preservar `5.3.1.3.0.00.00` como exceção histórica do PCASP 2019 — foi **revogada em 2026-09-04**:
+a conta foi descontinuada e seu conteúdo está em `5.3.1.2.0.00.00`, já declarada na mesma coluna.
+Nenhuma regra invoca mais a exceção B1. A decisão **B3** segue valendo — seus padrões são usados
+como `field: conta_contabil` em filtro, não como conta de coluna.
+
+A decisão **B6** de 2026-09-03 — `L27` a `L30` com as quatro colunas de receita — foi
+**restringida em 2026-09-04**: `L29` Superávit Financeiro NÃO declara `previsao_inicial`, porque
+**zero de 25 entes** publicam `PREVISÃO INICIAL` para `SuperavitFinanceiro` no `RREO-Anexo 01`. O
+restante de B6 segue valendo, e a decisão **B5** — a conta da linha em `L29` — não é afetada.
+
 #### Scenario: refinanciamento usa padrões de conta PCASP
 
 - **GIVEN** os pares `2111/8111`, `2118/8118`, `2121/8121` e `2128/8128` das exclusões de `L11` e
@@ -296,15 +366,13 @@ domínios. A decisão NÃO DEVE apagar o literal do IPC07 nem alterar as tabelas
 - **AND** a ausência desses padrões no PCASP atual é registrada como exceção histórica do PCASP
   2019 decidida pelo PO, sem `review_required` por B3
 
-#### Scenario: conta 531 histórica é preservada
+#### Scenario: a fórmula fica simétrica à do quadro de RP Processados
 
-- **GIVEN** que `5.3.1.3.0.00.00` consta na fórmula do IPC07 p. 12, mas não no PCASP atual
-- **WHEN** as 9 regras do quadro de RP Não Processados são lidas
-- **THEN** a fórmula mantém `5.3.1.3.0.00.00` com sinal `+` e segue a família/prefixo `531`
-- **AND** a ausência atual é registrada como exceção histórica do PCASP 2019, sem
-  `review_required` por B1
-- **AND** a implementação contém comentário adjacente ao tratamento informando que a conta foi
-  descontinuada em edições posteriores a 2019
+- **GIVEN** que o quadro de RP Processados declara `5.3.2.2 + 5.3.2.6 (-) 6.3.2.6` na coluna
+  homóloga, e que o grupo `5.3.2` não tem `5.3.2.3`
+- **WHEN** as colunas "Inscritos — Em Exercícios Anteriores (a)" dos dois quadros são comparadas
+- **THEN** ambas declaram 3 contas, nas mesmas posições de família
+- **AND** nenhuma regra de `rp_nao_processados` declara `decision: B1`, nem fica `review_required`
 
 #### Scenario: conta da linha substitui contas das colunas em L29 e L30
 
@@ -314,14 +382,18 @@ domínios. A decisão NÃO DEVE apagar o literal do IPC07 nem alterar as tabelas
 - **AND** a regra registra `line_account_override: true`
 - **AND** `L29` e `L30` não ficam `review_required` por B5
 
-#### Scenario: L27 a L30 têm as quatro colunas de receita
+#### Scenario: L27, L28 e L30 têm as quatro colunas de receita, e L29 tem três
 
 - **GIVEN** que a p. 15 mostra `L28`, `L29` e `L30` sem marcação de coluna, e o PO decidiu em
   2026-09-03 que a seção REGRAS prevalece
 - **WHEN** `L27`, `L28`, `L29` e `L30` são lidas
-- **THEN** cada uma declara as 4 colunas de receita — `previsao_inicial`, `previsao_atualizada`,
-  `receitas_realizadas` e `saldo`
-- **AND** `L27` mantém `calculation` como `L28 + L29 + L30` em cada coluna
+- **THEN** `L27`, `L28` e `L30` declaram as 4 colunas de receita — `previsao_inicial`,
+  `previsao_atualizada`, `receitas_realizadas` e `saldo`
+- **AND** `L29` declara **três**: `previsao_atualizada`, `receitas_realizadas` e `saldo` — um
+  superávit financeiro é apurado sobre o exercício fechado e não existe em previsão inicial
+- **AND** `L27` mantém `calculation` como `L28 + L29 + L30` em cada coluna, e em
+  `previsao_inicial` a parcela de `L29` **não existe** — o total é `L28 + L30` = 12.000.000,00 em
+  João Pessoa 2025, e não sai `None`
 - **AND** cada uma registra `provenance.decision: B6` e o literal divergente da p. 15 em
   `evidence.text`
 - **AND** nenhuma delas fica `review_required`

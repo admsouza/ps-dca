@@ -1269,14 +1269,19 @@ rules:
   status: extracted
   review:
     required: true
+  columns:
+    receitas_realizadas:
+      label: Receitas Realizadas (c)
   calculation:
     references:
     - rule: bo.quadro_principal.despesas.l48
       sign: +
+      column: empenhadas
     - rule: bo.quadro_principal.receitas.l24
       sign: '-'
     condition:
       when: result_positive
+      column: receitas_realizadas
 - rule_id: bo.quadro_principal.receitas.l26
   demonstrativo:
     codigo: BO
@@ -1315,6 +1320,13 @@ rules:
   status: extracted
   review:
     required: true
+  columns:
+    previsao_inicial:
+      label: Previsão Inicial (a)
+    previsao_atualizada:
+      label: Previsão Atualizada (b)
+    receitas_realizadas:
+      label: Receitas Realizadas (c)
   calculation:
     references:
     - rule: bo.quadro_principal.receitas.l24
@@ -1463,12 +1475,6 @@ rules:
   review:
     required: true
   columns:
-    previsao_inicial:
-      label: Previsão Inicial (a)
-      accounts:
-      - literal: 5.2.2.1.3.01.00
-        pattern: '5221301'
-        sign: +
     previsao_atualizada:
       label: Previsão Atualizada (b)
       accounts:
@@ -2608,14 +2614,23 @@ rules:
   status: extracted
   review:
     required: true
+  columns:
+    empenhadas:
+      label: Despesas Empenhadas (f)
+    liquidadas:
+      label: Despesas Liquidadas (g)
+    pagas:
+      label: Despesas Pagas (h)
   calculation:
     references:
     - rule: bo.quadro_principal.receitas.l24
       sign: +
+      column: receitas_realizadas
     - rule: bo.quadro_principal.despesas.l48
       sign: '-'
     condition:
       when: result_positive
+      column: empenhadas
 - rule_id: bo.quadro_principal.despesas.l50
   demonstrativo:
     codigo: BO
@@ -2654,6 +2669,17 @@ rules:
   status: extracted
   review:
     required: true
+  columns:
+    dotacao_inicial:
+      label: Dotação Inicial (d)
+    dotacao_atualizada:
+      label: Dotação Atualizada (e)
+    empenhadas:
+      label: Despesas Empenhadas (f)
+    liquidadas:
+      label: Despesas Liquidadas (g)
+    pagas:
+      label: Despesas Pagas (h)
   calculation:
     references:
     - rule: bo.quadro_principal.despesas.l48

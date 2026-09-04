@@ -170,6 +170,44 @@ def test_referencia_inexistente_e_rejeitada(base, validar):
     assert "quadro_principal.yaml" in texto
 
 
+def test_referencia_nomeia_coluna_ausente_e_rejeitada(base, validar):
+    """Scenario: referência nomeia coluna ausente é rejeitada.
+
+    `L24` é composta e herda as colunas de receita das linhas que agrega; nomear `pagas` nela é
+    pedir coluna do bloco de despesa. Sem o check, a parcela seria tratada como inexistente e o
+    total sairia com uma parcela a menos, sem aviso nenhum.
+    """
+    l16 = regra(rule_id="bo.quadro_principal.receitas.l16")
+    l24 = regra_composta(
+        "bo.quadro_principal.receitas.l24", [("bo.quadro_principal.receitas.l16", "+")]
+    )
+    cruzada = regra_composta(
+        "bo.quadro_principal.despesas.l49", [("bo.quadro_principal.receitas.l24", "+")]
+    )
+    cruzada["calculation"]["references"][0]["column"] = "pagas"
+    rel = validar(base(quadro_principal=[l16, l24, cruzada]))
+    assert rel.exit_code == 1
+    texto = mensagens(rel)
+    assert "pagas" in texto
+    assert "bo.quadro_principal.receitas.l24" in texto
+    assert "bo.quadro_principal.despesas.l49" in texto
+
+
+def test_referencia_com_coluna_valida_e_aceita(base, validar):
+    """Requisito: referência que nomeia coluna existente na linha referenciada é aceita."""
+    l16 = regra(rule_id="bo.quadro_principal.receitas.l16")
+    coluna = next(iter(l16["columns"]))
+    l24 = regra_composta(
+        "bo.quadro_principal.receitas.l24", [("bo.quadro_principal.receitas.l16", "+")]
+    )
+    cruzada = regra_composta(
+        "bo.quadro_principal.despesas.l49", [("bo.quadro_principal.receitas.l24", "+")]
+    )
+    cruzada["calculation"]["references"][0]["column"] = coluna
+    rel = validar(base(quadro_principal=[l16, l24, cruzada]))
+    assert rel.exit_code == 0, mensagens(rel)
+
+
 def test_ciclo_de_dependencia_e_rejeitado(base, validar):
     """Scenario: ciclo de dependência é rejeitado — erro imprime o caminho completo."""
     ida = [("bo.quadro_principal.receitas.l2", "+")]

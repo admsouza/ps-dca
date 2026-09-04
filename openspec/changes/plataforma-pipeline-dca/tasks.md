@@ -28,35 +28,72 @@ segue em frente; as fases **F2 (transporte)** e **F3 (pipeline)** implementam o 
 
 ## 1. PLAN/ARCH
 
-- [ ] 1.1 Registry e resumo agregado no formato "job por anexo" (P4), já com a ordem canônica dos
-      7 anexos — o pipeline completo consome o mesmo registry, sem redesenho.
-- [ ] 1.2 Fixar as dependências da F2/F3: `fastapi`, `uvicorn`, `gunicorn`, `pydantic`, `arq`,
-      `redis`, `sqlalchemy`, `alembic`, `psycopg2-binary`, `python-jose`, `cryptography`. Nenhuma
-      delas alcançável a partir de `domain/`.
-- [ ] 1.3.0 Fechar o shape de `linhas` (JSONB) de `dca_regra_mapeamento` a partir do contrato de
-      cálculo do BO — é o que o carregador de banco devolve e o que o seed produz.
-- [ ] 1.3 Implementar `versao_regras` como **hash canônico** (P-D7): SHA-256 sobre as regras
-      efetivamente carregadas para o exercício + as tabelas STN usadas, serializadas de forma
-      estável (chaves ordenadas, UTF-8, LF) — nunca sobre bytes crus de arquivo. A edição declarada
-      (`IPC07 2020-01`) acompanha na procedência, sem participar da invalidação.
-- [ ] 1.4 Confirmar com a infra o acesso ao Postgres e ao Redis compartilhados. **Não** criar
-      schema: a DCA usa o `public`, com prefixo `dca_*` e `alembic_version_dca` (P5).
+- [x] 1.1 Fechado em `design.md` § 4bis, "O registry e o resumo agregado". Ordem canônica
+      `("BO", "I-AB", "I-C", "I-D", "I-E", "I-F", "I-G", "I-HI")` — o `BO` à frente por ser o
+      derivado da MSC, os 7 da DCA na ordem do SICONFI. Um job parametrizado por anexo (P4);
+      anexo sem implementação entra com `servico: null` e o resumo o reporta `sem_cache`. O
+      pipeline completo consome a mesma tupla como ordem de execução.
+- [x] 1.2 As 11 fixadas em `pyproject.toml`, extra `plataforma` — extra, e não `dependencies`,
+      enquanto nada em `app/` as importa; migram quando a F2 entrar. A garantia de não serem
+      alcançáveis a partir de `domain/` é executável: `tests/test_fronteira_camadas.py` (task 2.5).
+- [x] 1.3.0 Fechado em `design.md` § 4bis, "O shape de `linhas`". Array 1:1 com `Linha`, `Coluna`,
+      `ContaCC`, `Filtro`, `RefColuna` e `RefLinha` de `app/domain/bo/modelo.py`, sem a transcrição
+      normativa (que não é lida ao apurar). Três pontos que o seed herda: `exclusoes` é array **de
+      arrays** (D2), `natureza_saldo` fica reservado na conta para quando C6 fechar, e nenhum
+      `Decimal` atravessa o shape.
+- [x] 1.3 Implementado em `app/infra/regras/carregador.py::_hash_canonico`. **Lacuna corrigida
+      nesta sessão:** o hash cobria só as regras — os hashes das tabelas STN iam para a procedência
+      mas **não entravam na invalidação**, então uma tabela de natureza de receita corrigida
+      serviria cache velho. Agora o payload canônico é
+      `{"regras": [...], "tabelas_stn": {...}}`, com `sort_keys=True`, UTF-8 e sobre o conteúdo
+      **parseado** (imune a CRLF). A edição (`IPC07 2020-01`) segue só na procedência.
+- [x] 1.4 Acesso confirmado e schema levantado em 2026-09-04, por inspeção read-only do banco
+      real `db-ps-rreo-rgf-dca` (PostgreSQL 18.0, `localhost:5432`). **44 tabelas, todas em
+      `public`.** Três achados que confirmam P5:
+      - **`dca_*`: zero tabelas.** O espaço de nomes da DCA está livre — nenhuma colisão.
+      - **Não existe `alembic_version` órfão**: só `alembic_version_rgf` (`060_token_ps_validacao_status`)
+        e `alembic_version_rreo` (`032`). `alembic_version_dca` é livre, e a guarda da task 4.1
+        continua valendo como defesa, sem caso hoje.
+      - O RGF tem **uma tabela de cache por anexo** (`rgf_anexo01..06_cache`) e **uma de mapeamento
+        por anexo** (`rgf_anexo02..05_mapeamento`) — o acúmulo que P-D1 evita com tabela única.
 - [x] 1.5 Nomes de variáveis levantados dos `.env` reais de RREO e RGF em 2026-09-04 e
       consolidados em `design.md` §5. Dois achados: o banco já é `db-ps-rreo-rgf-dca`, e
       `REDIS_PREFIX=msc_cache:` é comum aos dois — nomeia o cache de MSC, que deve continuar
       compartilhado; o isolamento é só do estado de execução (`dca:`).
-- [ ] 1.6 Confirmar com a infra qual `POSTGRES_DB`/host a DCA usa por ambiente, e obter
-      `TOKEN_ENCRYPTION_KEY` e `S2S_API_SECRET` próprios — nunca reaproveitar os dos irmãos.
+- [x] 1.6 Resolvido em 2026-09-04. `.env` criado (fora do git, `.gitignore` linha 10) e
+      `.env.example` atualizado com os mesmos nomes e **placeholders vazios**:
+      - **Herdado do `regras-rgf-api`**, compartilhado de propósito: `POSTGRES_HOST/PORT/USER/
+        PASSWORD/DB` (banco `db-ps-rreo-rgf-dca`) e as 7 variáveis de Redis, incluindo
+        `REDIS_PREFIX=msc_cache:`.
+      - **Gerado próprio da DCA**, nunca copiado: `SECRET_KEY`, `S2S_API_SECRET` e
+        `TOKEN_ENCRYPTION_KEY` (Fernet, 32 bytes urlsafe base64). Vazamento em um irmão não
+        compromete a DCA.
+      Ambiente de produção ainda não confirmado — o `.env` atual é `development`.
 
 ## 2. TEST — antes do código
 
+**Em andamento: 15 dos 63 cenários cobertos.** Fundação pronta em `tests/pipeline/conftest.py` —
+fakes em memória de repositório, fila e lock, implementando as mesmas portas que os adapters de
+`infra/` vão implementar. Estado: **20 testes vermelhos**, e o resto da suíte segue verde (155).
+
 - [ ] 2.1 Traduzir cada cenário do delta spec em teste de comportamento.
+      **15 de 63 feitos**, nos requisitos `Ciclo único`, `Identidade e invalidação`,
+      `Cache único` e `Anexo é conjunto fechado` — `tests/pipeline/test_ciclo.py` e
+      `test_invalidacao.py`. Faltam os 48 de lock, polling/SSE, reprocessamento, resumo,
+      vigência, mapeamento INSERT-only, procedência, diagnóstico, isolamento de execução, banco
+      compartilhado, notificação e auth.
 - [ ] 2.2 Teste de ciclo completo com fila e banco de teste: miss → `202 + job_id` → worker →
       `200`, sem apurar no processo da API.
-- [ ] 2.3 Teste que falha se `versao_regras` divergente servir cache.
+- [x] 2.3 `test_versao_de_regras_divergente_nao_serve` e `test_alteracao_real_de_regra_invalida`.
+      Cobre também o inverso — `test_regra_de_outro_anexo_nao_invalida` —, que é o que impede um
+      hash global de reapurar os sete anexos de todos os entes por uma linha do BO.
 - [ ] 2.4 Teste de lock: segunda requisição não enfileira segundo job; lock órfão é liberado.
-- [ ] 2.5 Teste de fronteira de camada: `domain/` sem import de `requests`, `pandas`, `yaml`,
-      `sqlalchemy`, `redis` ou `fastapi` — falha o build se alguém cruzar.
+- [x] 2.5 `tests/test_fronteira_camadas.py`. Percorre o **fecho transitivo** dos imports `app.*`
+      a partir de `app/domain/**` via `ast` — um domínio limpo que importe módulo de `infra/` que
+      importe `sqlalchemy` está igualmente contaminado, e o teste pega. Cobre as 14 proibidas
+      (as 6 da task + `arq`, `alembic`, `psycopg2`, `uvicorn`, `gunicorn`, `pydantic`, `jose`,
+      `cryptography`). Verificado por injeção: `import sqlalchemy` em `domain/bo/saldo.py` derruba
+      o teste nomeando o módulo.
 - [ ] 2.6 Testes de auth: `401` sem JWT, `403` para ente não autorizado, recusa de credencial de
       fonte vinda de browser.
 - [ ] 2.7 Teste de vigência: a carga recebe o exercício e resolve a maior vigência `<=` a pedida;
@@ -67,11 +104,27 @@ segue em frente; as fases **F2 (transporte)** e **F3 (pipeline)** implementam o 
       `seed-yaml`, e a apuração passa a ler do banco.
 - [ ] 2.8 Teste de procedência e diagnóstico: o resultado gravado identifica regras, edição
       normativa e versão das tabelas STN, e lista células não apuradas — tudo sem reapurar.
-- [ ] 2.8.1 Teste de estabilidade do hash: reescrever os YAMLs com CRLF, reordenar chaves e
-      reindentar **não** muda `versao_regras`; alterar uma conta **muda**.
+- [x] 2.8.1 `test_identificador_de_regra_e_estavel_a_formatacao` e
+      `test_alteracao_de_conta_muda_o_identificador` — **passam contra a F1**, sem precisar de
+      F2/F3: o hash canônico já existe. Confere as duas direções de fim de linha (LF e CRLF),
+      reindentação e reordenação de chaves.
+
+      **Achado do próprio teste:** na primeira versão ele acusava instabilidade a CRLF, e eu
+      cheguei a "corrigir" o `_hash_canonico` por isso. O diagnóstico estava errado — os YAMLs do
+      repositório **já estão em CRLF**, e o `replace(b"\n", b"\r\n")` da fixture produzia
+      `\r\r\n`, mudando a estrutura de linhas e, por dobra de escalar do YAML, o valor
+      parseado. O teste media o seu próprio defeito. A alteração no produto foi **revertida**: ela
+      resolvia problema inexistente e, pior, mascararia um `\r` legítimo dentro de escalar
+      citado. A fixture passou a normalizar antes de gerar a variante.
 - [ ] 2.9 Teste de reprocessamento: com cache `ok` cria job; não escapa do lock; resultado anterior
       permanece legível durante a reapuração; `403` sem autorização.
 - [ ] 2.10 Rodar e confirmar que falham pelo motivo esperado.
+      Feito para os 15 escritos: 20 vermelhos, todos por `ModuleNotFoundError` dos módulos da
+      F2/F3 ou por asserção de comportamento. **Dois testes tiveram de ser reescritos por
+      passarem antes da implementação** — afirmavam a validação do próprio dublê, não a
+      persistência real; agora apontam para `app.infra.cache.modelo` e ficam vermelhos. E as
+      exceções foram nomeadas (`AnexoDesconhecido`, `StatusInvalido`) em vez de `Exception` cega,
+      que deixaria o teste verde por acidente de import.
 
 ## 3. IMPLEMENT — F2 (transporte)
 

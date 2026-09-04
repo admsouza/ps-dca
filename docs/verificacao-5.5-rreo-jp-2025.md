@@ -12,10 +12,18 @@ célula com `RREO-Anexo 01` do mesmo ente e exercício.
 | Conferem em centavos | **108** |
 | Divergem só no sinal, por convenção do IPC 07 | **14** |
 | Divergência real de valor | **1** (`L27.previsao_inicial` — pendência **C7**) |
-| Linhas sem gabarito no RREO | 11 (L42–L47, L49–L51, L18–L23, L25, L26, L30 — o ente não as publica) |
+| Linhas não comparadas | 11 — ver a ressalva abaixo |
 
 O BO é **consolidado**; o RREO separa `exceto intra` de `intra`. A comparação soma os dois
 `cod_conta` nas linhas em que isso ocorre (`L1`, `L3`, `L7`, `L31`, `L32`, `L34`).
+
+**Ressalva sobre as 11 não comparadas.** Duas causas distintas, que não devem ser confundidas:
+
+- `L18`–`L23`, `L30`, `L42`–`L47`, `L51` — o ente **não publica** essas linhas (sem refinanciamento,
+  sem reabertura de créditos, sem reserva do RPPS). Não há gabarito.
+- `L25`, `L26`, `L49`, `L50` — o RREO **publica**, como `TotalReceitasComDeficit`, `Superavit` e
+  `TotalDespesasComSuperavit`. Não foram comparadas porque **o nosso lado sai vazio** (pendência
+  C5), não porque falte gabarito. É a seção seguinte.
 
 ## As 14 divergências de sinal não são erro
 
@@ -32,6 +40,17 @@ RREO      (a-c)            442.467.502,93
 
 A coluna de despesa **não** tem esse efeito: `Saldo da Dotação (j) = (f-g)` do IPC 07 e
 `SALDO (g) = (e-f)` do RREO apontam na mesma direção, e as 6 células de `saldo_dotacao` conferem.
+
+## Evidência medida para a pendência C5
+
+A conferência acima deixou `L25`, `L26`, `L49` e `L50` de fora porque **o nosso lado sai vazio**
+(C5). O que o STN publica nessas linhas foi medido em separado, nas duas metades — a do superávit
+em João Pessoa e a do déficit em 12 estados deficitários, já que JP foi superavitária.
+
+→ **`docs/evidencia-c5-deficit-superavit.md`**
+
+O resultado em uma linha: as duas metades **não são simétricas** — o superávit sai em 3 colunas de
+execução da despesa, o déficit em 1 só, contra a empenhada.
 
 ## A única divergência de valor — pendência C7
 

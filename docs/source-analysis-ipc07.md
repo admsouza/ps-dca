@@ -111,10 +111,34 @@ coluna, sem contrapartida de `5.3.2.3`:
 **Decisão necessária:** confirmar contra o PCASP 2019, ou aceitar a fórmula de 3 termos por
 simetria (decisão registrada), ou manter as 9 linhas `review_required`.
 
-**Decisão do PO (2026-08-27) — resolvido:** manter a leitura da família/prefixo `531` e preservar
+**Decisão do PO (2026-08-27) — SUPERADA:** manter a leitura da família/prefixo `531` e preservar
 `5.3.1.3.0.00.00` na fórmula do IPC07. A implementação SHALL conter comentário adjacente ao
 tratamento informando que essa conta existia no contexto do PCASP 2019 e foi descontinuada em
 edições posteriores. Não remover o termo por comparação com o PCASP atual.
+
+**Decisão do PO (2026-09-04) — vigente:** `5.3.1.3.0.00.00` foi descontinuada e **o que ela
+guardava está em `5.3.1.2.0.00.00`**, que já é o primeiro termo da mesma fórmula. O termo é
+redundante e **sai da regra**: a coluna passa a declarar 3 contas,
+`5.3.1.2 + 5.3.1.6 (-) 6.3.1.6` — simétrica à do quadro de RP Processados.
+
+Por que não substituir `5313` por `5312`: a apuração soma por conta declarada e **não deduplica**
+(`app/domain/bo/saldo.py`), então declarar `5.3.1.2` duas vezes dobraria o valor — R$ 67.299.876,72
+a mais na coluna (a) em João Pessoa 2025.
+
+Medições que sustentam (`docs/evidencia-c6-c7.md`):
+
+- `5313` e `5323` em **zero** de ~185.000 registros de classe 5 (`MSCC`, `ending_balance`, 12/2025)
+  em 9 entes grandes — SP, MG, RJ, BA, PR, RS, CE, PE e João Pessoa.
+- O grupo `5.3.2` não tem `5.3.2.3`, e a fórmula de RP Processados sempre teve 3 termos.
+- `5.3.1` e `5.3.2` são Devedora em 8 de 8; `6.3.1`/`6.3.2` Credora em 16 de 16.
+
+Efeito medido na apuração: **nenhum**. Conta declarada sem escrituração já contribuía zero, e a
+regressão contra JP 2025 saiu com 0 células divergentes em 69 linhas. O que muda é que a presença
+de escrituração em `5.3.1.3` deixa de apagar a célula das 9 linhas do quadro.
+
+Consequência: a pendência **C6 é encerrada sem alteração de schema** — `natureza_saldo` perdeu o
+único caso de uso e foi removida do domínio, junto com `_direcao_da_conta`, que nunca era chamada.
+Change: `ipc07-b1-remocao-termo-5313`.
 
 ---
 
@@ -364,3 +388,61 @@ elegíveis a `validated`.
 
 O inventário passa a ter 41 contas/padrões PCASP: 32 conferidos na tabela atual e 9 exceções
 históricas decididas pelo PO (B1: 1; B3: 8). Todos os 7 pares função/subfunção seguem conferidos.
+
+
+---
+
+## B6 restringida em 2026-09-04 — `L29` não tem previsão inicial
+
+A decisão B6 de 2026-09-03 mandou `L27` a `L30` declararem as quatro colunas de receita. Medição em
+25 entes (`docs/evidencia-c6-c7.md`): **zero** publicam `PREVISÃO INICIAL` para
+`SuperavitFinanceiro` no `RREO-Anexo 01` — nem os que publicam todas as outras colunas.
+
+Um superávit financeiro é apurado sobre o exercício **fechado**, logo não existe no orçamento
+originário: entra como crédito adicional, na previsão atualizada.
+
+**Restrição:** `L29` declara três colunas — `previsao_atualizada`, `receitas_realizadas` e `saldo`.
+O restante de B6 segue valendo (`L27`, `L28` e `L30` com as quatro), e **B5** — a conta da linha em
+`L29` — não é afetada. A decisão de 2026-09-03 fica registrada, não apagada.
+
+Efeito medido em João Pessoa 2025: `L27.previsao_inicial` passou de 482.338.332,64 para
+**12.000.000,00**, batendo em centavos com o STN.
+
+## C5 fechada em 2026-09-04 — as linhas cruzadas, e a assimetria
+
+`L25`, `L26`, `L49` e `L50` cruzam receita e despesa. O IPC 07 não diz em qual coluna são
+apresentadas; o publicado do STN diz, e foi medido em JP (superavitário) e nos 12 estados
+deficitários de 2025 (`docs/evidencia-c5-deficit-superavit.md`).
+
+| Linha | Colunas | Fórmula por célula |
+|---|---|---|
+| `L25` Déficit | `receitas_realizadas` (1) | `L48.empenhadas − L24.receitas_realizadas` |
+| `L26` TOTAL (VII) | previsão inicial, atualizada, realizadas (3) | `L24 + L25` |
+| `L49` Superávit | `empenhadas`, `liquidadas`, `pagas` (3) | `L24.receitas_realizadas − L48.<coluna>` |
+| `L50` TOTAL (XV) | 5 de despesa, sem `saldo_dotacao` | `L48 + L49` |
+
+**Não são simétricas:** cada bloco recebe tantas células de ajuste quantas colunas de realização
+tem — a receita tem uma, a despesa tem três.
+
+Três achados que a medição obrigou, e que o documento não continha:
+
+1. **A fórmula é cruzada em coluna.** `L49.empenhadas` lê `L24.receitas_realizadas`. A referência
+   passou a poder nomear a coluna lida.
+2. **Célula suprimida pela condição contribui zero, e se apresenta em branco.** Em ente
+   deficitário o STN deixa `Superavit` em branco e **publica** `TotalDespesasComSuperavit` igual a
+   `TotalDespesas` (SP e GO, exatos).
+3. **A condição é decidida uma vez, por linha, não célula a célula.** São Paulo 2025 tem déficit
+   contra a empenhada e superávit contra liquidadas e pagas — e o STN deixa `Superavit` em branco
+   nas três. Decidir por célula publicaria duas células que o STN não publica. A regra declara em
+   qual coluna a condição é avaliada (`calculation.condition.column`).
+
+## Observação aberta — `L30` em Goiás, R$ 963.024,00
+
+Medido no aceite de C5: em GO 2025 o nosso `L27.previsao_atualizada` dá 9.690.185.679,58 contra
+9.689.222.655,58 do STN. A diferença é **exatamente** `L30` Reabertura de Créditos Adicionais
+(963.024,00), linha que GO **não publica** no anexo, embora a MSC do ente tenha o valor. `L29` bate
+em centavos nos três entes conferidos.
+
+É da mesma família da ressalva da Paraíba, que não publicou `Deficit` tendo empenhada acima da
+receita: o ente publica menos linhas do que a sua MSC sustenta. **Não é defeito de apuração e não
+foi tratado nesta change** — fica registrado para o PO decidir se cabe conferência por ente.

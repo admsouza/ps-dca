@@ -114,6 +114,19 @@ Uma tabela, não sete. O payload é JSONB nos dois pipelines existentes; sete mo
 existem lá por acúmulo histórico, e são o que obriga `services/cache_rgf/resumo.py` a importar seis
 services para fazer a mesma pergunta.
 
+**Medido no banco real em 2026-09-04** (inspeção read-only de `db-ps-rreo-rgf-dca`, PostgreSQL
+18.0): 44 tabelas, todas em `public`, **zero com prefixo `dca_`**. O RGF tem `rgf_anexo01..06_cache`
+e o RREO nove tabelas `rreo_anexo*_cache` — o acúmulo que P-D1 evita. `rgf_anexo01_cache` tem 12
+colunas; a `dca_anexo_cache` acrescenta `versao_regras`, `procedencia` e `diagnostico`, e dispensa
+`tipo_poder`, `periodicidade` e `periodo_referencia`, que a DCA não tem por ser anual e consolidada.
+
+`rgf_anexo02_mapeamento` confirma o molde de `dca_regra_mapeamento` — as mesmas 7 colunas
+(`ano_vigencia`, `mes_vigencia`, `versao`, `linhas` JSONB, `origem`, `criado_em`,
+`criado_por_usuario_id`), e a DCA acrescenta `anexo` para unificar as cinco tabelas em uma.
+
+Versionamento: existem `alembic_version_rgf` e `alembic_version_rreo`, e **nenhum
+`alembic_version` órfão** — `alembic_version_dca` nasce limpo.
+
 ## 4bis. Onde vive a regra
 
 Duas naturezas de conteúdo, dois lugares (P10):
@@ -149,6 +162,80 @@ Duas correções em relação a ele:
 O carregador (`infra/regras/`) implementa a porta do domínio e passa a ter duas implementações: a de
 banco, usada em produção, e a de YAML, usada no seed e nos testes da F1 — que assim não precisam de
 Postgres. O domínio não sabe de qual das duas veio.
+
+### O shape de `linhas` (task 1.3.0)
+
+`linhas` é o **contrato de cálculo já achatado** — o que `app/domain/bo/modelo.py` consome, sem a
+transcrição normativa (`source.page`, `evidence.text`, hash do PDF), que fica no YAML e não é lida
+ao apurar. É um array, na ordem de apresentação:
+
+```jsonc
+[
+  {
+    "id": "bo.quadro_principal.receitas.l16",   // = rule_id; chave de referência entre linhas
+    "codigo": "L16",
+    "rotulo": "SUBTOTAL DAS RECEITAS (III) = (I + II)",
+    "quadro": "QUADRO_PRINCIPAL",
+    "grupo": "RECEITAS",
+    "condicao": null,                            // null | "result_positive" | "result_negative"
+
+    // Linha folha: filtros + colunas. Linha composta: referencias. Nunca as duas.
+    "filtros":   [{"campo": "natureza_receita", "operador": "not_in", "valores": ["9990*"]}],
+    "exclusoes": [[{"campo": "conta_contabil", "operador": "in", "valores": ["521129900"]}]],
+    "colunas": [
+      {
+        "id": "previsao_atualizada",
+        "rotulo": "PREVISÃO ATUALIZADA (b)",
+        "contas": [
+          {"cc": "521110000", "operacao": "+", "natureza_saldo": null}
+        ],
+        "derivada": []                           // ou [{"coluna": "...", "sinal": "+|-"}]
+      }
+    ],
+    "referencias": [{"regra": "bo.quadro_principal.receitas.l1", "sinal": "+"}]
+  }
+]
+```
+
+Correspondência 1:1 com o modelo do domínio — `Linha`, `Coluna`, `ContaCC`, `Filtro`, `RefColuna`,
+`RefLinha`. Três consequências que o seed e o carregador de banco herdam de graça:
+
+- **`exclusoes` é array de arrays.** Grupos independentes (D2), não uma lista achatada.
+- **`natureza_saldo` existe na conta e é `null` no caso normal.** É a exceção histórica B1/B3, e
+  hoje o schema `knowledge/schemas/rule.json` **não tem o campo** — é a pendência C6 da change do
+  BO. O shape de banco já o reserva para não exigir migration quando C6 fechar.
+- **Nada de `Decimal` no shape.** Só identificadores, rótulos e sinais; valor nenhum atravessa.
+
+O hash canônico (P-D7) roda sobre este array serializado com chaves ordenadas — é o mesmo
+`_hash_canonico` da F1, que já cobre regras **e** hashes das tabelas STN (task 1.3).
+
+### O registry e o resumo agregado (task 1.1)
+
+Um registry, não um conjunto por anexo. Declaração única, na **ordem canônica de apresentação**,
+que é a do próprio SICONFI:
+
+```python
+ANEXOS = ("BO", "I-AB", "I-C", "I-D", "I-E", "I-F", "I-G", "I-HI")
+```
+
+`BO` vem primeiro porque é o demonstrativo derivado — apurado da MSC pelas regras do IPC 07, e
+publicado pelo STN como `RREO-Anexo 01`, não como anexo da DCA. Os 7 seguintes são os anexos da
+DCA na ordem em que o SICONFI os lista (`docs/anexos-siconfi-inventario.md`).
+
+Cada entrada do registry declara o anexo, o service de apuração e o nome do job. Anexo sem
+implementação entra com service `None` — é assim que o resumo o reporta como `sem_cache` em vez de
+omitir:
+
+```jsonc
+{ "anexo": "BO", "servico": "services.bo.quadro_principal:apurar", "job": "apurar_anexo" }
+{ "anexo": "I-C", "servico": null,                                 "job": "apurar_anexo" }
+```
+
+**Um job só, parametrizado por anexo** (P4). O pipeline completo — job único percorrendo os 8 em
+série — é change posterior e consome o mesmo registry: a ordem já é a de execução, e nada no
+resumo muda. O resumo agregado itera `ANEXOS` e faz **uma** consulta a `dca_anexo_cache` por
+`(id_ente, an_referencia)`, projetando só metadados — nunca `resultado`. É o que evita o
+`services/cache_rgf/resumo.py` importando seis services para fazer a mesma pergunta.
 
 ## 5. Infra
 

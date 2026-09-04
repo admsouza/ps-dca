@@ -123,31 +123,4 @@ def _direcao_da_coluna(contas: Sequence[ContaCC], direcao) -> bool | None:
         resolvida = prefixo(conta.cc) if prefixo else direcao.credora(conta.cc)
         if resolvida is not None:
             return resolvida
-        if conta.natureza_saldo:
-            return conta.natureza_saldo.upper().startswith("C")
-    return None
-
-
-def _direcao_da_conta(conta: ContaCC, registros: Sequence[Registro], direcao) -> bool | None:
-    """Direção resolvida por conta folha do registro; a declarada na regra é o último recurso.
-
-    Contas diferentes podem casar o mesmo padrão da regra e ter direções opostas — medido:
-    o prefixo `6.2.1.3` tem 1 credora e 5 devedoras. Por isso a resolução é por registro, e a
-    célula só é apurada quando todas concordam.
-    """
-    direcoes = {direcao.credora(r.conta) for r in registros}
-    if None in direcoes:
-        return None       # alguma conta escriturada não tem direção conhecida
-    if len(direcoes) == 1:
-        return direcoes.pop()
-    if len(direcoes) > 1:
-        return None       # contas de direções opostas sob o mesmo padrão: não presumir
-
-    # Sem registro (ou nenhum com direção conhecida): tenta a própria conta declarada e, por
-    # último, a exceção histórica declarada na regra (B1/B3).
-    declarada = direcao.credora(conta.cc)
-    if declarada is not None:
-        return declarada
-    if conta.natureza_saldo:
-        return conta.natureza_saldo.upper().startswith("C")
     return None

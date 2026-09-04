@@ -347,8 +347,54 @@ def _validar_condicao(rel, regra, rule_id, arquivo, linha) -> None:
 
 # ─── referências e ciclos ────────────────────────────────────────────────────
 
+def _colunas_efetivas(regras) -> dict[str, set[str] | None]:
+    """Colunas que cada linha apresenta, resolvidas como o motor resolve.
+
+    Linha que declara `columns` apresenta essas. Linha composta que não declara herda a
+    **interseção** das colunas das linhas que referencia — o mesmo critério de
+    `app/domain/bo/matriz.py::_colunas_das_filhas`. Sem resolver transitivamente, uma referência
+    que nomeia coluna de linha composta (`L24`, `L48`) não teria como ser conferida, e é
+    exatamente esse o caso das linhas cruzadas.
+
+    Devolve `None` para linha cujas colunas não puderam ser resolvidas — aí a conferência é
+    omitida, em vez de acusar erro que pode não existir.
+    """
+    por_id = {r.get("rule_id"): r for r, _a, _l in regras}
+    memo: dict[str, set[str] | None] = {}
+
+    def resolver(rule_id: str, visitando: frozenset[str]) -> set[str] | None:
+        if rule_id in memo:
+            return memo[rule_id]
+        if rule_id in visitando:
+            return None                     # ciclo: reportado à parte, não aqui
+        regra = por_id.get(rule_id)
+        if regra is None:
+            return None
+        declaradas = regra.get("columns")
+        if declaradas is not None:
+            memo[rule_id] = set(declaradas)     # `{}` = linha sem coluna de valor (L51)
+            return memo[rule_id]
+        alvos = [
+            ref.get("rule")
+            for ref in ((regra.get("calculation") or {}).get("references") or [])
+            if ref.get("rule")
+        ]
+        conjuntos = [resolver(a, visitando | {rule_id}) for a in alvos]
+        if not conjuntos or any(c is None for c in conjuntos):
+            memo[rule_id] = None
+            return None
+        comuns = set(conjuntos[0])
+        for c in conjuntos[1:]:
+            comuns &= c
+        memo[rule_id] = comuns
+        return comuns
+
+    return {rule_id: resolver(rule_id, frozenset()) for rule_id in por_id}
+
+
 def _validar_referencias(rel, regras) -> None:
     conhecidos = {r.get("rule_id") for r, _a, _l in regras}
+    colunas_de = _colunas_efetivas(regras)
     grafo: dict[str, list[str]] = {}
     posicao: dict[str, tuple[str, int]] = {}
 
@@ -367,6 +413,18 @@ def _validar_referencias(rel, regras) -> None:
             if alvo not in conhecidos:
                 rel.erro(
                     f"referência a rule_id inexistente: {alvo}",
+                    rule_id=rule_id, arquivo=str(arquivo), linha=linha,
+                )
+                continue
+            # Coluna nomeada tem de existir na linha referenciada. Sem isso, a parcela seria
+            # tratada como inexistente e o total sairia com uma parcela a menos, sem aviso.
+            pedida = referencia.get("column")
+            disponiveis_alvo = colunas_de.get(alvo)
+            if pedida and disponiveis_alvo is not None and pedida not in disponiveis_alvo:
+                disponiveis = sorted(disponiveis_alvo or {"<nenhuma>"})
+                rel.erro(
+                    f"referência a {alvo} nomeia coluna inexistente: {pedida} — "
+                    f"disponíveis: {', '.join(disponiveis)}",
                     rule_id=rule_id, arquivo=str(arquivo), linha=linha,
                 )
         grafo[rule_id] = alvos

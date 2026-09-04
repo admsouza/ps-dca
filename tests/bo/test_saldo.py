@@ -186,17 +186,81 @@ def test_zero_legitimo_e_distinguido_de_nao_apurado(apurar_matriz, carregar_mapa
     assert de_celula == []
 
 
-def test_excecao_historica_usa_a_natureza_declarada(apurar_matriz, carregar_mapa):
-    """Scenario: exceção histórica usa a natureza declarada.
+# ─── Coluna (a) do quadro de RP Não Processados — termo `5.3.1.3` removido ───
+#
+# Direção conforme o PCASP: `5.3.1.*` é Devedora nas 4 contas do grupo, `6.3.1.6` é Credora.
+# A fixture antiga declarava as `531*` como credoras, contra a tabela (D4 do design).
+DIRECAO_RP = DirecaoFake(
+    devedoras={"531100000", "531200000", "531600000", "531700000"},
+    credoras={"631600000"},
+)
+COLUNA_A = "inscritos_exerc_anteriores"
 
-    `5.3.1.3.0.00.00` não está no PCASP atual (B1). Sem `natureza_saldo` na regra, a célula
-    ficaria `None`; com ele, a direção declarada resolve.
+
+def _contas_da_coluna_a(mapa, rule_id: str) -> list[str]:
+    linha = next(linha for linha in mapa.linhas if linha.id == rule_id)
+    coluna = next(c for c in linha.colunas if c.id == COLUNA_A)
+    return [conta.cc for conta in coluna.contas]
+
+
+def _folhas_do_quadro(mapa, quadro: str) -> list[str]:
+    """As linhas que declaram coluna. `L1`, `L5` e `L9` são compostas e agregam as folhas."""
+    return [
+        linha.id for linha in mapa.linhas
+        if linha.id.startswith(f"bo.{quadro}.") and not linha.composta
+    ]
+
+
+def test_coluna_a_do_rpnp_declara_tres_contas(carregar_mapa):
+    """Scenario: coluna com contas de sinal negativo.
+
+    O literal do IPC 07 p. 12 tem 4 termos, mas `5.3.1.3` foi descontinuada e o que ela guardava
+    está em `5.3.1.2` — que já é o primeiro termo. Declarar as duas duplicaria `5.3.1.2`, porque
+    `saldo_da_celula` soma por conta declarada e não deduplica.
     """
-    direcao = DirecaoFake(credoras={"531100000", "531200000", "531600000", "631600000"})
+    mapa = carregar_mapa(exercicio=2025)
+    folhas = _folhas_do_quadro(mapa, "rp_nao_processados")
+    assert len(folhas) == 6, "6 folhas declaram a coluna; L1, L5 e L9 agregam"
+    for rule_id in folhas:
+        contas = _contas_da_coluna_a(mapa, rule_id)
+        assert contas == ["5312", "5316", "6316"], f"{rule_id} declara {contas}"
+        assert "5313" not in contas
+
+
+def test_coluna_a_e_simetrica_nos_dois_quadros(carregar_mapa):
+    """Scenario: a fórmula fica simétrica à do quadro de RP Processados.
+
+    O grupo `5.3.2` não tem `5.3.2.3`, e a fórmula de RP Processados sempre teve 3 termos. Com o
+    termo removido, os dois quadros declaram as mesmas posições de família.
+    """
+    mapa = carregar_mapa(exercicio=2025)
+    nao_processados = _contas_da_coluna_a(mapa, "bo.rp_nao_processados.l2")
+    processados = _contas_da_coluna_a(mapa, "bo.rp_processados.l2")
+    assert nao_processados == ["5312", "5316", "6316"]
+    assert processados == ["5322", "5326", "6326"]
+    # Mesma posição de família: o dígito que difere é o do subgrupo (índice 2).
+    assert [c[:2] + c[3:] for c in nao_processados] == [c[:2] + c[3:] for c in processados]
+
+
+def test_conta_descontinuada_nao_apaga_a_celula(apurar_matriz, carregar_mapa):
+    """Scenario: escrituração em conta descontinuada não apaga a célula.
+
+    Nenhum ente medido escritura `5.3.1.3` — zero ocorrências em ~185.000 registros de classe 5
+    em 9 entes (`docs/evidencia-c6-c7.md`). Se algum escriturar, o registro é ignorado por não
+    casar com conta declarada, e as 9 linhas seguem apuradas. Antes desta change a mesma entrada
+    tornava a célula inteira `None`, por direção desconhecida.
+    """
     registros = [registro("531300000", "C", "10.00", natureza_despesa="3.1.00.00")]
-    matriz = apurar_matriz(carregar_mapa(exercicio=2025), registros, direcao)
-    celula = matriz.valores["bo.rp_nao_processados.l2"]["inscritos_exerc_anteriores"]
-    assert celula is not None, "a conta histórica precisa de natureza_saldo declarada na regra"
+    matriz = apurar_matriz(carregar_mapa(exercicio=2025), registros, DIRECAO_RP)
+
+    celula = matriz.valores["bo.rp_nao_processados.l2"][COLUNA_A]
+    assert celula == Decimal("0.00"), "o registro não casa com conta declarada e não é somado"
+
+    apagadas = [
+        a for a in matriz.nao_apuradas
+        if a.rule_id.startswith("bo.rp_nao_processados.") and a.coluna == COLUNA_A
+    ]
+    assert apagadas == [], "nenhuma das 9 linhas pode ficar sem apurar por causa de 5.3.1.3"
 
 
 # ─── Exemplo documental do IPC 07 p. 8 (fixture da task 2.2) ─────────────────

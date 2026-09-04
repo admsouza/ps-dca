@@ -22,55 +22,115 @@
       "pattern": "^[a-z0-9]+(\\.[a-z0-9_]+)+$",
       "description": "bo.<quadro>.<grupo?>.<linha>, minúsculo, único em toda a base"
     },
-    "demonstrativo": { "$ref": "#/$defs/codigoDescricao" },
-    "quadro": { "$ref": "#/$defs/codigoDescricao" },
-    "grupo": { "$ref": "#/$defs/codigoDescricao" },
+    "demonstrativo": {
+      "$ref": "#/$defs/codigoDescricao"
+    },
+    "quadro": {
+      "$ref": "#/$defs/codigoDescricao"
+    },
+    "grupo": {
+      "$ref": "#/$defs/codigoDescricao"
+    },
     "linha": {
       "type": "object",
-      "required": ["codigo", "descricao"],
+      "required": [
+        "codigo",
+        "descricao"
+      ],
       "additionalProperties": false,
       "properties": {
-        "codigo": { "type": "string", "minLength": 1 },
-        "descricao": { "type": "string", "minLength": 1 },
-        "nivel": { "type": "integer", "minimum": 1 },
-        "ordem": { "type": "integer", "minimum": 1 }
+        "codigo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "descricao": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nivel": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ordem": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     },
-    "policies": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-    "filters": { "$ref": "#/$defs/grupoDeFiltros" },
+    "policies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "filters": {
+      "$ref": "#/$defs/grupoDeFiltros"
+    },
     "exclusion_groups": {
       "type": "array",
       "description": "Cada grupo é uma combinação independente. Achatar em lista única excluiria mais do que o documento manda (D2).",
-      "items": { "$ref": "#/$defs/grupoDeFiltros" }
+      "items": {
+        "$ref": "#/$defs/grupoDeFiltros"
+      }
     },
     "columns": {
       "type": "object",
       "description": "Objeto vazio = linha sem coluna de valor (B6, caso L51).",
-      "additionalProperties": { "$ref": "#/$defs/coluna" }
+      "additionalProperties": {
+        "$ref": "#/$defs/coluna"
+      }
     },
-    "calculation": { "$ref": "#/$defs/calculoDeLinha" },
+    "calculation": {
+      "$ref": "#/$defs/calculoDeLinha"
+    },
     "line_account_override": {
       "type": "boolean",
       "description": "B5 — as contas da linha substituem as da coluna. Permitido apenas em L29 e L30; o validador recusa nos demais."
     },
-    "source": { "$ref": "#/$defs/source" },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
     "evidence": {
       "type": "object",
-      "required": ["page", "text"],
+      "required": [
+        "page",
+        "text"
+      ],
       "additionalProperties": false,
       "properties": {
-        "page": { "type": "integer", "minimum": 1 },
-        "text": { "type": "string", "minLength": 1 }
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "version": {
       "type": "object",
-      "required": ["source_document", "edition", "valid_from", "valid_until"],
+      "required": [
+        "source_document",
+        "edition",
+        "valid_from",
+        "valid_until"
+      ],
       "additionalProperties": false,
       "properties": {
-        "source_document": { "type": "string", "minLength": 1 },
-        "edition": { "type": "string", "minLength": 1 },
-        "valid_from": { "type": "string", "format": "date" },
+        "source_document": {
+          "type": "string",
+          "minLength": 1
+        },
+        "edition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "valid_from": {
+          "type": "string",
+          "format": "date"
+        },
         "valid_until": {
           "type": "null",
           "description": "O IPC 07 não declara fim de vigência; data inferida é erro."
@@ -79,34 +139,72 @@
     },
     "provenance": {
       "type": "object",
-      "required": ["extraction_method", "extracted_at"],
+      "required": [
+        "extraction_method",
+        "extracted_at"
+      ],
       "additionalProperties": false,
       "properties": {
-        "extraction_method": { "enum": ["automated", "assisted", "manual"] },
-        "extractor_version": { "type": "string" },
-        "extracted_at": { "type": "string", "format": "date" },
+        "extraction_method": {
+          "enum": [
+            "automated",
+            "assisted",
+            "manual"
+          ]
+        },
+        "extractor_version": {
+          "type": "string"
+        },
+        "extracted_at": {
+          "type": "string",
+          "format": "date"
+        },
         "decision": {
-          "enum": ["B1", "B3", "B5", "B6"],
+          "enum": [
+            "B1",
+            "B3",
+            "B5",
+            "B6"
+          ],
           "description": "Decisão do PO que sustenta a leitura adotada."
         },
         "reading": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "adopted_from_page": { "type": "integer", "minimum": 1 },
-            "note": { "type": "string" }
+            "adopted_from_page": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "note": {
+              "type": "string"
+            }
           }
         }
       }
     },
-    "status": { "enum": ["draft", "extracted", "review_required", "validated", "deprecated"] },
+    "status": {
+      "enum": [
+        "draft",
+        "extracted",
+        "review_required",
+        "validated",
+        "deprecated"
+      ]
+    },
     "review": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "required": { "type": "boolean" },
-        "reason": { "type": "string" },
-        "blocker": { "type": "string" },
+        "required": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "blocker": {
+          "type": "string"
+        },
         "candidate": {
           "type": "object",
           "description": "Candidato provável, registrado e NÃO aplicado em filters/columns."
@@ -117,16 +215,26 @@
   "$defs": {
     "codigoDescricao": {
       "type": "object",
-      "required": ["codigo"],
+      "required": [
+        "codigo"
+      ],
       "additionalProperties": false,
       "properties": {
-        "codigo": { "type": "string", "minLength": 1 },
-        "descricao": { "type": "string" }
+        "codigo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "descricao": {
+          "type": "string"
+        }
       }
     },
     "valor": {
       "type": "object",
-      "required": ["literal", "pattern"],
+      "required": [
+        "literal",
+        "pattern"
+      ],
       "additionalProperties": false,
       "properties": {
         "literal": {
@@ -135,44 +243,102 @@
           "description": "Grafia exata do PDF, preservada mesmo quando divergente."
         },
         "pattern": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Normalização em dígitos; null quando indeterminável — e aí a regra fica review_required."
         }
       }
     },
     "filtro": {
       "type": "object",
-      "required": ["field", "operator", "values"],
+      "required": [
+        "field",
+        "operator",
+        "values"
+      ],
       "additionalProperties": false,
       "properties": {
         "field": {
-          "enum": ["conta_contabil", "natureza_receita", "natureza_despesa", "funcao", "subfuncao"]
+          "enum": [
+            "conta_contabil",
+            "natureza_receita",
+            "natureza_despesa",
+            "funcao",
+            "subfuncao"
+          ]
         },
-        "operator": { "enum": ["in", "not_in"] },
-        "values": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/valor" } }
+        "operator": {
+          "enum": [
+            "in",
+            "not_in"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/valor"
+          }
+        }
       }
     },
-    "grupoDeFiltros": { "type": "array", "items": { "$ref": "#/$defs/filtro" } },
+    "grupoDeFiltros": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/filtro"
+      }
+    },
     "conta": {
       "type": "object",
-      "required": ["literal", "pattern", "sign"],
+      "required": [
+        "literal",
+        "pattern",
+        "sign"
+      ],
       "additionalProperties": false,
       "properties": {
-        "literal": { "type": "string", "minLength": 1 },
-        "pattern": { "type": ["string", "null"] },
-        "sign": { "enum": ["+", "-"] }
+        "literal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pattern": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sign": {
+          "enum": [
+            "+",
+            "-"
+          ]
+        }
       }
     },
     "coluna": {
       "type": "object",
-      "required": ["label"],
+      "required": [
+        "label"
+      ],
       "additionalProperties": false,
       "properties": {
-        "label": { "type": "string", "minLength": 1 },
-        "accounts": { "type": "array", "items": { "$ref": "#/$defs/conta" } },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/conta"
+          }
+        },
         "calculation": {
           "type": "object",
-          "required": ["references"],
+          "required": [
+            "references"
+          ],
           "additionalProperties": false,
           "properties": {
             "references": {
@@ -180,11 +346,22 @@
               "minItems": 1,
               "items": {
                 "type": "object",
-                "required": ["column", "sign"],
+                "required": [
+                  "column",
+                  "sign"
+                ],
                 "additionalProperties": false,
                 "properties": {
-                  "column": { "type": "string", "minLength": 1 },
-                  "sign": { "enum": ["+", "-"] }
+                  "column": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sign": {
+                    "enum": [
+                      "+",
+                      "-"
+                    ]
+                  }
                 }
               }
             }
@@ -194,7 +371,9 @@
     },
     "calculoDeLinha": {
       "type": "object",
-      "required": ["references"],
+      "required": [
+        "references"
+      ],
       "additionalProperties": false,
       "properties": {
         "references": {
@@ -202,36 +381,91 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": ["rule", "sign"],
+            "required": [
+              "rule",
+              "sign"
+            ],
             "additionalProperties": false,
             "properties": {
-              "rule": { "type": "string", "minLength": 1 },
-              "sign": { "enum": ["+", "-"] }
+              "rule": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sign": {
+                "enum": [
+                  "+",
+                  "-"
+                ]
+              },
+              "column": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Coluna lida na linha referenciada, quando difere da que esta sendo calculada. Ausente = le a mesma coluna."
+              }
             }
           }
         },
         "condition": {
           "type": "object",
-          "required": ["when"],
+          "required": [
+            "when"
+          ],
           "additionalProperties": false,
           "properties": {
-            "when": { "enum": ["result_positive", "result_negative"] }
+            "when": {
+              "enum": [
+                "result_positive",
+                "result_negative"
+              ]
+            },
+            "column": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Coluna em que a condicao e avaliada. O resultado orcamentario e decidido uma vez e vale para a linha inteira. Ausente = avaliada em cada coluna. Nao usar a chave `on`: YAML 1.1 a interpreta como booleano."
+            }
           }
         }
       }
     },
     "source": {
       "type": "object",
-      "required": ["document", "document_version", "page", "section", "table", "row"],
+      "required": [
+        "document",
+        "document_version",
+        "page",
+        "section",
+        "table",
+        "row"
+      ],
       "additionalProperties": false,
       "properties": {
-        "document": { "type": "string", "minLength": 1 },
-        "document_version": { "type": "string", "minLength": 1 },
-        "page": { "type": "integer", "minimum": 1 },
-        "section": { "type": "string", "minLength": 1 },
-        "item": { "type": "string" },
-        "table": { "type": "string", "minLength": 1 },
-        "row": { "type": "string", "minLength": 1 }
+        "document": {
+          "type": "string",
+          "minLength": 1
+        },
+        "document_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "item": {
+          "type": "string"
+        },
+        "table": {
+          "type": "string",
+          "minLength": 1
+        },
+        "row": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     }
   }

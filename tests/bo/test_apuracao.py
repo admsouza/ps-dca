@@ -215,12 +215,18 @@ def test_recursos_arrecadados_em_exercicios_anteriores(apurar_quadro):
         6: [],
     }
     resultado = apurar_quadro(ente=ENTE, exercicio=EXERCICIO, fonte=FonteFake(registros))
-    assert resultado.matriz["bo.quadro_principal.receitas.l26"][
-        "previsao_inicial"] == Decimal("5301644648.00")
+    matriz = resultado.matriz
 
-    residuos = resultado.diagnostico.residuos
-    assert any("9.9.9.0.00.0.0" in str(r) and Decimal("12000000.00") == r.valor
-               for r in residuos)
+    # Fora do total das receitas: `L16`, `L24` e `L26` excluem a natureza `999`.
+    for rule_id in ("receitas.l16", "receitas.l24", "receitas.l26"):
+        assert matriz[f"bo.quadro_principal.{rule_id}"]["previsao_inicial"] == Decimal(
+            "5301644648.00"), rule_id
+
+    # E dentro de `L28`, que os classifica por filtro — logo **não** são resíduo. O resíduo é para
+    # classificação que nenhuma linha captura; esta é capturada, e era a decisão B6.
+    assert matriz["bo.quadro_principal.receitas.l28"]["previsao_inicial"] == Decimal("12000000.00")
+    assert matriz["bo.quadro_principal.receitas.l27"]["previsao_inicial"] == Decimal("12000000.00")
+    assert resultado.diagnostico.residuos == []
 
 
 # ─── Vigência, procedência, diagnóstico ──────────────────────────────────────

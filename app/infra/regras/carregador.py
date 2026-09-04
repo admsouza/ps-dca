@@ -58,11 +58,12 @@ def carregar(exercicio: int, base: Path | None = None) -> MapaBO:
         if regra.get("version", {}).get("edition") == escolhida["edicao"]
     )
 
+    tabelas = _hashes_das_tabelas(raiz)
     return MapaBO(
         linhas=linhas,
         vigencia=Vigencia(escolhida["documento"], escolhida["edicao"], exercicio),
-        versao_regras=_hash_canonico(raiz, escolhida["edicao"]),
-        tabelas_stn=_hashes_das_tabelas(raiz),
+        versao_regras=_hash_canonico(raiz, escolhida["edicao"], tabelas),
+        tabelas_stn=tabelas,
     )
 
 
@@ -103,18 +104,23 @@ def _ano(valor) -> int | None:
 
 # ─── identidade do conteúdo carregado (P-D7) ─────────────────────────────────
 
-def _hash_canonico(raiz: Path, edicao: str) -> str:
+def _hash_canonico(raiz: Path, edicao: str, tabelas: dict[str, str]) -> str:
     """SHA-256 do conteúdo **parseado** e reserializado de forma estável.
 
     Nunca dos bytes do arquivo: um `git checkout` que troque LF por CRLF mudaria o hash e
     invalidaria todo o cache sem regra nenhuma ter mudado.
+
+    Entram as regras vigentes **e** os hashes das tabelas STN usadas: a apuração depende das
+    duas coisas, e uma tabela de natureza de receita corrigida muda o resultado sem que
+    nenhuma regra tenha mudado. Sem isso, o cache serviria valor velho.
     """
     regras = []
     for arquivo in sorted((raiz / "rules" / "bo").glob("*.yaml")):
         for regra in (yaml.safe_load(arquivo.read_text(encoding="utf-8")) or {}).get("rules", []):
             if (regra.get("version") or {}).get("edition") == edicao:
                 regras.append(regra)
-    canonico = json.dumps(regras, sort_keys=True, ensure_ascii=False, default=str)
+    conteudo = {"regras": regras, "tabelas_stn": tabelas}
+    canonico = json.dumps(conteudo, sort_keys=True, ensure_ascii=False, default=str)
     return hashlib.sha256(canonico.encode("utf-8")).hexdigest()
 
 
@@ -141,11 +147,12 @@ def _linha(regra: dict) -> Linha:
         ),
         colunas=tuple(_coluna(nome, dados) for nome, dados in (regra.get("columns") or {}).items()),
         referencias=tuple(
-            RefLinha(r["rule"], r["sign"])
+            RefLinha(r["rule"], r["sign"], r.get("column"))
             for r in (regra.get("calculation") or {}).get("references") or []
             if "rule" in r
         ),
         condicao=((regra.get("calculation") or {}).get("condition") or {}).get("when"),
+        condicao_coluna=((regra.get("calculation") or {}).get("condition") or {}).get("column"),
     )
 
 
@@ -162,7 +169,7 @@ def _coluna(nome: str, dados: dict) -> Coluna:
         id=nome,
         rotulo=dados.get("label", nome),
         contas=tuple(
-            ContaCC(c["pattern"], c.get("sign", "+"), c.get("natureza_saldo"))
+            ContaCC(c["pattern"], c.get("sign", "+"))
             for c in dados.get("accounts") or []
             if c.get("pattern")
         ),
