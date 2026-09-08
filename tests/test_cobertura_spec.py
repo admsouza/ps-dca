@@ -28,8 +28,10 @@ CENARIOS_ESPERADOS = {
 }
 
 # Capabilities cuja fase TEST já começou — só delas se exige teste por cenário.
-# `pipeline/plataforma` está em PLAN/ARCH: a contagem é conferida, a cobertura ainda não.
-COM_TESTES = ("dca/base-canonica-regras", "dca/balanco-orcamentario")
+# `pipeline/plataforma` entrou ao fechar os 63 cenários — fase TEST concluída, F2/F3 por
+# implementar. Os testes existem e são vermelhos de propósito; a cobertura passa a ser exigida
+# daqui para a frente, e cenário novo sem teste quebra o build.
+COM_TESTES = ("dca/base-canonica-regras", "dca/balanco-orcamentario", "pipeline/plataforma")
 
 
 def _specs() -> dict[str, Path]:

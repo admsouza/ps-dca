@@ -81,6 +81,60 @@ class FilaFake:
         self.enfileirados.append(((ente, exercicio, anexo), job_id))
 
 
+class JobsFake:
+    """Porta do estado de job — o que o polling e a stream leem. Dados puros, nada de pickle."""
+
+    def __init__(self):
+        self.registros: dict[str, dict] = {}
+
+    def gravar(self, job_id: str, estado: dict) -> None:
+        self.registros[job_id] = dict(estado)
+
+    def obter(self, job_id: str) -> dict | None:
+        estado = self.registros.get(job_id)
+        return dict(estado) if estado else None
+
+
+@dataclass
+class NotificadorFake:
+    """Canal de operação. `falhar` simula o webhook fora do ar; `ausente`, canal não configurado."""
+
+    enviadas: list[dict] = field(default_factory=list)
+    falhar: bool = False
+
+    def enviar(self, mensagem: dict) -> None:
+        if self.falhar:
+            raise RuntimeError("webhook indisponível")
+        self.enviadas.append(dict(mensagem))
+
+
+class RepoVigenciasFake:
+    """Espelha `dca_regra_mapeamento` — **INSERT-only**, uma tabela para todos os anexos.
+
+    A chave é `(anexo, ano_vigencia, mes_vigencia)`. Inserir sobre chave existente é recusado
+    aqui, como o `PRIMARY KEY` recusa no banco: corrigir mapeamento é publicar vigência nova, não
+    reescrever a publicada — quem apurou com a anterior tem de continuar podendo lê-la.
+    """
+
+    def __init__(self, registros: list[dict] | None = None):
+        self._linhas: list[dict] = [dict(r) for r in (registros or [])]
+
+    def inserir(self, registro: dict) -> dict:
+        chave = (registro["anexo"], registro["ano_vigencia"], registro["mes_vigencia"])
+        if any(chave == (r["anexo"], r["ano_vigencia"], r["mes_vigencia"]) for r in self._linhas):
+            raise KeyError(f"vigência já publicada: {chave}")
+        self._linhas.append(dict(registro))
+        return self._linhas[-1]
+
+    def listar(self, anexo: str) -> list[dict]:
+        """Vigências do anexo, da mais antiga para a mais recente."""
+        return sorted((dict(r) for r in self._linhas if r["anexo"] == anexo),
+                      key=lambda r: (r["ano_vigencia"], r["mes_vigencia"]))
+
+    def __len__(self) -> int:
+        return len(self._linhas)
+
+
 @dataclass
 class LockFake:
     """Lock por identidade, com recuperação de órfão."""
@@ -99,6 +153,10 @@ class LockFake:
 
     def liberar(self, ente: str, exercicio: int, anexo: str) -> None:
         self.tomados.pop((ente, exercicio, anexo), None)
+
+    def dono(self, ente: str, exercicio: int, anexo: str) -> str | None:
+        """`job_id` que detém o lock — é o que a resposta informa como job em voo."""
+        return self.tomados.get((ente, exercicio, anexo))
 
     def limpar_orfaos(self) -> int:
         quantos = len(self.orfaos)
@@ -122,6 +180,21 @@ def fila():
 @pytest.fixture
 def lock():
     return LockFake()
+
+
+@pytest.fixture
+def repo_vigencias():
+    return RepoVigenciasFake()
+
+
+@pytest.fixture
+def jobs():
+    return JobsFake()
+
+
+@pytest.fixture
+def notificador():
+    return NotificadorFake()
 
 
 @pytest.fixture

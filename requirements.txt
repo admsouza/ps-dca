@@ -1,0 +1,31 @@
+# Runtime da API e do worker. O núcleo de domínio não importa nada daqui além de nada:
+# `tests/test_fronteira_camadas.py` quebra o build se alguém cruzar a fronteira.
+#
+# Fonte da verdade das versões é o `pyproject.toml` (extra `plataforma`); este arquivo existe
+# porque o Dockerfile instala antes de copiar o código, o que preserva a camada de cache.
+
+# --- núcleo (F1) ---
+pyyaml>=6.0
+jsonschema>=4.25
+requests>=2.32
+
+# --- transporte (F2) ---
+fastapi>=0.115
+uvicorn[standard]>=0.32
+gunicorn>=23.0
+pydantic>=2.9
+python-dotenv>=1.0
+python-jose[cryptography]>=3.3
+cryptography>=43.0
+httpx>=0.27
+
+# --- pipeline (F3) ---
+arq>=0.26
+redis>=5.2
+sqlalchemy>=2.0
+alembic>=1.14
+psycopg2-binary>=2.9
+
+# Lê o cache de MSC que o RREO grava em parquet. Opcional por desenho: sem pyarrow, o recorte
+# é tratado como miss e reconsultado na fonte — nunca é `pickle.loads` de dado alheio.
+pyarrow>=17.0

@@ -15,9 +15,10 @@ o ciclo.
 ### Requirement: Ciclo único de requisição, cache e job
 
 Toda leitura de anexo SHALL responder por um destes quatro caminhos, decididos pelo estado do cache
-para a identidade solicitada: resultado pronto → `200`; processamento em voo → `202` sem `job_id`;
-ausente ou inválido → job criado, enfileirado e `202` com `job_id`; falha na criação do job →
-erro explícito. A rota NÃO DEVE executar apuração, e NÃO DEVE devolver resultado parcial.
+para a identidade solicitada: resultado pronto → `200`; processamento em voo → `202` com o `job_id`
+**do job em voo** e `status: already_queued`; ausente ou inválido → job criado, enfileirado e `202`
+com `job_id` e `status: processing`; falha na criação do job → erro explícito. A rota NÃO DEVE
+executar apuração, e NÃO DEVE devolver resultado parcial.
 
 #### Scenario: cache válido
 
@@ -36,8 +37,10 @@ erro explícito. A rota NÃO DEVE executar apuração, e NÃO DEVE devolver resu
 
 - **GIVEN** um job legítimo em execução para a mesma identidade
 - **WHEN** um segundo cliente solicita o mesmo anexo
-- **THEN** a resposta é `202` sem `job_id`, orientando a aguardar
+- **THEN** a resposta é `202` com `status: already_queued`, o `job_id` do job em voo e as URLs de
+  acompanhamento, orientando a aguardar
 - **AND** nenhum segundo job é enfileirado
+- **AND** o `status` — não a ausência do `job_id` — é o que informa que o job não é do cliente
 
 #### Scenario: apuração falhou
 
@@ -160,7 +163,7 @@ mecanismo SHALL ser único; NÃO DEVE haver cópia por anexo.
 
 - **GIVEN** lock ativo com job em `processing`
 - **WHEN** outra requisição chega para a mesma identidade
-- **THEN** ela recebe o `job_id` existente
+- **THEN** ela recebe o `job_id` existente, com `status: already_queued`
 - **AND** nenhum segundo job é enfileirado
 
 #### Scenario: worker reiniciado deixa lock órfão

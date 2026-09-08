@@ -1,0 +1,69 @@
+# Ambiente local. Redis vem de `C:\Projetos\ps-infra` (rede externa `ps-infra`, container
+# `redis_cache`) — esta stack **não** sobe outro Redis, e o Postgres é o do host.
+#
+# Porta 8003: na mesma máquina, 8000 é do RREO, 8001 do RGF e 8002 do audite-ps.
+# CapRover/produção não usa este arquivo (usa `captain-definition-api|worker`).
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: dca_api
+    env_file: .env
+    environment:
+      POSTGRES_HOST: host.docker.internal
+      REDIS_HOST: redis_cache
+      REDIS_PORT: 6379
+      DCA_ARQ_QUEUE_NAME: arq:queue:dca
+      # A API é quem migra, atrás desta variável. O advisory lock 43812/1001 serializa a
+      # migração com RREO e RGF, que dividem o schema.
+      RUN_MIGRATIONS: "true"
+      # AMBIENTE LOCAL: sem hub, a unidade é lida do claim do próprio JWT, e a API loga um
+      # aviso a cada requisição. Em produção **remova esta linha** — `AUTH_API_URL` do `.env`
+      # (o hub) passa a valer, e quem pode ler qual ente volta a ser dado de banco, não de token.
+      AUTH_API_URL: ""
+      WEB_WORKERS: 1
+      DB_POOL_SIZE: 5
+      DB_MAX_OVERFLOW: 10
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8003:8000"
+    networks:
+      - dca_network
+      - ps_infra
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: dca_worker
+    env_file: .env
+    environment:
+      POSTGRES_HOST: host.docker.internal
+      REDIS_HOST: redis_cache
+      REDIS_PORT: 6379
+      DCA_ARQ_QUEUE_NAME: arq:queue:dca
+      RUN_MIGRATIONS: "false"      # migração tem uma fonte só: a API
+      PIPELINE_MAX_CONCORRENTES: 2
+      DCA_JOB_TIMEOUT_SECONDS: 3600
+      DCA_JOB_TTL_SECONDS: 3600
+      DB_POOL_SIZE: 5
+      DB_MAX_OVERFLOW: 10
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      api:
+        condition: service_healthy   # o schema existe antes de o worker tentar gravar
+    networks:
+      - dca_network
+      - ps_infra
+    restart: unless-stopped
+
+networks:
+  dca_network:
+    driver: bridge
+  ps_infra:
+    name: ps-infra
+    external: true

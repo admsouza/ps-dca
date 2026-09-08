@@ -1,0 +1,26 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gcc libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN python -m pip install --upgrade pip setuptools wheel \
+    && pip install --no-cache-dir --retries 5 --timeout 120 -r requirements.txt
+
+COPY . .
+
+RUN useradd -m -u 1001 appuser && chown -R appuser:appuser /app
+USER appuser
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONIOENCODING=utf-8 \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
+
+# O worker não aplica migrations: a API o faz no boot, e duas fontes de migração no mesmo schema
+# compartilhado é como se cria corrida entre projetos.
+CMD ["arq", "worker.WorkerSettings"]

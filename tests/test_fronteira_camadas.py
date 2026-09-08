@@ -51,9 +51,9 @@ def _importados(caminho: Path) -> set[str]:
     return nomes
 
 
-def _fecho_do_dominio() -> dict[str, Path]:
-    """Todo módulo alcançável a partir de `app/domain/` por imports `app.*`."""
-    pendentes = [p for p in sorted(DOMINIO.rglob("*.py"))]
+def _fecho_de(raiz: Path) -> dict[str, Path]:
+    """Todo módulo alcançável a partir de `raiz` por imports `app.*`."""
+    pendentes = [p for p in sorted(raiz.rglob("*.py"))]
     alcancados = {_modulo_de(p): p for p in pendentes}
     while pendentes:
         atual = pendentes.pop()
@@ -74,7 +74,7 @@ def test_dominio_nao_alcanca_io_nem_framework():
     Falha nomeando o módulo do fecho e a dependência proibida — o build quebra na hora em que
     alguém cruza a fronteira, e não na revisão.
     """
-    fecho = _fecho_do_dominio()
+    fecho = _fecho_de(DOMINIO)
     assert "app.domain.bo.matriz" in fecho, "varredura não encontrou o domínio"
 
     violacoes = [

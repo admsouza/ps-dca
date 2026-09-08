@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from decimal import Decimal
 
 from app.services.bo.quadro_principal import apurar
 
@@ -53,33 +52,13 @@ def _texto(resultado) -> str:
 
 
 def _json(resultado) -> str:
-    def serializar(valor):
-        return str(valor) if isinstance(valor, Decimal) else valor
+    """Mesma serialização da rota e do worker (`services/pipeline/resultado.py`).
 
-    return json.dumps(
-        {
-            "matriz": {
-                rule_id: {c: serializar(v) for c, v in celulas.items()}
-                for rule_id, celulas in resultado.matriz.items()
-            },
-            "procedencia": {
-                "documento": resultado.procedencia.documento,
-                "edicao": resultado.procedencia.edicao,
-                "exercicio": resultado.procedencia.exercicio,
-                "versao_regras": resultado.procedencia.versao_regras,
-                "regras_aplicadas": resultado.procedencia.regras_aplicadas,
-                "tabelas_stn": resultado.procedencia.tabelas_stn,
-            },
-            "diagnostico": {
-                "nao_apuradas": [str(a) for a in resultado.diagnostico.nao_apuradas],
-                "residuos": [str(r) for r in resultado.diagnostico.residuos],
-                "duracao_ms": resultado.diagnostico.duracao_ms,
-                "sem_dados": resultado.diagnostico.sem_dados,
-            },
-        },
-        ensure_ascii=False,
-        indent=2,
-    )
+    Cópia própria aqui faria a saída do terminal divergir da da API em silêncio.
+    """
+    from app.services.pipeline.resultado import para_dados
+
+    return json.dumps(para_dados(resultado), ensure_ascii=False, indent=2)
 
 
 def main(argv: list[str] | None = None) -> int:

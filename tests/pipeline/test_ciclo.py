@@ -44,15 +44,19 @@ def test_cache_ausente_cria_job(pedido, repo, fila):
 def test_processamento_em_voo_nao_cria_segundo_job(pedido, repo, fila, lock):
     """Scenario: processamento já em voo.
 
-    `202` **sem** `job_id`: não há job novo a acompanhar, e devolver o `job_id` alheio faria o
-    cliente acreditar que o job é dele.
+    `202` orientando a aguardar, e **nenhum** segundo job enfileirado. O `job_id` devolvido é o do
+    job em voo, e `estado_job="already_queued"` é o que diz ao cliente que o job não é dele —
+    contrato de RREO/RGF, que o front já consome (`utils/rgfAnexoJob.ts` trata `202` sem `job_id`
+    como erro, e a UI renderiza `already_queued` como "cálculo em andamento").
     """
     repo.gravar(RegistroFake(ENTE, EXERCICIO, ANEXO, status="processando", resultado=None))
     lock.adquirir(ENTE, EXERCICIO, ANEXO, "job-em-voo")
 
     r = pedido()
     assert r.status == 202
-    assert r.job_id is None
+    assert r.estado_job == "already_queued"
+    assert r.job_id == "job-em-voo", "o cliente precisa do job em voo para acompanhar"
+    assert r.poll_url and r.sse_url
     assert fila.enfileirados == []
 
 

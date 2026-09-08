@@ -1,0 +1,22 @@
+.git/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.history/
+.env
+.env.*
+!.env.example
+*.log
+
+# `tests/` e `openspec/` não entram na imagem: são processo, não runtime.
+tests/
+openspec/
+
+# `docs/` é documentação **exceto** `docs/contas-stn/`, que é DADO DE PRODUÇÃO: a direção do
+# saldo por conta é lida de `PCASP.md`, e as tabelas de natureza de receita/despesa da STN saem
+# daí. Sem esses arquivos a apuração não roda — foi o que quebrou o primeiro build.
+docs/*
+!docs/contas-stn/

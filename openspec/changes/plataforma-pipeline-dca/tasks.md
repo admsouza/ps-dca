@@ -72,38 +72,78 @@ segue em frente; as fases **F2 (transporte)** e **F3 (pipeline)** implementam o 
 
 ## 2. TEST — antes do código
 
-**Em andamento: 15 dos 63 cenários cobertos.** Fundação pronta em `tests/pipeline/conftest.py` —
+**Concluída: 63 dos 63 cenários cobertos.** Fundação pronta em `tests/pipeline/conftest.py` —
 fakes em memória de repositório, fila e lock, implementando as mesmas portas que os adapters de
-`infra/` vão implementar. Estado: **20 testes vermelhos**, e o resto da suíte segue verde (155).
+`infra/` vão implementar. Estado: **66 testes vermelhos**, e o resto da suíte segue verde (155).
 
-- [ ] 2.1 Traduzir cada cenário do delta spec em teste de comportamento.
-      **15 de 63 feitos**, nos requisitos `Ciclo único`, `Identidade e invalidação`,
-      `Cache único` e `Anexo é conjunto fechado` — `tests/pipeline/test_ciclo.py` e
-      `test_invalidacao.py`. Faltam os 48 de lock, polling/SSE, reprocessamento, resumo,
-      vigência, mapeamento INSERT-only, procedência, diagnóstico, isolamento de execução, banco
-      compartilhado, notificação e auth.
+- [x] 2.1 Traduzir cada cenário do delta spec em teste de comportamento. **63 de 63.** `tests/pipeline/test_ciclo.py` e `test_invalidacao.py`: `Ciclo único`,
+      `Identidade e invalidação`, `Cache único`, `Anexo é conjunto fechado`.
+      `tests/pipeline/test_execucao.py` (bloco 1 — contrato de execução): `Rota e worker apenas
+      orquestram`, `Lock por identidade com recuperação de órfão`, `Apuração não roda no processo
+      da API`, `Serviço chamável por rota, worker e CLI`, `Estado de execução isolado`, `Estado do
+      job é serializado sem execução de código`.
+      `tests/pipeline/test_mapeamento.py` (bloco 2 — mapeamento e regras): `Regra vigente é
+      resolvida pelo exercício apurado`, `Mapeamento vigente é publicado sem sobrescrever o
+      anterior`, `Procedência do valor apurado`.
+      `tests/pipeline/test_transporte.py` (bloco 3 — API e observabilidade): `Acompanhamento por
+      polling e por stream`, `Resumo agregado responde sempre`, `Diagnóstico da apuração acompanha
+      o resultado`, `Conclusão de job é notificada`, `Autorização por unidade em toda rota de
+      anexo`.
+      `tests/pipeline/test_reprocessamento.py` (4) e `test_infra.py` (bloco 4 — banco
+      compartilhado, núcleo isolado e falha de infraestrutura, 8).
+      `pipeline/plataforma` entrou em `COM_TESTES` (`tests/test_cobertura_spec.py`): daqui para a
+      frente, cenário sem teste quebra o build.
 - [ ] 2.2 Teste de ciclo completo com fila e banco de teste: miss → `202 + job_id` → worker →
-      `200`, sem apurar no processo da API.
+      `200`, sem apurar no processo da API. **Coberto com fakes** em
+      `test_redeploy_da_api_nao_interrompe_job` e `test_cache_miss_nao_bloqueia_a_resposta`
+      (a apuração é monkeypatchada para explodir se a rota a chamar). Falta a versão com fila e
+      Postgres reais, que entra na F3.
 - [x] 2.3 `test_versao_de_regras_divergente_nao_serve` e `test_alteracao_real_de_regra_invalida`.
       Cobre também o inverso — `test_regra_de_outro_anexo_nao_invalida` —, que é o que impede um
       hash global de reapurar os sete anexos de todos os entes por uma linha do BO.
-- [ ] 2.4 Teste de lock: segunda requisição não enfileira segundo job; lock órfão é liberado.
+- [x] 2.4 `tests/pipeline/test_execucao.py` — `test_segundo_job_para_a_mesma_identidade`,
+      `test_worker_reiniciado_deixa_lock_orfao` e `test_limpeza_no_startup_do_worker`.
+      **Tensão de spec, fechada em 2026-09-08 por medição do front** (ver §3): o requisito do lock
+      mandava devolver "o `job_id` existente" e o `Scenario: processamento já em voo` mandava `202`
+      **sem** `job_id`. Vale o contrato dos irmãos — `job_id` do job em voo com
+      `status: already_queued` —, e o delta spec foi corrigido nos dois lados.
+      A limpeza de órfãos no startup ficou em `app.services.pipeline.startup.preparar(lock)`, e
+      não em `worker.py`: mantém o worker como wrapper fino e o startup testável sem `arq`.
 - [x] 2.5 `tests/test_fronteira_camadas.py`. Percorre o **fecho transitivo** dos imports `app.*`
       a partir de `app/domain/**` via `ast` — um domínio limpo que importe módulo de `infra/` que
       importe `sqlalchemy` está igualmente contaminado, e o teste pega. Cobre as 14 proibidas
       (as 6 da task + `arq`, `alembic`, `psycopg2`, `uvicorn`, `gunicorn`, `pydantic`, `jose`,
       `cryptography`). Verificado por injeção: `import sqlalchemy` em `domain/bo/saldo.py` derruba
       o teste nomeando o módulo.
-- [ ] 2.6 Testes de auth: `401` sem JWT, `403` para ente não autorizado, recusa de credencial de
-      fonte vinda de browser.
-- [ ] 2.7 Teste de vigência: a carga recebe o exercício e resolve a maior vigência `<=` a pedida;
-      exercício anterior a toda vigência falha nomeando as disponíveis, sem aproximar.
-- [ ] 2.7.1 Teste INSERT-only: publicar correção acrescenta vigência e a anterior continua legível;
-      tentativa de alterar ou remover é recusada.
-- [ ] 2.7.2 Teste de seed: a partir dos YAMLs, o banco passa a ter vigência utilizável marcada como
-      `seed-yaml`, e a apuração passa a ler do banco.
-- [ ] 2.8 Teste de procedência e diagnóstico: o resultado gravado identifica regras, edição
-      normativa e versão das tabelas STN, e lista células não apuradas — tudo sem reapurar.
+- [x] 2.6 `tests/pipeline/test_transporte.py` — `test_token_ausente_ou_invalido`,
+      `test_ente_diferente_do_autorizado`, `test_credencial_de_fonte_vinda_do_browser` e
+      `test_token_de_fonte_no_armazenamento_do_job`.
+      `autorizar(token, unidade, ente, verificar=None)` recebe a verificação de JWT por parâmetro:
+      o teste roda sem `jose` e sem `SECRET_KEY`, e a unidade é confrontada **com o token**, não
+      aceita do cabeçalho cru. O teste da credencial procura o segredo em claro no armazenamento —
+      é o que um `dump` do Redis mostraria (OWASP A02).
+- [x] 2.7 `tests/pipeline/test_mapeamento.py` — `test_exercicio_e_parametro_da_carga_de_regras`
+      (duas edições publicadas, 2020 e 2027; cada exercício recebe a sua) e
+      `test_exercicio_sem_regra_vigente`. `SemVigencia` é a **mesma** exceção do carregador de
+      YAML: a regra "não aproxima a mais próxima" não muda porque a fonte passou a ser o banco, e
+      duplicar a exceção deixaria uma das duas metades sem teste.
+- [x] 2.7.1 `test_correcao_publica_nova_vigencia`, `test_alteracao_destrutiva_e_recusada`,
+      `test_origem_e_autoria_registradas`, `test_um_repositorio_para_todos_os_anexos` e
+      `test_publicar_mapeamento_de_um_anexo_nao_afeta_outro`. `RepoVigenciasFake`
+      (`tests/pipeline/conftest.py`) recusa insert sobre `(anexo, ano, mes)` como o `PRIMARY KEY`
+      recusa no banco, e o teste ainda verifica que o módulo **não expõe** `atualizar`/`remover`.
+- [x] 2.7.2 `test_semente_a_partir_da_transcricao_normativa`. Não basta "existe vigência": o teste
+      compara os `rule_id` e a **matriz apurada** pelo mapa do banco contra a do YAML — semente que
+      perde conteúdo no caminho passaria por um assert de contagem.
+- [x] 2.8 Procedência e diagnóstico. `test_divergencia_e_explicavel_pelo_resultado_gravado`
+      lê a procedência do registro com `qp.apurar` monkeypatchado para falhar — se explicar a
+      divergência exigisse reapurar, o teste quebra. `test_mudanca_de_tabela_de_referencia_e_distinguivel`
+      apura duas vezes com o sha256 de uma tabela STN trocado: mesma matriz, `tabelas_stn` e
+      `versao_regras` distintos (premissa conferida contra o carregador da F1).
+      Diagnóstico em `test_transporte.py`: `test_celula_nao_apurada_e_visivel_ao_consumidor`
+      (conta fora do PCASP → 266 células declaradas com motivo, nunca `0`) e
+      `test_apuracao_integra_tambem_declara_diagnostico` (vazio **declarado**, não omitido).
+      As duas premissas foram medidas contra a F1 antes de escrever o assert.
 - [x] 2.8.1 `test_identificador_de_regra_e_estavel_a_formatacao` e
       `test_alteracao_de_conta_muda_o_identificador` — **passam contra a F1**, sem precisar de
       F2/F3: o hash canônico já existe. Confere as duas direções de fim de linha (LF e CRLF),
@@ -116,17 +156,113 @@ fakes em memória de repositório, fila e lock, implementando as mesmas portas q
       parseado. O teste media o seu próprio defeito. A alteração no produto foi **revertida**: ela
       resolvia problema inexistente e, pior, mascararia um `\r` legítimo dentro de escalar
       citado. A fixture passou a normalizar antes de gerar a variante.
-- [ ] 2.9 Teste de reprocessamento: com cache `ok` cria job; não escapa do lock; resultado anterior
-      permanece legível durante a reapuração; `403` sem autorização.
-- [ ] 2.10 Rodar e confirmar que falham pelo motivo esperado.
-      Feito para os 15 escritos: 20 vermelhos, todos por `ModuleNotFoundError` dos módulos da
-      F2/F3 ou por asserção de comportamento. **Dois testes tiveram de ser reescritos por
+- [x] 2.9 `tests/pipeline/test_reprocessamento.py` — os quatro cenários. Reprocessar é o **mesmo**
+      `ler_ou_enfileirar`, com `forcar=True` e `solicitado_por`: caminho próprio duplicaria lock,
+      cache e enfileiramento, que é a dívida dos irmãos. O teste do resultado anterior verifica o
+      registro **durante** a reapuração — apagar antes de reapurar abriria janela de minutos com o
+      anexo vazio.
+- [x] 2.10 Rodar e confirmar que falham pelo motivo esperado.
+      **66 vermelhos**, todos por `ModuleNotFoundError` dos módulos da F2/F3 ou por asserção de
+      comportamento; 158 verdes.
+      **Três testes passam antes da F2/F3, e é correto**: os dois do hash canônico (2.8.1) e
+      `test_apuracao_testavel_sem_infraestrutura` / `test_troca_de_fonte_nao_altera_o_dominio` —
+      propriedades que a F1 já tem e que o teste passa a travar. Os dois últimos foram
+      **verificados por injeção**: `import requests` em `domain/bo/saldo.py` e um
+      `socket.create_connection` dentro de `domain/bo/matriz.py::apurar` derrubam cada um deles.
+      As migrations são verificadas sem Postgres — o que erra na prática é o alvo de um `op.*` e a
+      tabela de versão, e as duas coisas estão no código; um teste que exigisse banco de produção
+      para provar que a migration não toca `rreo_*` não rodaria em CI. **Dois testes tiveram de ser reescritos por
       passarem antes da implementação** — afirmavam a validação do próprio dublê, não a
       persistência real; agora apontam para `app.infra.cache.modelo` e ficam vermelhos. E as
       exceções foram nomeadas (`AnexoDesconhecido`, `StatusInvalido`) em vez de `Exception` cega,
       que deixaria o teste verde por acidente de import.
 
-## 3. IMPLEMENT — F2 (transporte)
+**Gate da fase TEST: fechado.** 63/63 cenários com teste, 66 vermelhos pelo motivo esperado.
+**F2 e F3 implementadas em 2026-09-08: os 66 ficaram verdes, 224 passed, `ruff` limpo.**
+
+**Tensão lock × ciclo: fechada em 2026-09-08, por medição do consumidor.**
+
+O requisito do lock mandava devolver "o `job_id` existente"; o `Scenario: processamento já em voo`
+mandava `202` **sem** `job_id`. A primeira implementação tentou os dois em campos separados
+(`job_id: null` + `job_id_em_voo`) — e foi **descartada** ao medir `C:/Projetos/front-declaracoes`:
+
+| Onde | O que o front faz com `202` sem `job_id` |
+|---|---|
+| `src/utils/rgfAnexoJob.ts:170` — utilitário **compartilhado** pelos anexos RGF 02–06 | **lança erro**: "job iniciado sem ID de rastreamento" |
+| `src/hooks/useRGFAnexo1.ts:782` | cai em `pollSemJobId` — polling cego, sem SSE |
+| `useRREOAnexo4/6/12` | desiste (`setSemCache`) |
+
+E o discriminador de "este job não é seu" já existe no ecossistema, e **não** é a ausência do
+`job_id`: é `status: "already_queued"`, que o RGF publica (`_responder_job_existente`) e a UI já
+renderiza em seis componentes (`RGFDialog.tsx:1144` → "Já existe um cálculo em andamento.
+Acompanhe o progresso.").
+
+`job_id_em_voo` era campo que **nenhum** consumidor lia. O delta spec foi corrigido nos dois lados
+(`Ciclo único` e `Lock por identidade`), e a resposta passou a ser a dos irmãos: `202` com o
+`job_id` em voo, `status: already_queued`, `poll_url` e `sse_url`. Verificado com concorrência real
+no container — dois clientes, um único `job_id`, nenhum segundo job enfileirado.
+2. ~~Host/banco de produção~~ — **resolvido em 2026-09-08**: `.env` alinhado a
+   `regras-rreo-api/.env` e `regras-rgf-api/.env`. Banco `db-ps-rreo-rgf-dca` em
+   `host.docker.internal:5432`, Redis `redis_cache`, `SECRET_KEY`/`S2S_API_SECRET` **do hub** — a
+   nota anterior de gerar segredos próprios foi revogada (JWT `HS256` local com chave própria não
+   valida token do hub). Senha do Postgres na forma **crua**: o RREO a publica percent-encoded só
+   porque a embute em `DATABASE_URL`.
+
+## 3. IMPLEMENT — F2 (transporte) — **CONCLUÍDA em 2026-09-08**
+
+Entregue: `main.py`, `app/routes/{anexos,jobs,mapeamentos,dependencias}.py`, `app/auth/`,
+`app/core/{config,database,migrations}.py`.
+
+    GET  /dca/{anexo}?anReferencia=&id_ente=      200 | 202 processing | 202 already_queued
+    POST /dca/{anexo}/reprocessar                 202 — forcar=True, registra o solicitante
+    GET  /dca/resumo                              200 sempre, só metadados, oito anexos
+    GET  /jobs/{job_id} · /sse/jobs/{job_id}      polling e stream
+    GET  /dca/{anexo}/mapeamentos[/vigente]       vigências publicadas
+    POST /dca/{anexo}/mapeamentos                 publica vigência (409 se já existe)
+    GET  /health · /ready                         liveness e readiness
+
+**O contrato de entrada é o dos irmãos**, de propósito: `id_ente` em query, `Authorization: Bearer`,
+`X-Unidade-Id` conferido contra `id_ente` — um frontend que já fala com RREO/RGF não muda nada.
+
+**Achado que mudou o desenho da auth:** o RGF **não** lê a unidade de um claim. O token dá o `sub`,
+e a autorização é confirmada no hub (`POST {AUTH_API_URL}/internal/authorize`, `X-Internal-Secret`),
+porque quem pode ler qual ente é dado de banco — um usuário ganha ou perde unidade sem reemitir JWT.
+A DCA seguiu isso (`app/auth/hub.py`), com **fail closed**: hub fora do ar responde `503`, nunca
+libera. Sem hub configurado e em `ENVIRONMENT=development`, cai para o claim e loga aviso a cada
+requisição; fora de development, recusa com `503`.
+
+## 4. IMPLEMENT — F3 (pipeline) — **CONCLUÍDA em 2026-09-08**
+
+Entregue: `worker.py` (uma função de job para os oito anexos), `app/infra/fila/`
+(chaves · serializacao · job_manager · lock · credencial · redis_adapters), `app/infra/cache/`
+(modelo · repositorio · vigencias_repo), `app/infra/msc/cache.py`, `app/infra/regras/vigencias.py`,
+`app/infra/notificacao/discord.py`, `app/services/pipeline/` (registry · cache · job · resultado ·
+resumo · notificacao · startup · apuracao), `alembic/` e Docker.
+
+**Migration aplicada em 2026-09-08** no `db-ps-rreo-rgf-dca`: `dca_anexo_cache` e
+`dca_regra_mapeamento` + `alembic_version_dca` em `001_dca_cache`. 44 tabelas viraram 47, e
+`alembic_version_rreo` (032) e `alembic_version_rgf` (060) ficaram intactas.
+
+**Quatro achados de execução, cada um com o seu conserto:**
+
+1. **`tabelas_stn` vinha vazia ao carregar do banco** — a procedência perdia a versão das tabelas
+   da STN, que o requisito exige. Conserto: as tabelas **não** vêm do banco; são versionadas em
+   `knowledge/sources/stn/` e lidas de lá, e entram em `versao_regras` (uma tabela corrigida
+   invalida o cache sem nenhuma regra mudar).
+2. **O cache de MSC devolvia dado cru onde o domínio espera `Registro`.** Conserto: reidratar pelo
+   **mesmo** normalizador dos adapters (`normalizacao.normalizar`), que já cobre snake_case do
+   SICONFI e camelCase da PublicSoft — e payload não reconhecível vira miss, nunca exceção.
+3. **`docs/contas-stn/` estava fora da imagem** por causa do `.dockerignore`. É **dado de
+   produção**: a direção do saldo sai do `PCASP.md`. Sem ele o job morria com `FileNotFoundError`.
+4. **Porta 8002 já é do `audite_ps-api-1`** — a DCA foi para a **8003** (8000 é RREO, 8001 RGF).
+
+**Cache de MSC compartilhado, com uma restrição de segurança.** O RREO grava sob `msc_cache:` com um
+byte de formato: `` parquet+lz4 e `` **pickle**+lz4. A DCA lê o parquet e trata o pickle
+como *miss*, reconsultando a fonte — `pickle.loads` de dado escrito por outro processo executa
+código, e é o mesmo risco que a spec proíbe para payload de job. A chave é o MD5 dos mesmos
+parâmetros, com os mesmos nomes, para que o reuso realmente aconteça.
+
+## 4bis. IMPLEMENT — notas antigas da F2/F3
 
 - [ ] 3.1 `main.py` — app FastAPI, lifespan com pool `arq`, agregador único de routers.
 - [ ] 3.2 `app/core/` — config por ambiente, engine e sessão, logging.
