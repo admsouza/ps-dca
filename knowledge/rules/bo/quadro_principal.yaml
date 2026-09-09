@@ -1327,6 +1327,7 @@ rules:
       label: Previsão Atualizada (b)
     receitas_realizadas:
       label: Receitas Realizadas (c)
+    saldo: *id002
   calculation:
     references:
     - rule: bo.quadro_principal.receitas.l24

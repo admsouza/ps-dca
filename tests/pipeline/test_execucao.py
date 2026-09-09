@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import logging
 import pickle
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
@@ -221,6 +222,19 @@ def test_redeploy_da_api_nao_interrompe_job(pedido, repo, lock, apurador):
     depois = pedido()
     assert depois.status == 200
     assert depois.resultado == gravado.resultado
+
+
+def test_reapuracao_recarimba_calculado_em(repo, lock, apurador):
+    """Reapuração recarimba `calculado_em` — o front lê daqui o "processado em"."""
+    from app.services.pipeline.job import executar
+
+    antiga = datetime(2020, 1, 1, tzinfo=UTC)
+    repo.gravar(RegistroFake(id_ente=ENTE, an_referencia=EXERCICIO, anexo=ANEXO,
+                             status="ok", resultado={"x": 1}, calculado_em=antiga))
+    executar(ente=ENTE, exercicio=EXERCICIO, anexo=ANEXO, repo=repo, lock=lock,
+             apurador=apurador, versao_api=VERSAO_API, versao_regras=VERSAO_REGRAS)
+
+    assert repo.obter(ENTE, EXERCICIO, ANEXO).calculado_em > antiga
 
 
 # ─── Requirement: Serviço de apuração chamável por rota, worker e CLI ───────

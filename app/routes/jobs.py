@@ -65,7 +65,11 @@ async def acompanhar_job(
             if await request.is_disconnected():
                 return
             estado = _estado(request, job_id)
-            yield f"data: {json.dumps(estado, ensure_ascii=False)}\n\n"
+            # `event:` nomeado — o front (mesmo parser do RREO) ignora `data` sem event: done|error|…
+            yield (
+                f"event: {estado['status']}\n"
+                f"data: {json.dumps(estado, ensure_ascii=False)}\n\n"
+            )
             if estado["status"] in ("done", "error", job_manager.DESCONHECIDO):
                 return
             await asyncio.sleep(INTERVALO_SSE)

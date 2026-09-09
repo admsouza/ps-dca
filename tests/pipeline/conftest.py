@@ -36,6 +36,7 @@ class RegistroFake:
     solicitado_por: int | None = None
     procedencia: dict | None = None
     diagnostico: dict | None = None
+    calculado_em: object = None
 
     @property
     def identidade(self) -> tuple[str, int, str]:

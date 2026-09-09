@@ -17,6 +17,7 @@ from __future__ import annotations
 import logging
 import time
 from collections.abc import Callable
+from datetime import UTC, datetime
 from typing import Any
 
 from app.infra.fila import job_manager
@@ -96,6 +97,8 @@ def _gravar_ok(repo, ente, exercicio, anexo, dados, duracao_ms,
             "apurada=%s — o cache será invalidado na próxima leitura",
             anexo, ente, versao_regras[:12], apurada[:12],
         )
+    # recarimba: registro reusado traz a data da apuração anterior
+    registro.calculado_em = datetime.now(UTC)
     registro.procedencia = dados["procedencia"]
     registro.diagnostico = {**dados["diagnostico"], "duracao_ms": duracao_ms}
     if hasattr(registro, "duracao_ms"):

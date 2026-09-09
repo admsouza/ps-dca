@@ -95,10 +95,12 @@ def test_total_com_deficit_tem_valor_com_a_parcela_suprimida(jp):
     a parcela de `L25` vale **zero**, não indeterminada.
     """
     l26 = jp.matriz[L26]
-    assert set(l26) == {"previsao_inicial", "previsao_atualizada", "receitas_realizadas"}
-    assert "saldo" not in l26
+    assert set(l26) == {
+        "previsao_inicial", "previsao_atualizada", "receitas_realizadas", "saldo",
+    }
     for coluna in l26:
         assert l26[coluna] == jp.matriz[L24][coluna], coluna
+    assert l26["saldo"] == l26["receitas_realizadas"] - l26["previsao_atualizada"]
 
 
 # ─── C5, metade do déficit — São Paulo ───────────────────────────────────────
@@ -152,6 +154,7 @@ def test_total_com_deficit_soma_o_deficit(sp):
     assert l26["receitas_realizadas"] == sp.matriz[L48]["empenhadas"]
     for coluna in ("previsao_inicial", "previsao_atualizada"):
         assert l26[coluna] == sp.matriz[L24][coluna], coluna
+    assert l26["saldo"] == l26["receitas_realizadas"] - l26["previsao_atualizada"]
 
 
 # ─── C7 — previsão inicial de `L29` ──────────────────────────────────────────
