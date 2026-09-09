@@ -11,7 +11,7 @@ verdes, a migration foi aplicada, e API e worker rodam em container servindo o B
 apurado — 5 valores de referência do STN conferidos em centavos pela rota.
 
 ```bash
-python -m pytest                              # 224 passed
+python -m pytest                              # 232 passed
 python -m ruff check .                        # All checks passed!
 python -m scripts.validate_rules knowledge    # exit 0 · 69 regras · review_required 0
 python -m scripts.check_sources knowledge     # Fontes íntegras
@@ -25,10 +25,11 @@ curl localhost:8003/ready                     # {"redis":"ok","banco":"ok"}
 
 ## Por onde retomar
 
-1. **O frontend já pode consumir.** Contrato na §5bis — o quadro principal do BO responde para
-   qualquer ente, com procedência e diagnóstico no payload.
-2. **Antes de produção:** ligar o hub de autorização — remover `AUTH_API_URL: ""` do
-   `docker-compose.yml`.
+1. **O frontend já pode consumir.** Contrato na §5bis, handoff peça por peça na §5quater — o
+   quadro principal do BO responde para qualquer ente, com template, procedência e diagnóstico
+   no payload. Para o BO **não falta backend**; falta a tela.
+2. **Hub de autorização ligado** em 2026-09-08 (§5ter) — a permissão por unidade é do banco do
+   hub, não de claim. Um usuário sem a unidade recebe `403`.
 3. **Próximo demonstrativo:** os outros sete anexos entram pelo registry — cada um é um `servico` a
    preencher em `app/services/pipeline/registry.py`, sem tocar rota, cache, fila nem worker.
 
@@ -80,6 +81,7 @@ Teste antes do código, sempre. Durante uma change edita-se só o delta em
 
 | Change | Fase | Situação |
 |---|---|---|
+| `bo-template-no-resultado` | **VERIFY** | `linhas` no payload: template de apresentação junto dos valores. 232 testes verdes, conferido na API |
 | `plataforma-pipeline-dca` | **IMPLEMENT (F2)** | SPEC, PLAN/ARCH e **TEST** completos: 63/63 cenários. 38 tasks abertas |
 | `ipc07-c5-c7-linhas-cruzadas` | arquivada | fechou C5 e C7 |
 | `ipc07-b1-remocao-termo-5313` | arquivada | fechou C6 |
@@ -208,9 +210,14 @@ que o RREO nem tem, e o design manda dedicada, não derivada do `SECRET_KEY`.
 Igual ao de RREO e RGF de propósito: `id_ente` em query, `Authorization: Bearer <jwt>` e
 `X-Unidade-Id` conferido contra `id_ente`.
 
+O resultado tem **quatro** seções: `linhas` (o template do demonstrativo, na ordem da norma),
+`matriz` (valores por `rule_id`), `procedencia` e `diagnostico`. Quem renderiza itera `linhas` e
+busca em `matriz` — rótulo, quadro, grupo, nível e ordem vêm prontos, e o front não declara nenhum
+(change `bo-template-no-resultado`, 2026-09-08).
+
 ```text
 GET  /dca/{anexo}?anReferencia=2025&id_ente=2507507
-       200                              → {matriz, procedencia, diagnostico}
+       200                              → {linhas, matriz, procedencia, diagnostico}
        202 status=processing + job_id    → apuração enfileirada por esta requisição
        202 status=already_queued        → já havia apuração em andamento; o job_id é dela
 POST /dca/{anexo}/reprocessar   → 202, força reapuração e registra o solicitante
@@ -230,6 +237,70 @@ os outros sete respondem `sem_cache` no resumo em vez de desaparecer. Grafia é 
 
 **Valores no payload são string**, não float: `"6043181131.90"`. O aceite do projeto é 1:1 em
 centavos contra o STN, e `float` perde centavo. Converta no cliente com um tipo decimal.
+
+## 5ter. Autorização por unidade — como funciona, e como testar
+
+Herdada de RREO/RGF sem exceção: o JWT (`HS256`, `SECRET_KEY` do hub) dá o `sub`, e **quem pode ler
+qual ente é decidido pelo hub**, em `POST {AUTH_API_URL}/internal/authorize` com
+`X-Internal-Secret: $S2S_API_SECRET`. Ler a permissão de um claim entregaria autorização congelada
+no momento da emissão do token — o usuário ganha e perde unidade sem reemitir JWT.
+
+**Fail closed:** hub fora do ar responde `503`, nunca libera. Sem `AUTH_API_URL` configurado, a API
+só aceita o claim do token em `ENVIRONMENT=development`, e loga aviso a cada requisição; fora de
+development, recusa com `503`.
+
+**O endereço do hub no compose é `http://rgf_api:8000`, e não o `host.docker.internal:8001` do
+`.env`.** Medido: de dentro de um container, o port-forward do Docker Desktop fecha a conexão sem
+responder (`RemoteDisconnected`); pelo nome do container na rede `ps-infra`, o hub atende. É o mesmo
+padrão do Redis (`redis_cache`). O valor do `.env` serve a quem roda a API fora de container.
+
+**Quem tem qual unidade** está em `user_unidade_link` × `usuario` × `unidade_gestora`, no mesmo
+banco. Em 2026-09-08, João Pessoa (`2507507`) pertence a `admin@rgf.gov.br`; o usuário
+`jackson.silva@publicsoft.com.br` não tem nenhuma unidade vinculada — e por isso recebe `403`,
+corretamente.
+
+Verificado nos três caminhos, com o hub real:
+
+| Requisição | Resposta |
+|---|---|
+| `admin@rgf.gov.br` pedindo `2507507` | **200** com as 69 linhas |
+| `jackson.silva@…` (sem unidade) pedindo `2507507` | **403** |
+| `admin@rgf.gov.br` pedindo `3550308` (SP) | **403** |
+
+Para o frontend consumir localmente, o usuário logado precisa ter a unidade vinculada no hub —
+vincular em `user_unidade_link` ou logar com quem já a tem.
+
+## 5quater. Handoff do frontend — Balanço Orçamentário
+
+Registrado em 2026-09-08, a partir do quadro de peças levantado pelo front.
+**Para o BO não falta nada no backend.** O que falta é passar o contrato e implementar a tela.
+
+### O que passar para o front (pronto, é só consumir)
+
+| Peça da tela | Onde está | Detalhe que economiza retrabalho |
+|---|---|---|
+| Card "Processado em: data/hora" | `GET /dca/resumo?id_ente=&anReferencia=` | `200` sempre, oito entradas. Campos: `status`, `calculado_em`, `duracao_ms`, `versao_api`, `versao_regras`, `erro_detalhe`, `implementado`. Nunca inicia cálculo |
+| Ícone info do card | `procedencia` do resultado de `GET /dca/BO` | `documento`, `edicao`, `exercicio`, `versao_regras`, `tabelas_stn`. Não existe API de notas, e não precisa |
+| Botão Processar | `GET /dca/BO?anReferencia=&id_ente=` | `200` = cache; `202` = job. **`status: already_queued`** = o job é de outra requisição, e o `job_id` é dela — renderizar "já existe um cálculo em andamento", como o RGF |
+| Botão Reprocessar | `POST /dca/BO/reprocessar` | Força reapuração. O resultado anterior segue legível até o novo substituí-lo |
+| Progresso | `GET /jobs/{id}` ou `GET /sse/jobs/{id}` | **`EventSource` não serve** — não envia `Authorization`. Consumir com `fetch` + `ReadableStream`, como RREO/RGF |
+| Renderização das 69 linhas | `linhas` + `matriz` do payload | Iterar `linhas` (já na ordem da norma) e buscar em `matriz` por `rule_id`. **Não derivar `nivel` da árvore de composição** — erra `L51`, `L19` e `L18` |
+| Células sem valor | `diagnostico` | Célula não apurada vem **declarada com motivo**, nunca `0`. Exibir como "não apurada", não como zero |
+| Contrato navegável | `http://localhost:8003/docs` | Ligado em 2026-09-08 (`ENABLE_SWAGGER=True` no `.env`; `.env.example` segue `False` para produção) |
+
+Pré-requisito de ambiente, não de código: o usuário logado precisa da unidade vinculada no hub
+(§5ter), senão toda rota responde `403`.
+
+### O que falta implementar — e de quem é
+
+| Peça | Falta no back | Falta no front |
+|---|---|---|
+| Card do BO com data, processar, reprocessar, info | — | consumir `/dca/resumo` e `/dca/BO`; spec em `front-declaracoes`, `openspec/changes/dca-anexo01-bo-ui/` |
+| Tabela das 69 linhas | — | render de `linhas` × `matriz`, com string decimal (**nunca `float`**: `"6043181131.90"` perde centavo) |
+| "Processar lote" | **nada.** Não haverá endpoint de lote: são N requisições, e o `/resumo` já dá o estado de cada anexo | disparar por anexo |
+| Exportar arquivo SICONFI | **tudo** — leiaute, XBRL ou CSV, por anexo ou consolidado. Contrato novo, change própria | — |
+| Imprimir DCA completo | — | bloqueado: com 7 anexos sem `servico`, "completo" não existe. Concatenar só os que existem |
+| Banner MSC / matrizes auditadas | **não existe** fluxo de auditoria na DCA | não reusar o do RREO: o status seria falso |
 
 ## 6. A fase TEST da plataforma — concluída
 

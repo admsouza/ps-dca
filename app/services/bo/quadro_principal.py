@@ -51,6 +51,10 @@ class Resultado:
     matriz: dict[str, dict[str, Decimal | None]]
     procedencia: Procedencia
     diagnostico: Diagnostico
+    # O mapa que produziu estes números. Carrega o template de apresentação (rótulo, quadro,
+    # grupo, nível e ordem de cada linha), que o resultado publica junto dos valores — sem ele,
+    # quem renderiza declararia os 69 rótulos por fora.
+    mapa: MapaBO | None = None
 
 
 def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None = None,
@@ -69,6 +73,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
     residuos = _residuos(mapa, registros)
 
     return Resultado(
+        mapa=mapa,
         matriz=matriz.valores,
         procedencia=Procedencia(
             documento=mapa.vigencia.documento,

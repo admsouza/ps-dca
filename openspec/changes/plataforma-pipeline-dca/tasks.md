@@ -224,6 +224,13 @@ Entregue: `main.py`, `app/routes/{anexos,jobs,mapeamentos,dependencias}.py`, `ap
 **O contrato de entrada é o dos irmãos**, de propósito: `id_ente` em query, `Authorization: Bearer`,
 `X-Unidade-Id` conferido contra `id_ente` — um frontend que já fala com RREO/RGF não muda nada.
 
+**Hub ligado e verificado em 2026-09-08.** `AUTH_API_URL` no `docker-compose.yml` aponta para
+`http://rgf_api:8000` — de dentro de container, o `host.docker.internal:8001` do `.env` fecha a
+conexão sem responder (port-forward do Docker Desktop), e pelo nome do container na rede `ps-infra`
+o hub atende. Três caminhos conferidos contra o hub real: usuário com a unidade → `200`; usuário sem
+nenhuma unidade → `403`; usuário pedindo outro ente → `403`. O cadastro vive em
+`user_unidade_link` × `usuario` × `unidade_gestora`, e hoje `2507507` é de `admin@rgf.gov.br`.
+
 **Achado que mudou o desenho da auth:** o RGF **não** lê a unidade de um claim. O token dá o `sub`,
 e a autorização é confirmada no hub (`POST {AUTH_API_URL}/internal/authorize`, `X-Internal-Secret`),
 porque quem pode ler qual ente é dado de banco — um usuário ganha ou perde unidade sem reemitir JWT.

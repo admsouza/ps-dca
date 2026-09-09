@@ -153,6 +153,8 @@ def _linha(regra: dict) -> Linha:
         ),
         condicao=((regra.get("calculation") or {}).get("condition") or {}).get("when"),
         condicao_coluna=((regra.get("calculation") or {}).get("condition") or {}).get("column"),
+        nivel=int(regra["linha"].get("nivel") or 0),
+        ordem=int(regra["linha"].get("ordem") or 0),
     )
 
 

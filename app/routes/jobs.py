@@ -47,7 +47,12 @@ def consultar_job(
     return _estado(request, job_id)
 
 
-@router.get("/sse/jobs/{job_id}", summary="Estado de um job (stream de eventos)")
+@router.get(
+    "/sse/jobs/{job_id}",
+    summary="Estado de um job (stream de eventos)",
+    description="Exige `Authorization: Bearer` e `id_ente`. `EventSource` nativo não envia "
+                "header — consumir com `fetch` + `ReadableStream`, como RREO e RGF.",
+)
 async def acompanhar_job(
     request: Request,
     job_id: Annotated[str, Path()],

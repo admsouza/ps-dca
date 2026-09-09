@@ -117,7 +117,7 @@ def carregar(repo: RepoVigencias, anexo: str, exercicio: int) -> MapaBO:
     from app.infra.regras.carregador import KNOWLEDGE, _hashes_das_tabelas
 
     vigente = resolver(repo, anexo, exercicio)
-    linhas = tuple(_linha(dado) for dado in vigente["linhas"])
+    linhas = _completar_apresentacao(tuple(_linha(dado) for dado in vigente["linhas"]), exercicio)
     tabelas = _hashes_das_tabelas(KNOWLEDGE)
     return MapaBO(
         linhas=linhas,
@@ -125,6 +125,47 @@ def carregar(repo: RepoVigencias, anexo: str, exercicio: int) -> MapaBO:
         versao_regras=_hash_do_conteudo(vigente, tabelas),
         tabelas_stn=tabelas,
     )
+
+
+def _completar_apresentacao(linhas: tuple[Linha, ...], exercicio: int) -> tuple[Linha, ...]:
+    """Completa `nivel` e `ordem` ausentes com os da transcrição versionada.
+
+    Vigência publicada antes da change `bo-template-no-resultado` não carrega os metadados de
+    apresentação, e a tabela é **INSERT-only**: não há como corrigi-la no lugar. Completar aqui
+    mantém a apuração funcionando e o template correto.
+
+    Linha que a transcrição não contém — publicada por via administrativa — conserva a posição em
+    que aparece na vigência, e nunca falha a carga.
+    """
+    if all(linha.nivel and linha.ordem for linha in linhas):
+        return linhas
+
+    try:
+        da_norma = {linha.id: linha for linha in carregar_do_yaml(exercicio).linhas}
+    except Exception:
+        logger.warning("transcrição indisponível para completar nível/ordem", exc_info=True)
+        da_norma = {}
+
+    completadas, sem_correspondente = [], []
+    for posicao, linha in enumerate(linhas, start=1):
+        if linha.nivel and linha.ordem:
+            completadas.append(linha)
+            continue
+        referencia = da_norma.get(linha.id)
+        if referencia is None:
+            sem_correspondente.append(linha.id)
+            completadas.append(linha._replace(nivel=linha.nivel or 1,
+                                              ordem=linha.ordem or posicao))
+            continue
+        completadas.append(linha._replace(nivel=linha.nivel or referencia.nivel,
+                                          ordem=linha.ordem or referencia.ordem))
+
+    logger.info(
+        "vigência sem metadados de apresentação — nível e ordem completados pela transcrição "
+        "(%d linha(s); %d sem correspondente)",
+        sum(1 for x in linhas if not (x.nivel and x.ordem)), len(sem_correspondente),
+    )
+    return tuple(completadas)
 
 
 def semear(repo: RepoVigencias, base: Path | None = None, exercicio: int | None = None) -> int:
@@ -167,6 +208,8 @@ def _achatar(linha: Linha) -> dict:
         "grupo": linha.grupo,
         "condicao": linha.condicao,
         "condicao_coluna": linha.condicao_coluna,
+        "nivel": linha.nivel,
+        "ordem": linha.ordem,
         "filtros": [{"campo": f.campo, "operador": f.operador, "valores": list(f.valores)}
                     for f in linha.filtros],
         "exclusoes": [[{"campo": f.campo, "operador": f.operador, "valores": list(f.valores)}
@@ -201,6 +244,8 @@ def _linha(dado: dict) -> Linha:
                           for r in dado.get("referencias") or []),
         condicao=dado.get("condicao"),
         condicao_coluna=dado.get("condicao_coluna"),
+        nivel=int(dado.get("nivel") or 0),
+        ordem=int(dado.get("ordem") or 0),
     )
 
 

@@ -71,6 +71,10 @@ class Linha(NamedTuple):
     referencias: tuple[RefLinha, ...] = ()
     condicao: str | None = None                      # result_positive | result_negative
     condicao_coluna: str | None = None               # coluna que decide, para a linha inteira
+    # Apresentação, declarada pela norma e transcrita na base canônica. Não entra no cálculo, e
+    # **não** se deriva da árvore de composição: as duas coisas divergem, e a norma é a que vale.
+    nivel: int = 0                                   # 1 a 3 no IPC 07
+    ordem: int = 0                                   # 1-based, relativa ao GRUPO
 
     @property
     def composta(self) -> bool:

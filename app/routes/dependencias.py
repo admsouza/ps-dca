@@ -34,7 +34,9 @@ logger = logging.getLogger(__name__)
 
 async def unidade_autorizada(
     request: Request,
-    id_ente: Annotated[int, Query(examples=[2507507], description="Código IBGE do ente.")],
+    id_ente: Annotated[int | None, Query(examples=[2507507],
+                                         description="Código IBGE do ente. Omitido, vale o "
+                                                     "header X-Unidade-Id.")] = None,
     authorization: Annotated[str | None, Header()] = None,
     x_unidade_id: Annotated[str | None, Header(alias="X-Unidade-Id")] = None,
 ) -> str:
@@ -44,8 +46,13 @@ async def unidade_autorizada(
     except CredencialDeFonteRecusada as erro:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(erro)) from erro
 
-    ente = str(id_ente).strip()
-    if x_unidade_id and x_unidade_id.strip() != ente:
+    unidade = (x_unidade_id or "").strip()
+    # O SSE de job do front é o mesmo utilitário de RREO/RGF: identifica a unidade só pelo header.
+    ente = str(id_ente).strip() if id_ente is not None else unidade
+    if not ente:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                            detail="informe id_ente na query ou o header X-Unidade-Id.")
+    if unidade and unidade != ente:
         raise HTTPException(status.HTTP_400_BAD_REQUEST,
                             detail="X-Unidade-Id não corresponde ao id_ente informado.")
 

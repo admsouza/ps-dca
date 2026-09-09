@@ -18,10 +18,14 @@ services:
       # A API é quem migra, atrás desta variável. O advisory lock 43812/1001 serializa a
       # migração com RREO e RGF, que dividem o schema.
       RUN_MIGRATIONS: "true"
-      # AMBIENTE LOCAL: sem hub, a unidade é lida do claim do próprio JWT, e a API loga um
-      # aviso a cada requisição. Em produção **remova esta linha** — `AUTH_API_URL` do `.env`
-      # (o hub) passa a valer, e quem pode ler qual ente volta a ser dado de banco, não de token.
-      AUTH_API_URL: ""
+      # Autorização por unidade confirmada no hub — `POST {AUTH_API_URL}/internal/authorize` com
+      # `X-Internal-Secret`, como RREO e RGF fazem. Quem pode ler qual ente é dado de banco, não
+      # claim de token. Hub fora do ar responde `503`: **fail closed**, nunca libera acesso.
+      #
+      # `rgf_api:8000` e não o `host.docker.internal:8001` do `.env`: de dentro de um container, o
+      # port-forward do Docker Desktop fecha a conexão sem responder — medido. Na rede `ps-infra`
+      # o hub atende pelo nome do container e pela porta interna, como o Redis (`redis_cache`).
+      AUTH_API_URL: http://rgf_api:8000
       WEB_WORKERS: 1
       DB_POOL_SIZE: 5
       DB_MAX_OVERFLOW: 10
