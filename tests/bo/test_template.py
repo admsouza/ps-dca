@@ -167,8 +167,7 @@ def test_vigencia_antiga_sem_nivel_nem_ordem_e_completada(caplog):
     assert por_id["bo.quadro_principal.despesas.l51"].nivel == 2
     assert por_id["bo.quadro_principal.receitas.l19"].nivel == 3
     assert all(linha.ordem >= 1 for linha in mapa.linhas)
-    assert any("apresenta" in m.lower() or "nivel" in m.lower() or "nível" in m.lower()
-               for m in caplog.messages), "completar metadados não foi registrado em log"
+    assert any("completada pela transcrição" in m for m in caplog.messages)
 
 
 def test_linha_do_banco_sem_correspondente_na_transcricao(caplog):
@@ -197,3 +196,26 @@ def test_linha_do_banco_sem_correspondente_na_transcricao(caplog):
     mapa = carregar_do_banco(repo, "BO", EXERCICIO)
     assert [linha.id for linha in mapa.linhas] == ["bo.quadro_principal.receitas.l99"]
     assert mapa.linhas[0].ordem >= 1, "linha sem correspondente mantém posição de aparição"
+
+
+def test_coluna_nova_na_transcricao_entra_na_vigencia_antiga():
+    """L26 sem `saldo` no jsonb da semente antiga ganha a coluna da transcrição."""
+    from app.infra.regras.carregador import carregar
+    from app.infra.regras.vigencias import _achatar
+    from app.infra.regras.vigencias import carregar as carregar_do_banco
+    from app.infra.regras.vigencias import publicar
+    from tests.pipeline.conftest import RepoVigenciasFake
+
+    do_yaml = carregar(EXERCICIO)
+    achatadas = []
+    for linha in do_yaml.linhas:
+        bruta = _achatar(linha)
+        if linha.id == "bo.quadro_principal.receitas.l26":
+            bruta["colunas"] = [c for c in bruta["colunas"] if c["id"] != "saldo"]
+        achatadas.append(bruta)
+
+    repo = RepoVigenciasFake()
+    publicar(repo, anexo="BO", ano=2020, mes=1, linhas=achatadas, origem="seed-yaml")
+    mapa = carregar_do_banco(repo, "BO", EXERCICIO)
+    l26 = next(linha for linha in mapa.linhas if linha.id == "bo.quadro_principal.receitas.l26")
+    assert "saldo" in {c.id for c in l26.colunas}

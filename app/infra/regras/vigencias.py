@@ -119,52 +119,59 @@ def carregar(repo: RepoVigencias, anexo: str, exercicio: int) -> MapaBO:
     vigente = resolver(repo, anexo, exercicio)
     linhas = _completar_apresentacao(tuple(_linha(dado) for dado in vigente["linhas"]), exercicio)
     tabelas = _hashes_das_tabelas(KNOWLEDGE)
+    # Hash do mapa efetivo (já completado). Senão a semente INSERT-only antiga não invalida o cache
+    # quando a transcrição ganha coluna — medido: L26 sem `saldo` no jsonb, YAML já tinha.
+    efetivo = {**vigente, "linhas": [_achatar(linha) for linha in linhas]}
     return MapaBO(
         linhas=linhas,
         vigencia=Vigencia(vigente.get("documento", "IPC 07"), vigente["versao"], exercicio),
-        versao_regras=_hash_do_conteudo(vigente, tabelas),
+        versao_regras=_hash_do_conteudo(efetivo, tabelas),
         tabelas_stn=tabelas,
     )
 
 
 def _completar_apresentacao(linhas: tuple[Linha, ...], exercicio: int) -> tuple[Linha, ...]:
-    """Completa `nivel` e `ordem` ausentes com os da transcrição versionada.
+    """Completa apresentação e colunas ausentes com a transcrição versionada.
 
-    Vigência publicada antes da change `bo-template-no-resultado` não carrega os metadados de
-    apresentação, e a tabela é **INSERT-only**: não há como corrigi-la no lugar. Completar aqui
-    mantém a apuração funcionando e o template correto.
+    A tabela é **INSERT-only**: a semente de 2020-01 não é reescrita no boot. Completar aqui
+    evita que uma coluna nova no YAML (ex.: `L26.saldo`) fique de fora da apuração.
 
-    Linha que a transcrição não contém — publicada por via administrativa — conserva a posição em
-    que aparece na vigência, e nunca falha a carga.
+    Linha que a transcrição não contém — publicada por via administrativa — conserva o que veio
+    do banco, e nunca falha a carga.
     """
-    if all(linha.nivel and linha.ordem for linha in linhas):
-        return linhas
-
     try:
         da_norma = {linha.id: linha for linha in carregar_do_yaml(exercicio).linhas}
     except Exception:
-        logger.warning("transcrição indisponível para completar nível/ordem", exc_info=True)
-        da_norma = {}
+        logger.warning("transcrição indisponível para completar vigência", exc_info=True)
+        return linhas
 
-    completadas, sem_correspondente = [], []
+    completadas, sem_correspondente, colunas_extra = [], [], 0
     for posicao, linha in enumerate(linhas, start=1):
-        if linha.nivel and linha.ordem:
-            completadas.append(linha)
-            continue
         referencia = da_norma.get(linha.id)
         if referencia is None:
             sem_correspondente.append(linha.id)
-            completadas.append(linha._replace(nivel=linha.nivel or 1,
-                                              ordem=linha.ordem or posicao))
+            completadas.append(linha._replace(
+                nivel=linha.nivel or 1,
+                ordem=linha.ordem or posicao,
+            ))
             continue
-        completadas.append(linha._replace(nivel=linha.nivel or referencia.nivel,
-                                          ordem=linha.ordem or referencia.ordem))
+        ids = {c.id for c in linha.colunas}
+        extras = tuple(c for c in referencia.colunas if c.id not in ids)
+        if extras:
+            colunas_extra += len(extras)
+        completadas.append(linha._replace(
+            nivel=linha.nivel or referencia.nivel,
+            ordem=linha.ordem or referencia.ordem,
+            colunas=linha.colunas + extras,
+        ))
 
-    logger.info(
-        "vigência sem metadados de apresentação — nível e ordem completados pela transcrição "
-        "(%d linha(s); %d sem correspondente)",
-        sum(1 for x in linhas if not (x.nivel and x.ordem)), len(sem_correspondente),
-    )
+    if any(not (origem.nivel and origem.ordem) for origem in linhas) or colunas_extra:
+        logger.info(
+            "vigência completada pela transcrição | nivel_ordem=%s colunas_extra=%d sem_correspondente=%d",
+            sum(1 for x in linhas if not (x.nivel and x.ordem)),
+            colunas_extra,
+            len(sem_correspondente),
+        )
     return tuple(completadas)
 
 
