@@ -2725,8 +2725,8 @@ rules:
     decision: B6
     reading:
       adopted_from_page: 15
-      note: 'A ESTRUTURA põe L51 depois de TOTAL (XV), sem coluna. Decisão B6 do PO (2026-09-03): L51
-        não tem coluna de valor; os filtros são preservados.'
+      note: 'A ESTRUTURA põe L51 depois de TOTAL (XV). B6 (2026-09-03) deixou-a sem coluna; PO em
+        2026-09-10: apurar como L39 (columns *id003), fora do TOTAL (XV).'
   status: extracted
   review:
     required: true
@@ -2746,4 +2746,4 @@ rules:
     values:
     - literal: '99.997'
       pattern: '997'
-  columns: {}
+  columns: *id003

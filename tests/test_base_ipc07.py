@@ -347,12 +347,21 @@ def test_l27_soma_l28_l29_l30():
     }
 
 
-def test_l51_nao_tem_coluna_de_valor():
-    """Scenario: L51 não tem coluna de valor (B6 — Reserva do RPPS)."""
+def test_l51_tem_as_seis_colunas_da_l39():
+    """Scenario: L51 Reserva do RPPS usa o mapeamento de despesa da L39.
+
+    Scenario: L51 fica fora do TOTAL (XV)
+    """
     r = rule("bo.quadro_principal.despesas.l51")
-    assert r["columns"] == {}
-    literais = str(r)
-    assert "9.9.00.00.00" in literais and "99.997" in literais
+    l39 = rule("bo.quadro_principal.despesas.l39")
+    assert set(r["columns"]) == set(l39["columns"])
+    assert len(r["columns"]) == 6
+    assert contas(r, "pagas") == contas(l39, "pagas")
+    assert [v["pattern"] for v in filtro(r, "natureza_despesa")["values"]] == ["99"]
+    assert [v["pattern"] for v in filtro(r, "funcao")["values"]] == ["99"]
+    assert [v["pattern"] for v in filtro(r, "subfuncao")["values"]] == ["997"]
+    refs_l50 = rule("bo.quadro_principal.despesas.l50")["calculation"]["references"]
+    assert "bo.quadro_principal.despesas.l51" not in {ref["rule"] for ref in refs_l50}
     assert r["provenance"].get("decision") == "B6"
     assert r["status"] != "review_required"
 

@@ -76,7 +76,6 @@
     },
     "columns": {
       "type": "object",
-      "description": "Objeto vazio = linha sem coluna de valor (B6, caso L51).",
       "additionalProperties": {
         "$ref": "#/$defs/coluna"
       }

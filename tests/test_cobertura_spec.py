@@ -23,7 +23,7 @@ OPENSPEC = RAIZ_REPO / "openspec"
 # mudança de escopo: só com decisão registrada na change correspondente.
 CENARIOS_ESPERADOS = {
     "dca/base-canonica-regras": 51,
-    "dca/balanco-orcamentario": 34,
+    "dca/balanco-orcamentario": 43,
     "pipeline/plataforma": 63,
 }
 

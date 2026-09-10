@@ -225,7 +225,7 @@ def test_redeploy_da_api_nao_interrompe_job(pedido, repo, lock, apurador):
 
 
 def test_reapuracao_recarimba_calculado_em(repo, lock, apurador):
-    """Reapuração recarimba `calculado_em` — o front lê daqui o "processado em"."""
+    """Requisito: reapuração recarimba `calculado_em` — o front lê daqui o "processado em"."""
     from app.services.pipeline.job import executar
 
     antiga = datetime(2020, 1, 1, tzinfo=UTC)

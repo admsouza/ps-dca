@@ -199,7 +199,9 @@ def test_linha_do_banco_sem_correspondente_na_transcricao(caplog):
 
 
 def test_coluna_nova_na_transcricao_entra_na_vigencia_antiga():
-    """L26 sem `saldo` no jsonb da semente antiga ganha a coluna da transcrição."""
+    """Requisito: vigência antiga é completada pela transcrição — L26 sem `saldo` no jsonb
+    da semente antiga ganha a coluna da transcrição.
+    """
     from app.infra.regras.carregador import carregar
     from app.infra.regras.vigencias import _achatar
     from app.infra.regras.vigencias import carregar as carregar_do_banco

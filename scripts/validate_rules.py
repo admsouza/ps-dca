@@ -372,7 +372,7 @@ def _colunas_efetivas(regras) -> dict[str, set[str] | None]:
             return None
         declaradas = regra.get("columns")
         if declaradas is not None:
-            memo[rule_id] = set(declaradas)     # `{}` = linha sem coluna de valor (L51)
+            memo[rule_id] = set(declaradas)
             return memo[rule_id]
         alvos = [
             ref.get("rule")

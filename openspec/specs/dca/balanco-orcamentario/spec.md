@@ -3,7 +3,8 @@
 > Comportamento acordado e em vigor. Consolidado da change
 > `bo-quadro-principal-processamento`, aprovada pelo PO em 2026-09-04 e arquivada em
 > `openspec/changes/archive/`. Inclui as alterações das changes
-> `ipc07-b1-remocao-termo-5313` e `ipc07-c5-c7-linhas-cruzadas`.
+> `ipc07-b1-remocao-termo-5313`, `ipc07-c5-c7-linhas-cruzadas`, `ipc07-l51-reserva-rpps` e
+> `bo-template-no-resultado`.
 > Alterações entram por nova change, nunca por edição direta deste arquivo.
 
 ## Purpose
@@ -234,16 +235,26 @@ padrão da coluna. O override SHALL ser aceito somente em `bo.quadro_principal.r
 - **WHEN** a previsão atualizada é apurada
 - **THEN** `12.000.000,00 + 470.338.332,64` fecha `482.338.332,64`
 
-### Requirement: Linha sem coluna de valor não produz célula
+### Requirement: Reserva do RPPS é apurada com o mapeamento de despesa
 
-Linha cuja regra declara `columns` vazio SHALL aparecer na matriz sem célula de valor. A apuração
-NÃO DEVE emitir `0`, `None` nem aviso para ela.
+`bo.quadro_principal.despesas.l51` SHALL ser apurada com as mesmas colunas e contas da
+`bo.quadro_principal.despesas.l39`. Os filtros da linha SHALL restringir a MSC a
+`natureza_despesa` `9.9.00.00.00`, função `99` e subfunção `997`. A linha NÃO DEVE ser agregada
+por `L40` nem por `L50`. Escrituração ausente nessa classificação SHALL produzir `0.00`, não
+célula vazia nem aviso de não apurada.
 
 #### Scenario: reserva do RPPS
 
-- **WHEN** `bo.quadro_principal.despesas.l51` é apurada
-- **THEN** a linha existe na matriz com rótulo e sem nenhuma coluna de valor
-- **AND** nenhum aviso de célula não apurada é gerado por ela
+- **GIVEN** um registro `622130400` com ND `9.9.00.00.00`, função `99`, subfunção `997` e saldo
+  `100,00`, e outro idêntico com subfunção `999` e saldo `50,00`
+- **WHEN** o quadro principal é apurado
+- **THEN** `L51.pagas` é `100,00` e `L39.pagas` é `50,00`
+- **AND** nenhum aviso de célula não apurada cita `l51`
+
+#### Scenario: L51 fica fora do TOTAL (XV)
+
+- **WHEN** `L50` é lida
+- **THEN** suas referências são só `L48` e `L49`
 
 ### Requirement: Linha condicional só é apresentada quando a condição vale
 
@@ -361,3 +372,74 @@ coluna ou cálculo NÃO DEVEM ser codificados no apurador.
 - **WHEN** o código do apurador é inspecionado
 - **THEN** nenhum código de conta contábil, natureza ou função aparece literal fora de teste
 - **AND** trocar uma conta no YAML muda a matriz sem alterar código
+
+### Requirement: O resultado publica o template de apresentação
+
+Todo resultado apurado SHALL trazer, além dos valores, o **template do demonstrativo**: uma
+sequência ordenada de linhas com `rule_id`, `codigo`, `rotulo`, `quadro`, `grupo`, `nivel`, `ordem`
+e `totalizadora`. Quem renderiza NÃO DEVE precisar declarar rótulo, nível ou ordem por fora.
+
+`nivel` e `ordem` SHALL ser os declarados na transcrição normativa versionada, e NÃO DEVEM ser
+derivados da árvore de composição — as duas coisas divergem, e a norma é a que vale.
+
+#### Scenario: template acompanha os valores
+
+- **WHEN** um anexo é apurado
+- **THEN** o resultado traz `linhas` com uma entrada por linha do demonstrativo
+- **AND** todo `rule_id` de `linhas` existe em `matriz`, e todo `rule_id` de `matriz` existe em
+  `linhas`
+
+#### Scenario: nível e ordem são os da norma
+
+- **GIVEN** a transcrição declara `nivel` e `ordem` para cada linha
+- **WHEN** o template é publicado
+- **THEN** os valores publicados são os declarados na transcrição
+- **AND** `Reserva do RPPS` sai com `nivel: 2`, e não com o nível que a composição sugeriria
+
+#### Scenario: linhas saem na ordem de apresentação da norma
+
+- **WHEN** o template é publicado
+- **THEN** os quadros aparecem na ordem `QUADRO_PRINCIPAL`, `RP_NAO_PROCESSADOS`,
+  `RP_PROCESSADOS`
+- **AND** dentro do quadro principal, o grupo `RECEITAS` precede `DESPESAS`
+- **AND** dentro de cada grupo, as linhas seguem `ordem` crescente
+
+#### Scenario: ordem é relativa ao grupo
+
+- **GIVEN** que a norma numera receitas de 1 a 30 e despesas de 1 a 21
+- **WHEN** o template é publicado
+- **THEN** existem duas linhas com `ordem: 1` no quadro principal, distinguidas por `grupo`
+- **AND** `grupo` é publicado em cada linha, de modo que a intercalação seja resolúvel
+
+#### Scenario: linha totalizadora é identificável sem reimplementar a regra
+
+- **GIVEN** uma linha composta de outras
+- **WHEN** o template é publicado
+- **THEN** ela sai com `totalizadora: true`
+- **AND** linha de folha e linha de rótulo saem com `totalizadora: false`
+
+#### Scenario: adição não quebra consumidor existente
+
+- **WHEN** o resultado é publicado
+- **THEN** `matriz`, `procedencia` e `diagnostico` permanecem com a mesma forma
+- **AND** nenhum campo é removido ou renomeado
+
+### Requirement: Vigência publicada sem os metadados de apresentação é completada
+
+Vigência de mapeamento publicada antes desta change NÃO DEVE quebrar a apuração nem publicar
+template incompleto. O carregador SHALL completar `nivel` e `ordem` ausentes a partir da
+transcrição versionada, registrando o evento em log.
+
+#### Scenario: vigência antiga não tem nível nem ordem
+
+- **GIVEN** uma vigência publicada cujo shape não traz `nivel` e `ordem`
+- **WHEN** o mapa é carregado do banco
+- **THEN** os dois campos são completados pela transcrição versionada
+- **AND** o evento é registrado em log, sem falhar a apuração
+
+#### Scenario: linha do banco sem correspondente na transcrição
+
+- **GIVEN** uma vigência com linha que a transcrição versionada não contém
+- **WHEN** o mapa é carregado
+- **THEN** a linha permanece no template com a ordem em que aparece na vigência
+- **AND** a apuração não falha

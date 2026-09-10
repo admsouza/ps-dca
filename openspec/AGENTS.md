@@ -50,7 +50,9 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 A base canônica do IPC 07 e a F1 do Balanço Orçamentário estão **implementadas, verificadas e
 arquivadas**, com as três pendências normativas (C5, C6, C7) encerradas por medição contra o
-publicado do STN. **Suíte: 153 passed / 0 failed.** Resta uma change ativa: a plataforma.
+publicado do STN. **L51 Reserva do RPPS** passou a ser apurada como a L39 e o **template de
+apresentação** passou a acompanhar o resultado, ambos em 2026-09-10.
+Resta uma change ativa: a plataforma.
 
 | Change | Capability | Fase | Status |
 |---|---|---|---|
@@ -69,7 +71,9 @@ publicado do STN. **Suíte: 153 passed / 0 failed.** Resta uma change ativa: a p
 
 | Data | Change |
 |---|---|
-| 2026-09-04 | `bo-quadro-principal-processamento` — **F1 do BO entregue e verificada.** Núcleo puro (`domain/` + adapters + carregador YAML + service + CLI), sem Postgres nem Redis. Aceite 1:1 em centavos contra JP 12/2025 e conferência linha a linha contra o `RREO-Anexo 01`. Spec em `openspec/specs/dca/balanco-orcamentario/spec.md` — 15 requisitos / 34 cenários. F2 e F3 são trabalho de `plataforma-pipeline-dca`. |
+| 2026-09-10 | `bo-template-no-resultado` — **template de apresentação no resultado.** `linhas` com `rule_id`, `codigo`, `rotulo`, `quadro`, `grupo`, `nivel`, `ordem` e `totalizadora`; `nivel`/`ordem` vindos da transcrição normativa, nunca derivados da composição; vigência antiga completada pela transcrição no carregamento. Aditiva: `matriz`, `procedencia` e `diagnostico` inalterados. 2 requisitos / 8 cenários mesclados na spec do BO (35 → 43). |
+| 2026-09-10 | `ipc07-l51-reserva-rpps` — **L51 Reserva do RPPS apurada como L39.** Mesmo mapeamento `*id003`, filtros ND `9.9` + função `99` + subfunção `997`, fora do TOTAL (XV). Revoga a parte de B6 que deixava L51 sem coluna. |
+| 2026-09-04 | `bo-quadro-principal-processamento` — **F1 do BO entregue e verificada.** Núcleo puro (`domain/` + adapters + carregador YAML + service + CLI), sem Postgres nem Redis. Aceite 1:1 em centavos contra JP 12/2025 e conferência linha a linha contra o `RREO-Anexo 01`. Spec em `openspec/specs/dca/balanco-orcamentario/spec.md` — 17 requisitos / 43 cenários. F2 e F3 são trabalho de `plataforma-pipeline-dca`. |
 | 2026-09-04 | `ipc07-c5-c7-linhas-cruzadas` — **C5 e C7 fechadas.** `L25`, `L26`, `L49` e `L50` passam a ser apuradas, com colunas medidas no publicado do STN e referência que nomeia a coluna lida; `L29` perde `previsao_inicial` (B6 restringida). Motor: 3 casos distintos na parcela agregada e condição decidida por linha. **Suíte 153 passed / 0 failed** — verde pela primeira vez. Aceite: JP 13/13 em centavos, SP e GO conferidos. Evidência: `docs/evidencia-c5-deficit-superavit.md`. |
 | 2026-09-04 | `ipc07-b1-remocao-termo-5313` — `5.3.1.3.0.00.00` removida da coluna (a) do quadro de RP Não Processados: descontinuada, com o conteúdo em `5.3.1.2`, já primeiro termo da fórmula. Revoga a decisão B1 de 2026-08-27. **Encerra a pendência C6 sem alteração de schema.** Regressão bit a bit: 0 células divergentes em 69 linhas. Removido de passagem o código morto de `natureza_saldo` e a função `_direcao_da_conta`, nunca chamada. Evidência: `docs/evidencia-c6-c7.md`. |
 | 2026-09-04 | `ipc07-bo-regras-canonicas` — base canônica do IPC 07 entregue: 69 regras em `knowledge/rules/bo/`, 2 policies, schemas, validador e índice. 89 testes verdes; `review_required` 0. Spec em `openspec/specs/dca/base-canonica-regras/spec.md`. |

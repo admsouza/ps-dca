@@ -296,6 +296,11 @@ permanece como linha de filtro e rótulo (`ND 9.9.00.00.00`, Função `99.997`),
 `TOTAL (XV)`. Consequência: `columns` pode ser lista vazia, e nenhuma das 5 linhas fica
 `review_required`.
 
+**Decisão do PO — 2026-09-10 (restringe B6 só em `L51`):** apurar `L51` **como a `L39`**,
+respeitando o mapeamento de despesa (`columns: *id003`). Filtros da REGRAS permanecem
+(`ND 9.9.00.00.00`, função `99`, subfunção `997`). `L51` **continua fora** do `TOTAL (XV)`
+(`L50 = L48 + L49`). `L27`–`L30` não mudam.
+
 ---
 
 ## 4. Ambiguidades resolvidas por evidência interna do próprio IPC07

@@ -66,9 +66,6 @@ def _catalogo_de_derivadas(mapa: MapaBO) -> dict[str, tuple[RefColuna, ...]]:
 
 def _celulas(linha: Linha, registros: Sequence[Registro], direcao, matriz: Matriz,
              derivadas: dict) -> dict[str, Decimal | None]:
-    if not linha.colunas:
-        return {}   # linha sem coluna de valor (B6, caso L51) — nem zero, nem aviso
-
     elegiveis = [
         r for r in registros
         if atende(r, linha.filtros) and not excluido(r, linha.exclusoes)

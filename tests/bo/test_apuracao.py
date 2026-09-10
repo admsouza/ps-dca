@@ -181,10 +181,22 @@ def test_composicao_da_linha_27(apurar_quadro):
         "previsao_atualizada"] == Decimal("482338332.64")
 
 
-def test_reserva_do_rpps_nao_produz_celula(apurar_quadro):
-    """Scenario: reserva do RPPS — L51 existe na matriz sem coluna de valor."""
-    resultado = apurar_quadro(ente=ENTE, exercicio=EXERCICIO, fonte=FonteFake({5: [], 6: []}))
-    assert resultado.matriz["bo.quadro_principal.despesas.l51"] == {}
+def test_reserva_do_rpps_apura_como_l39(apurar_quadro):
+    """Scenario: reserva do RPPS — ND 9.9 + função 99 + subfunção 997, mapeamento da L39."""
+    registros = {
+        5: [],
+        6: [
+            saldo("622130400", "100.00", natureza_despesa="9.9.00.00.00",
+                  funcao="99", subfuncao="997"),
+            saldo("622130400", "50.00", natureza_despesa="9.9.00.00.00",
+                  funcao="99", subfuncao="999"),
+        ],
+    }
+    resultado = apurar_quadro(ente=ENTE, exercicio=EXERCICIO, fonte=FonteFake(registros))
+    l51 = resultado.matriz["bo.quadro_principal.despesas.l51"]
+    l39 = resultado.matriz["bo.quadro_principal.despesas.l39"]
+    assert l51["pagas"] == Decimal("100.00")
+    assert l39["pagas"] == Decimal("50.00")
     aviso = " ".join(str(a) for a in resultado.diagnostico.nao_apuradas)
     assert "l51" not in aviso
 

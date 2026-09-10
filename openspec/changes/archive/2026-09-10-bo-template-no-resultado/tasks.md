@@ -3,8 +3,7 @@
 ## 0. SPEC
 - [x] 0.1 `proposal.md` — por quê, decisões, impacto
 - [x] 0.2 `specs/dca/balanco-orcamentario/spec.md` — delta com 2 Requirements e 8 cenários
-- [ ] 0.3 Aprovação do PO (o processo exige; a implementação já está feita e verificada, e o que
-      falta é o aval formal antes do arquivamento)
+- [x] 0.3 Aprovação do PO — 2026-09-10
 
 ## 1. TEST — antes do código
 - [x] 1.1 `tests/bo/test_template.py` — os 8 cenários do delta, um teste cada
@@ -35,6 +34,7 @@
 - [x] 3.5 `l48.dotacao_atualizada` segue `6043181131.90` — a mudança é aditiva e não tocou valor
 
 ## 4. Pendente
-- [ ] 4.1 Arquivar a change e refletir em `openspec/specs/dca/balanco-orcamentario/spec.md`
+- [x] 4.1 Arquivada em 2026-09-10; os 2 Requirements e 8 cenários mesclados em
+      `openspec/specs/dca/balanco-orcamentario/spec.md` (35 → 43 cenários)
 - [ ] 4.2 Front consome `linhas` — `front-declaracoes`,
       `openspec/changes/dca-anexo01-bo-ui/` (spec atualizada nesta mesma sessão)

@@ -2,7 +2,8 @@
 
 > Comportamento acordado e em vigor. Consolidado da change `ipc07-bo-regras-canonicas`,
 > aprovada pelo PO em 2026-09-04 e arquivada em `openspec/changes/archive/`.
-> Alterações entram por nova change, nunca por edição direta deste arquivo.
+> Alterações posteriores: `ipc07-b1-remocao-termo-5313`, `ipc07-c5-c7-linhas-cruzadas` e
+> `ipc07-l51-reserva-rpps`. Alterações entram por nova change, nunca por edição direta deste arquivo.
 
 ## Purpose
 
@@ -355,6 +356,10 @@ A decisão **B6** de 2026-09-03 — `L27` a `L30` com as quatro colunas de recei
 **zero de 25 entes** publicam `PREVISÃO INICIAL` para `SuperavitFinanceiro` no `RREO-Anexo 01`. O
 restante de B6 segue valendo, e a decisão **B5** — a conta da linha em `L29` — não é afetada.
 
+A parte de B6 que deixava `L51` sem coluna de valor foi **revogada em 2026-09-10**: o PO mandou
+apurar `L51` como `L39`, com o mapeamento `*id003`. `L51` permanece fora do `TOTAL (XV)`.
+`L27`–`L30` não mudam.
+
 #### Scenario: refinanciamento usa padrões de conta PCASP
 
 - **GIVEN** os pares `2111/8111`, `2118/8118`, `2121/8121` e `2128/8128` das exclusões de `L11` e
@@ -398,16 +403,17 @@ restante de B6 segue valendo, e a decisão **B5** — a conta da linha em `L29` 
   `evidence.text`
 - **AND** nenhuma delas fica `review_required`
 
-#### Scenario: L51 não tem coluna de valor
+#### Scenario: L51 Reserva do RPPS usa o mapeamento de despesa da L39
 
-- **GIVEN** que a ESTRUTURA coloca `L51` — Reserva do RPPS — depois de `TOTAL (XV)` sem coluna, e o
-  PO decidiu em 2026-09-03 que `L51` não tem coluna de valor
+- **GIVEN** o IPC 07 p. 11 `L51 Reserva do RPPS ND 9.9.00.00.00 Função 99.997` e a decisão do PO
+  em 2026-09-10
 - **WHEN** `bo.quadro_principal.despesas.l51` é lida
-- **THEN** `columns` é lista vazia
-- **AND** os filtros `natureza_despesa = 9.9.00.00.00` e `funcao_subfuncao = 99.997` são
+- **THEN** `columns` é o mesmo conjunto da `L39` (`dotacao_inicial`, `dotacao_atualizada`,
+  `empenhadas`, `liquidadas`, `pagas`, `saldo_dotacao`) com as mesmas contas
+- **AND** os filtros `natureza_despesa = 9.9.00.00.00`, `funcao = 99` e `subfuncao = 997` são
   preservados
+- **AND** `L50` NÃO referencia `L51`
 - **AND** a regra registra `provenance.decision: B6` e não fica `review_required`
-- **AND** a validação NÃO reporta erro por ausência de coluna
 
 #### Scenario: override de conta fora de L29 e L30 é rejeitado
 
