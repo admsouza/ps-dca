@@ -270,7 +270,7 @@ def test_fonte_msc_indisponivel(repo, lock, jobs):
     from app.services.pipeline.job import executar
 
     class FonteMorta:
-        def registros(self, ente, ano, mes, classe):
+        def registros(self, ente, ano, mes, classe, matriz=None, tipo_saldo=None):
             raise ConnectionError("timeout ao ler a MSC do SICONFI")
 
     def apurador(ente, exercicio):

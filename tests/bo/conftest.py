@@ -65,8 +65,10 @@ class FonteFake:
         self.rotulo = rotulo
         self.chamadas: list[dict] = []
 
-    def registros(self, ente: int, ano: int, mes: int, classe: int):
-        self.chamadas.append({"ente": ente, "ano": ano, "mes": mes, "classe": classe})
+    def registros(self, ente: int, ano: int, mes: int, classe: int,
+                  matriz=None, tipo_saldo=None):
+        self.chamadas.append({"ente": ente, "ano": ano, "mes": mes, "classe": classe,
+                              "matriz": matriz, "tipo_saldo": tipo_saldo})
         return list(self._por_classe.get(classe, []))
 
 

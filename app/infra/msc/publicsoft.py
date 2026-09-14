@@ -11,7 +11,15 @@ import os
 from collections.abc import Sequence
 
 from app.domain.bo.modelo import Registro
+from app.infra.msc.fonte import Matriz, TipoSaldo
 from app.infra.msc.normalizacao import itens, normalizar
+
+# Vocabulário do domínio -> o que esta API usa. Ela não expõe a matriz de encerramento.
+ID_TV = {
+    TipoSaldo.ABERTURA: "beginning_balance",
+    TipoSaldo.ENCERRAMENTO: "ending_balance",
+    TipoSaldo.PERIODO: "period_change",
+}
 
 URL_SALDOS = os.getenv("PUBLICSOFT_API_URL", "")
 URL_AUDITORIA = os.getenv("PUBLICSOFT_AUDIT_URL", "")
@@ -41,14 +49,17 @@ class PublicSoftMSC:
         self._url_auditoria = url_auditoria
         self._timeout = timeout
 
-    def registros(self, ente: int, ano: int, mes: int, classe: int) -> Sequence[Registro]:
+    def registros(self, ente: int, ano: int, mes: int, classe: int,
+                  matriz: Matriz = Matriz.CONSOLIDADA,
+                  tipo_saldo: TipoSaldo = TipoSaldo.ENCERRAMENTO) -> Sequence[Registro]:
         if not self._auditoria_liberada(ano, mes):
             return []
 
         resposta = self._http(
             self._url_saldos,
             params={"anReferencia": ano, "meReferencia": mes,
-                    "classeConta": classe, "idTv": "ending_balance"},
+                    "classeConta": classe, "idTv": ID_TV[tipo_saldo],
+                    "tipoMatriz": str(matriz)},
             headers=self._cabecalhos(),
             timeout=self._timeout,
         ) or {}

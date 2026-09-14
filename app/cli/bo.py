@@ -1,6 +1,7 @@
 """Apura o quadro principal do BO e imprime a matriz.
 
-    python -m app.cli.bo <cod_ibge> <exercicio> [--fonte siconfi|publicsoft] [--json]
+    python -m app.cli.bo <cod_ibge> <exercicio> [--competencia 1..12]
+                         [--fonte siconfi|publicsoft] [--json]
 
 É o que torna a F1 verificável sem rota, sem banco e sem container: a mesma função que o worker
 vai chamar na F3, chamada aqui direto.
@@ -38,7 +39,9 @@ def _texto(resultado) -> str:
     d = resultado.diagnostico
     linhas += [
         "",
-        f"Procedência   {p.documento} {p.edicao} · exercício {p.exercicio} · "
+        f"Procedência   {p.documento} {p.edicao} · exercício {p.exercicio} "
+        f"competência {p.competencia:02d} · matriz {p.matriz}/{p.tipo_saldo} · "
+        f"classes {','.join(str(c) for c in p.classes)} · "
         f"{p.regras_aplicadas} regras · versao_regras {p.versao_regras[:12]}…",
         f"Diagnóstico   {len(d.nao_apuradas)} célula(s) não apurada(s) · "
         f"{len(d.residuos)} resíduo(s) · {d.duracao_ms} ms"
@@ -71,11 +74,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("exercicio", type=int)
     parser.add_argument("--fonte", choices=("siconfi", "publicsoft"), default="siconfi")
     parser.add_argument("--token", default="", help="token do ente (PublicSoft)")
+    parser.add_argument("--competencia", type=int, default=12, choices=range(1, 13),
+                        metavar="1..12", help="mês de referência; 12 é o exercício fechado")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 
     resultado = apurar(
-        ente=args.ente, exercicio=args.exercicio, fonte=_fonte(args.fonte, args.token)
+        ente=args.ente, exercicio=args.exercicio, fonte=_fonte(args.fonte, args.token),
+        competencia=args.competencia,
     )
     print(_json(resultado) if args.json else _texto(resultado))
     return 0

@@ -39,7 +39,8 @@ class CacheDados(Protocol):
 
 
 class Fonte(Protocol):
-    def registros(self, ente: int, ano: int, mes: int, classe: int) -> Sequence[Any]: ...
+    def registros(self, ente: int, ano: int, mes: int, classe: int,
+                  matriz=None, tipo_saldo=None) -> Sequence[Any]: ...
 
 
 def para_dados(registros: Sequence[Any]) -> list[dict]:
@@ -77,16 +78,18 @@ def de_dados(brutos: Sequence[Any]) -> list[Any] | None:
 
 
 def ler_ou_baixar(*, fonte: Fonte, cache: CacheDados | None, ente: int, ano: int,
-                  mes: int, classe: int) -> Any:
+                  mes: int, classe: int, matriz=None, tipo_saldo=None) -> Any:
     """Devolve o recorte pedido, do cache comum quando houver.
 
     A chave inclui competência e classe: uma chave por ente/exercício devolveria despesa onde se
-    pediu receita.
+    pediu receita. E inclui o **par (matriz, tipo de saldo)** quando ele não é o do RREO: o espaço
+    do Redis é compartilhado, e gravar ali a matriz de encerramento sob a chave que o RREO usa para
+    a consolidada serviria dado de outra origem aos três pipelines.
     """
     if cache is None:
-        return fonte.registros(ente, ano, mes, classe)
+        return fonte.registros(ente, ano, mes, classe, matriz=matriz, tipo_saldo=tipo_saldo)
 
-    chave = chaves.msc(ente, ano, mes, classe)
+    chave = _chave(ente, ano, mes, classe, matriz, tipo_saldo)
     guardado = cache.obter(chave)
     if guardado:
         registros = de_dados(guardado)
@@ -95,10 +98,23 @@ def ler_ou_baixar(*, fonte: Fonte, cache: CacheDados | None, ente: int, ano: int
                          ente, ano, mes, classe)
             return registros
 
-    registros = fonte.registros(ente, ano, mes, classe)
+    registros = fonte.registros(ente, ano, mes, classe, matriz=matriz, tipo_saldo=tipo_saldo)
     if registros:            # vazio pode ser falha de fonte; não se cacheia, como no RREO
         cache.gravar(chave, para_dados(registros))
     return registros
+
+
+def _chave(ente: int, ano: int, mes: int, classe: int, matriz, tipo_saldo) -> str:
+    """Chave do RREO quando o par é o dele; chave própria quando não é."""
+    from app.infra.msc.fonte import Matriz, TipoSaldo
+
+    do_rreo = matriz in (None, Matriz.CONSOLIDADA) and tipo_saldo in (
+        None, TipoSaldo.ENCERRAMENTO
+    )
+    if do_rreo:
+        return chaves.msc(ente, ano, mes, classe)
+    return chaves.msc(ente, ano, mes, classe,
+                      id_tv=str(tipo_saldo or ""), extra=str(matriz or ""))
 
 
 def decodificar(bruto: bytes | None) -> Any:

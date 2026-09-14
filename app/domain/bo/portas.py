@@ -20,6 +20,12 @@ class DirecaoSaldo(Protocol):
 
 
 class FonteSaldos(Protocol):
-    """Devolve os registros da MSC de um ente, exercício, mês e classe contábil."""
+    """Devolve os registros da MSC de um ente, exercício, competência e classe contábil.
 
-    def registros(self, ente: int, ano: int, mes: int, classe: int) -> Sequence[Registro]: ...
+    `matriz` e `tipo_saldo` são vocabulário do domínio — qual matriz e qual momento do saldo.
+    Quem os escolhe é a tabela por demonstrativo, não quem chama; o adapter traduz para o nome
+    que a sua API usa. O núcleo não conhece esses nomes.
+    """
+
+    def registros(self, ente: int, ano: int, mes: int, classe: int,
+                  matriz=None, tipo_saldo=None) -> Sequence[Registro]: ...

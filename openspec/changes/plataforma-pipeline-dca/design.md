@@ -82,6 +82,13 @@ repositórios. Lock cujo job não está mais `processing` é órfão: liberado e
 A DCA é anual e consolidada (`periodicidade=A`, `periodo=1`, poder `-`), o que simplifica a chave em
 relação ao RGF, que carrega periodicidade, período e poder.
 
+> **P9 — pendente (2026-09-14).** O PO informou que haverá **período mensal além do anual, em todos
+> os anexos** (G10 da change `bf-apuracao-f1`). Com isso a identidade abaixo deixa de bastar: dois
+> meses do mesmo exercício colidiriam na mesma entrada, e o cache devolveria o mês errado sem
+> acusar. A chave precisa ganhar a competência antes de qualquer resultado mensal ser cacheado.
+> Fica pendente também o **tipo de matriz** (`MSCC` × `MSCE`, G9): se entrar como parâmetro, entra
+> na identidade junto.
+
 ```
 identidade = (id_ente, an_referencia, anexo)
 invalida se: versao_api != atual   ou   versao_regras != atual
@@ -433,4 +440,8 @@ contrato antes. Mas a F1 do BO não espera por isto — ela é verificável por 
   **adiada com gatilho** — decidir antes de apurar o segundo exercício ou de publicar edição nova
   de IPC. `versao_regras` invalida por versão, não por vigência: força reapuração, mas não escolhe
   a edição correta.
+- **P9 (2026-09-14)** — periodicidade **mensal** em todos os anexos, informada pelo PO. Alcança a
+  chave de cache (§4), o job, a rota e o registry, todos hoje escritos para o anual. Decidir junto
+  com G9/G10 da change `bf-apuracao-f1`; enquanto não decidido, nenhum resultado mensal deve ser
+  cacheado com a chave atual.
 - Proposta, design e delta spec **aprovados pelo PO em 2026-09-04** (task 0.8). Fase SPEC fechada.

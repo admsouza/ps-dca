@@ -80,6 +80,10 @@ def para_dados(resultado) -> dict:
             "versao_regras": procedencia.versao_regras,
             "regras_aplicadas": procedencia.regras_aplicadas,
             "tabelas_stn": dict(procedencia.tabelas_stn),
+            "matriz": getattr(procedencia, "matriz", ""),
+            "tipo_saldo": getattr(procedencia, "tipo_saldo", ""),
+            "competencia": getattr(procedencia, "competencia", 12),
+            "classes": list(getattr(procedencia, "classes", ())),
         },
         "diagnostico": {
             # Declarado sempre, vazio inclusive: consumidor que não encontra a chave não sabe se a

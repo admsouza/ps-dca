@@ -23,7 +23,8 @@ OPENSPEC = RAIZ_REPO / "openspec"
 # mudança de escopo: só com decisão registrada na change correspondente.
 CENARIOS_ESPERADOS = {
     "dca/base-canonica-regras": 83,  # 51 do IPC 07 + 32 do IPC 06 (ipc06-bf-regras-canonicas)
-    "dca/balanco-orcamentario": 43,
+    "dca/balanco-orcamentario": 46,
+    "dca/fonte-msc": 12,
     "pipeline/plataforma": 63,
 }
 
@@ -31,7 +32,8 @@ CENARIOS_ESPERADOS = {
 # `pipeline/plataforma` entrou ao fechar os 63 cenários — fase TEST concluída, F2/F3 por
 # implementar. Os testes existem e são vermelhos de propósito; a cobertura passa a ser exigida
 # daqui para a frente, e cenário novo sem teste quebra o build.
-COM_TESTES = ("dca/base-canonica-regras", "dca/balanco-orcamentario", "pipeline/plataforma")
+COM_TESTES = ("dca/base-canonica-regras", "dca/balanco-orcamentario",
+              "dca/fonte-msc", "pipeline/plataforma")
 
 
 def _specs() -> dict[str, Path]:

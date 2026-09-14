@@ -53,10 +53,16 @@ arquivadas**, com as três pendências normativas (C5, C6, C7) encerradas por me
 publicado do STN. **L51 Reserva do RPPS** passou a ser apurada como a L39 e o **template de
 apresentação** passou a acompanhar o resultado, ambos em 2026-09-10. Em 2026-09-14 entrou a
 **base canônica do IPC 06** (Balanço Financeiro, 80 regras) — a apuração do BF ainda não existe.
-Resta uma change ativa: a plataforma.
+A **fonte MSC por demonstrativo e a apuração mensal** entraram em 2026-09-14 e estão arquivadas —
+com **uma pendência aberta**: o critério de identificação da MSC de encerramento na periodicidade
+mensal aguarda decisão do PO **com um ente real de prestação mensal**
+(`docs/pendencias-periodicidade-mensal.md`). A regra implementada para os meses 1–11 foi medida
+apenas em entes de prestação anual.
+Changes ativas: a apuração do BF (`bf-apuracao-f1`, em SPEC) e a plataforma.
 
 | Change | Capability | Fase | Status |
 |---|---|---|---|
+| `bf-apuracao-f1` | `dca/balanco-financeiro` (nova) | **SPEC** | Aguarda aprovação do PO e as decisões G1–G6. F1 do Balanço Financeiro: motor único em `app/domain/nucleo/`, fonte de recursos como filtro, saldo em data (`tipo_valor`), movimento credor/devedor, duas colunas e Quadro Anexo. Aceite: âncoras contra I-C/I-D/I-AB, `L33 == L66` e conciliação de caixa — **o `tt/dca` não publica o BF** (medido). Pendentes do PO: **G9** (tipo de matriz e tipo de saldo, `MSCC` × `MSCE`) e **G10** (**período mensal além do anual em todos os anexos**), ambos alcançando o BO já entregue e a plataforma (`P9`). |
 | `plataforma-pipeline-dca` | `pipeline/plataforma` (nova) | **PLAN/ARCH** | SPEC aprovada em 2026-09-04. 22 requisitos / 63 cenários: ciclo requisição→cache→job→worker, camadas e regra de dependência, cache e lock únicos, `versao_regras` por hash canônico, mapeamento vigente em banco INSERT-only, reprocessamento forçado, procedência e diagnóstico. Infra: Postgres e Redis do hub, prefixo `dca_*`, `alembic_version_dca`, advisory lock `43812/1001`, fila `arq:queue:dca`. Implementada nas fases F2/F3 do BO. |
 
 ### Ordem de execução acordada
@@ -72,6 +78,7 @@ Resta uma change ativa: a plataforma.
 
 | Data | Change |
 |---|---|
+| 2026-09-14 | `msc-fonte-e-competencia` — **fonte MSC por demonstrativo e apuração mensal.** Decisão do PO: todos os demonstrativos sobre a matriz de **encerramento**, saldo de **abertura** no BO, BF, DVP e DFC, e de **encerramento** no BP. O par vira propriedade do demonstrativo, e a combinação errada deixa de ser exprimível. Competência passa a parâmetro (padrão 12), para entes que prestam contas mensalmente — nos meses 1–11 a leitura é a consolidada, porque a **`MSCE` só existe em dezembro** (medido). Regressão do BO: **337 células × 2 entes, zero divergências**. Retry com backoff nos adapters. Revoga a decisão C1. Capability nova `dca/fonte-msc` (12 cenários); BO passa a 46. Suíte **312 passed**. |
 | 2026-09-14 | `ipc06-bf-regras-canonicas` — **base canônica do Balanço Financeiro (IPC 06, ed. 2024-06).** 80 regras em `knowledge/rules/bf/` (Quadro Principal 66 + Quadro Anexo 14), 5 policies e 3 enums novos: `fonte_recurso`, `saldo` (inicial/final) e `movimento` (credor/devedor). Campos e colunas passam a ser validados **por documento**. Fontes por subgrupo vindas do Anexo I da Portaria STN 710/2021 (`fontes-recursos-stn-2026.xlsx`, decisão F3). `review_required 6` — L22, L23, L28, L55, L56 e L61, sem mapeamento no IPC 06 (F1/F2). Suíte **287 passed**; parte `BO` do índice bit a bit igual. Spec: 27 requisitos / 83 cenários. Análise da fonte: `docs/source-analysis-ipc06.md`. |
 | 2026-09-10 | `bo-template-no-resultado` — **template de apresentação no resultado.** `linhas` com `rule_id`, `codigo`, `rotulo`, `quadro`, `grupo`, `nivel`, `ordem` e `totalizadora`; `nivel`/`ordem` vindos da transcrição normativa, nunca derivados da composição; vigência antiga completada pela transcrição no carregamento. Aditiva: `matriz`, `procedencia` e `diagnostico` inalterados. 2 requisitos / 8 cenários mesclados na spec do BO (35 → 43). |
 | 2026-09-10 | `ipc07-l51-reserva-rpps` — **L51 Reserva do RPPS apurada como L39.** Mesmo mapeamento `*id003`, filtros ND `9.9` + função `99` + subfunção `997`, fora do TOTAL (XV). Revoga a parte de B6 que deixava L51 sem coluna. |

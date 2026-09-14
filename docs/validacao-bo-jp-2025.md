@@ -1,7 +1,9 @@
 # Validação da regra de saldo — João Pessoa, exercício 2025
 
 **Medido em:** 2026-09-03 · **Ente:** `2507507` · **Competência:** 12/2025 · **Tipo de matriz:** `MSCC`
-**Fonte dos saldos:** `tt/msc_orcamentaria`, `id_tv=ending_balance`, classes **5** e **6**
+**Fonte dos saldos:** `tt/msc_orcamentaria`, classes **5** e **6** — medido sobre
+`MSCC`/`ending_balance`; desde 2026-09-14 a leitura é `MSCE`/`beginning_balance`, que produz
+**os mesmos valores** (337 células × 2 entes, zero divergências: `docs/evidencia-matriz-mscc-vs-msce.md`)
 **Gabarito:** `tt/dca`, `an_exercicio=2025` — anexos `DCA-Anexo I-C` e `DCA-Anexo I-D`
 
 Volume obtido: **4.600** registros de classe 5 e **4.320** de classe 6 (uma página ORDS cada).

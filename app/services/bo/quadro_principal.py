@@ -17,16 +17,24 @@ from decimal import Decimal
 from app.domain.bo.matriz import apurar as apurar_matriz
 from app.domain.bo.modelo import MapaBO, NaoApurada, Registro, Residuo
 from app.domain.bo.saldo import atende
+from app.infra.msc.fonte import COMPETENCIA_DE_ENCERRAMENTO, fonte_de
 from app.infra.pcasp.natureza import do_pcasp
 from app.infra.regras.carregador import carregar
 
-MES_DA_DCA = 12          # decisão C1 do PO: mês 12, MSCC — não o mês de encerramento
-CLASSES = (5, 6)
+DEMONSTRATIVO = "BO"
+# A competência é parâmetro, não constante: há entes que prestam contas mensalmente. O padrão é o
+# exercício fechado. De onde cada competência lê — matriz e tipo de saldo — vem de `msc/fonte.py`,
+# por decisão do PO de 2026-09-14, que revoga a C1.
 
 
 @dataclass(frozen=True)
 class Procedencia:
-    """O que produziu estes números — permite explicar divergência sem reapurar."""
+    """O que produziu estes números — permite explicar divergência sem reapurar.
+
+    Matriz, tipo de saldo e competência entram aqui porque **mudam o valor**: os mesmos `rule_id`
+    apurados de pares diferentes dão números diferentes, e sem a declaração duas apurações
+    incomparáveis passam por iguais.
+    """
 
     documento: str
     edicao: str
@@ -34,6 +42,10 @@ class Procedencia:
     versao_regras: str
     regras_aplicadas: int
     tabelas_stn: dict[str, str] = field(default_factory=dict)
+    matriz: str = ""
+    tipo_saldo: str = ""
+    competencia: int = COMPETENCIA_DE_ENCERRAMENTO
+    classes: tuple[int, ...] = ()
 
 
 @dataclass
@@ -58,16 +70,20 @@ class Resultado:
 
 
 def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None = None,
-           mes: int = MES_DA_DCA) -> Resultado:
-    """Apura o quadro principal do BO para um ente e exercício."""
+           competencia: int = COMPETENCIA_DE_ENCERRAMENTO) -> Resultado:
+    """Apura o quadro principal do BO para um ente, exercício e competência."""
     inicio = time.monotonic()
 
     mapa = mapa or carregar(exercicio=exercicio)
     direcao = direcao or do_pcasp()
+    origem = fonte_de(DEMONSTRATIVO, competencia)
 
     registros: list[Registro] = []
-    for classe in CLASSES:
-        registros.extend(fonte.registros(ente=ente, ano=exercicio, mes=mes, classe=classe))
+    for classe in origem.classes:
+        registros.extend(fonte.registros(
+            ente=ente, ano=exercicio, mes=competencia, classe=classe,
+            matriz=origem.matriz, tipo_saldo=origem.tipo_saldo,
+        ))
 
     matriz = apurar_matriz(mapa, registros, direcao)
     residuos = _residuos(mapa, registros)
@@ -82,6 +98,10 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
             versao_regras=mapa.versao_regras,
             regras_aplicadas=len(mapa.linhas),
             tabelas_stn=dict(mapa.tabelas_stn),
+            matriz=str(origem.matriz),
+            tipo_saldo=str(origem.tipo_saldo),
+            competencia=competencia,
+            classes=origem.classes,
         ),
         diagnostico=Diagnostico(
             nao_apuradas=matriz.nao_apuradas,

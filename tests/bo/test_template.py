@@ -125,7 +125,8 @@ def test_adicao_nao_quebra_consumidor_existente(dados):
     """Scenario: adição não quebra consumidor existente."""
     assert set(dados) == {"matriz", "procedencia", "diagnostico", "linhas"}
 
-    assert set(dados["procedencia"]) == {
+    # Superset: campo novo na procedência é aditivo — o que não pode é sumir campo que já existia.
+    assert set(dados["procedencia"]) >= {
         "documento", "edicao", "exercicio", "versao_regras", "regras_aplicadas", "tabelas_stn",
     }
     assert set(dados["diagnostico"]) == {"nao_apuradas", "residuos", "duracao_ms", "sem_dados"}
