@@ -1,0 +1,1257 @@
+# Quadro Anexo do Balanço Financeiro — IPC 06, pp. 14–15.
+# 14 linhas, seis colunas: (a)/(d) receita orçamentária, (b)/(e) deduções, (c)/(f) = (a-b)/(d-e).
+# Gerado por transcrição assistida a partir de knowledge/sources/ipc06/extracted.md.
+# A fonte canônica é este arquivo; o PDF é a origem normativa.
+rules:
+- rule_id: bf.quadro_anexo.l1
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L1
+    descricao: Recursos Não vinculados
+    nivel: 1
+    ordem: 1
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '500'
+      pattern: '500'
+    - literal: '501'
+      pattern: '501'
+    - literal: '502'
+      pattern: '502'
+    - literal: '503'
+      pattern: '503'
+  columns:
+    receita_orcamentaria_atual:
+      label: Receita Orçamentária (a)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_atual:
+      label: Deduções da Receita Orçamentária (b)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_atual:
+      label: Saldo (c) = (a - b)
+      calculation:
+        references:
+        - column: receita_orcamentaria_atual
+          sign: +
+        - column: deducoes_atual
+          sign: '-'
+    receita_orcamentaria_anterior:
+      label: Receita Orçamentária (d)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_anterior:
+      label: Deduções da Receita Orçamentária (e)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_anterior:
+      label: Saldo (f) = (d - e)
+      calculation:
+        references:
+        - column: receita_orcamentaria_anterior
+          sign: +
+        - column: deducoes_anterior
+          sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 14
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L1
+  evidence:
+    page: 14
+    text: L1 Recursos Não vinculados 6.2.1.2.0.00.00 <nas fontes aplicáveis> 6.2.1.3.0.00.00 <nas fontes
+      aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l2
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L2
+    descricao: Recursos Vinculados (EXCETO AO RPPS)
+    nivel: 1
+    ordem: 2
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  calculation:
+    references:
+    - rule: bf.quadro_anexo.l3
+      sign: +
+    - rule: bf.quadro_anexo.l4
+      sign: +
+    - rule: bf.quadro_anexo.l5
+      sign: +
+    - rule: bf.quadro_anexo.l6
+      sign: +
+    - rule: bf.quadro_anexo.l7
+      sign: +
+    - rule: bf.quadro_anexo.l8
+      sign: +
+    - rule: bf.quadro_anexo.l9
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 14
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L2
+  evidence:
+    page: 14
+    text: L2 Recursos Vinculados (EXCETO AO RPPS) (L3 + L4 + L5 + L6 + L7 + L8 + L9)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l3
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L3
+    descricao: Recursos Vinculados à Educação
+    nivel: 2
+    ordem: 3
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '540'
+      pattern: '540'
+    - literal: '541'
+      pattern: '541'
+    - literal: '542'
+      pattern: '542'
+    - literal: '543'
+      pattern: '543'
+    - literal: '544'
+      pattern: '544'
+    - literal: '545'
+      pattern: '545'
+    - literal: '546'
+      pattern: '546'
+    - literal: '550'
+      pattern: '550'
+    - literal: '551'
+      pattern: '551'
+    - literal: '552'
+      pattern: '552'
+    - literal: '553'
+      pattern: '553'
+    - literal: '569'
+      pattern: '569'
+    - literal: '570'
+      pattern: '570'
+    - literal: '571'
+      pattern: '571'
+    - literal: '572'
+      pattern: '572'
+    - literal: '573'
+      pattern: '573'
+    - literal: '574'
+      pattern: '574'
+    - literal: '575'
+      pattern: '575'
+    - literal: '576'
+      pattern: '576'
+    - literal: '599'
+      pattern: '599'
+  columns:
+    receita_orcamentaria_atual:
+      label: Receita Orçamentária (a)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_atual:
+      label: Deduções da Receita Orçamentária (b)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_atual:
+      label: Saldo (c) = (a - b)
+      calculation:
+        references:
+        - column: receita_orcamentaria_atual
+          sign: +
+        - column: deducoes_atual
+          sign: '-'
+    receita_orcamentaria_anterior:
+      label: Receita Orçamentária (d)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_anterior:
+      label: Deduções da Receita Orçamentária (e)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_anterior:
+      label: Saldo (f) = (d - e)
+      calculation:
+        references:
+        - column: receita_orcamentaria_anterior
+          sign: +
+        - column: deducoes_anterior
+          sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 14
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L3
+  evidence:
+    page: 14
+    text: L3 Recursos Vinculados à Educação 6.2.1.2.0.00.00 <nas fontes aplicáveis> 6.2.1.3.0.00.00 <nas
+      fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l4
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L4
+    descricao: Recursos Vinculados à Saúde
+    nivel: 2
+    ordem: 4
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '600'
+      pattern: '600'
+    - literal: '601'
+      pattern: '601'
+    - literal: '602'
+      pattern: '602'
+    - literal: '603'
+      pattern: '603'
+    - literal: '604'
+      pattern: '604'
+    - literal: '605'
+      pattern: '605'
+    - literal: '621'
+      pattern: '621'
+    - literal: '622'
+      pattern: '622'
+    - literal: '631'
+      pattern: '631'
+    - literal: '632'
+      pattern: '632'
+    - literal: '633'
+      pattern: '633'
+    - literal: '634'
+      pattern: '634'
+    - literal: '635'
+      pattern: '635'
+    - literal: '636'
+      pattern: '636'
+    - literal: '659'
+      pattern: '659'
+  columns:
+    receita_orcamentaria_atual:
+      label: Receita Orçamentária (a)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_atual:
+      label: Deduções da Receita Orçamentária (b)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_atual:
+      label: Saldo (c) = (a - b)
+      calculation:
+        references:
+        - column: receita_orcamentaria_atual
+          sign: +
+        - column: deducoes_atual
+          sign: '-'
+    receita_orcamentaria_anterior:
+      label: Receita Orçamentária (d)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_anterior:
+      label: Deduções da Receita Orçamentária (e)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_anterior:
+      label: Saldo (f) = (d - e)
+      calculation:
+        references:
+        - column: receita_orcamentaria_anterior
+          sign: +
+        - column: deducoes_anterior
+          sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 14
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L4
+  evidence:
+    page: 14
+    text: L4 Recursos Vinculados à Saúde 6.2.1.2.0.00.00 <nas fontes aplicáveis> 6.2.1.3.0.00.00 <nas
+      fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l5
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L5
+    descricao: Recursos Vinculados à Assistência Social
+    nivel: 2
+    ordem: 5
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '660'
+      pattern: '660'
+    - literal: '661'
+      pattern: '661'
+    - literal: '662'
+      pattern: '662'
+    - literal: '665'
+      pattern: '665'
+    - literal: '669'
+      pattern: '669'
+  columns:
+    receita_orcamentaria_atual:
+      label: Receita Orçamentária (a)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_atual:
+      label: Deduções da Receita Orçamentária (b)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_atual:
+      label: Saldo (c) = (a - b)
+      calculation:
+        references:
+        - column: receita_orcamentaria_atual
+          sign: +
+        - column: deducoes_atual
+          sign: '-'
+    receita_orcamentaria_anterior:
+      label: Receita Orçamentária (d)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_anterior:
+      label: Deduções da Receita Orçamentária (e)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_anterior:
+      label: Saldo (f) = (d - e)
+      calculation:
+        references:
+        - column: receita_orcamentaria_anterior
+          sign: +
+        - column: deducoes_anterior
+          sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 14
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L5
+  evidence:
+    page: 14
+    text: L5 Recursos Vinculados à Assistência Social 6.2.1.2.0.00.00 <nas fontes aplicáveis> 6.2.1.3.0.00.00
+      <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l6
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L6
+    descricao: Recursos Vinculados à Previdência Social (Exceto ao RPPS)
+    nivel: 2
+    ordem: 6
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '803'
+      pattern: '803'
+    - literal: '804'
+      pattern: '804'
+  columns:
+    receita_orcamentaria_atual:
+      label: Receita Orçamentária (a)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_atual:
+      label: Deduções da Receita Orçamentária (b)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_atual:
+      label: Saldo (c) = (a - b)
+      calculation:
+        references:
+        - column: receita_orcamentaria_atual
+          sign: +
+        - column: deducoes_atual
+          sign: '-'
+    receita_orcamentaria_anterior:
+      label: Receita Orçamentária (d)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_anterior:
+      label: Deduções da Receita Orçamentária (e)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_anterior:
+      label: Saldo (f) = (d - e)
+      calculation:
+        references:
+        - column: receita_orcamentaria_anterior
+          sign: +
+        - column: deducoes_anterior
+          sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 14
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L6
+  evidence:
+    page: 14
+    text: L6 Recursos Vinculados à Previdência Social (Exceto ao RPPS) 6.2.1.2.0.00.00 <nas fontes aplicáveis>
+      6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l7
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L7
+    descricao: Demais Vinculações Decorrentes de Transferências
+    nivel: 2
+    ordem: 7
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '700'
+      pattern: '700'
+    - literal: '701'
+      pattern: '701'
+    - literal: '702'
+      pattern: '702'
+    - literal: '703'
+      pattern: '703'
+    - literal: '704'
+      pattern: '704'
+    - literal: '705'
+      pattern: '705'
+    - literal: '706'
+      pattern: '706'
+    - literal: '707'
+      pattern: '707'
+    - literal: '708'
+      pattern: '708'
+    - literal: '709'
+      pattern: '709'
+    - literal: '710'
+      pattern: '710'
+    - literal: '711'
+      pattern: '711'
+    - literal: '712'
+      pattern: '712'
+    - literal: '713'
+      pattern: '713'
+    - literal: '714'
+      pattern: '714'
+    - literal: '715'
+      pattern: '715'
+    - literal: '716'
+      pattern: '716'
+    - literal: '717'
+      pattern: '717'
+    - literal: '718'
+      pattern: '718'
+    - literal: '719'
+      pattern: '719'
+    - literal: '720'
+      pattern: '720'
+    - literal: '721'
+      pattern: '721'
+    - literal: '722'
+      pattern: '722'
+    - literal: '747'
+      pattern: '747'
+    - literal: '748'
+      pattern: '748'
+    - literal: '749'
+      pattern: '749'
+  columns:
+    receita_orcamentaria_atual:
+      label: Receita Orçamentária (a)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_atual:
+      label: Deduções da Receita Orçamentária (b)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_atual:
+      label: Saldo (c) = (a - b)
+      calculation:
+        references:
+        - column: receita_orcamentaria_atual
+          sign: +
+        - column: deducoes_atual
+          sign: '-'
+    receita_orcamentaria_anterior:
+      label: Receita Orçamentária (d)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_anterior:
+      label: Deduções da Receita Orçamentária (e)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_anterior:
+      label: Saldo (f) = (d - e)
+      calculation:
+        references:
+        - column: receita_orcamentaria_anterior
+          sign: +
+        - column: deducoes_anterior
+          sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 14
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L7
+  evidence:
+    page: 14
+    text: L7 Demais Vinculações Decorrentes de Transferências 6.2.1.2.0.00.00 <nas fontes aplicáveis>
+      6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l8
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L8
+    descricao: Demais Vinculações Legais
+    nivel: 2
+    ordem: 8
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '750'
+      pattern: '750'
+    - literal: '751'
+      pattern: '751'
+    - literal: '752'
+      pattern: '752'
+    - literal: '753'
+      pattern: '753'
+    - literal: '754'
+      pattern: '754'
+    - literal: '755'
+      pattern: '755'
+    - literal: '756'
+      pattern: '756'
+    - literal: '757'
+      pattern: '757'
+    - literal: '758'
+      pattern: '758'
+    - literal: '759'
+      pattern: '759'
+    - literal: '760'
+      pattern: '760'
+    - literal: '761'
+      pattern: '761'
+    - literal: '762'
+      pattern: '762'
+    - literal: '763'
+      pattern: '763'
+    - literal: '799'
+      pattern: '799'
+  columns:
+    receita_orcamentaria_atual:
+      label: Receita Orçamentária (a)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_atual:
+      label: Deduções da Receita Orçamentária (b)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_atual:
+      label: Saldo (c) = (a - b)
+      calculation:
+        references:
+        - column: receita_orcamentaria_atual
+          sign: +
+        - column: deducoes_atual
+          sign: '-'
+    receita_orcamentaria_anterior:
+      label: Receita Orçamentária (d)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_anterior:
+      label: Deduções da Receita Orçamentária (e)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_anterior:
+      label: Saldo (f) = (d - e)
+      calculation:
+        references:
+        - column: receita_orcamentaria_anterior
+          sign: +
+        - column: deducoes_anterior
+          sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 14
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L8
+  evidence:
+    page: 14
+    text: L8 Demais Vinculações Legais 6.2.1.2.0.00.00 <nas fontes aplicáveis> 6.2.1.3.0.00.00 <nas fontes
+      aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l9
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L9
+    descricao: Outras Vinculações
+    nivel: 2
+    ordem: 9
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '880'
+      pattern: '880'
+    - literal: '898'
+      pattern: '898'
+    - literal: '899'
+      pattern: '899'
+  columns:
+    receita_orcamentaria_atual:
+      label: Receita Orçamentária (a)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_atual:
+      label: Deduções da Receita Orçamentária (b)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_atual:
+      label: Saldo (c) = (a - b)
+      calculation:
+        references:
+        - column: receita_orcamentaria_atual
+          sign: +
+        - column: deducoes_atual
+          sign: '-'
+    receita_orcamentaria_anterior:
+      label: Receita Orçamentária (d)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_anterior:
+      label: Deduções da Receita Orçamentária (e)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_anterior:
+      label: Saldo (f) = (d - e)
+      calculation:
+        references:
+        - column: receita_orcamentaria_anterior
+          sign: +
+        - column: deducoes_anterior
+          sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 14
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L9
+  evidence:
+    page: 14
+    text: L9 Outras Vinculações 6.2.1.2.0.00.00 <nas fontes aplicáveis> 6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l10
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L10
+    descricao: Recursos Vinculados ao RPPS
+    nivel: 1
+    ordem: 10
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  calculation:
+    references:
+    - rule: bf.quadro_anexo.l11
+      sign: +
+    - rule: bf.quadro_anexo.l12
+      sign: +
+    - rule: bf.quadro_anexo.l13
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 14
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L10
+  evidence:
+    page: 14
+    text: L10 Recursos Vinculados ao RPPS (L11 + L12 + L13)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l11
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L11
+    descricao: Recursos Vinculados ao RPPS - Fundo em Capitalização (Plano Previdenciário)
+    nivel: 2
+    ordem: 11
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '800'
+      pattern: '800'
+  columns:
+    receita_orcamentaria_atual:
+      label: Receita Orçamentária (a)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_atual:
+      label: Deduções da Receita Orçamentária (b)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_atual:
+      label: Saldo (c) = (a - b)
+      calculation:
+        references:
+        - column: receita_orcamentaria_atual
+          sign: +
+        - column: deducoes_atual
+          sign: '-'
+    receita_orcamentaria_anterior:
+      label: Receita Orçamentária (d)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_anterior:
+      label: Deduções da Receita Orçamentária (e)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_anterior:
+      label: Saldo (f) = (d - e)
+      calculation:
+        references:
+        - column: receita_orcamentaria_anterior
+          sign: +
+        - column: deducoes_anterior
+          sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 14
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L11
+  evidence:
+    page: 14
+    text: L11 Recursos Vinculados ao RPPS - Fundo em Capitalização (Plano Previdenciário) 6.2.1.2.0.00.00
+      <nas fontes aplicáveis> 6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l12
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L12
+    descricao: Recursos Vinculados ao RPPS - Fundo em Repartição (Plano Financeiro)
+    nivel: 2
+    ordem: 12
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '801'
+      pattern: '801'
+  columns:
+    receita_orcamentaria_atual:
+      label: Receita Orçamentária (a)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_atual:
+      label: Deduções da Receita Orçamentária (b)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_atual:
+      label: Saldo (c) = (a - b)
+      calculation:
+        references:
+        - column: receita_orcamentaria_atual
+          sign: +
+        - column: deducoes_atual
+          sign: '-'
+    receita_orcamentaria_anterior:
+      label: Receita Orçamentária (d)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_anterior:
+      label: Deduções da Receita Orçamentária (e)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_anterior:
+      label: Saldo (f) = (d - e)
+      calculation:
+        references:
+        - column: receita_orcamentaria_anterior
+          sign: +
+        - column: deducoes_anterior
+          sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L12
+  evidence:
+    page: 15
+    text: L12 Recursos Vinculados ao RPPS - Fundo em Repartição (Plano Financeiro) 6.2.1.2.0.00.00 <nas
+      fontes aplicáveis> 6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l13
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L13
+    descricao: Recursos Vinculados ao RPPS - Taxa de Administração
+    nivel: 2
+    ordem: 13
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '802'
+      pattern: '802'
+  columns:
+    receita_orcamentaria_atual:
+      label: Receita Orçamentária (a)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_atual:
+      label: Deduções da Receita Orçamentária (b)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_atual:
+      label: Saldo (c) = (a - b)
+      calculation:
+        references:
+        - column: receita_orcamentaria_atual
+          sign: +
+        - column: deducoes_atual
+          sign: '-'
+    receita_orcamentaria_anterior:
+      label: Receita Orçamentária (d)
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+    deducoes_anterior:
+      label: Deduções da Receita Orçamentária (e)
+      accounts:
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: +
+    saldo_anterior:
+      label: Saldo (f) = (d - e)
+      calculation:
+        references:
+        - column: receita_orcamentaria_anterior
+          sign: +
+        - column: deducoes_anterior
+          sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L13
+  evidence:
+    page: 15
+    text: L13 Recursos Vinculados ao RPPS - Taxa de Administração 6.2.1.2.0.00.00 <nas fontes aplicáveis>
+      6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_anexo.l14
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_ANEXO
+    descricao: Quadro Anexo
+  linha:
+    codigo: L14
+    descricao: TOTAL
+    nivel: 1
+    ordem: 14
+  policies:
+  - ipc06.receita_liquida_de_deducoes
+  calculation:
+    references:
+    - rule: bf.quadro_anexo.l1
+      sign: +
+    - rule: bf.quadro_anexo.l2
+      sign: +
+    - rule: bf.quadro_anexo.l10
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Anexo
+    row: L14
+  evidence:
+    page: 15
+    text: L14 TOTAL (L1 + L2 + L10)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true

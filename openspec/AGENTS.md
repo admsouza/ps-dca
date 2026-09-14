@@ -51,7 +51,8 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 A base canônica do IPC 07 e a F1 do Balanço Orçamentário estão **implementadas, verificadas e
 arquivadas**, com as três pendências normativas (C5, C6, C7) encerradas por medição contra o
 publicado do STN. **L51 Reserva do RPPS** passou a ser apurada como a L39 e o **template de
-apresentação** passou a acompanhar o resultado, ambos em 2026-09-10.
+apresentação** passou a acompanhar o resultado, ambos em 2026-09-10. Em 2026-09-14 entrou a
+**base canônica do IPC 06** (Balanço Financeiro, 80 regras) — a apuração do BF ainda não existe.
 Resta uma change ativa: a plataforma.
 
 | Change | Capability | Fase | Status |
@@ -71,6 +72,7 @@ Resta uma change ativa: a plataforma.
 
 | Data | Change |
 |---|---|
+| 2026-09-14 | `ipc06-bf-regras-canonicas` — **base canônica do Balanço Financeiro (IPC 06, ed. 2024-06).** 80 regras em `knowledge/rules/bf/` (Quadro Principal 66 + Quadro Anexo 14), 5 policies e 3 enums novos: `fonte_recurso`, `saldo` (inicial/final) e `movimento` (credor/devedor). Campos e colunas passam a ser validados **por documento**. Fontes por subgrupo vindas do Anexo I da Portaria STN 710/2021 (`fontes-recursos-stn-2026.xlsx`, decisão F3). `review_required 6` — L22, L23, L28, L55, L56 e L61, sem mapeamento no IPC 06 (F1/F2). Suíte **287 passed**; parte `BO` do índice bit a bit igual. Spec: 27 requisitos / 83 cenários. Análise da fonte: `docs/source-analysis-ipc06.md`. |
 | 2026-09-10 | `bo-template-no-resultado` — **template de apresentação no resultado.** `linhas` com `rule_id`, `codigo`, `rotulo`, `quadro`, `grupo`, `nivel`, `ordem` e `totalizadora`; `nivel`/`ordem` vindos da transcrição normativa, nunca derivados da composição; vigência antiga completada pela transcrição no carregamento. Aditiva: `matriz`, `procedencia` e `diagnostico` inalterados. 2 requisitos / 8 cenários mesclados na spec do BO (35 → 43). |
 | 2026-09-10 | `ipc07-l51-reserva-rpps` — **L51 Reserva do RPPS apurada como L39.** Mesmo mapeamento `*id003`, filtros ND `9.9` + função `99` + subfunção `997`, fora do TOTAL (XV). Revoga a parte de B6 que deixava L51 sem coluna. |
 | 2026-09-04 | `bo-quadro-principal-processamento` — **F1 do BO entregue e verificada.** Núcleo puro (`domain/` + adapters + carregador YAML + service + CLI), sem Postgres nem Redis. Aceite 1:1 em centavos contra JP 12/2025 e conferência linha a linha contra o `RREO-Anexo 01`. Spec em `openspec/specs/dca/balanco-orcamentario/spec.md` — 17 requisitos / 43 cenários. F2 e F3 são trabalho de `plataforma-pipeline-dca`. |

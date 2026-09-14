@@ -1,0 +1,94 @@
+# Regras gerais do Balanço Financeiro — IPC 06, pp. 8–10.
+policies:
+- policy_id: ipc06.receita_liquida_de_deducoes
+  descricao: As receitas orçamentárias são apresentadas líquidas das deduções. O detalhamento das
+    deduções por fonte ou destinação de recursos é apresentado no Quadro Anexo ao Balanço
+    Financeiro ou em notas explicativas.
+  aplica_a:
+    demonstrativo: BF
+  source:
+    document: IPC06
+    document_version: '2024-06'
+    page: 8
+    section: INSTRUÇÕES PARA PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '27'
+  evidence:
+    page: 8
+    text: As receitas orçamentárias são apresentadas líquidas das deduções. O detalhamento das
+      deduções da receita orçamentária por fonte ou destinação de recursos é apresentado em quadro
+      anexo ao Balanço Financeiro ou em Notas Explicativas.
+  status: extracted
+- policy_id: ipc06.regime_de_caixa_classes_3_e_4
+  descricao: Nas linhas de Transferências Financeiras Concedidas e Recebidas, mapeadas em contas
+    das classes 3 e 4, o regime das movimentações é o de caixa.
+  aplica_a:
+    demonstrativo: BF
+    quadro: QUADRO_PRINCIPAL
+  source:
+    document: IPC06
+    document_version: '2024-06'
+    page: 9
+    section: INSTRUÇÕES PARA PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '30'
+  evidence:
+    page: 9
+    text: Para os casos em que contas de classes 3 e 4 tiverem sido utilizadas, como no mapeamento
+      das linhas de Transferências Financeiras Concedidas e Recebidas, respectivamente, o regime
+      usado para as movimentações em questão é o regime de caixa.
+  status: extracted
+- policy_id: ipc06.apenas_valor_principal_investido
+  descricao: As linhas L22 Resgates de Investimentos e Aplicações Financeiras e L55 Transferências
+    para Investimentos e Aplicações Financeiras evidenciam apenas o valor principal investido ou
+    resgatado; as valorizações e perdas a valor justo são reconhecidas por VPA e VPD.
+  aplica_a:
+    demonstrativo: BF
+    quadro: QUADRO_PRINCIPAL
+  source:
+    document: IPC06
+    document_version: '2024-06'
+    page: 9
+    section: INSTRUÇÕES PARA PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '33'
+  evidence:
+    page: 9
+    text: as linhas “L22 Resgates de Investimentos e Aplicações Financeiras” e “L55 Transferências
+      para Investimentos e Aplicações Financeiras” deverão evidenciar apenas o valor principal
+      investido ou resgatado.
+  status: extracted
+- policy_id: ipc06.aberturas_de_saldo_nao_exaustivas
+  descricao: As linhas de Saldo do Exercício Anterior e de Saldo para o Exercício Seguinte podem
+    ser abertas em outras entradas além das apresentadas, conforme a forma de contabilização do
+    ente. As aberturas do IPC 06 não são exaustivas.
+  aplica_a:
+    demonstrativo: BF
+    quadro: QUADRO_PRINCIPAL
+  source:
+    document: IPC06
+    document_version: '2024-06'
+    page: 10
+    section: INSTRUÇÕES PARA PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '37'
+  evidence:
+    page: 10
+    text: As linhas de Saldo do Exercício Anterior e Saldo para o Exercício Seguinte podem ser
+      abertas em entradas, além daquelas aqui apresentadas, a depender da forma de contabilização
+      do ente da Federação. Desse modo, as aberturas aqui apresentadas não são exaustivas.
+  status: extracted
+- policy_id: ipc06.exclusao_de_intraorcamentarias
+  descricao: As linhas que tratam da execução orçamentária — receita e despesa — excluem as
+    transferências financeiras intraorçamentárias acompanhadas da respectiva execução
+    orçamentária, para evitar duplicidade.
+  aplica_a:
+    demonstrativo: BF
+  source:
+    document: IPC06
+    document_version: '2024-06'
+    page: 10
+    section: INSTRUÇÕES PARA PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '38'
+  evidence:
+    page: 10
+    text: As linhas que tratam da execução orçamentária, receita orçamentária ou despesa
+      orçamentária devem excluir as transferências financeiras intraorçamentárias que foram
+      acompanhadas da respectiva execução orçamentária, a fim de evitar duplicidade.
+  status: extracted

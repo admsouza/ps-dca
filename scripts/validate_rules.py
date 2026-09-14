@@ -20,15 +20,52 @@ from scripts import load_stn_tables
 from scripts._carregar import carregar_policies, carregar_regras
 from scripts._relatorio import Relatorio, configurar_saida
 
-# ─── conjuntos fechados do IPC 07 (design › "Enums fechados") ────────────────
+# ─── conjuntos fechados por documento (design › "Enums fechados") ────────────
 
 CAMPOS = {"conta_contabil", "natureza_receita", "natureza_despesa", "funcao", "subfuncao"}
+# O IPC 06 não tem classificação funcional nem natureza de receita/despesa: o que separa suas
+# linhas é a fonte de recursos. Enum único aceitaria campo de um IPC na regra do outro (D1).
+CAMPOS_POR_DOCUMENTO = {
+    "IPC07": CAMPOS,
+    "IPC06": {"conta_contabil", "fonte_recurso"},
+}
+COLUNAS_POR_QUADRO_IPC06 = {
+    "QUADRO_PRINCIPAL": {"exercicio_atual", "exercicio_anterior"},
+    "QUADRO_ANEXO": {
+        "receita_orcamentaria_atual", "deducoes_atual", "saldo_atual",
+        "receita_orcamentaria_anterior", "deducoes_anterior", "saldo_anterior",
+    },
+}
+# IPC 06 pp. 11 e 13: únicas linhas em que a conta é lida por saldo em data, não por movimento.
+LINHAS_DE_SALDO_BF = {
+    "bf.quadro_principal.ingressos.l30": "inicial",
+    "bf.quadro_principal.ingressos.l31": "inicial",
+    "bf.quadro_principal.ingressos.l32": "inicial",
+    "bf.quadro_principal.dispendios.l63": "final",
+    "bf.quadro_principal.dispendios.l64": "final",
+    "bf.quadro_principal.dispendios.l65": "final",
+}
+# IPC 06 pp. 11 e 13: mesmas contas, sentidos opostos (F4).
+MOVIMENTO_BF = {
+    "bf.quadro_principal.ingressos.l27": "credor",
+    "bf.quadro_principal.dispendios.l60": "devedor",
+}
+# Totais do BF: agregam linhas e nada mais. Conta própria aqui dobraria o valor do demonstrativo.
+TOTAIS_BF = {
+    "bf.quadro_principal.ingressos.l33",
+    "bf.quadro_principal.dispendios.l66",
+    "bf.quadro_anexo.l14",
+}
+# Bloco do Anexo I da Portaria STN 710/2021 aplicável a estados, DF e municípios — os entes que
+# entregam DCA. O bloco 000-499 é da União (F3).
+FONTE_MINIMA, FONTE_MAXIMA = 500, 999
+
 OPERADORES = {"in", "not_in"}
 SINAIS = {"+", "-"}
 CONDICOES = {"result_positive", "result_negative"}
 STATUS = {"draft", "extracted", "review_required", "validated", "deprecated"}
 METODOS = {"automated", "assisted", "manual"}
-DECISOES = {"B1", "B3", "B5", "B6"}
+DECISOES = {"B1", "B3", "B5", "B6", "F3", "F4", "F5"}
 OVERRIDE_PERMITIDO = {
     "bo.quadro_principal.receitas.l29",
     "bo.quadro_principal.receitas.l30",
@@ -46,6 +83,7 @@ RAIZ_REPO = Path(__file__).resolve().parent.parent
 CONTAS_STN = RAIZ_REPO / "docs" / "contas-stn"
 
 CAMPO_POR_DOMINIO = {
+    "fonte_recurso": "fonte_recurso",
     "conta_contabil": "conta_contabil",
     "natureza_receita": "natureza_receita",
     "natureza_despesa": "natureza_despesa",
@@ -187,15 +225,19 @@ def _excecao_de_dominio(campo: str, padrao: str) -> str | None:
 def _validar_filtros(rel, regra, codigos_stn, excecoes, rule_id, arquivo, linha) -> None:
     review_required = regra.get("status") == "review_required"
     decisao = (regra.get("provenance") or {}).get("decision")
+    documento = (regra.get("source") or {}).get("document", "")
+    campos_do_documento = CAMPOS_POR_DOCUMENTO.get(documento, CAMPOS)
 
     for grupo in _grupos_de_filtro(regra):
         for filtro in grupo:
             campo = filtro.get("field")
             operador = filtro.get("operator")
-            if campo not in CAMPOS:
-                rel.erro(f"campo de filtro não suportado para o IPC07: {campo}",
+            if campo not in campos_do_documento:
+                rel.erro(f"campo de filtro não suportado para o {documento or 'IPC07'}: {campo}",
                          rule_id=rule_id, arquivo=arquivo, linha=linha)
                 continue
+            if campo == "fonte_recurso":
+                _validar_fontes(rel, filtro, rule_id, arquivo, linha)
             if operador not in OPERADORES:
                 rel.erro(f"operador inválido: {operador}",
                          rule_id=rule_id, arquivo=arquivo, linha=linha)
@@ -203,6 +245,21 @@ def _validar_filtros(rel, regra, codigos_stn, excecoes, rule_id, arquivo, linha)
             for valor in filtro.get("values") or []:
                 _validar_valor(rel, valor, campo, codigos_stn, excecoes,
                                review_required, decisao, rule_id, arquivo, linha)
+
+
+def _validar_fontes(rel, filtro, rule_id, arquivo, linha) -> None:
+    """Fonte é código principal de 3 dígitos do bloco 500-999 (D6)."""
+    for valor in filtro.get("values") or []:
+        padrao = valor.get("pattern")
+        if padrao is None:
+            continue
+        if not (padrao.isdigit() and len(padrao) == 3
+                and FONTE_MINIMA <= int(padrao) <= FONTE_MAXIMA):
+            rel.erro(
+                f"fonte fora do bloco {FONTE_MINIMA}-{FONTE_MAXIMA} do Anexo I: {padrao} — "
+                f"o prefixo de exercício não entra no valor, e o bloco da União não se aplica",
+                rule_id=rule_id, arquivo=arquivo, linha=linha,
+            )
 
 
 def _validar_valor(rel, valor, campo, codigos_stn, excecoes,
@@ -258,6 +315,10 @@ def _validar_colunas(rel, regra, codigos_stn, excecoes, rule_id, arquivo, linha)
         return  # linha composta; cobertura em _validar_referencias
     review_required = regra.get("status") == "review_required"
     decisao = (regra.get("provenance") or {}).get("decision")
+    documento = (regra.get("source") or {}).get("document", "")
+
+    if documento == "IPC06":
+        _validar_colunas_bf(rel, regra, colunas, rule_id, arquivo, linha)
 
     for nome, coluna in colunas.items():
         for conta in coluna.get("accounts") or []:
@@ -276,6 +337,53 @@ def _validar_colunas(rel, regra, codigos_stn, excecoes, rule_id, arquivo, linha)
             if referencia.get("sign") not in SINAIS:
                 rel.erro(f"sinal inválido em columns.{nome}.calculation",
                          rule_id=rule_id, arquivo=arquivo, linha=linha)
+
+
+def _validar_colunas_bf(rel, regra, colunas, rule_id, arquivo, linha) -> None:
+    """Conjunto de colunas por quadro, momento do saldo, sentido do movimento e totais."""
+    quadro = (regra.get("quadro") or {}).get("codigo", "")
+    permitidas = COLUNAS_POR_QUADRO_IPC06.get(quadro)
+    if permitidas is not None:
+        for nome in colunas:
+            if nome not in permitidas:
+                rel.erro(
+                    f"coluna não suportada no {quadro} do IPC06: {nome} — "
+                    f"esperado {', '.join(sorted(permitidas))}",
+                    rule_id=rule_id, arquivo=arquivo, linha=linha,
+                )
+
+    momento = LINHAS_DE_SALDO_BF.get(rule_id)
+    movimento_esperado = MOVIMENTO_BF.get(rule_id)
+
+    for nome, coluna in colunas.items():
+        movimento = coluna.get("movimento")
+        if movimento and movimento != movimento_esperado:
+            rel.erro(f"columns.{nome}.movimento não previsto para esta linha: {movimento}",
+                     rule_id=rule_id, arquivo=arquivo, linha=linha)
+        if movimento_esperado and movimento != movimento_esperado:
+            rel.erro(
+                f"columns.{nome} deve declarar movimento: {movimento_esperado} — "
+                f"o sinal da conta não representa o sentido do movimento",
+                rule_id=rule_id, arquivo=arquivo, linha=linha,
+            )
+        for conta in coluna.get("accounts") or []:
+            if rule_id in TOTAIS_BF:
+                rel.erro(
+                    f"total do BF com conta própria em columns.{nome}: {conta.get('literal')}",
+                    rule_id=rule_id, arquivo=arquivo, linha=linha,
+                )
+            saldo = conta.get("saldo")
+            if momento is None and saldo is not None:
+                rel.erro(
+                    f"saldo declarado fora de linha de saldo em columns.{nome}: {saldo}",
+                    rule_id=rule_id, arquivo=arquivo, linha=linha,
+                )
+            elif momento is not None and saldo != momento:
+                rel.erro(
+                    f"conta patrimonial sem saldo: {conta.get('literal')} em columns.{nome} — "
+                    f"esperado saldo: {momento}",
+                    rule_id=rule_id, arquivo=arquivo, linha=linha,
+                )
 
 
 # ─── status, override, versão, condição ──────────────────────────────────────
@@ -303,7 +411,10 @@ def _validar_status(rel, regra, rule_id, arquivo, linha) -> None:
         rel.erro(f"provenance.decision fora do conjunto: {decisao}",
                  rule_id=rule_id, arquivo=arquivo, linha=linha)
 
-    if review.get("blocker"):
+    # No IPC 07 todo bloqueio foi decidido (B1/B3/B5/B6); remanescente é inconsistência. No
+    # IPC 06, `<conta de controle>` e `<contas sob demanda>` seguem sem mapeamento por decisão
+    # do PO (F1/F2) — ali o bloqueio é estado declarado, não erro.
+    if review.get("blocker") and (regra.get("source") or {}).get("document") != "IPC06":
         rel.erro(
             f"bloqueio documental remanescente: review.blocker={review['blocker']} — "
             f"B1, B3, B5 e B6 já foram decididos pelo PO",
@@ -329,7 +440,7 @@ def _validar_versao(rel, regra, rule_id, arquivo, linha) -> None:
         rel.erro("version.valid_from ausente", rule_id=rule_id, arquivo=arquivo, linha=linha)
     if versao.get("valid_until") is not None:
         rel.erro(
-            f"version.valid_until deve ser null — o IPC07 não declara fim de vigência "
+            f"version.valid_until deve ser null — o documento não declara fim de vigência "
             f"(obtido: {versao['valid_until']})",
             rule_id=rule_id, arquivo=arquivo, linha=linha,
         )
@@ -503,14 +614,17 @@ def _validar_indice(rel, base, regras) -> None:
 # ─── contagens ───────────────────────────────────────────────────────────────
 
 def _contar(regras, excecoes) -> dict:
-    por_quadro: dict[str, int] = {}
+    por_quadro: dict[str, dict[str, int]] = {}
     por_status = dict.fromkeys(STATUS, 0)
     rule_ids: list[str] = []
     valid_until: list = []
 
     for regra, arquivo, _linha in regras:
         rule_ids.append(regra.get("rule_id"))
-        por_quadro[arquivo.stem] = por_quadro.get(arquivo.stem, 0) + 1
+        # BO e BF têm, cada um, um `quadro_principal`: a chave é (demonstrativo, quadro).
+        demonstrativo = (regra.get("demonstrativo") or {}).get("codigo") or "?"
+        quadros = por_quadro.setdefault(demonstrativo, {})
+        quadros[arquivo.stem] = quadros.get(arquivo.stem, 0) + 1
         status = regra.get("status")
         if status in por_status:
             por_status[status] += 1
@@ -534,9 +648,11 @@ def main() -> int:
         print(erro)
         print()
     contagens = rel.contagens
-    quadros = " · ".join(f"{k} {v}" for k, v in sorted(contagens["por_quadro"].items()))
     status = " · ".join(f"{k} {v}" for k, v in sorted(contagens["por_status"].items()))
-    print(f"Regras por quadro    {quadros}   (total {contagens['total']})")
+    for demonstrativo, quadros_do in sorted(contagens["por_quadro"].items()):
+        quadros = " · ".join(f"{k} {v}" for k, v in sorted(quadros_do.items()))
+        print(f"Regras por quadro    {demonstrativo}: {quadros}")
+    print(f"Total de regras      {contagens['total']}")
     print(f"Regras por status    {status}")
     for rotulo, marca in (("B1", "B1"), ("B3", "B3"), ("B2", "B2"), ("B4", "B4")):
         itens = [e for e in contagens["excecoes_dominio"] if marca in e["motivo"]]

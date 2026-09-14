@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ps-dca/knowledge/schemas/rule.json",
   "title": "Regra canônica de linha de demonstrativo",
-  "description": "Uma regra representa UMA linha de um quadro, com o mapa de colunas daquele quadro. Escopo desta edição: IPC 07 (Balanço Orçamentário).",
+  "description": "Uma regra representa UMA linha de um quadro, com o mapa de colunas daquele quadro. Escopo: IPC 07 (Balanço Orçamentário) e IPC 06 (Balanço Financeiro).",
   "type": "object",
   "required": [
     "rule_id",
@@ -20,7 +20,7 @@
     "rule_id": {
       "type": "string",
       "pattern": "^[a-z0-9]+(\\.[a-z0-9_]+)+$",
-      "description": "bo.<quadro>.<grupo?>.<linha>, minúsculo, único em toda a base"
+      "description": "<demonstrativo>.<quadro>.<grupo?>.<linha>, minúsculo, único em toda a base"
     },
     "demonstrativo": {
       "$ref": "#/$defs/codigoDescricao"
@@ -163,7 +163,10 @@
             "B1",
             "B3",
             "B5",
-            "B6"
+            "B6",
+            "F3",
+            "F4",
+            "F5"
           ],
           "description": "Decisão do PO que sustenta a leitura adotada."
         },
@@ -265,7 +268,8 @@
             "natureza_receita",
             "natureza_despesa",
             "funcao",
-            "subfuncao"
+            "subfuncao",
+            "fonte_recurso"
           ]
         },
         "operator": {
@@ -313,6 +317,13 @@
             "+",
             "-"
           ]
+        },
+        "saldo": {
+          "enum": [
+            "inicial",
+            "final"
+          ],
+          "description": "Momento do saldo da conta patrimonial (IPC 06, linhas L30-L32 e L63-L65). Ausente = conta de movimento do periodo."
         }
       }
     },
@@ -332,6 +343,13 @@
           "items": {
             "$ref": "#/$defs/conta"
           }
+        },
+        "movimento": {
+          "enum": [
+            "credor",
+            "devedor"
+          ],
+          "description": "Sentido do movimento da conta (IPC 06, L27 e L60). Nao usar o sinal: as duas linhas somam positivamente em seus totais."
         },
         "calculation": {
           "type": "object",

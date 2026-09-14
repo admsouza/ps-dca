@@ -160,6 +160,79 @@ def regra_composta(rule_id: str, referencias: list[tuple[str, str]], **alteracoe
     return nova
 
 
+REGRA_BF_VALIDA: dict = {
+    "rule_id": "bf.quadro_principal.ingressos.l2",
+    "demonstrativo": {"codigo": "BF", "descricao": "Balanço Financeiro"},
+    "quadro": {"codigo": "QUADRO_PRINCIPAL", "descricao": "Quadro Principal"},
+    "grupo": {"codigo": "INGRESSOS", "descricao": "Ingressos"},
+    "linha": {"codigo": "L2", "descricao": "Recursos Não Vinculados", "nivel": 2, "ordem": 2},
+    "filters": [
+        {
+            "field": "fonte_recurso",
+            "operator": "in",
+            "values": [
+                {"literal": "500", "pattern": "500"},
+                {"literal": "501", "pattern": "501"},
+            ],
+        }
+    ],
+    "columns": {
+        "exercicio_atual": {
+            "label": "Exercício Atual",
+            "accounts": [
+                {"literal": "6.2.1.2.0.00.00", "pattern": "6212", "sign": "+"},
+                {"literal": "6.2.1.3.0.00.00", "pattern": "6213", "sign": "-"},
+            ],
+        },
+        "exercicio_anterior": {
+            "label": "Exercício Anterior",
+            "accounts": [
+                {"literal": "6.2.1.2.0.00.00", "pattern": "6212", "sign": "+"},
+                {"literal": "6.2.1.3.0.00.00", "pattern": "6213", "sign": "-"},
+            ],
+        },
+    },
+    "source": {
+        "document": "IPC06",
+        "document_version": "2024-06",
+        "page": 10,
+        "section": "REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO",
+        "item": "39",
+        "table": "Quadro Principal",
+        "row": "L2",
+    },
+    "evidence": {
+        "page": 10,
+        "text": "L2 Recursos Não Vinculados 6.2.1.2.0.00.00 - 6.2.1.3.0.00.00"
+                " <nas fontes aplicáveis>",
+    },
+    "version": {
+        "source_document": "IPC06",
+        "edition": "2024-06",
+        "valid_from": "2024-06-30",
+        "valid_until": None,
+    },
+    "provenance": {
+        "extraction_method": "assisted",
+        "extractor_version": "1.0",
+        "extracted_at": "2026-09-14",
+    },
+    "status": "extracted",
+    "review": {"required": True},
+}
+
+
+def regra_bf(**alteracoes) -> dict:
+    """Cópia da regra válida do BF com sobrescritas de primeiro nível."""
+    nova = copy.deepcopy(REGRA_BF_VALIDA)
+    for chave, valor in alteracoes.items():
+        if valor is None:
+            nova.pop(chave, None)
+        else:
+            nova[chave] = valor
+    return nova
+
+
 POLICY_VALIDA: dict = {
     "policy_id": "ipc07.receita_liquida_de_deducoes",
     "descricao": "Receitas informadas pelos valores líquidos das respectivas deduções.",
@@ -195,6 +268,9 @@ def base(tmp_path: Path):
         rp_processados: list[dict] | None = None,
         policies: list[dict] | None = None,
         paginas_ipc07: int = 17,
+        bf_quadro_principal: list[dict] | None = None,
+        bf_quadro_anexo: list[dict] | None = None,
+        paginas_ipc06: int = 19,
     ) -> Path:
         raiz = tmp_path / f"base{next(contador)}" / "knowledge"
         (raiz / "rules" / "bo").mkdir(parents=True)
@@ -232,6 +308,25 @@ def base(tmp_path: Path):
             },
         )
         _escrever(raiz / "sources" / "stn" / "metadata.yaml", {"tables": []})
+
+        if bf_quadro_principal is not None or bf_quadro_anexo is not None:
+            (raiz / "rules" / "bf").mkdir(parents=True)
+            for nome, regras in (
+                ("quadro_principal", bf_quadro_principal or []),
+                ("quadro_anexo", bf_quadro_anexo or []),
+            ):
+                _escrever(raiz / "rules" / "bf" / f"{nome}.yaml", {"rules": regras})
+            (raiz / "sources" / "ipc06").mkdir(parents=True)
+            _escrever(
+                raiz / "sources" / "ipc06" / "metadata.yaml",
+                {
+                    "document": "IPC06",
+                    "file": "IPC06 - Balanço Financeiro_2024- 2.pdf",
+                    "pages": paginas_ipc06,
+                    "edition": "2024-06",
+                    "sha256": "0" * 64,
+                },
+            )
         return raiz
 
     return _montar

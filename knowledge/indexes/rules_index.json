@@ -1,4 +1,564 @@
 {
+  "bf.quadro_anexo.l1": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 14
+  },
+  "bf.quadro_anexo.l10": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 14
+  },
+  "bf.quadro_anexo.l11": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 14
+  },
+  "bf.quadro_anexo.l12": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 15
+  },
+  "bf.quadro_anexo.l13": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 15
+  },
+  "bf.quadro_anexo.l14": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 15
+  },
+  "bf.quadro_anexo.l2": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 14
+  },
+  "bf.quadro_anexo.l3": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 14
+  },
+  "bf.quadro_anexo.l4": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 14
+  },
+  "bf.quadro_anexo.l5": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 14
+  },
+  "bf.quadro_anexo.l6": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 14
+  },
+  "bf.quadro_anexo.l7": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 14
+  },
+  "bf.quadro_anexo.l8": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 14
+  },
+  "bf.quadro_anexo.l9": {
+    "file": "rules/bf/quadro_anexo.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_ANEXO",
+    "document": "IPC06",
+    "page": 14
+  },
+  "bf.quadro_principal.dispendios.l34": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l35": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l36": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l37": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l38": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l39": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l40": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l41": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l42": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l43": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l44": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l45": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l46": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l47": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l48": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l49": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l50": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l51": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l52": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l53": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l54": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l55": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l56": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.dispendios.l57": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 13
+  },
+  "bf.quadro_principal.dispendios.l58": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 13
+  },
+  "bf.quadro_principal.dispendios.l59": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 13
+  },
+  "bf.quadro_principal.dispendios.l60": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 13
+  },
+  "bf.quadro_principal.dispendios.l61": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 13
+  },
+  "bf.quadro_principal.dispendios.l62": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 13
+  },
+  "bf.quadro_principal.dispendios.l63": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 13
+  },
+  "bf.quadro_principal.dispendios.l64": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 13
+  },
+  "bf.quadro_principal.dispendios.l65": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 13
+  },
+  "bf.quadro_principal.dispendios.l66": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 13
+  },
+  "bf.quadro_principal.ingressos.l1": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 10
+  },
+  "bf.quadro_principal.ingressos.l10": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l11": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l12": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l13": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l14": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l15": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l16": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l17": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l18": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l19": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l2": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 10
+  },
+  "bf.quadro_principal.ingressos.l20": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l21": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l22": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l23": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l24": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l25": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l26": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l27": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l28": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l29": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l3": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 10
+  },
+  "bf.quadro_principal.ingressos.l30": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l31": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l32": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l33": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 12
+  },
+  "bf.quadro_principal.ingressos.l4": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 10
+  },
+  "bf.quadro_principal.ingressos.l5": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 10
+  },
+  "bf.quadro_principal.ingressos.l6": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 10
+  },
+  "bf.quadro_principal.ingressos.l7": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l8": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
+  "bf.quadro_principal.ingressos.l9": {
+    "file": "rules/bf/quadro_principal.yaml",
+    "demonstrativo": "BF",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC06",
+    "page": 11
+  },
   "bo.quadro_principal.despesas.l31": {
     "file": "rules/bo/quadro_principal.yaml",
     "demonstrativo": "BO",

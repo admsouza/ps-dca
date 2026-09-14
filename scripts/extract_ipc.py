@@ -1,32 +1,49 @@
-"""Extração geométrica do IPC 07 — ferramenta de desenvolvimento, fora do CI.
+"""Extração geométrica de um IPC — ferramenta de desenvolvimento, fora do CI.
 
 As páginas de regra são **paisagem rotacionada 90°**: no espaço do PDF, a linha da tabela é uma
 banda em `x` e a coluna é uma banda em `y` (`docs/source-analysis-ipc07.md` §1.1). Extração
 linear de texto embaralha a associação célula→coluna; por isso aqui as palavras são agrupadas por
 coordenada, não por ordem de leitura.
 
+O PDF, o total de páginas e quais delas são rotacionadas vêm de
+`knowledge/sources/<ipc>/metadata.yaml` — o script não conhece IPC nenhum por dentro.
+
 Saída: `knowledge/sources/<ipc>/extracted.md`, que é insumo da transcrição — nunca a base
 canônica em si. Nada aqui grava YAML de regra.
 
-    python -m scripts.extract_ipc                 # todas as páginas
-    python -m scripts.extract_ipc 8 9             # só as páginas indicadas
+    python -m scripts.extract_ipc ipc07           # todas as páginas
+    python -m scripts.extract_ipc ipc07 8 9       # só as páginas indicadas
 """
 from __future__ import annotations
 
 import sys
 from pathlib import Path
 
+import yaml
+
 from scripts._relatorio import configurar_saida
 
 RAIZ_REPO = Path(__file__).resolve().parent.parent
-PDF = RAIZ_REPO / "docs" / "referencia" / "ipc" / "IPC07 - BO atualizacoes - 20200117.pdf"
-DESTINO = RAIZ_REPO / "knowledge" / "sources" / "ipc07" / "extracted.md"
+SOURCES = RAIZ_REPO / "knowledge" / "sources"
 
 TOLERANCIA_LINHA = 6.0   # pontos: palavras dentro desta faixa de `x` são da mesma linha da tabela
 
-# Só as páginas de matriz são rotacionadas. Nas de texto corrido, agrupar por `x` embaralha as
-# frases — ali vale a ordem de leitura normal.
-PAGINAS_DE_TABELA = frozenset(range(8, 14))
+# Páginas rotacionadas do IPC 07, quando o metadata não declara `rotated_pages`. Só as páginas de
+# matriz são rotacionadas; nas de texto corrido, agrupar por `x` embaralha as frases.
+ROTACIONADAS_IPC07 = list(range(8, 14))
+
+
+def fonte(ipc: str) -> tuple[Path, frozenset[int]]:
+    """PDF e páginas rotacionadas do IPC, lidos do metadata da fonte."""
+    meta = SOURCES / ipc / "metadata.yaml"
+    dados = yaml.safe_load(meta.read_text(encoding="utf-8")) or {}
+    pdf = RAIZ_REPO / dados["path"] if dados.get("path") else (
+        RAIZ_REPO / "docs" / "referencia" / "ipc" / dados["file"]
+    )
+    rotacionadas = dados.get("rotated_pages")
+    if rotacionadas is None:
+        rotacionadas = ROTACIONADAS_IPC07 if dados.get("document") == "IPC07" else []
+    return pdf, frozenset(rotacionadas)
 
 
 def palavras(pagina) -> list[tuple[float, float, str]]:
@@ -45,7 +62,8 @@ def agrupar_por_banda(itens, indice: int, tolerancia: float) -> list[list]:
     return grupos
 
 
-def extrair(caminho: Path, paginas: list[int] | None = None) -> str:
+def extrair(caminho: Path, paginas: list[int] | None = None,
+            rotacionadas: frozenset[int] = frozenset()) -> str:
     import pymupdf  # `fitz` é o nome antigo e está deprecado
 
     documento = pymupdf.open(caminho)
@@ -64,7 +82,7 @@ def extrair(caminho: Path, paginas: list[int] | None = None) -> str:
         partes.append(f"## Página {numero}")
         partes.append("")
 
-        if numero not in PAGINAS_DE_TABELA:
+        if numero not in rotacionadas:
             texto = pagina.get_text("text").strip()
             partes += [texto or "_(sem texto extraível)_", ""]
             continue
@@ -89,10 +107,16 @@ def extrair(caminho: Path, paginas: list[int] | None = None) -> str:
 
 def main() -> int:
     configurar_saida()
-    paginas = [int(a) for a in sys.argv[1:]] or None
-    DESTINO.parent.mkdir(parents=True, exist_ok=True)
-    DESTINO.write_text(extrair(PDF, paginas), encoding="utf-8", newline="\n")
-    print(f"✓ Extraído                        {DESTINO}")
+    if len(sys.argv) < 2:
+        print("uso: python -m scripts.extract_ipc <ipc> [páginas...]")
+        return 2
+    ipc = sys.argv[1].lower()
+    paginas = [int(a) for a in sys.argv[2:]] or None
+    pdf, rotacionadas = fonte(ipc)
+    destino = SOURCES / ipc / "extracted.md"
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    destino.write_text(extrair(pdf, paginas, rotacionadas), encoding="utf-8", newline="\n")
+    print(f"✓ Extraído                        {destino}")
     return 0
 
 

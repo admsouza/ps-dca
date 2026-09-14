@@ -346,7 +346,9 @@ def test_contagem_por_quadro_soma_o_total(base, validar):
         )
     )
     por_quadro = rel.contagens["por_quadro"]
-    assert por_quadro == {"quadro_principal": 3, "rp_nao_processados": 1, "rp_processados": 1}
+    assert por_quadro == {
+        "BO": {"quadro_principal": 3, "rp_nao_processados": 1, "rp_processados": 1}
+    }
     assert rel.contagens["total"] == 5
 
 

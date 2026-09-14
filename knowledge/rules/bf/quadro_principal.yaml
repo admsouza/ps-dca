@@ -1,0 +1,4089 @@
+# Quadro Principal do Balanço Financeiro — IPC 06, pp. 10–13.
+# 66 linhas: L1–L33 ingressos, L34–L66 dispêndios; duas colunas de valor em todas.
+# Gerado por transcrição assistida a partir de knowledge/sources/ipc06/extracted.md.
+# As fontes por subgrupo vêm dos blocos do Anexo I da Portaria STN 710/2021 (decisão F3).
+# A fonte canônica é este arquivo; o PDF é a origem normativa.
+rules:
+- rule_id: bf.quadro_principal.ingressos.l1
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L1
+    descricao: Receita Orçamentária (I)
+    nivel: 1
+    ordem: 1
+  calculation:
+    references:
+    - rule: bf.quadro_principal.ingressos.l2
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l3
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l11
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L1
+  evidence:
+    page: 10
+    text: L1 Receita Orçamentária (I) (L2 + L3 + L11)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l2
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L2
+    descricao: Recursos Não Vinculados
+    nivel: 2
+    ordem: 2
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '500'
+      pattern: '500'
+    - literal: '501'
+      pattern: '501'
+    - literal: '502'
+      pattern: '502'
+    - literal: '503'
+      pattern: '503'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L2
+  evidence:
+    page: 10
+    text: L2 Recursos Não Vinculados 6.2.1.2.0.00.00 - 6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l3
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L3
+    descricao: Recursos Vinculados (EXCETO AO RPPS)
+    nivel: 2
+    ordem: 3
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  calculation:
+    references:
+    - rule: bf.quadro_principal.ingressos.l4
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l5
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l6
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l7
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l8
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l9
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l10
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L3
+  evidence:
+    page: 10
+    text: L3 Recursos Vinculados (EXCETO AO RPPS) (L4 + L5 + L6 + L7 + L8 + L9 + L10)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l4
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L4
+    descricao: Recursos Vinculados à Educação
+    nivel: 3
+    ordem: 4
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '540'
+      pattern: '540'
+    - literal: '541'
+      pattern: '541'
+    - literal: '542'
+      pattern: '542'
+    - literal: '543'
+      pattern: '543'
+    - literal: '544'
+      pattern: '544'
+    - literal: '545'
+      pattern: '545'
+    - literal: '546'
+      pattern: '546'
+    - literal: '550'
+      pattern: '550'
+    - literal: '551'
+      pattern: '551'
+    - literal: '552'
+      pattern: '552'
+    - literal: '553'
+      pattern: '553'
+    - literal: '569'
+      pattern: '569'
+    - literal: '570'
+      pattern: '570'
+    - literal: '571'
+      pattern: '571'
+    - literal: '572'
+      pattern: '572'
+    - literal: '573'
+      pattern: '573'
+    - literal: '574'
+      pattern: '574'
+    - literal: '575'
+      pattern: '575'
+    - literal: '576'
+      pattern: '576'
+    - literal: '599'
+      pattern: '599'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L4
+  evidence:
+    page: 10
+    text: L4 Recursos Vinculados à Educação 6.2.1.2.0.00.00 - 6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l5
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L5
+    descricao: Recursos Vinculados à Saúde
+    nivel: 3
+    ordem: 5
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '600'
+      pattern: '600'
+    - literal: '601'
+      pattern: '601'
+    - literal: '602'
+      pattern: '602'
+    - literal: '603'
+      pattern: '603'
+    - literal: '604'
+      pattern: '604'
+    - literal: '605'
+      pattern: '605'
+    - literal: '621'
+      pattern: '621'
+    - literal: '622'
+      pattern: '622'
+    - literal: '631'
+      pattern: '631'
+    - literal: '632'
+      pattern: '632'
+    - literal: '633'
+      pattern: '633'
+    - literal: '634'
+      pattern: '634'
+    - literal: '635'
+      pattern: '635'
+    - literal: '636'
+      pattern: '636'
+    - literal: '659'
+      pattern: '659'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L5
+  evidence:
+    page: 10
+    text: L5 Recursos Vinculados à Saúde 6.2.1.2.0.00.00 - 6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l6
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L6
+    descricao: Recursos Vinculados à Assistência Social
+    nivel: 3
+    ordem: 6
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '660'
+      pattern: '660'
+    - literal: '661'
+      pattern: '661'
+    - literal: '662'
+      pattern: '662'
+    - literal: '665'
+      pattern: '665'
+    - literal: '669'
+      pattern: '669'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L6
+  evidence:
+    page: 10
+    text: L6 Recursos Vinculados à Assistência Social 6.2.1.2.0.00.00 - 6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l7
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L7
+    descricao: Recursos Vinculados à Previdência Social (Exceto ao RPPS)
+    nivel: 3
+    ordem: 7
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '803'
+      pattern: '803'
+    - literal: '804'
+      pattern: '804'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L7
+  evidence:
+    page: 11
+    text: L7 Recursos Vinculados à Previdência Social (Exceto ao RPPS) 6.2.1.2.0.00.00 - 6.2.1.3.0.00.00
+      <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l8
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L8
+    descricao: Demais Vinculações Decorrentes de Transferências
+    nivel: 3
+    ordem: 8
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '700'
+      pattern: '700'
+    - literal: '701'
+      pattern: '701'
+    - literal: '702'
+      pattern: '702'
+    - literal: '703'
+      pattern: '703'
+    - literal: '704'
+      pattern: '704'
+    - literal: '705'
+      pattern: '705'
+    - literal: '706'
+      pattern: '706'
+    - literal: '707'
+      pattern: '707'
+    - literal: '708'
+      pattern: '708'
+    - literal: '709'
+      pattern: '709'
+    - literal: '710'
+      pattern: '710'
+    - literal: '711'
+      pattern: '711'
+    - literal: '712'
+      pattern: '712'
+    - literal: '713'
+      pattern: '713'
+    - literal: '714'
+      pattern: '714'
+    - literal: '715'
+      pattern: '715'
+    - literal: '716'
+      pattern: '716'
+    - literal: '717'
+      pattern: '717'
+    - literal: '718'
+      pattern: '718'
+    - literal: '719'
+      pattern: '719'
+    - literal: '720'
+      pattern: '720'
+    - literal: '721'
+      pattern: '721'
+    - literal: '722'
+      pattern: '722'
+    - literal: '747'
+      pattern: '747'
+    - literal: '748'
+      pattern: '748'
+    - literal: '749'
+      pattern: '749'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L8
+  evidence:
+    page: 11
+    text: L8 Demais Vinculações Decorrentes de Transferências 6.2.1.2.0.00.00 - 6.2.1.3.0.00.00 <nas fontes
+      aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l9
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L9
+    descricao: Demais Vinculações Legais
+    nivel: 3
+    ordem: 9
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '750'
+      pattern: '750'
+    - literal: '751'
+      pattern: '751'
+    - literal: '752'
+      pattern: '752'
+    - literal: '753'
+      pattern: '753'
+    - literal: '754'
+      pattern: '754'
+    - literal: '755'
+      pattern: '755'
+    - literal: '756'
+      pattern: '756'
+    - literal: '757'
+      pattern: '757'
+    - literal: '758'
+      pattern: '758'
+    - literal: '759'
+      pattern: '759'
+    - literal: '760'
+      pattern: '760'
+    - literal: '761'
+      pattern: '761'
+    - literal: '762'
+      pattern: '762'
+    - literal: '763'
+      pattern: '763'
+    - literal: '799'
+      pattern: '799'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L9
+  evidence:
+    page: 11
+    text: L9 Demais Vinculações Legais 6.2.1.2.0.00.00 - 6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l10
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L10
+    descricao: Outras Vinculações
+    nivel: 3
+    ordem: 10
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '880'
+      pattern: '880'
+    - literal: '898'
+      pattern: '898'
+    - literal: '899'
+      pattern: '899'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L10
+  evidence:
+    page: 11
+    text: L10 Outras Vinculações 6.2.1.2.0.00.00 - 6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l11
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L11
+    descricao: Recursos Vinculados ao RPPS
+    nivel: 2
+    ordem: 11
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  calculation:
+    references:
+    - rule: bf.quadro_principal.ingressos.l12
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l13
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l14
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L11
+  evidence:
+    page: 11
+    text: L11 Recursos Vinculados ao RPPS (L12 + L13 + L14)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l12
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L12
+    descricao: Recursos Vinculados ao RPPS - Fundo em Capitalização (Plano Previdenciário)
+    nivel: 3
+    ordem: 12
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '800'
+      pattern: '800'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L12
+  evidence:
+    page: 11
+    text: L12 Recursos Vinculados ao RPPS - Fundo em Capitalização (Plano Previdenciário) 6.2.1.2.0.00.00
+      - 6.2.1.3.0.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l13
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L13
+    descricao: Recursos Vinculados ao RPPS - Fundo em Repartição (Plano Financeiro)
+    nivel: 3
+    ordem: 13
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '801'
+      pattern: '801'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L13
+  evidence:
+    page: 11
+    text: L13 Recursos Vinculados ao RPPS - Fundo em Repartição (Plano Financeiro) 6.2.1.2.0.00.00 - 6.2.1.3.0.00.00
+      <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l14
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L14
+    descricao: Recursos Vinculados ao RPPS - Taxa de Administração
+    nivel: 3
+    ordem: 14
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  - ipc06.receita_liquida_de_deducoes
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '802'
+      pattern: '802'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.1.2.0.00.00
+        pattern: '6212'
+        sign: +
+      - literal: 6.2.1.3.0.00.00
+        pattern: '6213'
+        sign: '-'
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L14
+  evidence:
+    page: 11
+    text: L14 Recursos Vinculados ao RPPS - Taxa de Administração 6.2.1.2.0.00.00 - 6.2.1.3.0.00.00 <nas
+      fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l15
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L15
+    descricao: Transferências Financeiras Recebidas (II)
+    nivel: 1
+    ordem: 15
+  calculation:
+    references:
+    - rule: bf.quadro_principal.ingressos.l16
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l17
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l18
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l19
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l20
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L15
+  evidence:
+    page: 11
+    text: L15 Transferências Financeiras Recebidas (II) (L16 + L17 + L18 + L19 + L20)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l16
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L16
+    descricao: Transferências Recebidas para a Execução Orçamentária
+    nivel: 2
+    ordem: 16
+  policies:
+  - ipc06.regime_de_caixa_classes_3_e_4
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 4.5.1.1.0.00.00
+        pattern: '4511'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 4.5.1.1.0.00.00
+        pattern: '4511'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L16
+  evidence:
+    page: 11
+    text: L16 Transferências Recebidas para a Execução Orçamentária 4.5.1.1.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l17
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L17
+    descricao: Transferências Financeiras Recebidas Independentes de Execução Orçamentária
+    nivel: 2
+    ordem: 17
+  policies:
+  - ipc06.regime_de_caixa_classes_3_e_4
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 4.5.1.2.2.01.00
+        pattern: '4512201'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 4.5.1.2.2.01.00
+        pattern: '4512201'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L17
+  evidence:
+    page: 11
+    text: L17 Transferências Financeiras Recebidas Independentes de Execução Orçamentária 4.5.1.2.2.01.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l18
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L18
+    descricao: Transferências Recebidas para Aportes de recursos para o RPPS
+    nivel: 2
+    ordem: 18
+  policies:
+  - ipc06.regime_de_caixa_classes_3_e_4
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 4.5.1.3.0.00.00
+        pattern: '4513'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 4.5.1.3.0.00.00
+        pattern: '4513'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L18
+  evidence:
+    page: 11
+    text: L18 Transferências Recebidas para Aportes de recursos para o RPPS 4.5.1.3.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l19
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L19
+    descricao: Transferências Recebidas para Aportes de recursos para o RGPS
+    nivel: 2
+    ordem: 19
+  policies:
+  - ipc06.regime_de_caixa_classes_3_e_4
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 4.5.1.4.0.00.00
+        pattern: '4514'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 4.5.1.4.0.00.00
+        pattern: '4514'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L19
+  evidence:
+    page: 11
+    text: L19 Transferências Recebidas para Aportes de recursos para o RGPS 4.5.1.4.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l20
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L20
+    descricao: Transferências Recebidas para o Sistema de Proteção Social dos Militares
+    nivel: 2
+    ordem: 20
+  policies:
+  - ipc06.regime_de_caixa_classes_3_e_4
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 4.5.1.5.0.00.00
+        pattern: '4515'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 4.5.1.5.0.00.00
+        pattern: '4515'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L20
+  evidence:
+    page: 11
+    text: L20 Transferências Recebidas para o Sistema de Proteção Social dos Militares 4.5.1.5.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l21
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L21
+    descricao: Outras Movimentações Financeiras Recebidas (III)
+    nivel: 1
+    ordem: 21
+  calculation:
+    references:
+    - rule: bf.quadro_principal.ingressos.l22
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l23
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L21
+  evidence:
+    page: 11
+    text: L21 Outras Movimentações Financeiras Recebidas (III) (L22 + L23)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l22
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L22
+    descricao: Resgates de Investimentos e Aplicações Financeiras
+    nivel: 2
+    ordem: 22
+  policies:
+  - ipc06.apenas_valor_principal_investido
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+    exercicio_anterior:
+      label: Exercício Anterior
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L22
+  evidence:
+    page: 11
+    text: L22 Resgates de Investimentos e Aplicações Financeiras <conta de controle>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: review_required
+  review:
+    required: true
+    blocker: 'IPC 06 item 32, p. 9: <conta de controle> — a conta de controle das classes 7 e 8 é criada
+      por cada ente; o documento não a fixa'
+    candidate:
+      classes:
+      - '7'
+      - '8'
+      nota: Controles devedores e credores do PCASP (IPC 06 item 20 (e), p. 7). Registrado, não aplicado
+        — depende do plano de contas do ente.
+- rule_id: bf.quadro_principal.ingressos.l23
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L23
+    descricao: Desbloqueios de Valores em Caixa
+    nivel: 2
+    ordem: 23
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+    exercicio_anterior:
+      label: Exercício Anterior
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L23
+  evidence:
+    page: 11
+    text: L23 Desbloqueios de Valores em Caixa <conta de controle>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: review_required
+  review:
+    required: true
+    blocker: 'IPC 06 item 31, p. 9: <conta de controle> — o documento não fixa a conta'
+    candidate:
+      classes:
+      - '7'
+      - '8'
+      nota: Controles devedores e credores do PCASP (IPC 06 item 20 (e), p. 7). Registrado, não aplicado
+        — depende do plano de contas do ente.
+- rule_id: bf.quadro_principal.ingressos.l24
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L24
+    descricao: Recebimentos Extraorçamentários (IV)
+    nivel: 1
+    ordem: 24
+  calculation:
+    references:
+    - rule: bf.quadro_principal.ingressos.l25
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l26
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l27
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l28
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L24
+  evidence:
+    page: 11
+    text: L24 Recebimentos Extraorçamentários (IV) (L25 + L26 + L27 + L28)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l25
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L25
+    descricao: Inscrição de Restos a Pagar Não Processados
+    nivel: 2
+    ordem: 25
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 5.3.1.7.0.00.00
+        pattern: '5317'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 5.3.1.7.0.00.00
+        pattern: '5317'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L25
+  evidence:
+    page: 11
+    text: L25 Inscrição de Restos a Pagar Não Processados 5.3.1.7.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l26
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L26
+    descricao: Inscrição de Restos a Pagar Processados
+    nivel: 2
+    ordem: 26
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 5.3.2.7.0.00.00
+        pattern: '5327'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 5.3.2.7.0.00.00
+        pattern: '5327'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L26
+  evidence:
+    page: 11
+    text: L26 Inscrição de Restos a Pagar Processados 5.3.2.7.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l27
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L27
+    descricao: Depósitos Restituíveis e Valores Vinculados
+    nivel: 2
+    ordem: 27
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '860'
+      pattern: '860'
+    - literal: '861'
+      pattern: '861'
+    - literal: '862'
+      pattern: '862'
+    - literal: '863'
+      pattern: '863'
+    - literal: '869'
+      pattern: '869'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.1.8.8.0.00.00
+        pattern: '2188'
+        sign: +
+      - literal: 2.2.8.8.0.00.00
+        pattern: '2288'
+        sign: +
+      movimento: credor
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.1.8.8.0.00.00
+        pattern: '2188'
+        sign: +
+      - literal: 2.2.8.8.0.00.00
+        pattern: '2288'
+        sign: +
+      movimento: credor
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L27
+  evidence:
+    page: 11
+    text: L27 Depósitos Restituíveis e Valores Vinculados 2.1.8.8.0.00.00 + 2.2.8.8.0.00.00 <movimento
+      credor> + < fontes extraorçamentárias>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F4
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l28
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L28
+    descricao: Outros Recebimentos Extraorçamentários
+    nivel: 2
+    ordem: 28
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+    exercicio_anterior:
+      label: Exercício Anterior
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L28
+  evidence:
+    page: 11
+    text: L28 Outros Recebimentos Extraorçamentários <contas sob demanda>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: review_required
+  review:
+    required: true
+    blocker: 'IPC 06 item 29, p. 9: <contas sob demanda> — cabe a cada ente adaptá-las'
+    candidate:
+      classes:
+      - '7'
+      - '8'
+      nota: Controles devedores e credores do PCASP (IPC 06 item 20 (e), p. 7). Registrado, não aplicado
+        — depende do plano de contas do ente.
+- rule_id: bf.quadro_principal.ingressos.l29
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L29
+    descricao: Saldo do Exercício Anterior (V)
+    nivel: 1
+    ordem: 29
+  policies:
+  - ipc06.aberturas_de_saldo_nao_exaustivas
+  calculation:
+    references:
+    - rule: bf.quadro_principal.ingressos.l30
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l31
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l32
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L29
+  evidence:
+    page: 11
+    text: L29 Saldo do Exercício Anterior (V) (L30 + L31 + L32)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l30
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L30
+    descricao: Caixa e Equivalentes de Caixa (exceto RPPS)
+    nivel: 2
+    ordem: 30
+  policies:
+  - ipc06.aberturas_de_saldo_nao_exaustivas
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.1.1.0.0.00.00
+        pattern: '111'
+        sign: +
+        saldo: inicial
+      - literal: 1.1.1.1.1.06.00
+        pattern: '1111106'
+        sign: '-'
+        saldo: inicial
+      - literal: 1.1.1.3.0.00.00
+        pattern: '1113'
+        sign: '-'
+        saldo: inicial
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.1.1.0.0.00.00
+        pattern: '111'
+        sign: +
+        saldo: inicial
+      - literal: 1.1.1.1.1.06.00
+        pattern: '1111106'
+        sign: '-'
+        saldo: inicial
+      - literal: 1.1.1.3.0.00.00
+        pattern: '1113'
+        sign: '-'
+        saldo: inicial
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L30
+  evidence:
+    page: 11
+    text: L30 Caixa e Equivalentes de Caixa (exceto RPPS) 1.1.1.0.0.00.0 CAIXA E EQUIVALENTES DE CAIXA
+      (saldo inicial) (-) 1.1.1.1.1.06.00 CONTA ÚNICA RPPS (saldo inicial) (-) 1.1.1.3.0.00.00 CAIXA E
+      EQUIVALENTES DE CAIXA - VALORES RESTITUÍVEIS E VINCULADOS (saldo inicial)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    reading:
+      adopted_from_page: 13
+      note: A p. 11 grafa `1.1.1.0.0.00.0`, com um dígito a menos; a p. 13 grafa `1.1.1.0.0.00.00`, que
+        é a conta do PCASP.
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l31
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L31
+    descricao: Caixa e Equivalentes de Caixa RPPS
+    nivel: 2
+    ordem: 31
+  policies:
+  - ipc06.aberturas_de_saldo_nao_exaustivas
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.1.1.1.1.06.00
+        pattern: '1111106'
+        sign: +
+        saldo: inicial
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.1.1.1.1.06.00
+        pattern: '1111106'
+        sign: +
+        saldo: inicial
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L31
+  evidence:
+    page: 11
+    text: L31 Caixa e Equivalentes de Caixa RPPS 1.1.1.1.1.06.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l32
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L32
+    descricao: Depósitos Restituíveis e Valores Vinculados
+    nivel: 2
+    ordem: 32
+  policies:
+  - ipc06.aberturas_de_saldo_nao_exaustivas
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.1.1.3.0.00.00
+        pattern: '1113'
+        sign: +
+        saldo: inicial
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.1.1.3.0.00.00
+        pattern: '1113'
+        sign: +
+        saldo: inicial
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L32
+  evidence:
+    page: 11
+    text: L32 Depósitos Restituíveis e Valores Vinculados 1.1.1.3.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.ingressos.l33
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INGRESSOS
+    descricao: Ingressos
+  linha:
+    codigo: L33
+    descricao: TOTAL (VI) = (I+II+III+IV+V)
+    nivel: 1
+    ordem: 33
+  calculation:
+    references:
+    - rule: bf.quadro_principal.ingressos.l1
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l15
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l21
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l24
+      sign: +
+    - rule: bf.quadro_principal.ingressos.l29
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L33
+  evidence:
+    page: 12
+    text: L33 TOTAL (VI) = (I+II+III+IV+V) (L1 + L15 + L21 + L24 + L29) — impressa na p. 12, após o bloco
+      de dispêndios
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F5
+    reading:
+      adopted_from_page: 12
+      note: A p. 12 imprime L33 depois do bloco de dispêndios; a linha é de ingressos, porque só agrega
+        L1, L15, L21, L24 e L29.
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l34
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L34
+    descricao: Despesa Orçamentária (VII)
+    nivel: 1
+    ordem: 34
+  calculation:
+    references:
+    - rule: bf.quadro_principal.dispendios.l35
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l36
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l44
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L34
+  evidence:
+    page: 12
+    text: L34 Despesa Orçamentária (VII) (L35 + L36 + L44)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l35
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L35
+    descricao: Recursos Não Vinculados
+    nivel: 2
+    ordem: 35
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '500'
+      pattern: '500'
+    - literal: '501'
+      pattern: '501'
+    - literal: '502'
+      pattern: '502'
+    - literal: '503'
+      pattern: '503'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L35
+  evidence:
+    page: 12
+    text: L35 Recursos Não Vinculados 6.2.2.1.3.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l36
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L36
+    descricao: Recursos Vinculados (EXCETO AO RPPS)
+    nivel: 2
+    ordem: 36
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  calculation:
+    references:
+    - rule: bf.quadro_principal.dispendios.l37
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l38
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l39
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l40
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l41
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l42
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l43
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L36
+  evidence:
+    page: 12
+    text: L36 Recursos Vinculados (EXCETO AO RPPS) (L37 + L38 + L39 + L40 + L41 + L42 + L43)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l37
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L37
+    descricao: Recursos Destinados à Educação
+    nivel: 3
+    ordem: 37
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '540'
+      pattern: '540'
+    - literal: '541'
+      pattern: '541'
+    - literal: '542'
+      pattern: '542'
+    - literal: '543'
+      pattern: '543'
+    - literal: '544'
+      pattern: '544'
+    - literal: '545'
+      pattern: '545'
+    - literal: '546'
+      pattern: '546'
+    - literal: '550'
+      pattern: '550'
+    - literal: '551'
+      pattern: '551'
+    - literal: '552'
+      pattern: '552'
+    - literal: '553'
+      pattern: '553'
+    - literal: '569'
+      pattern: '569'
+    - literal: '570'
+      pattern: '570'
+    - literal: '571'
+      pattern: '571'
+    - literal: '572'
+      pattern: '572'
+    - literal: '573'
+      pattern: '573'
+    - literal: '574'
+      pattern: '574'
+    - literal: '575'
+      pattern: '575'
+    - literal: '576'
+      pattern: '576'
+    - literal: '599'
+      pattern: '599'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L37
+  evidence:
+    page: 12
+    text: L37 Recursos Destinados à Educação 6.2.2.1.3.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l38
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L38
+    descricao: Recursos Destinados à Saúde
+    nivel: 3
+    ordem: 38
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '600'
+      pattern: '600'
+    - literal: '601'
+      pattern: '601'
+    - literal: '602'
+      pattern: '602'
+    - literal: '603'
+      pattern: '603'
+    - literal: '604'
+      pattern: '604'
+    - literal: '605'
+      pattern: '605'
+    - literal: '621'
+      pattern: '621'
+    - literal: '622'
+      pattern: '622'
+    - literal: '631'
+      pattern: '631'
+    - literal: '632'
+      pattern: '632'
+    - literal: '633'
+      pattern: '633'
+    - literal: '634'
+      pattern: '634'
+    - literal: '635'
+      pattern: '635'
+    - literal: '636'
+      pattern: '636'
+    - literal: '659'
+      pattern: '659'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L38
+  evidence:
+    page: 12
+    text: L38 Recursos Destinados à Saúde 6.2.2.1.3.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l39
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L39
+    descricao: Recursos Vinculados à Assistência Social
+    nivel: 3
+    ordem: 39
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '660'
+      pattern: '660'
+    - literal: '661'
+      pattern: '661'
+    - literal: '662'
+      pattern: '662'
+    - literal: '665'
+      pattern: '665'
+    - literal: '669'
+      pattern: '669'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L39
+  evidence:
+    page: 12
+    text: L39 Recursos Vinculados à Assistência Social 6.2.2.1.3.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l40
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L40
+    descricao: Recursos Vinculados à Previdência Social (Exceto ao RPPS)
+    nivel: 3
+    ordem: 40
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '803'
+      pattern: '803'
+    - literal: '804'
+      pattern: '804'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L40
+  evidence:
+    page: 12
+    text: L40 Recursos Vinculados à Previdência Social (Exceto ao RPPS) 6.2.2.1.3.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l41
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L41
+    descricao: Demais Vinculações Decorrentes de Transferências
+    nivel: 3
+    ordem: 41
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '700'
+      pattern: '700'
+    - literal: '701'
+      pattern: '701'
+    - literal: '702'
+      pattern: '702'
+    - literal: '703'
+      pattern: '703'
+    - literal: '704'
+      pattern: '704'
+    - literal: '705'
+      pattern: '705'
+    - literal: '706'
+      pattern: '706'
+    - literal: '707'
+      pattern: '707'
+    - literal: '708'
+      pattern: '708'
+    - literal: '709'
+      pattern: '709'
+    - literal: '710'
+      pattern: '710'
+    - literal: '711'
+      pattern: '711'
+    - literal: '712'
+      pattern: '712'
+    - literal: '713'
+      pattern: '713'
+    - literal: '714'
+      pattern: '714'
+    - literal: '715'
+      pattern: '715'
+    - literal: '716'
+      pattern: '716'
+    - literal: '717'
+      pattern: '717'
+    - literal: '718'
+      pattern: '718'
+    - literal: '719'
+      pattern: '719'
+    - literal: '720'
+      pattern: '720'
+    - literal: '721'
+      pattern: '721'
+    - literal: '722'
+      pattern: '722'
+    - literal: '747'
+      pattern: '747'
+    - literal: '748'
+      pattern: '748'
+    - literal: '749'
+      pattern: '749'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L41
+  evidence:
+    page: 12
+    text: L41 Demais Vinculações Decorrentes de Transferências 6.2.2.1.3.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l42
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L42
+    descricao: Demais Vinculações Legais
+    nivel: 3
+    ordem: 42
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '750'
+      pattern: '750'
+    - literal: '751'
+      pattern: '751'
+    - literal: '752'
+      pattern: '752'
+    - literal: '753'
+      pattern: '753'
+    - literal: '754'
+      pattern: '754'
+    - literal: '755'
+      pattern: '755'
+    - literal: '756'
+      pattern: '756'
+    - literal: '757'
+      pattern: '757'
+    - literal: '758'
+      pattern: '758'
+    - literal: '759'
+      pattern: '759'
+    - literal: '760'
+      pattern: '760'
+    - literal: '761'
+      pattern: '761'
+    - literal: '762'
+      pattern: '762'
+    - literal: '763'
+      pattern: '763'
+    - literal: '799'
+      pattern: '799'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L42
+  evidence:
+    page: 12
+    text: L42 Demais Vinculações Legais 6.2.2.1.3.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l43
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L43
+    descricao: Outras Vinculações
+    nivel: 3
+    ordem: 43
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '880'
+      pattern: '880'
+    - literal: '898'
+      pattern: '898'
+    - literal: '899'
+      pattern: '899'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L43
+  evidence:
+    page: 12
+    text: L43 Outras Vinculações 6.2.2.1.3.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l44
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L44
+    descricao: Recursos Vinculados ao RPPS
+    nivel: 2
+    ordem: 44
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  calculation:
+    references:
+    - rule: bf.quadro_principal.dispendios.l45
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l46
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l47
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L44
+  evidence:
+    page: 12
+    text: L44 Recursos Vinculados ao RPPS (L45 + L46 + L47)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l45
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L45
+    descricao: Recursos Vinculados ao RPPS - Fundo em Capitalização (Plano Previdenciário)
+    nivel: 3
+    ordem: 45
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '800'
+      pattern: '800'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L45
+  evidence:
+    page: 12
+    text: L45 Recursos Vinculados ao RPPS - Fundo em Capitalização (Plano Previdenciário) 6.2.2.1.3.00.00
+      <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l46
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L46
+    descricao: Recursos Vinculados ao RPPS - Fundo em Repartição (Plano Financeiro)
+    nivel: 3
+    ordem: 46
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '801'
+      pattern: '801'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L46
+  evidence:
+    page: 12
+    text: L46 Recursos Vinculados ao RPPS - Fundo em Repartição (Plano Financeiro) 6.2.2.1.3.00.00 <nas
+      fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l47
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L47
+    descricao: Recursos Vinculados ao RPPS - Taxa de Administração
+    nivel: 3
+    ordem: 47
+  policies:
+  - ipc06.exclusao_de_intraorcamentarias
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '802'
+      pattern: '802'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.2.2.1.3.00.00
+        pattern: '62213'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L47
+  evidence:
+    page: 12
+    text: L47 Recursos Vinculados ao RPPS - Taxa de Administração 6.2.2.1.3.00.00 <nas fontes aplicáveis>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F3
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l48
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L48
+    descricao: Transferências Financeiras Concedidas (VIII)
+    nivel: 1
+    ordem: 48
+  calculation:
+    references:
+    - rule: bf.quadro_principal.dispendios.l49
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l50
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l51
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l52
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l53
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L48
+  evidence:
+    page: 12
+    text: L48 Transferências Financeiras Concedidas (VIII) (L49 + L50 + L51 + L52 + L53)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l49
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L49
+    descricao: Transferências Concedidas para a Execução Orçamentária
+    nivel: 2
+    ordem: 49
+  policies:
+  - ipc06.regime_de_caixa_classes_3_e_4
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.5.1.1.0.00.00
+        pattern: '3511'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.5.1.1.0.00.00
+        pattern: '3511'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L49
+  evidence:
+    page: 12
+    text: L49 Transferências Concedidas para a Execução Orçamentária 3.5.1.1.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l50
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L50
+    descricao: Transferências Financeira Concedidas Independentes de Execução Orçamentária
+    nivel: 2
+    ordem: 50
+  policies:
+  - ipc06.regime_de_caixa_classes_3_e_4
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.5.1.2.2.01.00
+        pattern: '3512201'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.5.1.2.2.01.00
+        pattern: '3512201'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L50
+  evidence:
+    page: 12
+    text: L50 Transferências Financeira Concedidas Independentes de Execução Orçamentária 3.5.1.2.2.01.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l51
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L51
+    descricao: Transferências Concedidas para Aportes de recursos para o RPPS
+    nivel: 2
+    ordem: 51
+  policies:
+  - ipc06.regime_de_caixa_classes_3_e_4
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.5.1.3.0.00.00
+        pattern: '3513'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.5.1.3.0.00.00
+        pattern: '3513'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L51
+  evidence:
+    page: 12
+    text: L51 Transferências Concedidas para Aportes de recursos para o RPPS 3.5.1.3.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l52
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L52
+    descricao: Transferências Concedidas para Aportes de recursos para o RGPS
+    nivel: 2
+    ordem: 52
+  policies:
+  - ipc06.regime_de_caixa_classes_3_e_4
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.5.1.4.0.00.00
+        pattern: '3514'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.5.1.4.0.00.00
+        pattern: '3514'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L52
+  evidence:
+    page: 12
+    text: L52 Transferências Concedidas para Aportes de recursos para o RGPS 3.5.1.4.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l53
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L53
+    descricao: Transferências Concedidas para o Sistema de Proteção Social dos Militares
+    nivel: 2
+    ordem: 53
+  policies:
+  - ipc06.regime_de_caixa_classes_3_e_4
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.5.1.5.0.00.00
+        pattern: '3515'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.5.1.5.0.00.00
+        pattern: '3515'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L53
+  evidence:
+    page: 12
+    text: L53 Transferências Concedidas para o Sistema de Proteção Social dos Militares 3.5.1.5.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l54
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L54
+    descricao: Outras Movimentações Financeiras (IX)
+    nivel: 1
+    ordem: 54
+  calculation:
+    references:
+    - rule: bf.quadro_principal.dispendios.l55
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l56
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L54
+  evidence:
+    page: 12
+    text: L54 Outras Movimentações Financeiras (IX) (L55 + L56)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l55
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L55
+    descricao: Transferências para Investimentos e Aplicações Financeiras
+    nivel: 2
+    ordem: 55
+  policies:
+  - ipc06.apenas_valor_principal_investido
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+    exercicio_anterior:
+      label: Exercício Anterior
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L55
+  evidence:
+    page: 12
+    text: L55 Transferências para Investimentos e Aplicações Financeiras <conta de controle>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: review_required
+  review:
+    required: true
+    blocker: 'IPC 06 itens 32 e 33, p. 9: <conta de controle> — o documento não fixa a conta'
+    candidate:
+      classes:
+      - '7'
+      - '8'
+      nota: Controles devedores e credores do PCASP (IPC 06 item 20 (e), p. 7). Registrado, não aplicado
+        — depende do plano de contas do ente.
+- rule_id: bf.quadro_principal.dispendios.l56
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L56
+    descricao: Bloqueios de Valores em Caixa
+    nivel: 2
+    ordem: 56
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+    exercicio_anterior:
+      label: Exercício Anterior
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L56
+  evidence:
+    page: 12
+    text: L56 Bloqueios de Valores em Caixa <conta de controle>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: review_required
+  review:
+    required: true
+    blocker: 'IPC 06 item 31, p. 9: <conta de controle> — o documento não fixa a conta'
+    candidate:
+      classes:
+      - '7'
+      - '8'
+      nota: Controles devedores e credores do PCASP (IPC 06 item 20 (e), p. 7). Registrado, não aplicado
+        — depende do plano de contas do ente.
+- rule_id: bf.quadro_principal.dispendios.l57
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L57
+    descricao: Pagamentos Extraorçamentários (X)
+    nivel: 1
+    ordem: 57
+  calculation:
+    references:
+    - rule: bf.quadro_principal.dispendios.l58
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l59
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l60
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l61
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 13
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L57
+  evidence:
+    page: 13
+    text: L57 Pagamentos Extraorçamentários (X) (L58 + L59 + L60 + L61)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l58
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L58
+    descricao: Pagamentos de Restos a Pagar Não Processados
+    nivel: 2
+    ordem: 58
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.3.1.4.0.00.00
+        pattern: '6314'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.3.1.4.0.00.00
+        pattern: '6314'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 13
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L58
+  evidence:
+    page: 13
+    text: L58 Pagamentos de Restos a Pagar Não Processados 6.3.1.4.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l59
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L59
+    descricao: Pagamentos de Restos a Pagar Processados
+    nivel: 2
+    ordem: 59
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 6.3.2.2.0.00.00
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 6.3.2.2.0.00.00
+        pattern: '6322'
+        sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 13
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L59
+  evidence:
+    page: 13
+    text: L59 Pagamentos de Restos a Pagar Processados 6.3.2.2.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l60
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L60
+    descricao: Depósitos Restituíveis e Valores Vinculados
+    nivel: 2
+    ordem: 60
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '860'
+      pattern: '860'
+    - literal: '861'
+      pattern: '861'
+    - literal: '862'
+      pattern: '862'
+    - literal: '863'
+      pattern: '863'
+    - literal: '869'
+      pattern: '869'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.1.8.8.0.00.00
+        pattern: '2188'
+        sign: +
+      - literal: 2.2.8.8.0.00.00
+        pattern: '2288'
+        sign: +
+      movimento: devedor
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.1.8.8.0.00.00
+        pattern: '2188'
+        sign: +
+      - literal: 2.2.8.8.0.00.00
+        pattern: '2288'
+        sign: +
+      movimento: devedor
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 13
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L60
+  evidence:
+    page: 13
+    text: L60 Depósitos Restituíveis e Valores Vinculados 2.1.8.8.0.00.00 + 2.2.8.8.0.00.00 <movimento
+      devedor> + < fontes extraorçamentárias>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    decision: F4
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l61
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L61
+    descricao: Outros Pagamentos Extraorçamentários
+    nivel: 2
+    ordem: 61
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+    exercicio_anterior:
+      label: Exercício Anterior
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 13
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L61
+  evidence:
+    page: 13
+    text: L61 Outros Pagamentos Extraorçamentários <contas sob demanda>
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: review_required
+  review:
+    required: true
+    blocker: 'IPC 06 item 29, p. 9: <contas sob demanda> — cabe a cada ente adaptá-las'
+    candidate:
+      classes:
+      - '7'
+      - '8'
+      nota: Controles devedores e credores do PCASP (IPC 06 item 20 (e), p. 7). Registrado, não aplicado
+        — depende do plano de contas do ente.
+- rule_id: bf.quadro_principal.dispendios.l62
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L62
+    descricao: Saldo para o Exercício Seguinte (XI)
+    nivel: 1
+    ordem: 62
+  policies:
+  - ipc06.aberturas_de_saldo_nao_exaustivas
+  calculation:
+    references:
+    - rule: bf.quadro_principal.dispendios.l63
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l64
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l65
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 13
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L62
+  evidence:
+    page: 13
+    text: L62 Saldo para o Exercício Seguinte (XI) (L63 + L64 + L65)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l63
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L63
+    descricao: Caixa e Equivalentes de Caixa (exceto RPPS)
+    nivel: 2
+    ordem: 63
+  policies:
+  - ipc06.aberturas_de_saldo_nao_exaustivas
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.1.1.0.0.00.00
+        pattern: '111'
+        sign: +
+        saldo: final
+      - literal: 1.1.1.1.1.06.00
+        pattern: '1111106'
+        sign: '-'
+        saldo: final
+      - literal: 1.1.1.3.0.00.00
+        pattern: '1113'
+        sign: '-'
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.1.1.0.0.00.00
+        pattern: '111'
+        sign: +
+        saldo: final
+      - literal: 1.1.1.1.1.06.00
+        pattern: '1111106'
+        sign: '-'
+        saldo: final
+      - literal: 1.1.1.3.0.00.00
+        pattern: '1113'
+        sign: '-'
+        saldo: final
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 13
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L63
+  evidence:
+    page: 13
+    text: L63 Caixa e Equivalentes de Caixa (exceto RPPS) 1.1.1.0.0.00.00 CAIXA E EQUIVALENTES DE CAIXA
+      (saldo final) (-) 1.1.1.1.1.06.00 CONTA ÚNICA RPPS (saldo final) (-) 1.1.1.3.0.00.00 CAIXA E EQUIVALENTES
+      DE CAIXA - VALORES RESTITUÍVEIS E VINCULADOS (saldo final)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+    reading:
+      adopted_from_page: 13
+      note: A p. 11 grafa `1.1.1.0.0.00.0`, com um dígito a menos; a p. 13 grafa `1.1.1.0.0.00.00`, que
+        é a conta do PCASP.
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l64
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L64
+    descricao: Caixa e Equivalentes de Caixa RPPS
+    nivel: 2
+    ordem: 64
+  policies:
+  - ipc06.aberturas_de_saldo_nao_exaustivas
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.1.1.1.1.06.00
+        pattern: '1111106'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.1.1.1.1.06.00
+        pattern: '1111106'
+        sign: +
+        saldo: final
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 13
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L64
+  evidence:
+    page: 13
+    text: L64 Caixa e Equivalentes de Caixa RPPS 1.1.1.1.1.06.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l65
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L65
+    descricao: Depósitos Restituíveis e Valores Vinculados
+    nivel: 2
+    ordem: 65
+  policies:
+  - ipc06.aberturas_de_saldo_nao_exaustivas
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.1.1.3.0.00.00
+        pattern: '1113'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.1.1.3.0.00.00
+        pattern: '1113'
+        sign: +
+        saldo: final
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 13
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L65
+  evidence:
+    page: 13
+    text: L65 Depósitos Restituíveis e Valores Vinculados 1.1.1.3.0.00.00
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true
+- rule_id: bf.quadro_principal.dispendios.l66
+  demonstrativo:
+    codigo: BF
+    descricao: Balanço Financeiro
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: DISPENDIOS
+    descricao: Dispêndios
+  linha:
+    codigo: L66
+    descricao: TOTAL (XII) = (VII+VIII+IX+X+XI)
+    nivel: 1
+    ordem: 66
+  calculation:
+    references:
+    - rule: bf.quadro_principal.dispendios.l34
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l48
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l54
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l57
+      sign: +
+    - rule: bf.quadro_principal.dispendios.l62
+      sign: +
+  source:
+    document: IPC06
+    document_version: 2024-06
+    page: 13
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO FINANCEIRO
+    item: '39'
+    table: Quadro Principal
+    row: L66
+  evidence:
+    page: 13
+    text: L66 TOTAL (XII) = (VII+VIII+IX+X+XI) (L34 + L48 + L54 + L57 + L62)
+  version:
+    source_document: IPC06
+    edition: 2024-06
+    valid_from: '2024-06-30'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-09-14'
+  status: extracted
+  review:
+    required: true

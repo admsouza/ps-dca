@@ -15,6 +15,7 @@ TABELAS = {
     "conta_contabil": ("PCASP.md", 7),          # coluna CONTA, 9 dígitos
     "natureza_receita": ("natureza-receita.md", 7),  # coluna NR
     "natureza_despesa": ("natureza_despesa.md", 5),  # coluna Código
+    "fonte_recurso": ("fonte-recursos.md", 0),       # coluna Código, 3 dígitos (bloco 500–999)
 }
 FUNCAO_SUBFUNCAO = "funcao-subfuncao.md"
 
@@ -46,7 +47,8 @@ def _coluna(caminho: Path, indice: int) -> set[str]:
 def carregar(raiz_docs: Path) -> dict[str, set[str]]:
     """Mapeia domínio -> conjunto de códigos normalizados.
 
-    Chaves: `conta_contabil`, `natureza_receita`, `natureza_despesa`, `funcao`, `subfuncao`.
+    Chaves: `conta_contabil`, `natureza_receita`, `natureza_despesa`, `fonte_recurso`,
+    `funcao`, `subfuncao`.
     """
     conjuntos: dict[str, set[str]] = {}
     for dominio, (arquivo, indice) in TABELAS.items():

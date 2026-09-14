@@ -1,0 +1,13 @@
+# Fonte normativa do Balanço Financeiro. O PDF vive em docs/referencia/ipc/ e nunca é
+# copiado para dentro de knowledge/ — scripts/check_sources.py falha se isso acontecer.
+document: IPC06
+title: "IPC 06 — Metodologia para Elaboração do Balanço Financeiro"
+file: "IPC06 - Balanço Financeiro_2024- 2.pdf"
+path: "docs/referencia/ipc/IPC06 - Balanço Financeiro_2024- 2.pdf"
+pages: 19
+edition: "2024-06"
+published_at: "2024-06-30"
+sha256: "e663ffe5ee0376fd03e7cd340e79a9f6a4a8e265e9e4863098f7f1773dc1d097"
+# Nenhuma página é paisagem rotacionada: as tabelas do IPC 06 saem legíveis na ordem de leitura.
+# As pp. 14–15 são landscape, mas com rotação 0 — agrupar por coordenada ali embaralharia as células.
+rotated_pages: []

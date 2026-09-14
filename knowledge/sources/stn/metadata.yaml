@@ -1,9 +1,14 @@
 # Tabelas oficiais da STN usadas como domínio de validação.
 # Lidas, nunca alteradas. Hash divergente = erro, não aviso.
+# O .xlsx do Anexo I da Portaria STN 710/2021 entra como evidência do agrupamento de fontes
+# por subgrupo do IPC 06 (cabeçalhos de bloco); os códigos em si estão em fonte-recursos.md.
 tables:
   - file: "docs/contas-stn/complemento-fonte.md"
     records: 50
     sha256: "83717ba6cdbb6760d5bdf1996e84866b7a8405fe3333cb2bf8d75ddeba81bfd7"
+  - file: "docs/contas-stn/fontes-recursos-stn-2026.xlsx"
+    records: 98
+    sha256: "2996eb9890283aa6e5ae658bb92f9eb2eddd60a2209d59b7fbf80659ec9594cf"
   - file: "docs/contas-stn/fonte-recursos.md"
     records: 101
     sha256: "f9c5f0c9d01c40dd071d4d50d4f5a1f4b7dcb911445f00ea047a5fa056435469"
