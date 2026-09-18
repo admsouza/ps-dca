@@ -10,6 +10,10 @@
 **Fonte da verdade externa:** `regras-rreo-api` / `regras-rgf-api` (padrão de pipeline)
 **Evidência medida:** `docs/evidencia-bf-jp-2025.md` (G1–G4) e `docs/evidencia-matriz-mscc-vs-msce.md`
 (matriz consolidada × encerramento, piloto em Cuitegi/PB) — ambas de 2026-09-14
+**Base de homologação:** BF publicado pelos SIAFIC de **5 entes**, extraído em 2026-09-18 — **não** é
+fonte de mapeamento: o de-para conta → linha é o do IPC 06 em `knowledge/rules/bf/`; o SIAFIC só
+homologa o resultado da apuração sobre a MSC. Gabaritos em `docs/gabarito-bf-{recife,porto-alegre,jp,bh,cuitegi}-2025.md`,
+de-para em `docs/depara-bf-siafic-ipc06.md`, PDFs em `docs/entes-homologacao/`
 
 ## Why
 
@@ -66,8 +70,66 @@ detalhamento por fonte criado livremente pelo ente.
 ## Exemplo concreto
 
 **O `tt/dca` não publica o Balanço Financeiro** — medido em 2026-09-14: 2.002 registros, 7 anexos,
-nenhum deles é o BF (`docs/evidencia-bf-jp-2025.md` §1). Não existe gabarito célula a célula, como
-havia no `RREO-Anexo 01` para o BO. O aceite se apoia em três coisas, nesta ordem:
+nenhum deles é o BF (`docs/evidencia-bf-jp-2025.md` §1). A apuração continua sendo **MSC → regras do
+IPC 06** (`knowledge/rules/bf/quadro_principal.yaml`, 80 linhas, ed. 2024-06); o que faltava era com
+o que **conferir** o resultado. Entram aí os BF publicados pelos SIAFIC dos entes de homologação,
+extraídos dos PDFs em 2026-09-18:
+
+| Ente | SIAFIC | Cobertura do quadro principal | Gabarito |
+|---|---|---|---|
+| Recife/PE (2611606) | Anexo XIII da Lei 4.320/64 | **66/66**, mesma ordem e nomenclatura do IPC 06 | `docs/gabarito-bf-recife-2025.md` |
+| Porto Alegre/RS (4314902) | Balanço Financeiro (**administração direta**) | 66/66; PDF é **imagem**, transcrito visualmente | `docs/gabarito-bf-porto-alegre-2025.md` |
+| João Pessoa/PB (2507507) | SIGEF/JPA | 66/66, com 4 vinculações próprias agregadas em `L10`/`L43` | `docs/gabarito-bf-jp-2025.md` |
+| Belo Horizonte/MG (3106200) | Consolidação Geral | 62/66 (sem RGPS e militares); **origem OCR** | `docs/gabarito-bf-bh-2025.md` |
+| Cuitegi/PB (2504801) | PublicSoft 2026.19.4.0 | 48/66, sem segregação do RPPS | `docs/gabarito-bf-cuitegi-2025.md` |
+
+**Recife e Porto Alegre são os entes de referência:** publicam as 66 linhas na ordem e na nomenclatura
+do IPC 06, e as 16 identidades internas do demonstrativo fecham em centavos nos dois. Porto Alegre traz
+duas ressalvas próprias: o PDF é **imagem pura**, transcrito visualmente (a transcrição se valida pelas
+32 conferências — 16 identidades × 2 colunas), e o recorte é da **administração direta**, não do
+consolidado — nele `L15` ≠ `L48` em 728.820.927,09, diferença que num consolidado se anularia. É contra ele que a apuração deve fechar
+primeiro; os demais medem a robustez do motor diante de layouts que agregam ou omitem linhas.
+
+A extração foi conferida pela aritmética do próprio demonstrativo: as 16 identidades do BF
+(`L1 = L2+L3+L11`, `L33 = L1+L15+L21+L24+L29`, e assim por diante) fecham em centavos em Recife, João
+Pessoa e Belo Horizonte, e em Cuitegi nas linhas que ele publica separadas — o pareamento
+rótulo × valor está correto nos quatro. O quadro de detalhamento da receita por fonte de João Pessoa
+(págs. 5–6, 6 colunas) ficou **fora**, por ser quadro livre do ente.
+
+**Hierarquia das fontes, para não inverter:**
+
+1. **IPC 06, ed. 2024-06** — define quais contas compõem cada uma das 80 linhas. Fonte única do
+   mapeamento; nenhuma regra é criada ou alterada a partir de PDF de ente.
+2. **MSC do ente** — os saldos. É sobre ela que a apuração roda.
+3. **BF do SIAFIC (JP e Cuitegi)** — homologação do resultado. É o demonstrativo **do ente**, não
+   do STN: pode ter erro, classificação própria e nomenclatura fora do IPC 06. Divergência contra
+   ele é hipótese a investigar em ambos os lados, nunca prova de erro da apuração — e nunca motivo
+   para "ajustar" a regra canônica até o número fechar.
+
+O de-para rótulo do SIAFIC → linha `Lnn` existe só para comparar e vale por layout:
+`docs/depara-bf-siafic-ipc06.md` (2026-09-18). O que ele já mostra:
+
+- **`L21`–`L23` e `L54`–`L56` existem e são materiais** — as linhas hoje `review_required` que o G8
+  discute. Recife publica `L21` = `L22` = 370.110.128,29 e `L54` = `L55` = 690.544.116,24; Belo
+  Horizonte, 3.440.368.037,80 e 4.055.640.501,83. João Pessoa e Cuitegi zeram as duas. Ou seja: o
+  desequilíbrio de −228.702.095,15 medido em JP **não** vem delas, e o teste de G8 tem de ser feito
+  em Recife ou BH, não em João Pessoa (Porto Alegre também zera as duas).
+- **Recife e Porto Alegre são 1:1 com o IPC 06** — 66 rótulos, mesma ordem, mesma nomenclatura,
+  nenhuma agregação.
+- **João Pessoa cobre as 66 linhas** do quadro principal, mas agrega 4 vinculações próprias
+  (operação de crédito, cultura e lazer, trânsito, outras destinações) no que o IPC 06 chama de
+  `L10`/`L43` — a comparação nessas linhas é **soma contra soma** (383.875.863,35 em `L10`,
+  277.578.365,98 em `L43`, em 2025).
+- **Belo Horizonte cobre 62 linhas** (não tem RGPS nem militares: `L19`, `L20`, `L52`, `L53`) e vem
+  de **PDF digitalizado**: 2 células saíram com leitura de OCR duvidosa (`L9` e `L41`) e estão
+  marcadas no gabarito — conferir no PDF antes de usar como referência.
+- **Cuitegi cobre 48 linhas e omite 18**: não separa RPPS dos demais vinculados (`L3+L11`,
+  `L36+L44`), não separa o caixa do RPPS (`L30+L31`, `L63+L64`), não tem os fundos do RPPS
+  (`L12`–`L14`, `L45`–`L47`), nem "Demais Vinculações" (`L8`, `L9`, `L41`, `L42`), nem o grupo
+  "Outras Movimentações Financeiras" (`L21`–`L23`, `L54`–`L56`) — o que desloca sua numeração
+  romana a partir do 3º grupo. Comparar por código `Lnn`, nunca por romano impresso.
+- Nas 18 linhas omitidas, a homologação verifica apenas que a apuração não produz valor onde o ente
+  não tem conteúdo; se produzir, é divergência estrutural a investigar dos dois lados.
 
 **a) Âncoras já medidas** — batem em centavos contra o publicado:
 
@@ -86,6 +148,11 @@ exercício: 2.613.640.800,87 → 3.248.364.442,41, ou seja +634.723.641,54.
 
 ## Critérios de aceite
 
+- [ ] Homologação nos dois entes: cada linha apurada a partir da MSC pelas regras do IPC 06 é
+      confrontada com `docs/gabarito-bf-jp-2025.md` e `docs/gabarito-bf-cuitegi-2025.md`, na coluna
+      do exercício apurado. Divergência é listada linha a linha, com hipótese e lado provável
+      (regra, MSC do ente ou demonstrativo do ente) — nunca silenciada, nunca resolvida mudando a
+      regra canônica sem base no IPC 06.
 - [ ] `L33 TOTAL (VI)` = `L66 TOTAL (XII)`, em centavos, no caso de referência — a identidade que
       define o demonstrativo. Hoje a diferença é **−228.702.095,15**, e fechá-la depende de G8.
 - [ ] As 4 âncoras publicadas (`L1`, `L25`, `L26`, `L34`) seguem batendo em centavos.
@@ -136,8 +203,11 @@ exercício: 2.613.640.800,87 → 3.248.364.442,41, ou seja +634.723.641,54.
 - A leitura da MSC cresce: classes 1–6, até 3 tipos de valor, 2 exercícios. **Medido:** ~45 s para
   tudo, maior resposta com 6.202 registros — não é obstáculo. Mas 2 das ~40 chamadas caíram por
   reset de conexão: o adapter precisa de **retry com backoff**, que o do BO não tem.
-- **Não há gabarito do BF no SICONFI.** O aceite passa a ser identidade interna + âncoras + caixa,
-  e isso precisa estar claro antes de começar: "bate 1:1 com o publicado" não é prometível aqui.
+- **Não há gabarito do BF no SICONFI.** A homologação usa o BF do SIAFIC de JP e Cuitegi — fonte do
+  ente, não do STN, em nomenclatura própria de cada sistema. O de-para rótulo → linha `Lnn` é da
+  fase TEST e pode não ser 1:1 em toda linha; "bate 1:1 com o publicado" não é prometível aqui.
+- **Risco de inversão de fonte:** fechar número mexendo na regra canônica para alcançar o PDF do
+  ente descaracteriza a apuração. Toda alteração em `knowledge/rules/bf/` exige citação do IPC 06.
 - G8 é o que falta para o BF fechar. Sem ele, a entrega é um demonstrativo com desequilíbrio
   declarado de −228.702.095,15 — honesto, mas incompleto.
 - **G9 e G10 atravessam o repositório inteiro, não só o BF.** O tipo de matriz e a competência valem

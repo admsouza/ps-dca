@@ -15,7 +15,17 @@ Fatia vertical: João Pessoa/PB (2507507), exercício 2025, BF apurado ponta a p
 - [x] 0.5 Apuração exploratória do BF completa, com as 4 âncoras batendo em centavos e o
       desequilíbrio residual de −228.702.095,15 rastreado até as linhas bloqueadas
 
+- [x] 0.6 Base de homologação extraída dos PDFs de SIAFIC de **5 entes** (2026-09-18) — conferência
+      do resultado, não fonte de mapeamento (o mapeamento é o IPC 06 em `knowledge/rules/bf/`):
+      `docs/gabarito-bf-{recife,porto-alegre,jp,bh,cuitegi}-2025.md`. Extração conferida pelas 16
+      identidades do próprio demonstrativo, que fecham em Recife, Porto Alegre, JP e BH. Porto Alegre
+      é PDF **imagem**: transcrição visual validada pelas 16 identidades × 2 colunas
+
 ## 1. TEST (antes do código)
+- [x] 1.0 De-para rótulo do SIAFIC → linha `Lnn` do IPC 06 por layout, só para homologação:
+      `docs/depara-bf-siafic-ipc06.md` (2026-09-18). Recife e Porto Alegre 66/66 (1:1 com o IPC 06),
+      JP 66/66 com agregação em L10/L43, BH 62/66 (OCR), Cuitegi 48/66. Ausências e agregações
+      declaradas; Porto Alegre é **administração direta**, não consolidado
 - [ ] 1.1 Traduzir cada `#### Scenario:` do delta spec em `tests/bf/test_*.py`
 - [ ] 1.2 Teste de regressão do BO: os 11 valores de `docs/validacao-bo-jp-2025.md` antes e depois
       da renomeação do núcleo
@@ -52,6 +62,11 @@ Fatia vertical: João Pessoa/PB (2507507), exercício 2025, BF apurado ponta a p
 - [ ] 4.2 `python -m ruff check .` — sem erro novo
 - [ ] 4.3 `python -m scripts.validate_rules` — 149 regras, `review_required 6`
 - [ ] 4.4 As 4 âncoras publicadas (`L1`, `L25`, `L26`, `L34`) batem em centavos
+- [ ] 4.4b Homologação linha a linha nos 5 entes, **Recife primeiro** (1:1 com o IPC 06): `N` batem /
+      `M` divergem, cada divergência com hipótese e lado provável; nenhuma regra de
+      `knowledge/rules/bf/` alterada sem citação do IPC 06
+- [ ] 4.4c `L21`–`L23` e `L54`–`L56` (G8) homologadas em Recife e BH, que as publicam com valor
+      material; em JP, Porto Alegre e Cuitegi o esperado é zero
 - [ ] 4.5 `L33 == L66` nas duas colunas; diferença remanescente medida e explicada
 - [ ] 4.5b Ingressos − dispêndios explicam a variação de caixa do exercício
 - [ ] 4.6 Regressão do BO: 11 valores idênticos em centavos
