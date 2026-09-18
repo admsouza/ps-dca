@@ -24,8 +24,13 @@ OPENSPEC = RAIZ_REPO / "openspec"
 CENARIOS_ESPERADOS = {
     "dca/base-canonica-regras": 83,  # 51 do IPC 07 + 32 do IPC 06 (ipc06-bf-regras-canonicas)
     "dca/balanco-orcamentario": 46,
-    "dca/fonte-msc": 12,
-    "pipeline/plataforma": 63,
+    # 45 da apuração (`bf-apuracao-f1`) + 4 do quadro anexo (`bf-quadro-anexo`).
+    "dca/balanco-financeiro": 49,
+    # 12 da fonte por demonstrativo + 3 da competência de encerramento por API.
+    "dca/fonte-msc": 15,
+    # 63 da plataforma + 9 da entrada do BF no pipeline (`bf-no-pipeline`)
+    # + 4 da vigência por anexo (`vigencia-por-anexo`).
+    "pipeline/plataforma": 76,
 }
 
 # Capabilities cuja fase TEST já começou — só delas se exige teste por cenário.
@@ -33,28 +38,49 @@ CENARIOS_ESPERADOS = {
 # implementar. Os testes existem e são vermelhos de propósito; a cobertura passa a ser exigida
 # daqui para a frente, e cenário novo sem teste quebra o build.
 COM_TESTES = ("dca/base-canonica-regras", "dca/balanco-orcamentario",
-              "dca/fonte-msc", "pipeline/plataforma")
+              "dca/balanco-financeiro", "dca/fonte-msc", "pipeline/plataforma")
 
 
-def _specs() -> dict[str, Path]:
-    """Capability -> spec em vigor, preferindo a mesclada à da change ativa ou arquivada."""
-    encontrados: dict[str, Path] = {}
-    for raiz, prioridade in ((OPENSPEC / "specs", 0),
-                             (OPENSPEC / "changes", 1),
-                             (OPENSPEC / "changes" / "archive", 2)):
+def _specs() -> dict[str, list[Path]]:
+    """Capability -> specs em vigor.
+
+    A mesclada em `openspec/specs/` vence sozinha. Enquanto não houver mesclagem, valem **todos**
+    os deltas das changes ativas: duas changes podem tocar a mesma capability ao mesmo tempo — é o
+    caso de `pipeline/plataforma`, com a plataforma e a entrada do BF —, e escolher um delta só
+    faria a contagem de cenários cair sem que nenhum tivesse sido removido.
+    """
+    mescladas: dict[str, list[Path]] = {}
+    ativas: dict[str, list[Path]] = {}
+    arquivadas: dict[str, list[Path]] = {}
+    for raiz, destino in ((OPENSPEC / "specs", mescladas),
+                          (OPENSPEC / "changes", ativas),
+                          (OPENSPEC / "changes" / "archive", arquivadas)):
         for caminho in sorted(raiz.rglob("spec.md")):
             partes = caminho.parts
             if "specs" not in partes:
                 continue
+            if destino is ativas and "archive" in partes:
+                continue
             indice = len(partes) - 1 - partes[::-1].index("specs")
             capability = "/".join(partes[indice + 1:-1])
-            if capability and (capability not in encontrados or prioridade == 0):
-                encontrados.setdefault(capability, caminho)
+            if capability:
+                destino.setdefault(capability, []).append(caminho)
+
+    encontrados = dict(mescladas)
+    for capability in set(ativas) | set(arquivadas):
+        if capability in encontrados:
+            continue        # já mesclada: a spec em vigor é a única fonte
+        # Sem mesclagem, a spec em vigor é a **soma** do que foi aprovado: uma capability pode ter
+        # delta numa change ativa e noutra já arquivada — é o caso de `pipeline/plataforma`, com a
+        # plataforma em curso e a entrada do BF já encerrada.
+        encontrados[capability] = ativas.get(capability, []) + arquivadas.get(capability, [])
     return encontrados
 
 
-def _cenarios(caminho: Path) -> list[str]:
-    return re.findall(r"^#### Scenario: (.+)$", caminho.read_text(encoding="utf-8"), re.M)
+def _cenarios(caminhos: list[Path]) -> list[str]:
+    return [cenario for caminho in caminhos
+            for cenario in re.findall(r"^#### Scenario: (.+)$",
+                                      caminho.read_text(encoding="utf-8"), re.M)]
 
 
 def _docstrings() -> dict[str, str]:

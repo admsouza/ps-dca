@@ -1,9 +1,17 @@
 """Fonte PublicSoft — `base-demonstrativos`, com gate de auditoria.
 
-Implementa `FonteSaldos`. A diferença que o adapter absorve, além do camelCase: antes de
-buscar saldos, a auditoria do exercício/mês precisa estar `validado` **e** `podeGerar`.
-Reprovado significa **sem dados** — conjunto vazio, não exceção: um demonstrativo em auditoria
-não é uma falha de transporte, e tratá-lo como erro esconderia a diferença.
+Implementa `FonteSaldos`. Duas diferenças que o adapter absorve, além do camelCase:
+
+1. **A competência de encerramento é a 13**, não a 12. Nesta API, 12 é dezembro e 13 é a
+   competência especial de encerramento do exercício — `?exercicio=2026&mesMsc=13`, ou o alias
+   `?anReferencia=2026&meReferencia=13`. No SICONFI é o oposto: o encerramento está na
+   competência 12, identificado por `co_tipo_matriz=MSCE`, e pedir 13 devolve zero registros
+   (medido nos 4 entes de homologação em 2026-09-18). O domínio continua falando em competência
+   1–12 mais a matriz; o número de cada API morre aqui.
+2. Antes de buscar saldos, a auditoria do exercício/mês precisa estar `validado` **e**
+   `podeGerar`. Reprovado significa **sem dados** — conjunto vazio, não exceção: um
+   demonstrativo em auditoria não é uma falha de transporte, e tratá-lo como erro esconderia a
+   diferença.
 """
 from __future__ import annotations
 
@@ -14,7 +22,10 @@ from app.domain.bo.modelo import Registro
 from app.infra.msc.fonte import Matriz, TipoSaldo
 from app.infra.msc.normalizacao import itens, normalizar
 
-# Vocabulário do domínio -> o que esta API usa. Ela não expõe a matriz de encerramento.
+# Competência especial de encerramento do exercício nesta API (12 é dezembro).
+COMPETENCIA_13 = 13
+
+# Vocabulário do domínio -> o que esta API usa.
 ID_TV = {
     TipoSaldo.ABERTURA: "beginning_balance",
     TipoSaldo.ENCERRAMENTO: "ending_balance",
@@ -52,18 +63,29 @@ class PublicSoftMSC:
     def registros(self, ente: int, ano: int, mes: int, classe: int,
                   matriz: Matriz = Matriz.CONSOLIDADA,
                   tipo_saldo: TipoSaldo = TipoSaldo.ENCERRAMENTO) -> Sequence[Registro]:
-        if not self._auditoria_liberada(ano, mes):
+        competencia = self._competencia(mes, matriz)
+        if not self._auditoria_liberada(ano, competencia):
             return []
 
         resposta = self._http(
             self._url_saldos,
-            params={"anReferencia": ano, "meReferencia": mes,
+            params={"anReferencia": ano, "meReferencia": competencia,
                     "classeConta": classe, "idTv": ID_TV[tipo_saldo],
                     "tipoMatriz": str(matriz)},
             headers=self._cabecalhos(),
             timeout=self._timeout,
         ) or {}
         return [normalizar(item) for item in itens(resposta)]
+
+    @staticmethod
+    def _competencia(mes: int, matriz: Matriz) -> int:
+        """Traduz a competência do domínio para a desta API.
+
+        A matriz de encerramento vive na competência **13**; a consolidada, no próprio mês. É a
+        auditoria dessa mesma competência que libera a leitura — auditar dezembro e ler o
+        encerramento liberaria uma competência com base na validação de outra.
+        """
+        return COMPETENCIA_13 if matriz is Matriz.ENCERRAMENTO else mes
 
     def _auditoria_liberada(self, ano: int, mes: int) -> bool:
         resposta = self._http(

@@ -12,7 +12,7 @@
 (matriz consolidada × encerramento, piloto em Cuitegi/PB) — ambas de 2026-09-14
 **Base de homologação:** BF publicado pelos SIAFIC de **5 entes**, extraído em 2026-09-18 — **não** é
 fonte de mapeamento: o de-para conta → linha é o do IPC 06 em `knowledge/rules/bf/`; o SIAFIC só
-homologa o resultado da apuração sobre a MSC. Gabaritos em `docs/gabarito-bf-{recife,porto-alegre,jp,bh,cuitegi}-2025.md`,
+homologa o resultado da apuração sobre a MSC. Gabaritos em `docs/entes-homologacao/<ente>/gabarito-bf-2025.md`,
 de-para em `docs/depara-bf-siafic-ipc06.md`, PDFs em `docs/entes-homologacao/`
 
 ## Why
@@ -63,9 +63,35 @@ detalhamento por fonte criado livremente pelo ente.
 
 | Interface | Entrada | Saída |
 |---|---|---|
-| `apurar(ente, exercicio, fonte, direcao=None, mapa=None)` | cod. IBGE, exercício, `FonteSaldos` | `Resultado` com `matriz`, `mapa`, `procedencia`, `diagnostico` |
-| `python -m app.cli.bf <cod_ibge> <exercicio> [--fonte siconfi\|publicsoft] [--json]` | idem | matriz em texto ou JSON |
+| `apurar(ente, exercicio, fonte, direcao=None, mapa=None, anterior=Anterior.MSCE)` | cod. IBGE, exercício, `FonteSaldos`, **origem da coluna do exercício anterior** | `Resultado` com `matriz`, `mapa`, `procedencia`, `diagnostico` |
+| `Anterior.MSCE` (padrão) | — | coluna `exercicio_anterior` apurada da MSCE do **exercício anterior**, pelas mesmas regras |
+| `Anterior.MANUAL` | `{"L1": Decimal, "L2": Decimal, …}` informado pelo usuário | coluna `exercicio_anterior` preenchida com o informado, linha a linha |
+| `python -m app.cli.bf <cod_ibge> <exercicio> [--fonte siconfi\|publicsoft] [--anterior msce\|manual] [--anterior-arquivo <json>] [--json]` | idem | matriz em texto ou JSON |
 | `carregar(exercicio, demonstrativo="bf")` | exercício | `Mapa` com 80 linhas da edição 2024-06 |
+
+### Coluna do exercício anterior — duas origens, escolha do usuário
+
+Todas as 66 linhas do quadro principal têm duas colunas. A do exercício anterior **SHALL** aceitar
+duas origens, escolhidas por quem apura:
+
+1. **`MSCE` do exercício anterior** (padrão) — a coluna é apurada pelas mesmas regras do IPC 06, sobre
+   a matriz do exercício anterior. Medido em 2026-09-18: funciona, e já está no relatório de auditoria
+   de cada ente (`docs/entes-homologacao/<ente>/auditoria-bf-2025.md`, coluna "Exercício 2024").
+2. **Preenchimento manual** — o usuário informa os valores linha a linha. Existe porque o ente pode
+   ter publicado o exercício anterior com números que a MSC daquele ano não reproduz: em Recife, `L17`
+   e `L50` de 2024 saem 628.456.869,17 da matriz contra **0,00** publicado; em Cuitegi a divergência
+   alcança quase toda a coluna. Reapurar o passado não é sempre o que o ente quer declarar.
+
+Regras que valem nos dois casos:
+
+- A **procedência SHALL declarar** a origem usada (`msce_exercicio_anterior` ou `manual`) e, no modo
+  manual, a identidade do conjunto informado — sem isso, dois demonstrativos incomparáveis passam
+  por iguais e o cache serve a coluna errada.
+- No modo manual, valor **não informado** para uma linha é `None` (não apurada), nunca `0`.
+- No modo manual, a coluna **não entra** na conferência contra a MSC: o relatório de auditoria marca
+  aquelas células como `informado pelo usuário`, e as identidades do IPC 06 continuam sendo exigidas
+  sobre o que foi informado (`L33 = L1+L15+L21+L24+L29` também vale na coluna manual).
+- A coluna do exercício **atual** nunca é manual.
 
 ## Exemplo concreto
 
@@ -77,11 +103,11 @@ extraídos dos PDFs em 2026-09-18:
 
 | Ente | SIAFIC | Cobertura do quadro principal | Gabarito |
 |---|---|---|---|
-| Recife/PE (2611606) | Anexo XIII da Lei 4.320/64 | **66/66**, mesma ordem e nomenclatura do IPC 06 | `docs/gabarito-bf-recife-2025.md` |
-| Porto Alegre/RS (4314902) | Balanço Financeiro (**administração direta**) | 66/66; PDF é **imagem**, transcrito visualmente | `docs/gabarito-bf-porto-alegre-2025.md` |
-| João Pessoa/PB (2507507) | SIGEF/JPA | 66/66, com 4 vinculações próprias agregadas em `L10`/`L43` | `docs/gabarito-bf-jp-2025.md` |
-| Belo Horizonte/MG (3106200) | Consolidação Geral | 62/66 (sem RGPS e militares); **origem OCR** | `docs/gabarito-bf-bh-2025.md` |
-| Cuitegi/PB (2504801) | PublicSoft 2026.19.4.0 | 48/66, sem segregação do RPPS | `docs/gabarito-bf-cuitegi-2025.md` |
+| Recife/PE (2611606) | Anexo XIII da Lei 4.320/64 | **66/66**, mesma ordem e nomenclatura do IPC 06 | `docs/entes-homologacao/recife/gabarito-bf-2025.md` |
+| Porto Alegre/RS (4314902) | Balanço Financeiro (**administração direta**) | 66/66; PDF é **imagem**, transcrito visualmente | `docs/entes-homologacao/porto-alegre/gabarito-bf-2025.md` |
+| João Pessoa/PB (2507507) | SIGEF/JPA | 66/66, com 4 vinculações próprias agregadas em `L10`/`L43` | `docs/entes-homologacao/joao-pessoa/gabarito-bf-2025.md` |
+| Belo Horizonte/MG (3106200) | Consolidação Geral | 62/66 (sem RGPS e militares); **origem OCR** | `docs/entes-homologacao/<ente>/belo-horizonte/gabarito-bf-2025.md` |
+| Cuitegi/PB (2504801) | PublicSoft 2026.19.4.0 | 48/66, sem segregação do RPPS | `docs/entes-homologacao/cuitegi/gabarito-bf-2025.md` |
 
 **Recife e Porto Alegre são os entes de referência:** publicam as 66 linhas na ordem e na nomenclatura
 do IPC 06, e as 16 identidades internas do demonstrativo fecham em centavos nos dois. Porto Alegre traz
@@ -146,10 +172,31 @@ resíduo de fonte; falta `L33 = L66`, hoje a −228.702.095,15.
 **c) Conciliação de caixa** — ingressos menos dispêndios devem explicar a variação de caixa do
 exercício: 2.613.640.800,87 → 3.248.364.442,41, ou seja +634.723.641,54.
 
+## O que a apuração persegue (diretriz do PO, 2026-09-18)
+
+O alvo é a **fidelidade ao mapeamento do IPC 06** sobre a matriz de saldos — não o número publicado
+pelo ente. O BF do SIAFIC pode ter sido alterado na publicação e divergir da matriz que o próprio
+ente enviou à MSC. Portanto:
+
+1. Cada linha e cada coluna apurada **SHALL** refletir a regra canônica em `knowledge/rules/bf/`,
+   com as contas e os códigos da STN que a regra declara.
+2. Divergência contra o publicado **SHALL** virar **relatório de auditoria na pasta do ente**
+   (`docs/entes-homologacao/<ente>/auditoria-bf-2025.md`), nomeando a **linha e a coluna** do IPC 06,
+   o valor apurado e o valor publicado.
+3. Divergência **NÃO É** motivo para alterar regra canônica. Alteração em `knowledge/rules/bf/` só
+   com citação do texto do IPC 06.
+4. A conferência que vale sem depender do ente são as **identidades do próprio demonstrativo**
+   (`L1 = L2+L3+L11`, `L33 = L1+L15+L21+L24+L29`, …), apuradas sobre a matriz.
+
 ## Critérios de aceite
 
+- [ ] Coluna do exercício anterior apurada nas duas origens: por `MSCE` do exercício anterior e por
+      valores informados; a procedência declara qual foi usada, e o modo manual não é escolhido por
+      omissão em nenhum caminho.
+- [ ] Relatório de auditoria gerado na pasta de cada ente de homologação, com linha e coluna do
+      IPC 06 de toda divergência — nenhuma silenciada.
 - [ ] Homologação nos dois entes: cada linha apurada a partir da MSC pelas regras do IPC 06 é
-      confrontada com `docs/gabarito-bf-jp-2025.md` e `docs/gabarito-bf-cuitegi-2025.md`, na coluna
+      confrontada com `docs/entes-homologacao/joao-pessoa/gabarito-bf-2025.md` e `docs/entes-homologacao/cuitegi/gabarito-bf-2025.md`, na coluna
       do exercício apurado. Divergência é listada linha a linha, com hipótese e lado provável
       (regra, MSC do ente ou demonstrativo do ente) — nunca silenciada, nunca resolvida mudando a
       regra canônica sem base no IPC 06.
@@ -179,6 +226,10 @@ exercício: 2.613.640.800,87 → 3.248.364.442,41, ou seja +634.723.641,54.
 | Fonte MSC sem dados para o exercício | `diagnostico.sem_dados: true`, matriz vazia, sem exceção |
 | Exercício sem vigência do IPC 06 (< 2024) | `SemVigencia`, nomeando as edições disponíveis |
 | `id_tv` pedido que a fonte não suporta | erro explícito da fonte, não `ending_balance` por omissão |
+| Coluna anterior por `MSCE` e o exercício anterior sem dados na MSC | `diagnostico.sem_dados_exercicio_anterior: true`; coluna anterior toda `None`, coluna atual íntegra — nunca zero, nunca cair para o modo manual por omissão |
+| Coluna anterior `MANUAL` com linha faltando | aquela célula é `None` + `NaoApurada` com motivo `não informado`; as demais valem |
+| Coluna anterior `MANUAL` com linha inexistente no IPC 06 | erro explícito nomeando a linha recusada, antes de apurar |
+| Coluna anterior `MANUAL` que quebra `L33 = L1+L15+L21+L24+L29` | apura e publica, com a quebra no diagnóstico: o informado é do usuário, mas a identidade violada é declarada |
 
 ## Decisões pendentes do PO (gate desta proposta)
 
@@ -188,12 +239,53 @@ exercício: 2.613.640.800,87 → 3.248.364.442,41, ou seja +634.723.641,54.
 | ~~**G2**~~ | Saldo do exercício anterior (L30–L32) | **Medido:** `beginning_balance` responde nas classes 1 e 2 | (a) `beginning_balance` do exercício apurado — **confirmado** |
 | ~~**G3**~~ | Movimento credor/devedor (L27/L60) | **Medido:** em `2.1.8.8`, `period_change` traz C = 127.592.727,15 e D = 145.790.710,23; o acumulado traz só o líquido −18.197.983,08 | (a) `period_change` com C em L27 e D em L60 — **confirmado** |
 | ~~**G4**~~ | Coluna "Exercício Anterior" | **Medido:** 2024 completo baixa junto com 2025 em ~45 s no total, 8 classes × 3 tipos de valor | (a) apurar — **confirmado**, latência não é obstáculo |
-| **G5** | Efeito das 6 linhas bloqueadas nos totais | Se `L22` é `None`, `L21` é `None`, `L33` é `None` — e o BF inteiro não fecha | (a) linha bloqueada contribui como **parcela inexistente** (total soma as demais), com o bloqueio no diagnóstico **(recomendado)**; (b) propagar `None` até o total, e o BF só fecha quando F1/F2 forem decididos |
+| **G5** | Efeito das 6 linhas bloqueadas nos totais | **Medido em 2026-09-18:** sem a opção (a), Recife não fecha nenhum total; com ela, 42/66 linhas batem em centavos | Se `L22` é `None`, `L21` é `None`, `L33` é `None` — e o BF inteiro não fecha | (a) linha bloqueada contribui como **parcela inexistente** (total soma as demais), com o bloqueio no diagnóstico **(recomendado)**; (b) propagar `None` até o total, e o BF só fecha quando F1/F2 forem decididos |
 | **G6** | Renomear `app/domain/bo/` → `app/domain/nucleo/` | Evita duplicar 500 linhas de motor entre BO e BF | (a) renomear nesta change **(recomendado)**; (b) manter e importar `MapaBO` no BF; (c) duplicar o motor em `app/domain/bf/` |
-| **G7** | Critério de direção do saldo no BF | **Medido:** com a direção da coluna (critério do BO), `L1` sai 5.872.854.713,27; com a direção **por conta**, sai 5.117.875.296,33 — exatamente o publicado. O par `6.2.1.2 (+) / 6.2.1.3 (−)` do IPC 06 já traz o sinal na regra | (a) direção por conta no BF, mantendo a direção de coluna no BO, escolhida pela regra **(recomendado)**; (b) direção por conta nos dois — exige remedir o BO inteiro |
+| ~~**G7**~~ | Critério de direção do saldo no BF | **Confirmado por medição em 3 entes (2026-09-18):** com direção por conta, todas as linhas por fonte fecham | **Medido:** com a direção da coluna (critério do BO), `L1` sai 5.872.854.713,27; com a direção **por conta**, sai 5.117.875.296,33 — exatamente o publicado. O par `6.2.1.2 (+) / 6.2.1.3 (−)` do IPC 06 já traz o sinal na regra | (a) direção por conta no BF, mantendo a direção de coluna no BO, escolhida pela regra **(recomendado)**; (b) direção por conta nos dois — exige remedir o BO inteiro |
 | ~~**G9**~~ | Par (matriz, tipo de saldo) | **Decidido pelo PO em 2026-09-14:** todos os demonstrativos sobre a **matriz de encerramento (`MSCE`)**; tipo de saldo **abertura** no BO, BF, DVP e DFC, e **encerramento** no BP. Medido: `MSCC`/encerramento ≡ `MSCE`/abertura no BO, **0 divergências em 337 células** em Cuitegi **e** em João Pessoa | — |
 | **G10** | **Periodicidade mensal além da anual, em todos os anexos** | Hoje `MES_DA_DCA = 12` é constante no serviço do BO, a chave de cache não tem mês e a decisão C1 do PO fixou dezembro. Mensal muda serviço, carregador, chave de cache, job e rota — e muda o significado do tipo de saldo: num mês qualquer, `ending_balance` é posição acumulada e `period_change` é o movimento do mês | (a) mês como parâmetro em toda a cadeia, com 12 como padrão **(a definir com o PO)**; (b) manter anual e tratar mensal em change própria |
-| **G8** | Como apurar `L22` e `L55` sem conta de controle | **Medido:** as classes 7 e 8 do ente só têm controles de disponibilidade e programação financeira — nenhuma conta de movimentação de investimento. Já `1.2.1.3` tem 374.780.440,97 de movimento credor no período, e `1.1.4` está zerada | (a) apurar pela **variação patrimonial dos investimentos** (`1.1.4` + `1.2.1.3`): movimento credor → `L22`, devedor → `L55` **(recomendado)**; (b) manter `review_required` e entregar o BF com desequilíbrio declarado |
+| **G8** | Como apurar `L22` e `L55` sem conta de controle | **Hipótese (a) refutada em 2026-09-18:** busca reversa em 7 combinações de matriz e tipo de saldo, todos os prefixos de conta, saldo/créditos/débitos — nenhum valor publicado por Recife existe na MSC. Recomendação passa a ser (b) | **Medido:** as classes 7 e 8 do ente só têm controles de disponibilidade e programação financeira — nenhuma conta de movimentação de investimento. Já `1.2.1.3` tem 374.780.440,97 de movimento credor no período, e `1.1.4` está zerada | (a) apurar pela **variação patrimonial dos investimentos** (`1.1.4` + `1.2.1.3`): movimento credor → `L22`, devedor → `L55` **(recomendado)**; (b) manter `review_required` e entregar o BF com desequilíbrio declarado |
+
+## Medição de 2026-09-18 — `docs/evidencia-bf-medicao-2026-09-18.md`
+
+Apuração completa pelas regras do IPC 06 sobre a MSC do SICONFI, com o PCASP da STN, confrontada
+com os gabaritos dos SIAFIC:
+
+| Ente | Batem em centavos | Divergem | Não apuráveis | `L33 − L66` do apurado |
+|---|---|---|---|---|
+| Recife/PE | **42 / 66** | 18 (12 por propagação) | 6 | 18.025.391,58 |
+| João Pessoa/PB | **40 / 66** | 20 | 6 | −972.846.807,25 |
+| Porto Alegre/RS | 17 / 65 | 43 | 5 | 356.960.596,03 |
+
+O que a medição fechou, e que muda esta proposta:
+
+- **G1, G7 confirmados**; **G2 resolvido de forma diferente da prevista**: `L29`–`L32` são o
+  **exercício anterior**, não um tipo de saldo distinto — MSCE/abertura de 2024, conta `1.1.1`
+  (802.570.332,31) mais `1.1.3.5.1` (717.721,98), igual aos 803.288.054,29 publicados por Recife.
+- **O tipo de saldo é por linha, não por demonstrativo** (refina G9): `L25`/`L26` só existem no
+  saldo de **encerramento** — as contas `5.3.1.7` e `5.3.2.7` valem lá exatamente o publicado.
+- **G8 refutado por medição:** nenhum dos valores que Recife publica em `L22`, `L28`, `L55`, `L61`,
+  `L27` e `L60` existe na MSC, em nenhuma das 7 combinações, em nenhum prefixo de conta, como saldo,
+  crédito ou débito — e a busca foi validada por controle (acha `L16` e `L25`). A hipótese de apurar
+  `L22`/`L55` por `1.1.4` + `1.2.1.3` não se sustenta: `1.1.4` varia +710.419.938,88 e `1.2.1.3` não
+  tem movimento no ente.
+- **Porto Alegre não homologa no recorte atual:** a MSC é consolidada e o PDF é da administração
+  direta — `L11`–`L14` saem 2,27 bi contra zero publicado.
+- **A granularidade de JP não é 1:1, mas o bloco fecha em 0,00:** `L8+L9+L10` = 580.159.482,56 e
+  `L41+L42+L43` = 529.816.473,72, iguais à soma dos rótulos do ente.
+
+### G11 — escopo do item 38 (intraorçamentárias)
+
+**Novo, aberto por medição em 2026-09-18.** A policy `ipc06.exclusao_de_intraorcamentarias` declara o
+conceito sem os códigos. Aplicada pela interpretação natural (receita das categorias 7 e 8, despesa
+com modalidade 91), ela **quebra linhas que batiam em centavos**: `L1` e `L34` de Belo Horizonte e de
+João Pessoa conferem sem a exclusão e divergem com ela. Em Cuitegi não há intraorçamentária alguma.
+
+| Opção | Consequência |
+|---|---|
+| (a) **não aplicar** e declarar no relatório **(recomendado)** | mantém 4 linhas que conferem em 2 entes; a policy fica declarada e não executada, com a medição anexa |
+| (b) aplicar por categoria 7/8 e modalidade 91 | quebra `L1` e `L34` em BH e JP, sem nenhum ente onde melhore de forma inequívoca |
+| (c) definir o escopo com o STN antes de implementar | correto no longo prazo; depende de terceiro |
 
 ## Restrições e riscos
 
@@ -220,7 +312,9 @@ exercício: 2.613.640.800,87 → 3.248.364.442,41, ou seja +634.723.641,54.
 
 ## Aprovação do PO
 
-- [ ] PO aprovou esta proposta em ______ — **gate para a fase PLAN/ARCH**
+> Resumo das decisões, com a evidência de cada uma, em **`docs/decisoes-bf-para-po-2026-09-18.md`**.
+
+- [x] PO autorizou o fechamento em 2026-09-18, nesta sessão
 - [x] G1, G2, G3 e G4 **resolvidos por medição** em 2026-09-14 (`docs/evidencia-bf-jp-2025.md`)
 - [x] **G9 decidido em 2026-09-14** — `MSCE`, saldo de abertura no BF
 - [ ] PO decidiu G5, G6, G7, G8 e **G10** (periodicidade mensal)

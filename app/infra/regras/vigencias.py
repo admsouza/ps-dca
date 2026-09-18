@@ -49,7 +49,8 @@ class RepoVigencias(Protocol):
 
 
 def publicar(repo: RepoVigencias, *, anexo: str, ano: int, mes: int = 1,
-             linhas: list[dict], origem: str, usuario_id: int | None = None) -> dict:
+             linhas: list[dict], origem: str, usuario_id: int | None = None,
+             documento: str | None = None) -> dict:
     """Acrescenta uma vigência. Nunca sobrescreve a anterior."""
     if origem not in ORIGENS:
         raise ValueError(f"origem inválida: {origem!r} — esperado um de {', '.join(ORIGENS)}")
@@ -61,6 +62,9 @@ def publicar(repo: RepoVigencias, *, anexo: str, ano: int, mes: int = 1,
         "ano_vigencia": ano,
         "mes_vigencia": mes,
         "versao": f"{ano}-{mes:02d}",
+        # Qual norma rege este anexo. Sem isso, o mapa carregado do banco declararia `IPC 07` para
+        # todos — e o BF, que é IPC 06, publicaria procedência errada.
+        "documento": documento,
         "linhas": list(linhas),
         "origem": origem,
         "criado_em": datetime.now(UTC).isoformat(),
@@ -116,22 +120,26 @@ def carregar(repo: RepoVigencias, anexo: str, exercicio: int) -> MapaBO:
     """
     from app.infra.regras.carregador import KNOWLEDGE, _hashes_das_tabelas
 
+    from app.services.pipeline.registry import anexo as descrever
+
     vigente = resolver(repo, anexo, exercicio)
-    linhas = _completar_apresentacao(tuple(_linha(dado) for dado in vigente["linhas"]), exercicio)
+    linhas = _completar_apresentacao(tuple(_linha(dado) for dado in vigente["linhas"]), exercicio,
+                                     descrever(anexo).base_canonica)
     tabelas = _hashes_das_tabelas(KNOWLEDGE)
     # Hash do mapa efetivo (já completado). Senão a semente INSERT-only antiga não invalida o cache
     # quando a transcrição ganha coluna — medido: L26 sem `saldo` no jsonb, YAML já tinha.
     efetivo = {**vigente, "linhas": [_achatar(linha) for linha in linhas]}
     return MapaBO(
         linhas=linhas,
-        vigencia=Vigencia(vigente.get("documento", "IPC 07"), vigente["versao"], exercicio),
+        vigencia=Vigencia(vigente.get("documento") or "IPC 07", vigente["versao"], exercicio),
         versao_regras=_hash_do_conteudo(efetivo, tabelas),
         tabelas_stn=tabelas,
     )
 
 
-def _completar_apresentacao(linhas: tuple[Linha, ...], exercicio: int) -> tuple[Linha, ...]:
-    """Completa apresentação e colunas ausentes com a transcrição versionada.
+def _completar_apresentacao(linhas: tuple[Linha, ...], exercicio: int,
+                            demonstrativo: str = "bo") -> tuple[Linha, ...]:
+    """Completa apresentação e colunas ausentes com a transcrição versionada **do anexo**.
 
     A tabela é **INSERT-only**: a semente de 2020-01 não é reescrita no boot. Completar aqui
     evita que uma coluna nova no YAML (ex.: `L26.saldo`) fique de fora da apuração.
@@ -140,7 +148,8 @@ def _completar_apresentacao(linhas: tuple[Linha, ...], exercicio: int) -> tuple[
     do banco, e nunca falha a carga.
     """
     try:
-        da_norma = {linha.id: linha for linha in carregar_do_yaml(exercicio).linhas}
+        da_norma = {linha.id: linha
+                    for linha in carregar_do_yaml(exercicio, demonstrativo=demonstrativo).linhas}
     except Exception:
         logger.warning("transcrição indisponível para completar vigência", exc_info=True)
         return linhas
@@ -176,29 +185,47 @@ def _completar_apresentacao(linhas: tuple[Linha, ...], exercicio: int) -> tuple[
 
 
 def semear(repo: RepoVigencias, base: Path | None = None, exercicio: int | None = None) -> int:
-    """Publica o mapeamento versionado como vigência de origem `seed-yaml`.
+    """Publica o mapeamento versionado de **cada anexo implementado**, como `seed-yaml`.
 
     Idempotente: vigência já publicada é mantida — o `PRIMARY KEY` recusa a segunda, e a recusa é
     tratada como "já semeado", não como erro de boot.
+
+    Era só o Balanço Orçamentário. Com o BF entregue, o anexo não semeado apura pelo YAML e avisa a
+    cada job — e, pior, os dois anexos passariam a ter origens de regra diferentes no dia em que
+    alguém publicasse uma correção pela via administrativa, sem nada declarar isso.
     """
-    from app.services.pipeline.registry import ANEXO_BO
+    from app.services.pipeline.registry import REGISTRY
 
-    mapa = carregar_do_yaml(exercicio or datetime.now(UTC).year, base=base)
-    ano = _ano_da_edicao(mapa.vigencia.edicao)
+    ano_pedido = exercicio or datetime.now(UTC).year
+    publicadas = 0
+    for anexo in REGISTRY:
+        if anexo.servico is None:
+            continue                       # anexo sem serviço não tem o que semear
+        try:
+            mapa = carregar_do_yaml(ano_pedido, base=base, demonstrativo=anexo.base_canonica)
+        except Exception:
+            # Transcrição ausente ou sem edição que cubra o ano: um anexo não pode impedir os
+            # outros de serem semeados.
+            logger.warning("sem transcrição para semear %s/%s — anexo pulado",
+                           anexo.codigo, ano_pedido, exc_info=True)
+            continue
 
-    try:
-        publicar(
-            repo,
-            anexo=ANEXO_BO,
-            ano=ano,
-            mes=1,
-            linhas=[_achatar(linha) for linha in mapa.linhas],
-            origem="seed-yaml",
-        )
-    except PublicacaoDestrutiva:
-        logger.info("semente já aplicada para %s %s — nada a fazer", ANEXO_BO, ano)
-        return 0
-    return 1
+        ano = _ano_da_edicao(mapa.vigencia.edicao)
+        try:
+            publicar(
+                repo,
+                anexo=anexo.codigo,
+                ano=ano,
+                mes=1,
+                linhas=[_achatar(linha) for linha in mapa.linhas],
+                origem="seed-yaml",
+                documento=mapa.vigencia.documento,
+            )
+        except PublicacaoDestrutiva:
+            logger.info("semente já aplicada para %s %s — nada a fazer", anexo.codigo, ano)
+            continue
+        publicadas += 1
+    return publicadas
 
 
 # ─── tradução entre o shape achatado (jsonb) e o modelo do domínio ───────────

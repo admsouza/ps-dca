@@ -1,0 +1,356 @@
+"""Apuração do Quadro Principal do Balanço Financeiro — IPC 06, ed. 2024-06.
+
+Mesmo fluxo do Balanço Orçamentário: síncrono, puro, sem sessão de banco nem cliente HTTP
+construído por quem chama — a mesma função serve à rota, ao worker e ao CLI.
+
+O que difere do BO, e por quê (tudo medido em 2026-09-18,
+`docs/evidencia-bf-medicao-2026-09-18.md`):
+
+1. **Direção do saldo por conta**, não da coluna (G7): a regra do IPC 06 já traz o sinal do par
+   redutor, e com a direção da coluna `L1` de Recife erra em 754 milhões.
+2. **A origem do saldo é por linha** (N1): quase tudo vem da abertura do exercício, mas `L25` e
+   `L26` só existem no **encerramento** — é quando a inscrição de restos a pagar acontece — e
+   `L29`–`L32` são o **exercício anterior**, porque a abertura do exercício já traz a posição
+   final, que é `L62`.
+3. **Seis linhas não têm conta declarada no IPC 06** e ficam não apuradas, nunca zero (G8-b).
+4. **O item 38 não é aplicado** (G11-a): a policy não diz quais códigos caracterizam a
+   transferência intra, e a interpretação natural quebra `L1` e `L34` em dois entes que batiam
+   em centavos. Fica declarada e não executada.
+"""
+from __future__ import annotations
+
+import time
+from dataclasses import dataclass, field
+from decimal import Decimal
+from enum import Enum
+
+from app.domain.bo.matriz import apurar as apurar_matriz
+from app.domain.bo.modelo import Linha, MapaBO, NaoApurada, Registro, Residuo
+from app.infra.msc.fonte import COMPETENCIA_DE_ENCERRAMENTO, TipoSaldo, fonte_de
+from app.infra.pcasp.natureza import do_pcasp
+from app.infra.regras.carregador import carregar
+
+DEMONSTRATIVO = "BF"
+QUADRO_PRINCIPAL = "QUADRO_PRINCIPAL"
+QUADRO_ANEXO = "QUADRO_ANEXO"
+COLUNA_ATUAL = "exercicio_atual"
+COLUNA_ANTERIOR = "exercicio_anterior"
+SUFIXO_ATUAL = "_atual"
+SUFIXO_ANTERIOR = "_anterior"
+
+# Origem do saldo por linha. Não é preferência: é onde o saldo existe (evidência §N1 e §G2).
+DO_ENCERRAMENTO = frozenset({"L25", "L26"})
+DO_EXERCICIO_ANTERIOR = frozenset({"L29", "L30", "L31", "L32"})
+
+POLICIES_NAO_APLICADAS = (
+    "item 38 (exclusão de intraorçamentárias): a policy não declara quais códigos caracterizam a "
+    "transferência intra acompanhada de execução; a interpretação por categoria 7/8 e modalidade "
+    "91 foi medida e quebra L1 e L34 em Belo Horizonte e João Pessoa (G11-a)",
+)
+
+
+class Anterior(Enum):
+    """De onde vem a coluna do exercício anterior."""
+
+    MSCE = "msce_exercicio_anterior"
+    MANUAL = "manual"
+
+
+class LinhaDesconhecida(ValueError):
+    """Valor informado para uma linha que o IPC 06 não declara. Recusado antes de apurar."""
+
+
+@dataclass(frozen=True)
+class Procedencia:
+    documento: str
+    edicao: str
+    exercicio: int
+    versao_regras: str
+    regras_aplicadas: int
+    tabelas_stn: dict[str, str] = field(default_factory=dict)
+    matriz: str = ""
+    tipo_saldo: str = ""
+    competencia: int = COMPETENCIA_DE_ENCERRAMENTO
+    classes: tuple[int, ...] = ()
+    # O que muda o valor tem de estar declarado, ou duas apurações incomparáveis passam por iguais.
+    origens_por_linha: dict[str, str] = field(default_factory=dict)
+    origem_exercicio_anterior: str = Anterior.MSCE.value
+
+
+@dataclass
+class Diagnostico:
+    nao_apuradas: list[NaoApurada] = field(default_factory=list)
+    residuos: list[Residuo] = field(default_factory=list)
+    # `L14 (c)` do anexo contra `L1` do principal: a mesma receita líquida por dois caminhos.
+    # Diferença é reportada, nunca ajustada — em Recife ela é a receita sem fonte de recursos.
+    conferencia_anexo: dict | None = None
+    # `L33 TOTAL (VI)` contra `L66 TOTAL (XII)`, por coluna. Equilíbrio é a propriedade que define
+    # o demonstrativo; diferença é **medida**, nunca ajustada para forçar o fechamento.
+    equilibrio: dict[str, Decimal] = field(default_factory=dict)
+    duracao_ms: int = 0
+    sem_dados: bool = False
+    sem_dados_exercicio_anterior: bool = False
+    policies_nao_aplicadas: tuple[str, ...] = POLICIES_NAO_APLICADAS
+
+
+@dataclass
+class Resultado:
+    matriz: dict[str, dict[str, Decimal | None]]
+    procedencia: Procedencia
+    diagnostico: Diagnostico
+    mapa: MapaBO | None = None
+
+
+def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None = None,
+           competencia: int = COMPETENCIA_DE_ENCERRAMENTO,
+           anterior: Anterior = Anterior.MSCE,
+           valores_anteriores: dict[str, Decimal] | None = None) -> Resultado:
+    """Apura as 66 linhas do quadro principal, nas duas colunas."""
+    inicio = time.monotonic()
+    mapa = mapa or _mapa(exercicio)
+    direcao = direcao or do_pcasp()
+    origem = fonte_de(DEMONSTRATIVO, competencia)
+    por_codigo = {linha.codigo: linha for linha in mapa.linhas}
+
+    if anterior is Anterior.MANUAL:
+        _validar_informados(valores_anteriores or {}, por_codigo)
+
+    atual, nao_apuradas, sem_dados, registros_do_exercicio = _apurar_exercicio(
+        mapa, ente, exercicio, competencia, fonte, direcao, origem)
+
+    sem_dados_anterior = False
+    if anterior is Anterior.MSCE:
+        coluna_anterior, _, sem_dados_anterior, _ = _apurar_exercicio(
+            mapa, ente, exercicio - 1, competencia, fonte, direcao, origem)
+    else:
+        informados = valores_anteriores or {}
+        coluna_anterior = {linha.id: {COLUNA_ATUAL: informados.get(linha.codigo)}
+                           for linha in mapa.linhas}
+        nao_apuradas += [
+            NaoApurada(linha.id, COLUNA_ANTERIOR, "-", "não informado no preenchimento manual")
+            for linha in mapa.linhas
+            if linha.quadro == QUADRO_PRINCIPAL and linha.codigo not in informados
+        ]
+
+    matriz = _montar(mapa, atual, coluna_anterior, anterior)
+
+    return Resultado(
+        mapa=mapa,
+        matriz=matriz,
+        procedencia=Procedencia(
+            documento=mapa.vigencia.documento,
+            edicao=mapa.vigencia.edicao,
+            exercicio=exercicio,
+            versao_regras=mapa.versao_regras,
+            regras_aplicadas=len(mapa.linhas),
+            tabelas_stn=dict(mapa.tabelas_stn),
+            matriz=str(origem.matriz),
+            tipo_saldo=str(origem.tipo_saldo),
+            competencia=competencia,
+            classes=origem.classes,
+            origens_por_linha=_origens(mapa, origem),
+            origem_exercicio_anterior=anterior.value,
+        ),
+        diagnostico=Diagnostico(
+            nao_apuradas=nao_apuradas,
+            residuos=_residuos_de_fonte(mapa, registros_do_exercicio),
+            conferencia_anexo=_conferir_anexo(mapa, matriz),
+            equilibrio=_equilibrio(mapa, matriz),
+            duracao_ms=int((time.monotonic() - inicio) * 1000),
+            sem_dados=sem_dados,
+            sem_dados_exercicio_anterior=sem_dados_anterior,
+        ),
+    )
+
+
+# ─── apuração de um exercício, combinando as três origens ────────────────────
+
+def _apurar_exercicio(mapa, ente, exercicio, competencia, fonte, direcao, origem):
+    """Devolve `(valores, nao_apuradas, sem_dados, registros)` para um exercício."""
+    do_exercicio = _ler(fonte, ente, exercicio, competencia, origem, origem.tipo_saldo)
+    do_encerramento = _ler(fonte, ente, exercicio, competencia, origem, TipoSaldo.ENCERRAMENTO)
+    do_anterior = _ler(fonte, ente, exercicio - 1, competencia, origem, origem.tipo_saldo)
+
+    por_regra: dict[str, list[Registro]] = {}
+    for linha in mapa.linhas:
+        if linha.codigo in DO_ENCERRAMENTO:
+            por_regra[linha.id] = do_encerramento
+        elif linha.codigo in DO_EXERCICIO_ANTERIOR:
+            por_regra[linha.id] = do_anterior
+
+    matriz = apurar_matriz(mapa, do_exercicio, direcao, por_conta=True,
+                           registros_por_regra=por_regra)
+    valores, nao_apuradas = _sem_conta_declarada(mapa, matriz)
+    return valores, nao_apuradas, not do_exercicio, do_exercicio
+
+
+def _ler(fonte, ente, exercicio, competencia, origem, tipo_saldo) -> list[Registro]:
+    registros: list[Registro] = []
+    for classe in origem.classes:
+        registros.extend(fonte.registros(
+            ente=ente, ano=exercicio, mes=competencia, classe=classe,
+            matriz=origem.matriz, tipo_saldo=tipo_saldo,
+        ))
+    return registros
+
+
+def _sem_conta_declarada(mapa: MapaBO, matriz):
+    """Linha sem conta no IPC 06 é **não apurada**, não zero (G8-b).
+
+    O motor devolve `0,00` para coluna sem conta — correto para conta declarada e sem
+    escrituração, errado para linha que a norma não mapeou. A diferença importa: zero afirma
+    que não houve movimento; aqui não se sabe.
+    """
+    valores = dict(matriz.valores)
+    nao_apuradas = list(matriz.nao_apuradas)
+    for linha in mapa.linhas:
+        if linha.composta or _tem_conta(linha):
+            continue
+        valores[linha.id] = {coluna.id: None for coluna in linha.colunas}
+        nao_apuradas += [
+            NaoApurada(linha.id, coluna.id, "-",
+                       "linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)")
+            for coluna in linha.colunas
+        ]
+    return valores, nao_apuradas
+
+
+def _tem_conta(linha: Linha) -> bool:
+    return any(coluna.contas or coluna.derivada for coluna in linha.colunas)
+
+
+# ─── apoio ───────────────────────────────────────────────────────────────────
+
+def _mapa(exercicio: int) -> MapaBO:
+    """Os dois quadros do BF — o principal e o anexo — num mapa só.
+
+    Separá-los em dois serviços duplicaria a leitura da MSC: as mesmas classes, o mesmo ente, o
+    mesmo exercício, para produzir dois pedaços do mesmo demonstrativo.
+    """
+    return carregar(exercicio=exercicio, demonstrativo="bf")
+
+
+def _validar_informados(informados: dict[str, Decimal], por_codigo: dict[str, Linha]) -> None:
+    desconhecidas = sorted(set(informados) - set(por_codigo))
+    if desconhecidas:
+        raise LinhaDesconhecida(
+            f"linhas informadas que o IPC 06 não declara: {', '.join(desconhecidas)}")
+
+
+def _origens(mapa: MapaBO, origem) -> dict[str, str]:
+    """Qual saldo cada linha leu — parte da procedência, porque muda o valor."""
+    saida = {}
+    for linha in mapa.linhas:
+        if linha.codigo in DO_ENCERRAMENTO:
+            saida[linha.codigo] = f"{origem.matriz}/{TipoSaldo.ENCERRAMENTO} do exercício"
+        elif linha.codigo in DO_EXERCICIO_ANTERIOR:
+            saida[linha.codigo] = f"{origem.matriz}/{origem.tipo_saldo} do exercício anterior"
+        else:
+            saida[linha.codigo] = f"{origem.matriz}/{origem.tipo_saldo} do exercício"
+    return saida
+
+
+# ─── montagem das colunas e conferências ─────────────────────────────────────
+
+def _montar(mapa: MapaBO, atual: dict, anterior_valores: dict, anterior: Anterior) -> dict:
+    """Junta as colunas do exercício e do exercício anterior, linha a linha.
+
+    O par de colunas é dado pelo **sufixo** declarado na regra: `_atual` e `_anterior`. Vale para
+    os dois quadros — no principal são `exercicio_atual`/`exercicio_anterior`, no anexo são três
+    pares (receita, deduções e saldo). A coluna `_anterior` recebe o valor da `_atual`
+    correspondente, apurada no exercício anterior.
+    """
+    matriz: dict[str, dict[str, Decimal | None]] = {}
+    for linha in mapa.linhas:
+        celulas: dict[str, Decimal | None] = {}
+        for coluna in _colunas_de(linha, atual):
+            if coluna.endswith(SUFIXO_ANTERIOR):
+                par = coluna[: -len(SUFIXO_ANTERIOR)] + SUFIXO_ATUAL
+                lido = anterior_valores.get(linha.id) or {}
+                # No preenchimento manual só o quadro principal é informado; o anexo fica sem.
+                celulas[coluna] = lido.get(COLUNA_ATUAL if anterior is Anterior.MANUAL else par)
+            else:
+                celulas[coluna] = (atual.get(linha.id) or {}).get(coluna)
+        matriz[linha.id] = celulas
+    return matriz
+
+
+def _colunas_de(linha: Linha, atual: dict) -> tuple[str, ...]:
+    """Colunas declaradas na linha; as compostas herdam as das filhas, já apuradas."""
+    if linha.colunas:
+        return tuple(coluna.id for coluna in linha.colunas)
+    return tuple((atual.get(linha.id) or {}).keys())
+
+
+def _conferir_anexo(mapa: MapaBO, matriz: dict) -> dict | None:
+    """`L14 (c)` do anexo contra `L1` do principal — a mesma receita líquida por dois caminhos.
+
+    Diferente é achado, não erro: em Recife a diferença é exatamente a receita sem fonte de
+    recursos na MSC, que o principal perde por compor `L1` das linhas por fonte.
+    """
+    por_quadro = {(linha.quadro, linha.codigo): linha.id for linha in mapa.linhas}
+    anexo = por_quadro.get((QUADRO_ANEXO, "L14"))
+    principal = por_quadro.get((QUADRO_PRINCIPAL, "L1"))
+    if anexo is None or principal is None:
+        return None
+    do_anexo = (matriz.get(anexo) or {}).get("saldo_atual")
+    do_principal = (matriz.get(principal) or {}).get(COLUNA_ATUAL)
+    if do_anexo is None or do_principal is None:
+        return None
+    return {"anexo_l14_saldo": do_anexo, "principal_l1": do_principal,
+            "diferenca": do_anexo - do_principal}
+
+
+def _residuos_de_fonte(mapa: MapaBO, registros) -> list[Residuo]:
+    """Receita que nenhuma linha por fonte captura — declarada, nunca rateada.
+
+    Medido em Recife: 450.202.814,72 em dois registros da conta sintética de receita orçamentária,
+    sem fonte de recursos na MSC. O ente os classificou por critério próprio; a apuração não tem
+    como saber qual, e inventar um rateio seria afirmar uma vinculação que ninguém declarou.
+
+    Qual conta é essa vem da base canônica, nunca daqui: conta contábil literal no código cria uma
+    segunda fonte de regra, e é o que o teste `test_nenhuma_conta_literal_no_apurador` proíbe.
+    """
+    from app.domain.bo.saldo import _casa, atende
+
+    do_anexo = [linha for linha in mapa.linhas
+                if linha.quadro == QUADRO_ANEXO and linha.filtros]
+    if not do_anexo:
+        return []
+
+    # As contas vêm da própria base canônica — a coluna de receita do anexo declara quais são.
+    # Nenhuma conta literal no código: a regra é o único lugar onde conta contábil aparece.
+    contas = {conta.cc for linha in do_anexo for coluna in linha.colunas
+              if coluna.id.startswith("receita") for conta in coluna.contas}
+
+    total = Decimal("0.00")
+    for registro in registros:
+        if not any(_casa(registro.conta, conta) for conta in contas):
+            continue
+        if any(atende(registro, linha.filtros) for linha in do_anexo):
+            continue
+        total += registro.valor if registro.natureza == "C" else -registro.valor
+    return [Residuo("fonte_recurso", "(sem fonte na MSC)", total)] if total else []
+
+
+def _equilibrio(mapa: MapaBO, matriz: dict) -> dict[str, Decimal]:
+    """`L33 − L66` em cada coluna do quadro principal.
+
+    Zero é o esperado: ingressos e dispêndios fecham por construção quando todas as linhas existem.
+    Diferente de zero é **achado**, e fica declarado — as seis linhas sem conta no IPC 06 e a
+    receita sem fonte de recursos aparecem aqui como resíduo, não como ajuste.
+    """
+    por_codigo = {linha.codigo: linha.id for linha in mapa.linhas
+                  if linha.quadro == QUADRO_PRINCIPAL}
+    ingressos, dispendios = por_codigo.get("L33"), por_codigo.get("L66")
+    if ingressos is None or dispendios is None:
+        return {}
+
+    saida: dict[str, Decimal] = {}
+    for coluna in (COLUNA_ATUAL, COLUNA_ANTERIOR):
+        total_ingressos = (matriz.get(ingressos) or {}).get(coluna)
+        total_dispendios = (matriz.get(dispendios) or {}).get(coluna)
+        if total_ingressos is None or total_dispendios is None:
+            continue
+        saida[coluna] = total_ingressos - total_dispendios
+    return saida

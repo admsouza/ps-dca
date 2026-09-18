@@ -145,7 +145,8 @@ class FilaArq:
         self._pool = pool
         self._fila = fila or chaves.FILA
 
-    def enfileirar(self, ente: str, exercicio: int, anexo: str, job_id: str) -> None:
+    def enfileirar(self, ente: str, exercicio: int, anexo: str, job_id: str,
+                   **parametros) -> None:
         import asyncio
 
         from app.services.pipeline.registry import anexo as descrever
@@ -158,6 +159,7 @@ class FilaArq:
             ente=ente,
             exercicio=exercicio,
             anexo=anexo,
+            **parametros,
         )
         # A rota é async e o service é síncrono: quem chama de dentro do loop usa
         # `FilaArqAsync.enfileirar`. Aqui cobrimos o caso do CLI e de scripts.
@@ -183,7 +185,8 @@ class FilaArqAsync:
         self._fila = fila or chaves.FILA
         self.pendente = None
 
-    def enfileirar(self, ente: str, exercicio: int, anexo: str, job_id: str) -> None:
+    def enfileirar(self, ente: str, exercicio: int, anexo: str, job_id: str,
+                   **parametros) -> None:
         from app.services.pipeline.registry import anexo as descrever
 
         self.pendente = self._pool.enqueue_job(
@@ -194,4 +197,5 @@ class FilaArqAsync:
             ente=ente,
             exercicio=exercicio,
             anexo=anexo,
+            **parametros,
         )

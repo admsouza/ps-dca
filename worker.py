@@ -26,8 +26,13 @@ logging.basicConfig(
 logger = logging.getLogger("dca.worker")
 
 
-async def apurar_anexo(ctx: dict, *, job_id: str, ente: str, exercicio: int, anexo: str) -> None:
+async def apurar_anexo(ctx: dict, *, job_id: str, ente: str, exercicio: int, anexo: str,
+                       **parametros) -> None:
     """Job único, parametrizado por anexo.
+
+    `parametros` são as escolhas do pedido que mudam o valor — competência e, no BF, a origem da
+    coluna do exercício anterior. Chegam do enfileiramento e são repassadas ao serviço do anexo
+    que as aceitar; o que não for da assinatura dele é descartado antes da chamada.
 
     Roda em thread: a apuração é síncrona e CPU/IO-bound, e executá-la no event loop travaria o
     heartbeat do `arq` — o job apareceria como perdido.
@@ -49,6 +54,7 @@ async def apurar_anexo(ctx: dict, *, job_id: str, ente: str, exercicio: int, ane
             token=credencial,
             cache=ctx.get("cache_msc"),
             repo_vigencias=RepositorioVigencias(db),
+            parametros=parametros,
         )
         versao = apuracao.versao_regras(exercicio, anexo, RepositorioVigencias(db))
 

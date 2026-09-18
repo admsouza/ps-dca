@@ -24,6 +24,10 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import NamedTuple
 
+# Competência do **domínio** para o demonstrativo anual. O número que cada API usa para chegar à
+# matriz de encerramento é outro assunto, e mora no adapter: o SICONFI a identifica por
+# `co_tipo_matriz=MSCE` na própria competência 12 (medido: `me_referencia=13` devolve zero
+# registros nos 4 entes de homologação), enquanto a PublicSoft usa a competência especial 13.
 COMPETENCIA_DE_ENCERRAMENTO = 12
 
 

@@ -63,7 +63,29 @@ class Repo(Protocol):
 
 
 class Fila(Protocol):
-    def enfileirar(self, ente: str, exercicio: int, anexo: str, job_id: str) -> None: ...
+    def enfileirar(self, ente: str, exercicio: int, anexo: str, job_id: str,
+                   **parametros) -> None: ...
+
+
+def identidade_do_pedido(*, anexo: str, competencia: int = 12,
+                         origem_anterior: str = "", valores_anteriores=None,
+                         **_ignorados) -> str:
+    """O que, além de ente/exercício/anexo, distingue dois resultados do mesmo demonstrativo.
+
+    `versao_api` e `versao_regras` invalidam o cache quando **código** ou **regra** mudam. Há
+    escolhas que mudam o **valor** sem mudar nenhum dos dois: a competência apurada e, no BF, a
+    origem da coluna do exercício anterior — apurada da matriz do ano anterior ou informada à mão.
+    Sem entrar na identidade, um resultado com a coluna preenchida manualmente seria servido a quem
+    pediu a coluna apurada, e a diferença não apareceria em lugar nenhum.
+    """
+    import hashlib
+
+    partes = [validar_anexo(anexo), f"c{int(competencia)}", origem_anterior or "-"]
+    if valores_anteriores:
+        pares = ";".join(f"{codigo}={valor}"
+                         for codigo, valor in sorted(valores_anteriores.items()))
+        partes.append(hashlib.sha256(pares.encode("utf-8")).hexdigest()[:16])
+    return ":".join(partes)
 
 
 def _url_de_job(job_id: str, base: str = "") -> tuple[str, str]:
@@ -88,9 +110,18 @@ def _servivel(registro, versao_api: str, versao_regras: str) -> bool:
 def ler_ou_enfileirar(*, ente: str, exercicio: int, anexo: str, repo: Repo, fila: Fila,
                       lock, versao_api: str, versao_regras: str, jobs=None,
                       forcar: bool = False, solicitado_por: int | None = None,
-                      base_url: str = "") -> Resposta:
-    """Decide entre servir o cache e criar job. Nunca apura — a apuração é do worker."""
+                      base_url: str = "", parametros: dict | None = None) -> Resposta:
+    """Decide entre servir o cache e criar job. Nunca apura — a apuração é do worker.
+
+    `parametros` são as escolhas do pedido que **mudam o valor** sem mudar código nem regra — a
+    competência e, no BF, a origem da coluna do exercício anterior. Elas entram na identidade
+    (senão o resultado de um mês seria servido a quem pediu outro) e no payload do job (senão o
+    worker apuraria dezembro qualquer que fosse o pedido).
+    """
     anexo = validar_anexo(anexo)
+    parametros = parametros or {}
+    if parametros:
+        versao_regras = f"{versao_regras}|{identidade_do_pedido(anexo=anexo, **parametros)}"
     registro = repo.obter(ente, exercicio, anexo)
 
     if not forcar and _servivel(registro, versao_api, versao_regras):
@@ -121,7 +152,7 @@ def ler_ou_enfileirar(*, ente: str, exercicio: int, anexo: str, repo: Repo, fila
     _marcar_processando(repo, registro, ente, exercicio, anexo,
                         versao_api, versao_regras, solicitado_por)
     try:
-        fila.enfileirar(ente, exercicio, anexo, job_id)
+        fila.enfileirar(ente, exercicio, anexo, job_id, **parametros)
     except Exception as falha:
         # Fila fora do ar não pode virar `202` mentiroso, nem deixar a identidade presa em
         # `processando`: o cliente esperaria um job que ninguém vai executar.

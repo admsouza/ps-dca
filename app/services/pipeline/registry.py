@@ -12,6 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 ANEXO_BO = "BO"
+ANEXO_BF = "BF"
 JOB_APURAR = "apurar_anexo"
 
 
@@ -20,10 +21,16 @@ class Anexo:
     codigo: str
     servico: str | None          # "modulo:funcao" — `None` = ainda não implementado
     job: str = JOB_APURAR
+    # Base canônica que rege o anexo: `bo` é o IPC 07, `bf` é o IPC 06. Sem isto, o carregador
+    # devolveria as regras do BO para qualquer anexo — regra errada, sem erro.
+    base_canonica: str = "bo"
 
 
 REGISTRY: tuple[Anexo, ...] = (
     Anexo(ANEXO_BO, "app.services.bo.quadro_principal:apurar"),
+    # O BF, como o BO, é derivado da MSC — apurado pelas regras do IPC 06 e **não publicado** pelo
+    # `tt/dca`. Por isso vem junto dos derivados, antes dos anexos que o STN publica.
+    Anexo(ANEXO_BF, "app.services.bf.quadro_principal:apurar", base_canonica="bf"),
     Anexo("I-AB", None),
     Anexo("I-C", None),
     Anexo("I-D", None),

@@ -48,31 +48,34 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 ## Change ativa
 
-A base canônica do IPC 07 e a F1 do Balanço Orçamentário estão **implementadas, verificadas e
-arquivadas**, com as três pendências normativas (C5, C6, C7) encerradas por medição contra o
-publicado do STN. **L51 Reserva do RPPS** passou a ser apurada como a L39 e o **template de
-apresentação** passou a acompanhar o resultado, ambos em 2026-09-10. Em 2026-09-14 entrou a
-**base canônica do IPC 06** (Balanço Financeiro, 80 regras) — a apuração do BF ainda não existe.
-A **fonte MSC por demonstrativo e a apuração mensal** entraram em 2026-09-14 e estão arquivadas —
-com **uma pendência aberta**: o critério de identificação da MSC de encerramento na periodicidade
-mensal aguarda decisão do PO **com um ente real de prestação mensal**
-(`docs/pendencias-periodicidade-mensal.md`). A regra implementada para os meses 1–11 foi medida
-apenas em entes de prestação anual.
-Changes ativas: a apuração do BF (`bf-apuracao-f1`, em SPEC) e a plataforma.
+A base canônica do IPC 07, a F1 do Balanço Orçamentário e a plataforma (rota, cache, job, worker,
+SSE) estão **implementadas, verificadas e arquivadas**.
 
-| Change | Capability | Fase | Status |
-|---|---|---|---|
-| `bf-apuracao-f1` | `dca/balanco-financeiro` (nova) | **SPEC** | Aguarda aprovação do PO e as decisões G1–G6. F1 do Balanço Financeiro: motor único em `app/domain/nucleo/`, fonte de recursos como filtro, saldo em data (`tipo_valor`), movimento credor/devedor, duas colunas e Quadro Anexo. Aceite: âncoras contra I-C/I-D/I-AB, `L33 == L66` e conciliação de caixa — **o `tt/dca` não publica o BF** (medido). Pendentes do PO: **G9** (tipo de matriz e tipo de saldo, `MSCC` × `MSCE`) e **G10** (**período mensal além do anual em todos os anexos**), ambos alcançando o BO já entregue e a plataforma (`P9`). |
-| `plataforma-pipeline-dca` | `pipeline/plataforma` (nova) | **PLAN/ARCH** | SPEC aprovada em 2026-09-04. 22 requisitos / 63 cenários: ciclo requisição→cache→job→worker, camadas e regra de dependência, cache e lock únicos, `versao_regras` por hash canônico, mapeamento vigente em banco INSERT-only, reprocessamento forçado, procedência e diagnóstico. Infra: Postgres e Redis do hub, prefixo `dca_*`, `alembic_version_dca`, advisory lock `43812/1001`, fila `arq:queue:dca`. Implementada nas fases F2/F3 do BO. |
+Em **2026-09-18** o **Balanço Financeiro foi concluído no backend** e as quatro changes dele foram
+arquivadas:
 
-### Ordem de execução acordada
+| Change arquivada | O que entregou |
+|---|---|
+| `2026-09-18-bf-apuracao-f1` | núcleo, serviço e CLI do quadro principal: 66 linhas × 2 colunas |
+| `2026-09-18-bf-quadro-anexo` | as 14 linhas × 6 colunas do quadro anexo, com as derivadas |
+| `2026-09-18-msc-competencia-de-encerramento` | competência 13 na PublicSoft, 12 no SICONFI |
+| `2026-09-18-bf-no-pipeline` | `GET /dca/BF`: registry, cache multi-origem, serializador, chave |
 
-0. ~~Base canônica do IPC 07~~ — **concluída em 2026-09-04**. As 51 regras do Quadro Principal que
-   a F1 do BO consome já existem em `knowledge/rules/bo/quadro_principal.yaml`.
-1. **F1 do BO** — núcleo puro (`domain/` + adapters + carregador YAML + service + CLI), verificável
-   sem Postgres, Redis ou container. Aceite: os 11 valores de `docs/validacao-bo-jp-2025.md`.
-2. **F2** — FastAPI e rota fina, conforme `plataforma-pipeline-dca`.
-3. **F3** — job ARQ, cache, mapeamento em banco, registry, SSE, Discord.
+A apuração foi medida contra a MSC do SICONFI em **5 entes de homologação**, com relatório de
+auditoria por ente em `docs/entes-homologacao/<ente>/auditoria-bf-2025.md`: as 24 identidades do
+IPC 06 fecham em todos, e **32 de 34** confrontos contra o RREO publicado pelo próprio ente batem em
+centavos.
+
+**Change ativa: apenas `plataforma-pipeline-dca`** (63 cenários, F2/F3 implementadas, spec ainda não
+mesclada).
+
+Pendências abertas que **não** bloqueiam o front:
+
+- as 10 decisões de `docs/decisoes-bf-para-po-2026-09-18.md`, adotadas conforme a recomendação
+  medida e sujeitas a confirmação na auditoria final;
+- as divergências contra o BF publicado pelos entes, remetidas à etapa de auditoria;
+- o critério de identificação da MSC de encerramento na periodicidade mensal
+  (`docs/pendencias-periodicidade-mensal.md`).
 
 ## Changes arquivadas (recentes)
 

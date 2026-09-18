@@ -28,13 +28,19 @@ ORDEM_QUADROS = ("QUADRO_PRINCIPAL", "RP_NAO_PROCESSADOS", "RP_PROCESSADOS")
 # Dentro do quadro principal, receitas antes de despesas; `ordem` é relativa ao grupo.
 ORDEM_GRUPOS = ("RECEITAS", "DESPESAS")
 
+# A ordem é do **documento normativo**, não do serializador: `RECEITAS`/`DESPESAS` é vocabulário do
+# IPC 07 e `INGRESSOS`/`DISPENDIOS` do IPC 06. Documento desconhecido cai no padrão do IPC 07 e,
+# dentro dele, quadro ou grupo desconhecido vai para o fim — sem quebrar a serialização.
+ORDEM_POR_DOCUMENTO = {
+    "IPC06": (("QUADRO_PRINCIPAL", "QUADRO_ANEXO"), ("INGRESSOS", "DISPENDIOS")),
+}
 
-def _posicao(linha) -> tuple[int, int, int]:
+
+def _posicao(linha, ordens=(ORDEM_QUADROS, ORDEM_GRUPOS)) -> tuple[int, int, int]:
     """Quadro, grupo e ordem — quadro ou grupo desconhecido vai para o fim, sem quebrar."""
-    quadro = (ORDEM_QUADROS.index(linha.quadro) if linha.quadro in ORDEM_QUADROS
-              else len(ORDEM_QUADROS))
-    grupo = (ORDEM_GRUPOS.index(linha.grupo) if linha.grupo in ORDEM_GRUPOS
-             else len(ORDEM_GRUPOS))
+    quadros, grupos = ordens
+    quadro = quadros.index(linha.quadro) if linha.quadro in quadros else len(quadros)
+    grupo = grupos.index(linha.grupo) if linha.grupo in grupos else len(grupos)
     return (quadro, grupo, linha.ordem)
 
 
@@ -59,8 +65,25 @@ def template(mapa) -> list[dict]:
             "ordem": linha.ordem,
             "totalizadora": bool(linha.referencias),
         }
-        for linha in sorted(mapa.linhas, key=_posicao)
+        for linha in sorted(mapa.linhas, key=lambda linha: _posicao(linha, _ordens(mapa)))
     ]
+
+
+def _ordens(mapa) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Ordem de quadros e grupos do documento que produziu o mapa."""
+    documento = getattr(getattr(mapa, "vigencia", None), "documento", "")
+    return ORDEM_POR_DOCUMENTO.get(documento, (ORDEM_QUADROS, ORDEM_GRUPOS))
+
+
+def _especificos(origem, campos: tuple[str, ...]) -> dict:
+    """Campos que o demonstrativo publica e os demais não têm — omitidos quando ausentes."""
+    saida = {}
+    for campo in campos:
+        valor = getattr(origem, campo, None)
+        if valor is None:
+            continue
+        saida[campo] = list(valor) if isinstance(valor, tuple) else valor
+    return saida
 
 
 def para_dados(resultado) -> dict:
@@ -84,6 +107,9 @@ def para_dados(resultado) -> dict:
             "tipo_saldo": getattr(procedencia, "tipo_saldo", ""),
             "competencia": getattr(procedencia, "competencia", 12),
             "classes": list(getattr(procedencia, "classes", ())),
+            # Campos que só alguns demonstrativos produzem. Publicados quando existem, em vez de
+            # listados aqui um a um: o serializador não deve aprender o vocabulário de cada norma.
+            **_especificos(procedencia, ("origens_por_linha", "origem_exercicio_anterior")),
         },
         "diagnostico": {
             # Declarado sempre, vazio inclusive: consumidor que não encontra a chave não sabe se a
@@ -92,5 +118,7 @@ def para_dados(resultado) -> dict:
             "residuos": [str(r) for r in diagnostico.residuos],
             "duracao_ms": diagnostico.duracao_ms,
             "sem_dados": diagnostico.sem_dados,
+            **_especificos(diagnostico, ("sem_dados_exercicio_anterior",
+                                         "policies_nao_aplicadas")),
         },
     }

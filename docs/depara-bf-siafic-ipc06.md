@@ -9,11 +9,11 @@ a partir dele.
 
 | Ente | SIAFIC | Gabarito | Cobertura |
 |---|---|---|---|
-| Recife/PE (2611606) | Anexo XIII, Lei 4.320/64 | `docs/gabarito-bf-recife-2025.md` | 66/66, ordem idêntica à do IPC 06 |
-| João Pessoa/PB (2507507) | SIGEF/JPA | `docs/gabarito-bf-jp-2025.md` | 66/66, com 4 vinculações próprias agregadas em L10/L43 |
-| Belo Horizonte/MG (3106200) | Consolidação Geral | `docs/gabarito-bf-bh-2025.md` | 62/66; **origem OCR** |
-| Porto Alegre/RS (4314902) | Balanço Financeiro (adm. direta) | `docs/gabarito-bf-porto-alegre-2025.md` | 66/66; **PDF imagem**, transcrição visual; recorte **não consolidado** |
-| Cuitegi/PB (2504801) | PublicSoft | `docs/gabarito-bf-cuitegi-2025.md` | 48/66, sem segregação do RPPS |
+| Recife/PE (2611606) | Anexo XIII, Lei 4.320/64 | `docs/entes-homologacao/recife/gabarito-bf-2025.md` | 66/66, ordem idêntica à do IPC 06 |
+| João Pessoa/PB (2507507) | SIGEF/JPA | `docs/entes-homologacao/joao-pessoa/gabarito-bf-2025.md` | 66/66, com 4 vinculações próprias agregadas em L10/L43 |
+| Belo Horizonte/MG (3106200) | Consolidação Geral | `docs/entes-homologacao/<ente>/belo-horizonte/gabarito-bf-2025.md` | 62/66; **origem OCR** |
+| Porto Alegre/RS (4314902) | Balanço Financeiro (adm. direta) | `docs/entes-homologacao/porto-alegre/gabarito-bf-2025.md` | 66/66; **PDF imagem**, transcrição visual; recorte **não consolidado** |
+| Cuitegi/PB (2504801) | PublicSoft | `docs/entes-homologacao/cuitegi/gabarito-bf-2025.md` | 48/66, sem segregação do RPPS |
 
 O mapeamento é **por posição no demonstrativo**, não por semelhança de texto: cada SIAFIC usa
 nomenclatura própria e nenhum deles segue a do IPC 06 palavra a palavra.

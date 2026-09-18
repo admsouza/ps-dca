@@ -92,25 +92,111 @@ pré-encerramento do próprio exercício, e na `MSCC` é a abertura de dezembro.
 - **THEN** ela falha explicitamente, nomeando o tipo pedido
 - **AND** NÃO devolve o saldo de encerramento no lugar
 
-### Requirement: Sentido do movimento separado por natureza do lançamento
+### Requirement: Movimento bruto de depósitos restituíveis declarado como indisponível
 
-As colunas que declaram `movimento` SHALL somar apenas os lançamentos daquele sentido:
-`credor` soma os registros de natureza `C`, `devedor` os de natureza `D`. A leitura SHALL usar a
-variação do período, não o saldo acumulado — o saldo líquido não distingue os dois sentidos, e
-usá-lo faria `L27` e `L60` devolverem o mesmo número com sinais trocados.
+`L27` e `L60` declaram as **mesmas contas** (`2.1.8.8` e `2.2.8.8`) e, no demonstrativo publicado,
+representam fluxos brutos em sentidos opostos. A MSC **não expõe esse movimento bruto**: entrega
+saldo e variação, e nenhum dos dois reproduz o publicado. Medido em Recife, 2026-09-18 — saldo de
+`2.1.8.8`: 132.890.609,07 (2024) e 176.421.602,57 (2025), variação +43.530.993,50; `period_change`
+da MSCC: líquido -6.107.254,33; o publicado implica +123.944.269,55. Três números, nenhum igual.
 
-#### Scenario: depósitos restituíveis nos dois sentidos
+As duas linhas SHALL ser apuradas pelo saldo das contas declaradas, como as demais, e a diferença
+contra o publicado SHALL ser registrada no relatório de auditoria do ente. A apuração NÃO DEVE
+inventar um fluxo bruto que a fonte não tem.
 
-- **GIVEN** registros da conta `2.1.8.8.0.00.00` com `C` = 300,00 e `D` = 120,00 no período
-- **WHEN** `bf.quadro_principal.ingressos.l27` e `bf.quadro_principal.dispendios.l60` são apuradas
-- **THEN** `L27` vale 300,00 e `L60` vale 120,00
-- **AND** as duas somam **positivamente** em `L24` e `L57`, respectivamente
+#### Scenario: depósitos restituíveis apurados pelo saldo declarado
 
-#### Scenario: nenhuma outra linha usa o sentido do movimento
+- **GIVEN** as contas `2.1.8.8` e `2.2.8.8` na matriz do exercício
+- **WHEN** `L27` e `L60` são apuradas
+- **THEN** ambas trazem o saldo das contas declaradas, na direção do PCASP
+- **AND** a divergência contra o BF publicado aparece no relatório de auditoria do ente, com os
+  dois valores
+
+#### Scenario: nenhuma linha do BF depende de movimento bruto
 
 - **WHEN** a base do BF é carregada
-- **THEN** apenas `L27` e `L60` declaram `movimento`
-- **AND** as demais linhas somam o saldo da conta na direção do PCASP, como no BO
+- **THEN** nenhuma coluna declara `movimento`
+- **AND** todas as linhas somam o saldo das contas declaradas
+
+### Requirement: Origem do saldo declarada por linha
+
+A origem do saldo SHALL ser propriedade **da linha**, não do demonstrativo. Medido em 2026-09-18
+nos entes de homologação, três origens cobrem o quadro principal:
+
+| Origem | Linhas | Por quê |
+|---|---|---|
+| `MSCE`/abertura do exercício | as demais, inclusive `L62`-`L65` | é a posição final do exercício |
+| `MSCE`/**encerramento** do exercício | `L25`, `L26` | `5.3.1.7` e `5.3.2.7` **não existem** na abertura: a inscrição de restos a pagar acontece no encerramento |
+| `MSCE`/abertura do **exercício anterior** | `L29`-`L32` | o saldo do exercício anterior é o do ano anterior |
+
+Ler tudo de uma origem só NÃO DEVE acontecer: `L25` e `L26` sairiam **zeradas sem erro**, e
+`L29`-`L32` trariam a posição final em vez da inicial.
+
+A procedência SHALL declarar a origem usada por cada linha.
+
+#### Scenario: inscrição de restos a pagar vem do encerramento
+
+- **GIVEN** a MSCE de Recife 2025, em que `5.3.1.7` e `5.3.2.7` não têm saldo na abertura
+- **WHEN** `L25` e `L26` são apuradas
+- **THEN** valem 74.205.408,29 e 106.062.740,96, lidas do saldo de encerramento
+- **AND** os dois valores coincidem com o RREO Anexo 01 publicado pelo próprio ente
+
+#### Scenario: saldo do exercício anterior lido do ano anterior
+
+- **GIVEN** o exercício 2025 de Recife
+- **WHEN** `L29`-`L32` são apuradas
+- **THEN** leem a MSCE/abertura de **2024**: `1.1.1` = 802.570.332,31 e `1.1.3.5.1` = 717.721,98
+- **AND** somam 803.288.054,29, o valor publicado em `L29`
+
+#### Scenario: a procedência nomeia a origem de cada linha
+
+- **WHEN** o resultado é publicado
+- **THEN** `procedencia.origens_por_linha` traz, para cada código de linha, matriz, tipo de saldo e
+  exercício lidos
+
+### Requirement: Linha sem conta declarada no IPC 06 não é apurada
+
+Seis linhas do quadro principal — `L22`, `L23`, `L28`, `L55`, `L56`, `L61` — não têm conta
+declarada na base canônica. Elas SHALL sair **não apuradas**, com motivo no diagnóstico, e NÃO
+DEVEM sair como zero: zero afirma que não houve movimento, e aqui não se sabe.
+
+Medido em 2026-09-18: os valores que os entes publicam nessas linhas **não existem na MSC** — busca
+em 7 combinações de matriz e tipo de saldo, em todos os prefixos de conta de 3 a 9 dígitos, como
+saldo, como total de créditos e como total de débitos. A busca foi validada por controle, achando
+`L16` e `L25`.
+
+No total que as agrega, a linha não apurada SHALL contribuir como **parcela inexistente** — o total
+soma as demais e declara o bloqueio. Propagar `None` até o total deixaria o demonstrativo inteiro em
+branco por causa de seis linhas.
+
+#### Scenario: linha sem conta sai não apurada
+
+- **WHEN** `L22` é apurada
+- **THEN** a célula é `None` nas duas colunas
+- **AND** o diagnóstico nomeia a linha e o motivo
+
+#### Scenario: o total soma as parcelas que existem
+
+- **GIVEN** `L21` = `L22` + `L23`, ambas sem conta declarada
+- **WHEN** a matriz é apurada
+- **THEN** `L21` vale 0,00 e `L33` é apurada normalmente
+
+### Requirement: Policy declarada e não aplicada é publicada como tal
+
+A policy `ipc06.exclusao_de_intraorcamentarias` (item 38) declara o conceito **sem dizer quais
+códigos** caracterizam a transferência intraorçamentária acompanhada de execução. A apuração NÃO
+DEVE aplicá-la por interpretação: medido em 2026-09-18, excluir a receita das categorias 7 e 8 e a
+despesa de modalidade 91 **quebra `L1` e `L34` em Belo Horizonte e João Pessoa**, que conferem em
+centavos sem a exclusão.
+
+A policy SHALL constar do diagnóstico como declarada e não aplicada, com o motivo.
+
+#### Scenario: o item 38 não altera o valor apurado
+
+- **GIVEN** registros de receita com natureza das categorias 7 e 8
+- **WHEN** `L2` é apurada
+- **THEN** o valor inclui os registros intraorçamentários
+- **AND** `diagnostico.policies_nao_aplicadas` cita o item 38 e o motivo
 
 ### Requirement: Duas colunas por linha, apuradas no mesmo passe
 
@@ -133,12 +219,47 @@ publicado nem estimada.
 - **THEN** `exercicio_anterior` sai não apurada, com o motivo no diagnóstico
 - **AND** `exercicio_atual` é apurada normalmente
 
+### Requirement: Coluna do exercício anterior com origem escolhida por quem apura
+
+A coluna do exercício anterior SHALL aceitar duas origens:
+
+1. **`MSCE` do exercício anterior** (padrão) — apurada pelas mesmas regras do IPC 06.
+2. **Preenchimento manual**, linha a linha, informado por quem apura.
+
+A segunda existe porque o ente pode ter publicado o exercício anterior com números que a matriz
+daquele ano não reproduz: medido em Recife, `L17` e `L50` de 2024 saem 628.456.869,17 da MSC contra
+**0,00** publicado.
+
+A procedência SHALL declarar a origem usada. No modo manual, linha não informada SHALL ser `None`
+com motivo — nunca zero. Linha informada que o IPC 06 não declara SHALL ser recusada antes de
+apurar. A coluna do exercício **atual** NÃO DEVE aceitar preenchimento manual.
+
+#### Scenario: coluna anterior apurada da MSCE do exercício anterior
+
+- **WHEN** a apuração corre com a origem padrão
+- **THEN** `exercicio_anterior` vem da matriz do exercício anterior, pelas mesmas regras
+- **AND** a procedência declara `msce_exercicio_anterior`
+
+#### Scenario: coluna anterior preenchida manualmente
+
+- **GIVEN** valores informados para parte das linhas
+- **WHEN** a apuração corre no modo manual
+- **THEN** as linhas informadas trazem o valor informado
+- **AND** as demais saem `None`, com `não informado` no diagnóstico
+- **AND** a procedência declara `manual`
+
+#### Scenario: linha informada fora do IPC 06
+
+- **WHEN** o preenchimento manual traz um código que a base canônica não declara
+- **THEN** a apuração é recusada, nomeando o código
+
 ### Requirement: Classes da MSC lidas pelo Balanço Financeiro
 
-A apuração do BF SHALL ler as classes **1, 2, 3, 4, 5 e 6** da MSC, matriz `MSCC`. As classes 7 e 8
-NÃO DEVEM ser lidas enquanto as contas de controle de `L22`, `L23`, `L55` e `L56` não tiverem
-mapeamento decidido (F1 do IPC 06). O conjunto de classes SHALL ser declarado na procedência do
-resultado.
+A apuração do BF SHALL ler as classes **1, 2, 3, 4, 5 e 6** da MSC, matriz `MSCE` — decisão G9 do
+PO em 2026-09-14, confirmada pela medição de 2026-09-18. As classes 7 e 8 NÃO DEVEM ser lidas: o
+mapeamento de `L22`, `L23`, `L55` e `L56` não existe no IPC 06, e a busca reversa mostrou que os
+valores publicados nessas linhas não estão em conta nenhuma da MSC. O conjunto de classes SHALL ser
+declarado na procedência do resultado.
 
 #### Scenario: classes lidas
 
@@ -163,12 +284,13 @@ O saldo de **abertura do exercício**, que `L29`–`L32` exigem, SHALL vir de
 `(ano-1, competência 12, MSCE, abertura)`. Medido em João Pessoa: 1.865.100.624,27, idêntico ao
 `(ano-1, competência 12, MSCC, encerramento)` já usado como referência.
 
-#### Scenario: transferências financeiras existem na matriz consolidada
+#### Scenario: transferências financeiras existem na matriz de encerramento lida pela abertura
 
 - **GIVEN** a competência 12 do exercício apurado
-- **WHEN** `L15 Transferências Financeiras Recebidas` e `L48 Concedidas` são apuradas sobre `MSCC`
+- **WHEN** `L15 Transferências Financeiras Recebidas` e `L48 Concedidas` são apuradas sobre
+  `MSCE`/abertura
 - **THEN** as duas trazem valor, vindo das classes 4 e 3
-- **AND** a procedência declara `MSCC`
+- **AND** a procedência declara `MSCE`/abertura
 
 #### Scenario: a matriz de encerramento lida pela abertura é equivalente
 
@@ -284,44 +406,37 @@ equilíbrio.
 - **THEN** o diagnóstico traz a diferença, por coluna, com sinal
 - **AND** os dois totais mantêm os valores apurados
 
-### Requirement: Quadro Anexo apurado nas seis colunas
+### Requirement: Aceite por homologação contra o BF do ente e o RREO
 
-O Quadro Anexo SHALL ser apurado com as seis colunas do IPC 06: `(a)`/`(d)` a receita
-orçamentária, `(b)`/`(e)` as deduções e `(c)`/`(f)` calculadas como `(a) − (b)` e `(d) − (e)`.
-`L14 TOTAL` SHALL fechar `L1 + L2 + L10` em cada uma das seis.
+O `tt/dca` **não publica** o Balanço Financeiro — medido em 2026-09-14: 2.002 registros, 7 anexos,
+nenhum deles é o BF. O aceite SHALL se apoiar, nesta ordem:
 
-#### Scenario: saldo do anexo é derivado, não somado
+1. **Identidades do próprio demonstrativo** sobre a matriz apurada (`L1 = L2+L3+L11`,
+   `L33 = L1+L15+L21+L24+L29`, e as demais): não dependem de ente nenhum e SHALL fechar sempre.
+2. **RREO publicado pelo próprio ente** (Anexo 01 e Anexo 07), terceira fonte independente do PDF:
+   cobre `L1`, `L34`, `L25`, `L26`, `L58` e `L59`.
+3. **BF publicado pelo SIAFIC** dos entes de homologação, com a ressalva de que ele pode ter sido
+   alterado na publicação e divergir da matriz que o próprio ente enviou.
 
-- **GIVEN** `bf.quadro_anexo.l1` com `(a)` = 1.000,00 e `(b)` = 150,00
-- **WHEN** a matriz é apurada
-- **THEN** `(c)` vale 850,00, calculada da própria linha
-- **AND** `L14 (c)` é a soma de `L1 (c)`, `L2 (c)` e `L10 (c)`
-
-#### Scenario: o anexo detalha o que o principal traz líquido
-
-- **GIVEN** o caso de referência
-- **WHEN** `bf.quadro_anexo.l14` coluna `(c)` e `bf.quadro_principal.ingressos.l1`
-  `exercicio_atual` são comparadas
-- **THEN** a diferença entre as duas é registrada no diagnóstico, com o valor medido
-- **AND** a comparação não altera nenhum dos dois
-
-### Requirement: Matriz apurada reproduz o publicado do anexo I-D
-
-A matriz do BF SHALL reproduzir, em centavos, os valores publicados do `DCA-Anexo I-D` para o ente
-e exercício de referência. Divergência SHALL ser registrada em `docs/validacao-bf-jp-2025.md`, com
-a célula, o valor apurado, o publicado e a hipótese — nunca corrigida por constante no código.
+Divergência SHALL ser registrada no relatório de auditoria do ente
+(`docs/entes-homologacao/<ente>/auditoria-bf-2025.md`), nomeando **linha e coluna** do IPC 06, o
+valor apurado e o publicado — nunca corrigida por constante no código nem por alteração de regra
+canônica sem citação do IPC 06.
 
 #### Scenario: aceite do caso de referência
 
-- **GIVEN** João Pessoa/PB (2507507), exercício 2025
+- **GIVEN** Recife/PE (2611606), exercício 2025, cujo BF publicado traz as 66 linhas na ordem e na
+  nomenclatura do IPC 06
 - **WHEN** a apuração do BF é executada contra a MSC
-- **THEN** cada célula apurada é igual à publicada no `tt/dca`, anexo I-D, em centavos
-- **AND** `L33` é igual a `L66`
+- **THEN** as 24 identidades do demonstrativo fecham em centavos, nas duas colunas
+- **AND** `L1`, `L34`, `L25`, `L26`, `L58` e `L59` conferem com o RREO publicado pelo ente
+- **AND** cada célula que divergir do BF publicado está no relatório de auditoria
 
 #### Scenario: divergência é registrada, não escondida
 
 - **WHEN** uma célula diverge do publicado
-- **THEN** a divergência entra no documento de validação, com célula, apurado, publicado e hipótese
+- **THEN** a divergência entra no relatório de auditoria do ente, com linha, coluna, apurado,
+  publicado e diferença
 - **AND** nenhuma constante de ajuste é introduzida no código
 
 ### Requirement: Regra carregada pela vigência e pelo demonstrativo
@@ -400,3 +515,55 @@ nenhuma linha nem descartado em silêncio.
 - **WHEN** a matriz é apurada
 - **THEN** eles aparecem em `diagnostico.residuos`, agregados por código
 - **AND** `L1` continua sendo exatamente `L2 + L3 + L11`
+
+## ADDED Requirements
+
+### Requirement: Quadro Anexo apurado nas seis colunas
+
+O Quadro Anexo SHALL ser apurado com as seis colunas do IPC 06: `(a)` e `(d)` a receita
+orçamentária, `(b)` e `(e)` as deduções, `(c)` e `(f)` **derivadas** como `(a) − (b)` e `(d) − (e)`.
+As colunas derivadas SHALL ser calculadas da própria linha, nunca somadas das filhas. `L14 TOTAL`
+SHALL fechar `L1 + L2 + L10` em cada uma das seis.
+
+#### Scenario: saldo do anexo é derivado, não somado
+
+- **GIVEN** `bf.quadro_anexo.l1` com `(a)` = 1.000,00 e `(b)` = 150,00
+- **WHEN** a matriz é apurada
+- **THEN** `(c)` vale 850,00, calculada da própria linha
+- **AND** `L14 (c)` é a soma de `L1 (c)`, `L2 (c)` e `L10 (c)`
+
+#### Scenario: coluna derivada com parcela não apurada
+
+- **GIVEN** uma linha do anexo cuja coluna `(a)` saiu não apurada
+- **WHEN** `(c)` é calculada
+- **THEN** `(c)` é `None`
+- **AND** NÃO é a subtração feita com a parcela que existe
+
+### Requirement: Conferência entre o anexo e o quadro principal
+
+`L14 (c)` do anexo SHALL ser comparada a `L1 exercicio_atual` do quadro principal, e a diferença,
+quando houver, SHALL entrar no diagnóstico com o valor medido. A conferência NÃO DEVE alterar
+nenhum dos dois quadros.
+
+#### Scenario: o anexo detalha o que o principal traz líquido
+
+- **GIVEN** o caso de referência
+- **WHEN** `bf.quadro_anexo.l14` coluna `(c)` e `bf.quadro_principal.ingressos.l1`
+  `exercicio_atual` são comparadas
+- **THEN** a diferença entre as duas é registrada no diagnóstico, com o valor medido
+- **AND** a comparação não altera nenhum dos dois
+
+### Requirement: Receita sem fonte de recursos declarada como resíduo do anexo
+
+Registro de receita sem fonte de recursos na MSC NÃO DEVE entrar em nenhuma linha por fonte nem ser
+rateado entre elas. Ele SHALL aparecer como **resíduo** do anexo, com o valor.
+
+Medido em Recife, 2026-09-18: 450.202.814,72 em dois registros da conta sintética
+`6.2.1.2.0.00.00`, que o ente classificou por critério próprio e a MSC não qualifica.
+
+#### Scenario: fonte ausente vira resíduo, não rateio
+
+- **GIVEN** registros de receita sem fonte de recursos
+- **WHEN** o anexo é apurado
+- **THEN** o valor aparece no diagnóstico como resíduo de fonte
+- **AND** nenhuma linha por fonte o recebe

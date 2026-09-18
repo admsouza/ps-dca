@@ -35,8 +35,20 @@ def atende(registro: Registro, filtros: Sequence[Filtro]) -> bool:
 
 def _atende_um(registro: Registro, filtro: Filtro) -> bool:
     valor = _campo(registro, filtro.campo)
-    casou = any(_casa(valor, padrao) for padrao in filtro.valores)
+    casou = any(_casa_no_campo(filtro.campo, valor, padrao) for padrao in filtro.valores)
     return casou if filtro.operador == "in" else not casou
+
+
+def _casa_no_campo(campo: str, valor: str, padrao: str) -> bool:
+    """Fonte de recursos casa por **igualdade**; os demais campos, por prefixo.
+
+    Medido (G1): a fonte do IPC 06 tem 3 dígitos e é um código completo, não um prefixo — a
+    fonte `500` não pode ser capturada por um padrão `50`, que pegaria também `501`, `502` e
+    `503`, cada uma de uma linha diferente do demonstrativo.
+    """
+    if campo == "fonte_recurso":
+        return bool(valor) and valor == padrao
+    return _casa(valor, padrao)
 
 
 def excluido(registro: Registro, grupos: Sequence[Sequence[Filtro]]) -> bool:
@@ -59,7 +71,21 @@ def _casa_no_grupo(registro: Registro, filtro: Filtro) -> bool:
 def _campo(registro: Registro, nome: str) -> str:
     if nome == "conta_contabil":
         return registro.conta
+    if nome == "fonte_recurso":
+        return _fonte_do_ipc(registro.fonte_recursos)
     return getattr(registro, nome, "") or ""
+
+
+def _fonte_do_ipc(fonte: str) -> str:
+    """Os 3 dígitos que o IPC 06 declara, a partir dos 4 que a MSC entrega.
+
+    O 1º dígito da fonte escriturada é o **exercício da vinculação** (`1500` é a fonte `500`);
+    o detalhamento do ente vai em coluna separada. Medido em 2026-09-18 nos 5 entes de
+    homologação: com o corte, `L1 = L2 + L3 + L11` fecha em 0,00 e o resíduo de fonte é zero;
+    sem ele, **nenhuma** das 22 linhas por fonte casaria — e sairiam zeradas, sem erro.
+    """
+    digitos = "".join(c for c in fonte if c.isdigit())
+    return digitos[1:4] if len(digitos) == 4 else digitos
 
 
 def _casa(valor: str, padrao: str) -> bool:
@@ -111,6 +137,44 @@ def saldo_da_celula(
             pendencias.append((desconhecidas[0], "sem natureza de saldo no PCASP nem na regra"))
             continue
         parcial = saldo_da_conta(casados, credora_da_coluna)
+        total += parcial if conta.operacao == "+" else -parcial
+
+    return (None if pendencias else total), pendencias
+
+
+def saldo_da_celula_por_conta(
+    registros: Sequence[Registro],
+    contas: Sequence[ContaCC],
+    direcao,
+) -> tuple[Decimal | None, list[tuple[str, str]]]:
+    """Como `saldo_da_celula`, mas cada conta entra na direção **dela**, não na da coluna.
+
+    É o critério do BF (G7), medido em 3 entes: com a direção da coluna, `L1` de Recife sai
+    5.872.854.713,27; com a direção por conta, sai 10.390.050.823,18 — o valor que o ente
+    declarou no RREO. A redutora continua reduzindo porque a própria regra do IPC 06 traz o
+    sinal do par (`6.2.1.2 (+)` / `6.2.1.3 (−)`), o que no BO vinha da direção do grupo.
+    """
+    total = ZERO
+    pendencias: list[tuple[str, str]] = []
+
+    for conta in contas:
+        casados = [r for r in registros if _casa(r.conta, conta.cc)]
+        if not casados:
+            continue                      # conta declarada sem escrituração contribui zero
+        por_folha: dict[str, list[Registro]] = {}
+        for registro in casados:
+            por_folha.setdefault(registro.conta, []).append(registro)
+
+        parcial, indeterminada = ZERO, False
+        for folha, registros_da_folha in por_folha.items():
+            credora = direcao.credora(folha)
+            if credora is None:
+                pendencias.append((folha, "sem natureza de saldo no PCASP nem na regra"))
+                indeterminada = True
+                break
+            parcial += saldo_da_conta(registros_da_folha, credora)
+        if indeterminada:
+            continue
         total += parcial if conta.operacao == "+" else -parcial
 
     return (None if pendencias else total), pendencias

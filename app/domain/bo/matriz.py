@@ -16,7 +16,7 @@ from collections.abc import Sequence
 from decimal import Decimal
 
 from app.domain.bo.modelo import Linha, MapaBO, Matriz, NaoApurada, RefColuna, Registro
-from app.domain.bo.saldo import atende, excluido, saldo_da_celula
+from app.domain.bo.saldo import atende, excluido, saldo_da_celula, saldo_da_celula_por_conta
 
 ZERO = Decimal("0.00")
 
@@ -25,15 +25,25 @@ class CicloDeDependencia(RuntimeError):
     """Referências circulares entre linhas. Aborta sem produzir matriz parcial."""
 
 
-def apurar(mapa: MapaBO, registros: Sequence[Registro], direcao) -> Matriz:
+def apurar(mapa: MapaBO, registros: Sequence[Registro], direcao, por_conta: bool = False,
+           registros_por_regra: dict[str, Sequence[Registro]] | None = None) -> Matriz:
+    """Apura a matriz.
+
+    `por_conta` escolhe o critério de direção do saldo: o do BO (direção da coluna) ou o do BF
+    (direção de cada conta, medido em G7). `registros_por_regra` deixa uma linha ler de outro
+    conjunto de saldos — no BF, `L25`/`L26` vêm do encerramento e `L29`–`L32` do exercício
+    anterior, porque é onde esses saldos existem (evidência §N1 e §G2).
+    """
     matriz = Matriz(vigencia=mapa.vigencia)
     linhas = mapa.por_id()
     ordem = _ordem_topologica(linhas)
     derivadas = _catalogo_de_derivadas(mapa)
+    por_regra = registros_por_regra or {}
 
     for linha in mapa.linhas:                                   # (a)
         if not linha.composta:
-            matriz.valores[linha.id] = _celulas(linha, registros, direcao, matriz, derivadas)
+            matriz.valores[linha.id] = _celulas(
+                linha, por_regra.get(linha.id, registros), direcao, matriz, derivadas, por_conta)
 
     for rule_id in ordem:                                       # (b)
         linha = linhas[rule_id]
@@ -65,7 +75,7 @@ def _catalogo_de_derivadas(mapa: MapaBO) -> dict[str, tuple[RefColuna, ...]]:
 # ─── (a) células ─────────────────────────────────────────────────────────────
 
 def _celulas(linha: Linha, registros: Sequence[Registro], direcao, matriz: Matriz,
-             derivadas: dict) -> dict[str, Decimal | None]:
+             derivadas: dict, por_conta: bool = False) -> dict[str, Decimal | None]:
     elegiveis = [
         r for r in registros
         if atende(r, linha.filtros) and not excluido(r, linha.exclusoes)
@@ -76,7 +86,8 @@ def _celulas(linha: Linha, registros: Sequence[Registro], direcao, matriz: Matri
         if coluna.derivada:
             celulas[coluna.id] = None   # preenchida no passo (c)
             continue
-        valor, pendencias = saldo_da_celula(elegiveis, coluna.contas, direcao)
+        calcular = saldo_da_celula_por_conta if por_conta else saldo_da_celula
+        valor, pendencias = calcular(elegiveis, coluna.contas, direcao)
         celulas[coluna.id] = valor
         for conta, motivo in pendencias:
             matriz.nao_apuradas.append(NaoApurada(linha.id, coluna.id, conta, motivo))

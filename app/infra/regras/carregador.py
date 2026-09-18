@@ -1,4 +1,4 @@
-"""Carrega o mapa vigente a partir da base canônica em `knowledge/rules/bo/`.
+"""Carrega o mapa vigente a partir da base canônica em `knowledge/rules/<demonstrativo>/`.
 
 O **exercício é parâmetro**, não constante implícita (P8 da change de plataforma). Hoje só a
 edição `2020-01` responde, e o resultado é idêntico ao de fixar a edição no código — a
@@ -38,10 +38,14 @@ class SemVigencia(LookupError):
     """Nenhuma edição cobre o exercício pedido. Não se aproxima a mais próxima."""
 
 
-def carregar(exercicio: int, base: Path | None = None) -> MapaBO:
-    """Mapa vigente para o exercício, com a procedência do que foi carregado."""
+def carregar(exercicio: int, base: Path | None = None, demonstrativo: str = "bo") -> MapaBO:
+    """Mapa vigente para o exercício, com a procedência do que foi carregado.
+
+    `demonstrativo` escolhe a base canônica: `bo` (IPC 07) ou `bf` (IPC 06). Era fixo em `bo`,
+    e o BF tem a mesma forma de regra — mesmo tradutor, mesma vigência, mesmo hash.
+    """
     raiz = base or KNOWLEDGE
-    edicoes = _vigencias(raiz)
+    edicoes = _vigencias(raiz, demonstrativo)
 
     aplicaveis = [v for v in edicoes if _cobre(v, exercicio)]
     if not aplicaveis:
@@ -53,7 +57,7 @@ def carregar(exercicio: int, base: Path | None = None) -> MapaBO:
 
     linhas = tuple(
         _linha(regra)
-        for arquivo in sorted((raiz / "rules" / "bo").glob("*.yaml"))
+        for arquivo in sorted((raiz / "rules" / demonstrativo).glob("*.yaml"))
         for regra in (yaml.safe_load(arquivo.read_text(encoding="utf-8")) or {}).get("rules", [])
         if regra.get("version", {}).get("edition") == escolhida["edicao"]
     )
@@ -62,17 +66,17 @@ def carregar(exercicio: int, base: Path | None = None) -> MapaBO:
     return MapaBO(
         linhas=linhas,
         vigencia=Vigencia(escolhida["documento"], escolhida["edicao"], exercicio),
-        versao_regras=_hash_canonico(raiz, escolhida["edicao"], tabelas),
+        versao_regras=_hash_canonico(raiz, escolhida["edicao"], tabelas, demonstrativo),
         tabelas_stn=tabelas,
     )
 
 
 # ─── vigência ────────────────────────────────────────────────────────────────
 
-def _vigencias(raiz: Path) -> list[dict]:
+def _vigencias(raiz: Path, demonstrativo: str = "bo") -> list[dict]:
     """Edições declaradas pelas próprias regras, pelo bloco `version`."""
     vistas: dict[str, dict] = {}
-    for arquivo in sorted((raiz / "rules" / "bo").glob("*.yaml")):
+    for arquivo in sorted((raiz / "rules" / demonstrativo).glob("*.yaml")):
         for regra in (yaml.safe_load(arquivo.read_text(encoding="utf-8")) or {}).get("rules", []):
             versao = regra.get("version") or {}
             edicao = versao.get("edition")
@@ -104,7 +108,8 @@ def _ano(valor) -> int | None:
 
 # ─── identidade do conteúdo carregado (P-D7) ─────────────────────────────────
 
-def _hash_canonico(raiz: Path, edicao: str, tabelas: dict[str, str]) -> str:
+def _hash_canonico(raiz: Path, edicao: str, tabelas: dict[str, str],
+                   demonstrativo: str = "bo") -> str:
     """SHA-256 do conteúdo **parseado** e reserializado de forma estável.
 
     Nunca dos bytes do arquivo: um `git checkout` que troque LF por CRLF mudaria o hash e
@@ -115,7 +120,7 @@ def _hash_canonico(raiz: Path, edicao: str, tabelas: dict[str, str]) -> str:
     nenhuma regra tenha mudado. Sem isso, o cache serviria valor velho.
     """
     regras = []
-    for arquivo in sorted((raiz / "rules" / "bo").glob("*.yaml")):
+    for arquivo in sorted((raiz / "rules" / demonstrativo).glob("*.yaml")):
         for regra in (yaml.safe_load(arquivo.read_text(encoding="utf-8")) or {}).get("rules", []):
             if (regra.get("version") or {}).get("edition") == edicao:
                 regras.append(regra)
@@ -183,7 +188,7 @@ def _coluna(nome: str, dados: dict) -> Coluna:
     )
 
 
-@lru_cache(maxsize=8)
-def carregar_em_cache(exercicio: int) -> MapaBO:
-    """Mesma carga, memorizada por exercício — a base tem 69 regras e não muda em execução."""
-    return carregar(exercicio)
+@lru_cache(maxsize=16)
+def carregar_em_cache(exercicio: int, demonstrativo: str = "bo") -> MapaBO:
+    """Mesma carga, memorizada — a base não muda em execução."""
+    return carregar(exercicio, demonstrativo=demonstrativo)
