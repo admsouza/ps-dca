@@ -35,6 +35,26 @@ def preparar(lock: Trava) -> int:
     return liberados
 
 
+def soltar_jobs_interrompidos(redis, fila: str) -> int:
+    """Devolve à fila os jobs que o processo anterior pegou e não terminou.
+
+    `arq:in-progress:<id>` marca job em execução e faz o worker seguinte recusar o id.
+    No boot o dono anterior já morreu: apagar a chave dos ids ainda na fila devolve o
+    job ao poll. DEL de chave ausente conta zero — job sem dono fica intocado.
+    """
+    from arq.constants import in_progress_key_prefix
+
+    ids = redis.zrange(fila, 0, -1)
+    if not ids:
+        return 0
+    soltos = int(redis.delete(*(
+        in_progress_key_prefix + (i.decode() if isinstance(i, bytes) else i) for i in ids
+    )))
+    if soltos:
+        logger.warning("startup: %d job(s) interrompido(s) devolvido(s) à fila", soltos)
+    return soltos
+
+
 def verificar_dependencias(*, redis: Callable[[], object], banco: Callable[[], object]) -> dict:
     """Testa cada dependência e registra o resultado. Falha nomeia qual caiu e por quê."""
     estado: dict[str, str] = {}

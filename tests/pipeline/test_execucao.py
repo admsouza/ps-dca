@@ -178,6 +178,28 @@ def test_limpeza_no_startup_do_worker(lock):
     assert lock.tomados == {}
 
 
+def test_startup_devolve_job_interrompido_a_fila():
+    # deploy no meio do cálculo deixa in-progress; boot devolve o job à fila
+    from app.services.pipeline.startup import soltar_jobs_interrompidos
+
+    class Redis:
+        def __init__(self):
+            self.chaves = {"arq:in-progress:job-parado"}
+
+        def zrange(self, nome, inicio, fim):
+            assert (nome, inicio, fim) == ("arq:queue:dca", 0, -1)
+            return [b"job-parado", b"job-na-fila"]
+
+        def delete(self, *chaves):
+            apagadas = len(self.chaves.intersection(chaves))
+            self.chaves.difference_update(chaves)
+            return apagadas
+
+    redis = Redis()
+    assert soltar_jobs_interrompidos(redis, "arq:queue:dca") == 1
+    assert redis.chaves == set()
+
+
 # ─── Requirement: Apuração não roda no processo da API ───────────────────────
 
 def test_cache_miss_nao_bloqueia_a_resposta(pedido, fila, monkeypatch):

@@ -104,7 +104,11 @@ async def startup(ctx: dict) -> None:
     from app.infra.fila.redis_adapters import (
         ping as ping_redis,
     )
-    from app.services.pipeline.startup import preparar, verificar_dependencias
+    from app.services.pipeline.startup import (
+        preparar,
+        soltar_jobs_interrompidos,
+        verificar_dependencias,
+    )
 
     verificar_dependencias(redis=ping_redis, banco=ping_banco)
 
@@ -117,6 +121,7 @@ async def startup(ctx: dict) -> None:
     ctx["notificador"] = _notificador()
 
     preparar(ctx["lock"])
+    soltar_jobs_interrompidos(sincrono, cfg.fila)
     _semear()
 
     logger.info("worker iniciado | fila=%s | max_jobs=%s | timeout=%ss",
