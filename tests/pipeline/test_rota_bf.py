@@ -100,3 +100,15 @@ def test_bf_deixa_de_aparecer_como_anexo_sem_servico():
     from app.services.pipeline.registry import implementado
 
     assert implementado("BF")
+
+
+def test_parametros_manuais_do_bf_entram_no_pedido():
+    from app.routes.anexos import _parametros_bf
+
+    assert _parametros_bf("BF", None, None) == {}
+    assert _parametros_bf("BF", "msce_exercicio_anterior", None) == {}
+    assert _parametros_bf("BO", "manual", '{"L2": "1.00"}') == {}
+    pedido = _parametros_bf("BF", "manual", '{"L2": "1.00"}')
+    assert pedido["anterior"] == "manual"
+    assert pedido["origem_anterior"] == "manual"
+    assert pedido["valores_anteriores"] == {"L2": "1.00"}

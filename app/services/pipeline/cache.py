@@ -88,6 +88,14 @@ def identidade_do_pedido(*, anexo: str, competencia: int = 12,
     return ":".join(partes)
 
 
+def versao_do_pedido(versao_regras: str, anexo: str, parametros: dict | None) -> str:
+    """Versão de cache com a identidade do pedido. Rota e worker têm de gravar a mesma:
+    sem o sufixo, a leitura seguinte não reconhece o cache e enfileira de novo."""
+    if not parametros:
+        return versao_regras
+    return f"{versao_regras}|{identidade_do_pedido(anexo=anexo, **parametros)}"
+
+
 def _url_de_job(job_id: str, base: str = "") -> tuple[str, str]:
     raiz = base.rstrip("/")
     return f"{raiz}/jobs/{job_id}", f"{raiz}/sse/jobs/{job_id}"
@@ -120,8 +128,7 @@ def ler_ou_enfileirar(*, ente: str, exercicio: int, anexo: str, repo: Repo, fila
     """
     anexo = validar_anexo(anexo)
     parametros = parametros or {}
-    if parametros:
-        versao_regras = f"{versao_regras}|{identidade_do_pedido(anexo=anexo, **parametros)}"
+    versao_regras = versao_do_pedido(versao_regras, anexo, parametros)
     registro = repo.obter(ente, exercicio, anexo)
 
     if not forcar and _servivel(registro, versao_api, versao_regras):

@@ -224,6 +224,32 @@ def test_coluna_anterior_manual_usa_o_informado(apurar_bf):
     assert resultado.procedencia.origem_exercicio_anterior == "manual"
 
 
+def test_coluna_anterior_manual_aceita_texto_do_job(apurar_bf):
+    """Requisito: o worker entrega `anterior` e os valores como texto."""
+    fonte = fonte_com(a2025={6: [saldo("621200000", "1000.00", fonte_recursos="1500")]},
+                      e2025={}, a2024={})
+    resultado = apurar_bf(ENTE, EXERCICIO, fonte, anterior="manual",
+                          valores_anteriores={"L2": "777.00"})
+    por_codigo = {linha.codigo: linha.id for linha in resultado.mapa.linhas}
+    assert resultado.matriz[por_codigo["L2"]]["exercicio_anterior"] == Decimal("777.00")
+
+
+def test_anexo_manual_calcula_o_saldo(apurar_bf):
+    """Requisito: receita (d) e deduções (e) informadas; saldo (f) é a diferença."""
+    from app.services.bf.quadro_principal import Anterior
+
+    fonte = fonte_com(a2025={}, e2025={}, a2024={})
+    resultado = apurar_bf(
+        ENTE, EXERCICIO, fonte, anterior=Anterior.MANUAL,
+        valores_anteriores={"A:L1:receita": Decimal("100.00"), "A:L1:deducoes": Decimal("40.00")},
+    )
+    anexo = {linha.codigo: resultado.matriz[linha.id]
+             for linha in resultado.mapa.linhas if linha.quadro == "QUADRO_ANEXO"}
+    assert anexo["L1"]["receita_orcamentaria_anterior"] == Decimal("100.00")
+    assert anexo["L1"]["deducoes_anterior"] == Decimal("40.00")
+    assert anexo["L1"]["saldo_anterior"] == Decimal("60.00")
+
+
 def test_coluna_anterior_manual_sem_a_linha_nao_vira_zero(apurar_bf):
     """Requisito: valor não informado é `None` + motivo, nunca zero.
 

@@ -37,6 +37,7 @@ COLUNA_ATUAL = "exercicio_atual"
 COLUNA_ANTERIOR = "exercicio_anterior"
 SUFIXO_ATUAL = "_atual"
 SUFIXO_ANTERIOR = "_anterior"
+NAO_INFORMADO = "não informado no preenchimento manual"
 
 # Origem do saldo por linha. Não é preferência: é onde o saldo existe (evidência §N1 e §G2).
 DO_ENCERRAMENTO = frozenset({"L25", "L26"})
@@ -107,13 +108,19 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
            valores_anteriores: dict[str, Decimal] | None = None) -> Resultado:
     """Apura as 66 linhas do quadro principal, nas duas colunas."""
     inicio = time.monotonic()
+    anterior = Anterior(anterior)                # o job chega com string; a apuração compara o enum
+    if valores_anteriores:
+        valores_anteriores = {str(c): Decimal(str(v)) for c, v in valores_anteriores.items()}
     mapa = mapa or _mapa(exercicio)
     direcao = direcao or do_pcasp()
     origem = fonte_de(DEMONSTRATIVO, competencia)
-    por_codigo = {linha.codigo: linha for linha in mapa.linhas}
 
     if anterior is Anterior.MANUAL:
-        _validar_informados(valores_anteriores or {}, por_codigo)
+        principal, anexo = _partir_informados(valores_anteriores or {})
+        _validar_informados(principal, mapa, QUADRO_PRINCIPAL)
+        _validar_informados(anexo, mapa, QUADRO_ANEXO)
+    else:
+        principal, anexo = {}, {}
 
     atual, nao_apuradas, sem_dados, registros_do_exercicio = _apurar_exercicio(
         mapa, ente, exercicio, competencia, fonte, direcao, origem)
@@ -123,13 +130,24 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
         coluna_anterior, _, sem_dados_anterior, _ = _apurar_exercicio(
             mapa, ente, exercicio - 1, competencia, fonte, direcao, origem)
     else:
-        informados = valores_anteriores or {}
-        coluna_anterior = {linha.id: {COLUNA_ATUAL: informados.get(linha.codigo)}
-                           for linha in mapa.linhas}
+        coluna_anterior = {}
+        for linha in mapa.linhas:
+            if linha.quadro != QUADRO_ANEXO:
+                coluna_anterior[linha.id] = {COLUNA_ATUAL: principal.get(linha.codigo)}
+                continue
+            info = anexo.get(linha.codigo, {})
+            receita, deducoes = info.get("receita"), info.get("deducoes")
+            saldo = receita - deducoes if receita is not None and deducoes is not None else None
+            coluna_anterior[linha.id] = {"receita_orcamentaria_atual": receita,
+                                         "deducoes_atual": deducoes, "saldo_atual": saldo}
+            nao_apuradas += [NaoApurada(linha.id, coluna, "-", NAO_INFORMADO)
+                             for coluna, valor in (("receita_orcamentaria_anterior", receita),
+                                                   ("deducoes_anterior", deducoes))
+                             if valor is None]
         nao_apuradas += [
-            NaoApurada(linha.id, COLUNA_ANTERIOR, "-", "não informado no preenchimento manual")
+            NaoApurada(linha.id, COLUNA_ANTERIOR, "-", NAO_INFORMADO)
             for linha in mapa.linhas
-            if linha.quadro == QUADRO_PRINCIPAL and linha.codigo not in informados
+            if linha.quadro == QUADRO_PRINCIPAL and linha.codigo not in principal
         ]
 
     matriz = _montar(mapa, atual, coluna_anterior, anterior)
@@ -230,8 +248,22 @@ def _mapa(exercicio: int) -> MapaBO:
     return carregar(exercicio=exercicio, demonstrativo="bf")
 
 
-def _validar_informados(informados: dict[str, Decimal], por_codigo: dict[str, Linha]) -> None:
-    desconhecidas = sorted(set(informados) - set(por_codigo))
+def _partir_informados(informados: dict[str, Decimal]):
+    """Principal é `L2`. Anexo é `A:L1:receita` e `A:L1:deducoes` — o código L1 existe nos dois."""
+    principal: dict[str, Decimal] = {}
+    anexo: dict[str, dict[str, Decimal]] = {}
+    for chave, valor in informados.items():
+        partes = chave.split(":")
+        if len(partes) == 3 and partes[0] == "A" and partes[2] in ("receita", "deducoes"):
+            anexo.setdefault(partes[1], {})[partes[2]] = valor
+        else:
+            principal[chave] = valor
+    return principal, anexo
+
+
+def _validar_informados(informados: dict, mapa: MapaBO, quadro: str) -> None:
+    declarados = {linha.codigo for linha in mapa.linhas if linha.quadro == quadro}
+    desconhecidas = sorted(set(informados) - declarados)
     if desconhecidas:
         raise LinhaDesconhecida(
             f"linhas informadas que o IPC 06 não declara: {', '.join(desconhecidas)}")
@@ -267,8 +299,8 @@ def _montar(mapa: MapaBO, atual: dict, anterior_valores: dict, anterior: Anterio
             if coluna.endswith(SUFIXO_ANTERIOR):
                 par = coluna[: -len(SUFIXO_ANTERIOR)] + SUFIXO_ATUAL
                 lido = anterior_valores.get(linha.id) or {}
-                # No preenchimento manual só o quadro principal é informado; o anexo fica sem.
-                celulas[coluna] = lido.get(COLUNA_ATUAL if anterior is Anterior.MANUAL else par)
+                manual_principal = anterior is Anterior.MANUAL and linha.quadro != QUADRO_ANEXO
+                celulas[coluna] = lido.get(COLUNA_ATUAL if manual_principal else par)
             else:
                 celulas[coluna] = (atual.get(linha.id) or {}).get(coluna)
         matriz[linha.id] = celulas

@@ -2,6 +2,9 @@
 
 Documento de handoff. Escrito para quem chega sem contexto nenhum.
 
+> **Balanço Financeiro (IPC 06):** concluído no backend em 2026-09-18 — handoff próprio em
+> `docs/PONTO-DE-PARADA-BF.md`.
+
 ## Onde estamos, em uma frase
 
 A **base canônica do IPC 07** e a **F1 do Balanço Orçamentário** estão entregues, verificadas

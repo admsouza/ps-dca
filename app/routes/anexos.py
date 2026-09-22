@@ -8,7 +8,9 @@ Uma rota para os oito anexos, com `anexo` no path. O RGF tem seis conjuntos quas
 """
 from __future__ import annotations
 
+import json
 import logging
+from decimal import Decimal, InvalidOperation
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, status
@@ -70,8 +72,42 @@ def _exercicio(
     return an_referencia
 
 
+def _erro_422(detalhe: str) -> HTTPException:
+    return HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detalhe)
+
+
+def _parametros_bf(
+    anexo: Annotated[str, Depends(_anexo_valido)],
+    origem: Annotated[str | None, Query(alias="origem_exercicio_anterior")] = None,
+    valores_json: Annotated[str | None, Query(alias="valores_anteriores")] = None,
+) -> dict:
+    """Origem da coluna anterior. Só o BF usa; nos outros anexos o parâmetro é ignorado.
+
+    `msce_exercicio_anterior` (ou ausência) não entra na identidade: é o pedido padrão, e o
+    cache já gravado sem sufixo continua servível. `manual` entra, com os valores na forma
+    em que o cliente enviou — a leitura seguinte tem de repetir o mesmo texto.
+    """
+    if anexo != "BF" or not origem or origem == "msce_exercicio_anterior":
+        return {}
+    if origem != "manual":
+        raise _erro_422("origem_exercicio_anterior inválida")
+    try:
+        bruto = json.loads(valores_json) if valores_json else {}
+    except json.JSONDecodeError as erro:
+        raise _erro_422("valores_anteriores não é JSON") from erro
+    if not isinstance(bruto, dict):
+        raise _erro_422("valores_anteriores deve ser um objeto")
+    valores = {str(codigo): str(valor) for codigo, valor in bruto.items()}
+    for codigo, valor in valores.items():
+        try:
+            Decimal(valor)           # bool, lista e objeto viram texto não-numérico e caem aqui
+        except InvalidOperation as erro:
+            raise _erro_422(f"valor inválido em {codigo}") from erro
+    return {"origem_anterior": "manual", "anterior": "manual", "valores_anteriores": valores}
+
+
 async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo,
-                   forcar: bool, solicitante: int | None):
+                   forcar: bool, solicitante: int | None, parametros: dict | None = None):
     """Caminho comum de leitura e reprocessamento. Difere só em `forcar`."""
     portas = request.app.state.portas
     fila = portas["fila_async"]()
@@ -90,6 +126,7 @@ async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo
             versao_api=apuracao.VERSAO_API, versao_regras=versao,
             forcar=forcar, solicitado_por=solicitante,
             base_url=str(request.base_url).rstrip("/"),
+            parametros=parametros,
         )
     except RuntimeError as erro:                 # fila indisponível — não vira `202` mentiroso
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(erro)) from erro
@@ -144,9 +181,10 @@ async def obter_anexo(
     ente: Annotated[str, Depends(unidade_autorizada)],
     exercicio: Annotated[int, Depends(_exercicio)],
     repo: Annotated[Any, Depends(repositorio)],
+    parametros: Annotated[dict, Depends(_parametros_bf)],
 ):
     return await _decidir(request, ente, exercicio, anexo, repo,
-                          forcar=False, solicitante=None)
+                          forcar=False, solicitante=None, parametros=parametros)
 
 
 @router.post(
@@ -165,7 +203,8 @@ async def reprocessar_anexo(
     ente: Annotated[str, Depends(unidade_autorizada)],
     exercicio: Annotated[int, Depends(_exercicio)],
     repo: Annotated[Any, Depends(repositorio)],
+    parametros: Annotated[dict, Depends(_parametros_bf)],
     solicitante: Annotated[int | None, Depends(usuario_id)] = None,
 ):
     return await _decidir(request, ente, exercicio, anexo, repo,
-                          forcar=True, solicitante=solicitante)
+                          forcar=True, solicitante=solicitante, parametros=parametros)

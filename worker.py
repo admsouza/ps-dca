@@ -14,6 +14,7 @@ from arq.connections import RedisSettings
 from dotenv import load_dotenv
 
 from app.core.config import config
+from app.services.pipeline.cache import versao_do_pedido
 
 load_dotenv()
 
@@ -56,7 +57,11 @@ async def apurar_anexo(ctx: dict, *, job_id: str, ente: str, exercicio: int, ane
             repo_vigencias=RepositorioVigencias(db),
             parametros=parametros,
         )
-        versao = apuracao.versao_regras(exercicio, anexo, RepositorioVigencias(db))
+        versao = versao_do_pedido(
+            apuracao.versao_regras(exercicio, anexo, RepositorioVigencias(db)),
+            anexo,
+            parametros,
+        )
 
         await asyncio.to_thread(
             executar,

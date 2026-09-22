@@ -91,7 +91,8 @@ def _gravar_ok(repo, ente, exercicio, anexo, dados, duracao_ms,
     # mesma; divergirem significa que a regra mudou entre o enfileiramento e a execução.
     registro.versao_regras = versao_regras
     apurada = dados["procedencia"]["versao_regras"]
-    if apurada and apurada != versao_regras:
+    vigente = versao_regras.split("|", 1)[0]
+    if apurada and apurada != vigente:
         logger.warning(
             "versao_regras mudou entre enfileirar e apurar | anexo=%s ente=%s vigente=%s "
             "apurada=%s — o cache será invalidado na próxima leitura",

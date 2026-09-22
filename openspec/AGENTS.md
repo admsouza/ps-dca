@@ -66,8 +66,10 @@ auditoria por ente em `docs/entes-homologacao/<ente>/auditoria-bf-2025.md`: as 2
 IPC 06 fecham em todos, e **32 de 34** confrontos contra o RREO publicado pelo próprio ente batem em
 centavos.
 
-**Change ativa: apenas `plataforma-pipeline-dca`** (63 cenários, F2/F3 implementadas, spec ainda não
-mesclada).
+Handoff do BF para quem retoma: **`docs/PONTO-DE-PARADA-BF.md`**.
+
+**Changes ativas: `plataforma-pipeline-dca` e `vigencia-por-anexo`** (esta implementada e verde,
+aguardando aprovação e arquivamento) — 63 cenários, F2/F3 implementadas, spec ainda não mesclada.
 
 Pendências abertas que **não** bloqueiam o front:
 
