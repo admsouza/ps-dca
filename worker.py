@@ -91,12 +91,14 @@ async def apurar_completo(ctx: dict, *, job_id: str, ente: str, exercicio: int,
     pode ter sido apurado por outro pedido.
     """
     import asyncio
+    from functools import cache
 
     from app.core.database import sessao
     from app.infra.cache.repositorio import RepositorioCache
     from app.infra.cache.vigencias_repo import RepositorioVigencias
     from app.infra.msc.escopo import escopo
     from app.services.pipeline import apuracao, completo
+    from app.services.pipeline.cache import parametros_efetivos
 
     db = sessao()
     try:
@@ -104,14 +106,18 @@ async def apurar_completo(ctx: dict, *, job_id: str, ente: str, exercicio: int,
         vigencias = RepositorioVigencias(db)
         credencial = _credencial(ctx, job_id)
 
+        @cache                       # `versao_de` e `apurador_de` pedem o mesmo anexo
+        def pedido_de(anexo: str) -> dict:
+            return parametros_efetivos(parametros, repo.obter(ente, exercicio, anexo))
+
         def versao_de(anexo: str) -> str:
             return versao_do_pedido(
-                apuracao.versao_regras(exercicio, anexo, vigencias), anexo, parametros
+                apuracao.versao_regras(exercicio, anexo, vigencias), anexo, pedido_de(anexo)
             )
 
         def apurador_de(anexo: str):
             return apuracao.apurador(anexo, token=credencial, repo_vigencias=vigencias,
-                                     parametros=parametros)
+                                     parametros=pedido_de(anexo))
 
         percurso = completo.montar_percurso(
             ente=ente, exercicio=exercicio, repo=repo, lock=ctx["lock"], jobs=ctx["jobs"],

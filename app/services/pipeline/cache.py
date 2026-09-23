@@ -88,6 +88,35 @@ def identidade_do_pedido(*, anexo: str, competencia: int = 12,
     return ":".join(partes)
 
 
+def parametros_efetivos(pedido: dict | None, registro) -> dict:
+    """O que o BF vai apurar.
+
+    Origem MSC explícita não reaproveita mapa. Manual no pedido vale o que veio.
+    Pedido sem origem reaplica `procedencia.valores_anteriores` da linha, quando houver.
+    """
+    pedido = dict(pedido or {})
+    origem = pedido.get("origem_anterior") or ""
+    if origem == "msce_exercicio_anterior":
+        return {}
+    if origem == "manual":
+        return _manual(pedido.get("valores_anteriores") or {})
+    salvos = _mapa_salvo(registro)
+    return _manual(salvos) if salvos else {}
+
+
+def _manual(valores) -> dict:
+    return {"origem_anterior": "manual", "anterior": "manual", "valores_anteriores": dict(valores)}
+
+
+def _mapa_salvo(registro) -> dict[str, str]:
+    procedencia = getattr(registro, "procedencia", None) or {}
+    if (not isinstance(procedencia, dict)
+            or procedencia.get("origem_exercicio_anterior") != "manual"):
+        return {}
+    valores = procedencia.get("valores_anteriores")
+    return {str(c): str(v) for c, v in valores.items()} if isinstance(valores, dict) else {}
+
+
 def versao_do_pedido(versao_regras: str, anexo: str, parametros: dict | None) -> str:
     """Versão de cache com a identidade do pedido. Rota e worker têm de gravar a mesma:
     sem o sufixo, a leitura seguinte não reconhece o cache e enfileira de novo."""

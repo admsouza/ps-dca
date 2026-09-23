@@ -38,8 +38,8 @@ Fatia vertical: João Pessoa (2507507), exercício 2025, anexos `BO` e `BF` pont
 ## 4. VERIFY
 - [x] 4.1 `python -m pytest` — reportar `N passed / M failed`
 - [x] 4.2 `python -m ruff check .` — limpo
-- [ ] 4.3 Medição real em João Pessoa/2025: percurso completo, resumo com `BO` e `BF` em `ok`
-- [ ] 4.4 Valores idênticos aos dos jobs individuais (337 células do BO; 66 × 2 do BF)
+- [x] 4.3 Medição real em João Pessoa/2025 (SICONFI, 2026-09-23): percurso `done`, falhas 0, cache `BO` e `BF` em `ok`
+- [x] 4.4 Valores idênticos aos dos jobs individuais: 337 células do BO e 216 do BF (66 × 2 do quadro principal + 14 × 6 do quadro anexo), zero divergências. Consultas à fonte: 32 nos jobs separados, 30 no percurso — as 2 do BO saem das leituras que o BF já faz, inclusive do exercício anterior
 - [x] 4.5 Reconferência da spec: cada cenário → onde é coberto
 
 ## 5. Arquivamento

@@ -113,6 +113,7 @@ def _gravar_erro(repo, ente, exercicio, anexo, erro, versao_api, versao_regras) 
     registro = _registro(repo, ente, exercicio, anexo)
     registro.status = "erro"
     registro.resultado = None          # `ok` com zeros entraria no demonstrativo sem ninguém ver
+    # `procedencia` fica. O mapa manual mora nela; zerá-la no erro apagaria o preenchimento.
     registro.erro_detalhe = erro
     registro.versao_api = versao_api
     registro.versao_regras = versao_regras

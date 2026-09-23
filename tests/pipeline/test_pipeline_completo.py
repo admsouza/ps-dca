@@ -35,12 +35,12 @@ def cliente(repo, lock, jobs, monkeypatch):
         def enfileirar_percurso(self, ente, exercicio, job_id, **_):
             self.enfileirados = [(ente, exercicio, job_id)]
 
-    def _montar():
+    def _montar(fila_cls=FilaFake):
         app = FastAPI()
         app.include_router(rotas.router)
         app.dependency_overrides[repositorio] = lambda: repo
         app.dependency_overrides[unidade_autorizada] = lambda: ENTE
-        app.state.portas = {"fila_async": FilaFake, "lock": lock, "jobs": jobs,
+        app.state.portas = {"fila_async": fila_cls, "lock": lock, "jobs": jobs,
                             "repo_vigencias": None, "base_url": ""}
         return TestClient(app, raise_server_exceptions=False)
 
@@ -138,6 +138,29 @@ def test_exercicio_ausente_ou_invalido(cliente):
     """Scenario: exercício ausente ou inválido."""
     assert cliente().post("/batch-jobs", headers=HDR).status_code == 422
     assert cliente().post("/batch-jobs?anReferencia=1500", headers=HDR).status_code == 422
+
+
+def test_fila_indisponivel_nao_deixa_o_job_em_processing(cliente, jobs):
+    """Caso de erro: fila indisponível no enfileiramento.
+
+    O estado do percurso é gravado antes do enfileiramento. Se a fila recusar, o job tem de
+    terminar em `error` — `processing` faria o cliente acompanhar um job que ninguém executa.
+    """
+
+    class FilaQueRecusa:
+        def enfileirar_percurso(self, ente, exercicio, job_id, **_):
+            async def recusada():
+                raise ConnectionError("redis recusou")
+
+            self.pendente = recusada()
+
+    resposta = cliente(FilaQueRecusa).post(f"/batch-jobs?anReferencia={EXERCICIO}", headers=HDR)
+
+    assert resposta.status_code == 503
+    assert jobs.registros, "o percurso foi registrado antes da fila recusar"
+    estado = next(iter(jobs.registros.values()))
+    assert estado["status"] == "error"
+    assert "fila" in (estado.get("erro") or "").lower()
 
 
 # ─── Requirement: Cache válido é respeitado; reprocessar ignora ──────────────

@@ -1,0 +1,26 @@
+# Fim de linha normalizado no repositório e no working tree: LF.
+#
+# Sem isto, o working tree era misto — 90 arquivos em LF e o resto em CRLF, conforme a ferramenta
+# que gravou cada um. O índice já guardava tudo em LF (`core.autocrlf=true`), então a divergência
+# não aparecia no diff, mas reaparecia a cada arquivo novo e obrigava qualquer script de edição a
+# detectar a quebra antes de escrever.
+#
+# `eol=lf` também é o que os containers esperam: `scripts/entrypoint-api.sh` e os `Dockerfile`
+# rodam em Linux, e um `\r` no shebang quebra a execução com uma mensagem que não diz o motivo.
+* text=auto eol=lf
+
+# Tabelas oficiais da STN: `-text` — o git versiona os bytes como estão, sem converter nada.
+#
+# O `sha256` de cada uma está registrado em `knowledge/sources/stn/metadata.yaml` como procedência
+# da fonte normativa, e é conferido por `tests/test_regras_bf.py::test_dois_documentos_integros`.
+# Esses arquivos têm fim de linha **misto** (CRLF, com duas quebras em LF), e conversão de qualquer
+# lado muda o hash. Sem `-text`, o conteúdo dependia do `core.autocrlf` de quem clonou: em Linux o
+# checkout traria LF e o teste de integridade falharia — um bug latente em CI.
+docs/contas-stn/** -text
+
+# Binários: nunca converter.
+*.pdf   binary
+*.xlsx  binary
+*.png   binary
+*.jpg   binary
+*.ico   binary

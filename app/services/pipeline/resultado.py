@@ -109,7 +109,8 @@ def para_dados(resultado) -> dict:
             "classes": list(getattr(procedencia, "classes", ())),
             # Campos que só alguns demonstrativos produzem. Publicados quando existem, em vez de
             # listados aqui um a um: o serializador não deve aprender o vocabulário de cada norma.
-            **_especificos(procedencia, ("origens_por_linha", "origem_exercicio_anterior")),
+            **_especificos(procedencia, ("origens_por_linha", "origem_exercicio_anterior",
+                                         "valores_anteriores")),
         },
         "diagnostico": {
             # Declarado sempre, vazio inclusive: consumidor que não encontra a chave não sabe se a

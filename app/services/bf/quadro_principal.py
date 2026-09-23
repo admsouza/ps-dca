@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from enum import Enum
 
 from app.domain.bo.matriz import apurar as apurar_matriz
@@ -76,6 +76,8 @@ class Procedencia:
     # O que muda o valor tem de estar declarado, ou duas apurações incomparáveis passam por iguais.
     origens_por_linha: dict[str, str] = field(default_factory=dict)
     origem_exercicio_anterior: str = Anterior.MSCE.value
+    # Mapa informado, na forma em que chegou. É o que o pedido seguinte reaplica.
+    valores_anteriores: dict[str, str] | None = None
 
 
 @dataclass
@@ -109,6 +111,8 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
     """Apura as 66 linhas do quadro principal, nas duas colunas."""
     inicio = time.monotonic()
     anterior = Anterior(anterior)                # o job chega com string; a apuração compara o enum
+    manual = anterior is Anterior.MANUAL and valores_anteriores
+    informado = dict(valores_anteriores) if manual else None
     if valores_anteriores:
         valores_anteriores = {str(c): Decimal(str(v)) for c, v in valores_anteriores.items()}
     mapa = mapa or _mapa(exercicio)
@@ -168,6 +172,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
             classes=origem.classes,
             origens_por_linha=_origens(mapa, origem),
             origem_exercicio_anterior=anterior.value,
+            valores_anteriores=informado,
         ),
         diagnostico=Diagnostico(
             nao_apuradas=nao_apuradas,
@@ -238,6 +243,20 @@ def _tem_conta(linha: Linha) -> bool:
 
 
 # ─── apoio ───────────────────────────────────────────────────────────────────
+
+def validar_valores_anteriores(exercicio: int, valores: dict[str, str]) -> None:
+    """Recusa valor não-numérico e código que o IPC 06 não declara, antes de enfileirar o job."""
+    decimais = {}
+    for codigo, valor in valores.items():
+        try:
+            decimais[codigo] = Decimal(valor)
+        except InvalidOperation as erro:
+            raise ValueError(f"valor inválido em {codigo}") from erro
+    mapa = _mapa(exercicio)
+    principal, anexo = _partir_informados(decimais)
+    _validar_informados(principal, mapa, QUADRO_PRINCIPAL)
+    _validar_informados(anexo, mapa, QUADRO_ANEXO)
+
 
 def _mapa(exercicio: int) -> MapaBO:
     """Os dois quadros do BF — o principal e o anexo — num mapa só.

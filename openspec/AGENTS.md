@@ -75,6 +75,11 @@ Handoff do BF para quem retoma: **`docs/PONTO-DE-PARADA-BF.md`**.
 **Changes ativas: `plataforma-pipeline-dca` e `vigencia-por-anexo`** (esta implementada e verde,
 aguardando aprovação e arquivamento) — 63 cenários, F2/F3 implementadas, spec ainda não mesclada.
 
+**Change em fase SPEC, aguardando o PO: `bf-anterior-manual-persistido`** — o mapa manual do
+exercício anterior do BF fica na procedência da linha de cache; pedido sem origem reaplica; MSC
+só explícita apaga; `valores_anteriores` na query responde `400`. A UI irmã está em
+`front-declaracoes`, change de mesmo nome. Nenhum código antes da aprovação.
+
 Pendências abertas que **não** bloqueiam o front:
 
 - as 10 decisões de `docs/decisoes-bf-para-po-2026-09-18.md`, adotadas conforme a recomendação

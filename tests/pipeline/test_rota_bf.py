@@ -102,13 +102,19 @@ def test_bf_deixa_de_aparecer_como_anexo_sem_servico():
     assert implementado("BF")
 
 
-def test_parametros_manuais_do_bf_entram_no_pedido():
+def test_valores_na_query_sao_recusados():
+    """Scenario: mapa na query é recusado."""
+    from fastapi import HTTPException
+
     from app.routes.anexos import _parametros_bf
 
     assert _parametros_bf("BF", None, None) == {}
-    assert _parametros_bf("BF", "msce_exercicio_anterior", None) == {}
-    assert _parametros_bf("BO", "manual", '{"L2": "1.00"}') == {}
-    pedido = _parametros_bf("BF", "manual", '{"L2": "1.00"}')
-    assert pedido["anterior"] == "manual"
-    assert pedido["origem_anterior"] == "manual"
-    assert pedido["valores_anteriores"] == {"L2": "1.00"}
+    assert _parametros_bf("BF", "msce_exercicio_anterior", None) == {
+        "origem_anterior": "msce_exercicio_anterior",
+    }
+    with pytest.raises(HTTPException) as erro:
+        _parametros_bf("BF", "manual", '{"L2": "1.00"}')
+    assert erro.value.status_code == 400
+    with pytest.raises(HTTPException) as erro_bo:
+        _parametros_bf("BO", None, '{"L2": "1.00"}')
+    assert erro_bo.value.status_code == 400
