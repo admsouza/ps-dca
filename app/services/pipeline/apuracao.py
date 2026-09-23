@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 VERSAO_API = "0.1.0"
 
 
-def fonte(nome: str | None = None, token: str | None = None, cache=None):
-    """Adapter de MSC pelo nome. `cache` compartilha o espaço `msc_cache:` com RREO e RGF."""
+def fonte(nome: str | None = None, token: str | None = None):
+    """Adapter de MSC pelo nome, com a memória da execução por cima."""
     escolhido = (nome or config().fonte_padrao).strip().lower()
     if escolhido == "publicsoft":
         from app.infra.msc.publicsoft import PublicSoftMSC
@@ -34,15 +34,20 @@ def fonte(nome: str | None = None, token: str | None = None, cache=None):
 
         bruta = SiconfiMSC()
 
-    return _ComCache(bruta, cache) if cache is not None else bruta
+    return _NoEscopo(bruta, escolhido)
 
 
-class _ComCache:
-    """Envolve a fonte no cache de dados comum, sem que a fonte saiba disso."""
+class _NoEscopo:
+    """Envolve a fonte na memória da execução, sem que a fonte saiba disso.
 
-    def __init__(self, bruta, cache) -> None:
+    Nada é persistido: o recorte lido vale para o job que o leu e some com ele — o ente retifica
+    declaração já publicada, e dado guardado entre execuções serviria o número anterior à
+    retificação (`app/infra/msc/cache.py`).
+    """
+
+    def __init__(self, bruta, nome: str = "") -> None:
         self._bruta = bruta
-        self._cache = cache
+        self._nome = nome
 
     def registros(self, ente: int, ano: int, mes: int, classe: int,
                   matriz=None, tipo_saldo=None):
@@ -55,9 +60,8 @@ class _ComCache:
         """
         from app.infra.msc.cache import ler_ou_baixar
 
-        return ler_ou_baixar(fonte=self._bruta, cache=self._cache,
-                             ente=ente, ano=ano, mes=mes, classe=classe,
-                             matriz=matriz, tipo_saldo=tipo_saldo)
+        return ler_ou_baixar(fonte=self._bruta, ente=ente, ano=ano, mes=mes, classe=classe,
+                             matriz=matriz, tipo_saldo=tipo_saldo, fonte_nome=self._nome)
 
 
 def mapa_vigente(exercicio: int, anexo: str = "BO", repo_vigencias=None):
@@ -86,8 +90,7 @@ def mapa_vigente(exercicio: int, anexo: str = "BO", repo_vigencias=None):
 
 
 def apurador(anexo: str = "BO", *, fonte_nome: str | None = None, token: str | None = None,
-             cache=None, repo_vigencias=None,
-             parametros: dict | None = None) -> Callable[[int, int], Any]:
+             repo_vigencias=None, parametros: dict | None = None) -> Callable[[int, int], Any]:
     """A função `(ente, exercicio) -> Resultado` que o worker executa.
 
     A versão de regras **não** sai daqui: ela depende do exercício, e quem precisa dela antes de
@@ -99,7 +102,7 @@ def apurador(anexo: str = "BO", *, fonte_nome: str | None = None, token: str | N
     if descricao.servico is None:
         raise NotImplementedError(f"anexo {descricao.codigo} ainda não tem serviço de apuração")
 
-    dados = fonte(fonte_nome, token, cache)
+    dados = fonte(fonte_nome, token)
 
     apurar = _servico_de(descricao.codigo)
     extras = _aceitos_por(apurar, parametros or {})

@@ -25,6 +25,7 @@ from app.infra.msc.normalizacao import itens, normalizar
 
 URL_PADRAO = os.getenv("SICONFI_API_URL", "https://apidatalake.tesouro.gov.br/ords/siconfi")
 TIMEOUT = int(os.getenv("SICONFI_TIMEOUT", "30"))
+POOL = int(os.getenv("SICONFI_POOL_MAXSIZE") or 12)      # `or`: variável vazia no .env
 
 ENDPOINT_POR_CLASSE = {
     1: "msc_patrimonial", 2: "msc_patrimonial", 3: "msc_patrimonial", 4: "msc_patrimonial",
@@ -45,9 +46,11 @@ ID_TV = {
 
 
 def _http_requests(url: str, params: dict, timeout: int) -> dict:
-    import requests  # importado aqui: o domínio nunca alcança a dependência de rede
+    # Sessão compartilhada: pool de conexões entre as páginas e retry de 429/5xx, que o retry
+    # por exceção abaixo não enxerga. Importada aqui — o domínio nunca alcança a rede.
+    from app.infra.msc.http import sessao
 
-    resposta = requests.get(url, params=params, timeout=timeout)
+    resposta = sessao(pool=POOL).get(url, params=params, timeout=timeout)
     resposta.raise_for_status()
     return resposta.json()
 

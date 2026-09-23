@@ -101,7 +101,7 @@ def _url_de_job(job_id: str, base: str = "") -> tuple[str, str]:
     return f"{raiz}/jobs/{job_id}", f"{raiz}/sse/jobs/{job_id}"
 
 
-def _servivel(registro, versao_api: str, versao_regras: str) -> bool:
+def servivel(registro, versao_api: str, versao_regras: str) -> bool:
     """`ok` com as duas versões conferindo.
 
     `versao_regras` é o que a DCA tem e os irmãos não: uma correção de conta em
@@ -131,7 +131,7 @@ def ler_ou_enfileirar(*, ente: str, exercicio: int, anexo: str, repo: Repo, fila
     versao_regras = versao_do_pedido(versao_regras, anexo, parametros)
     registro = repo.obter(ente, exercicio, anexo)
 
-    if not forcar and _servivel(registro, versao_api, versao_regras):
+    if not forcar and servivel(registro, versao_api, versao_regras):
         return Resposta(status=200, resultado=registro.resultado, anexo=anexo)
 
     job_id = job_manager.novo_id()

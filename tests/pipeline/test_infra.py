@@ -318,3 +318,35 @@ def test_verificacao_de_dependencias_no_startup_do_worker(caplog):
     assert "redis" in str(erro.value).lower()
     assert any("refused" in m.lower() for m in caplog.messages), \
         "falha de dependência ficou silenciosa"
+
+
+def test_import_de_adapter_inexistente_nao_passa_da_suite():
+    """Requisito: o que a API e o worker importam dos adapters existe de verdade.
+
+    O import do lifespan mora **dentro** da função (`main.py`), e por isso não falha na coleta dos
+    testes nem no lint: falha no boot do container, com a suíte verde. Foi o que aconteceu ao
+    remover `CacheMscRedis` do adapter sem tirá-lo do `main.py`. A varredura é do repositório
+    inteiro, não só do `main`, porque o próximo import assim pode estar em qualquer lugar.
+    """
+    import ast
+
+    from app.infra.fila import redis_adapters
+    from tests.conftest import RAIZ_REPO
+
+    existentes = set(dir(redis_adapters))
+    faltando: list[str] = []
+    for caminho in sorted(RAIZ_REPO.rglob("*.py")):
+        if any(parte in {".ruff_cache", ".history", "tests"} for parte in caminho.parts):
+            continue
+        arvore = ast.parse(caminho.read_text(encoding="utf-8"), filename=str(caminho))
+        for no in ast.walk(arvore):
+            if isinstance(no, ast.ImportFrom) and no.module == "app.infra.fila.redis_adapters":
+                faltando += [
+                    f"{caminho.relative_to(RAIZ_REPO)}:{no.lineno} -> {alias.name}"
+                    for alias in no.names
+                    if alias.name not in existentes
+                ]
+
+    assert faltando == [], "importam de `redis_adapters` o que não existe:\n  - " + "\n  - ".join(
+        faltando
+    )

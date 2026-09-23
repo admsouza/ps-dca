@@ -14,6 +14,8 @@ from dataclasses import dataclass
 ANEXO_BO = "BO"
 ANEXO_BF = "BF"
 JOB_APURAR = "apurar_anexo"
+# Um job para o percurso inteiro — os anexos vêm do próprio registry.
+JOB_COMPLETO = "apurar_completo"
 
 
 @dataclass(frozen=True)

@@ -45,7 +45,6 @@ async def lifespan(app: FastAPI):
     from app.core.database import sessao
     from app.infra.cache.vigencias_repo import RepositorioVigencias
     from app.infra.fila.redis_adapters import (
-        CacheMscRedis,
         CofreRedis,
         FilaArqAsync,
         JobsRedis,
@@ -67,7 +66,6 @@ async def lifespan(app: FastAPI):
         "jobs": JobsRedis(sincrono),
         "lock": LockRedis(sincrono),
         "cofre": CofreRedis(sincrono),
-        "cache_msc": CacheMscRedis(sincrono),
         "repo_vigencias": RepositorioVigencias(db_vigencias),
         "fila_async": lambda: FilaArqAsync(pool, cfg.fila),
     }

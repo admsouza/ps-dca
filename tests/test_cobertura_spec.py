@@ -31,6 +31,8 @@ CENARIOS_ESPERADOS = {
     # 63 da plataforma + 9 da entrada do BF no pipeline (`bf-no-pipeline`)
     # + 4 da vigência por anexo (`vigencia-por-anexo`).
     "pipeline/plataforma": 76,
+    # 11 do percurso completo (`pipeline-completo-dca`).
+    "pipeline/processamento-completo": 11,
 }
 
 # Capabilities cuja fase TEST já começou — só delas se exige teste por cenário.
@@ -38,7 +40,8 @@ CENARIOS_ESPERADOS = {
 # implementar. Os testes existem e são vermelhos de propósito; a cobertura passa a ser exigida
 # daqui para a frente, e cenário novo sem teste quebra o build.
 COM_TESTES = ("dca/base-canonica-regras", "dca/balanco-orcamentario",
-              "dca/balanco-financeiro", "dca/fonte-msc", "pipeline/plataforma")
+              "dca/balanco-financeiro", "dca/fonte-msc", "pipeline/plataforma",
+              "pipeline/processamento-completo")
 
 
 def _specs() -> dict[str, list[Path]]:

@@ -1,4 +1,4 @@
-"""`GET /dca/{anexo}` · `POST /dca/{anexo}/reprocessar` · `GET /dca/resumo`.
+"""`GET /dca/{anexo}` · `POST /dca/{anexo}/reprocessar` · `GET /dca/resumo` · `POST /batch-jobs`.
 
 A rota valida entrada e autorização, lê o cache, enfileira e responde. **Nada** de cálculo,
 consulta a fonte ou composição de demonstrativo — o requisito é explícito, e o contraexemplo é a
@@ -17,8 +17,9 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, sta
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
+from app.infra.fila import job_manager
 from app.routes.dependencias import repositorio, unidade_autorizada, usuario_id
-from app.services.pipeline import apuracao
+from app.services.pipeline import apuracao, completo
 from app.services.pipeline import cache as cache_service
 from app.services.pipeline import resumo as resumo_service
 from app.services.pipeline.registry import ANEXOS, AnexoDesconhecido, validar_anexo
@@ -45,6 +46,24 @@ class JobAceito(BaseModel):
     sse_url: str | None = None
     anexo: str | None = None
     mensagem: str | None = None
+
+
+class NoPercursoResposta(BaseModel):
+    anexo: str
+    estado: str = Field(description="`a_apurar`, `em_cache`, `already_queued` "
+                                    "ou `nao_implementado`.")
+    job_id: str | None = Field(default=None, description="Em `already_queued`: o job em voo.")
+    calculado_em: Any = None
+
+
+class PercursoAceito(BaseModel):
+    """`202` — percurso enfileirado. Mesmo contrato de batch job que RREO e RGF publicam."""
+
+    batch_job_id: str
+    status: str = "processing"
+    poll_url: str | None = None
+    sse_url: str | None = None
+    anexos: list[NoPercursoResposta] = Field(default_factory=list)
 
 
 class EntradaResumo(BaseModel):
@@ -147,6 +166,67 @@ async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo
             anexo=resposta.anexo,
             mensagem=resposta.mensagem,
         ).model_dump(),
+    )
+
+
+@router.post(
+    "/batch-jobs",
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=PercursoAceito,
+    summary="Apurar todos os anexos implementados de um ente e exercício",
+    description=(
+        "Um job para o percurso inteiro. Anexo com cache válido não é reapurado, salvo "
+        "`forcar=true`; anexo com job em voo é reportado como `already_queued` e pulado; anexo sem "
+        "serviço aparece como `nao_implementado`. O demonstrativo continua sendo lido em "
+        "`GET /dca/{anexo}` — aqui só se acompanha o percurso."
+    ),
+)
+async def processar_percurso(
+    request: Request,
+    ente: Annotated[str, Depends(unidade_autorizada)],
+    exercicio: Annotated[int, Depends(_exercicio)],
+    repo: Annotated[Any, Depends(repositorio)],
+    forcar: Annotated[bool, Query(description="Reapura todos, ignorando cache válido.")] = False,
+    solicitante: Annotated[int | None, Depends(usuario_id)] = None,
+):
+    portas = request.app.state.portas
+    fila = portas["fila_async"]()
+
+    def versao_de(anexo: str) -> str:
+        return apuracao.versao_regras(exercicio, anexo, portas.get("repo_vigencias"))
+
+    try:
+        percurso = completo.montar_percurso(
+            ente=ente, exercicio=exercicio, repo=repo, lock=portas["lock"], jobs=portas["jobs"],
+            versao_api=apuracao.VERSAO_API, versao_de_regras=versao_de, forcar=forcar,
+        )
+    except Exception as erro:                    # sem regra vigente não há o que apurar
+        raise _erro_422(str(erro)) from erro
+
+    if not completo.implementados(percurso):
+        # `202` aqui prometeria um job que não faria nada, e o cliente ficaria acompanhando o vazio.
+        raise _erro_422("nenhum anexo implementado no registry")
+
+    job_id = job_manager.novo_id()
+    completo.registrar(portas["jobs"], job_id, ente=ente, exercicio=exercicio, percurso=percurso)
+    try:
+        fila.enfileirar_percurso(ente, exercicio, job_id,
+                                 forcar=forcar, solicitado_por=solicitante)
+    except Exception as erro:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE,
+                            detail=f"fila indisponível: {erro}") from erro
+    if getattr(fila, "pendente", None) is not None:
+        await fila.pendente
+
+    raiz = str(request.base_url).rstrip("/")
+    logger.info("percurso enfileirado | ente=%s exercicio=%s job=%s forcar=%s anexos=%s",
+                ente, exercicio, job_id, forcar, len(completo.implementados(percurso)))
+    return PercursoAceito(
+        batch_job_id=job_id,
+        poll_url=f"{raiz}/batch-jobs/{job_id}",
+        sse_url=f"{raiz}/sse/batch-jobs/{job_id}",
+        anexos=[NoPercursoResposta(anexo=no.anexo, estado=no.estado, job_id=no.job_id,
+                                   calculado_em=no.calculado_em) for no in percurso],
     )
 
 

@@ -111,33 +111,6 @@ class CofreRedis:
         return bruto.decode("utf-8") if bruto else None
 
 
-class CacheMscRedis:
-    """Cache de dados da MSC — espaço **comum** aos três pipelines.
-
-    Escreve no formato do próprio processo (JSON) e lê tanto o seu quanto o parquet do RREO. O
-    pickle do RREO é ignorado por segurança; `app/infra/msc/cache.py::decodificar` explica.
-    """
-
-    def __init__(self, redis, ttl: int = 1800) -> None:
-        self._redis = redis
-        self._ttl = ttl
-
-    def obter(self, chave: str):
-        from app.infra.fila.serializacao import PayloadInvalido
-        from app.infra.msc.cache import decodificar
-
-        bruto = self._redis.get(chave)
-        if not bruto:
-            return None
-        try:
-            return desserializar(bruto)
-        except PayloadInvalido:
-            return decodificar(bruto)          # payload do RREO: parquet ok, pickle recusado
-
-    def gravar(self, chave: str, valor) -> None:
-        self._redis.setex(chave, self._ttl, serializar(valor))
-
-
 class FilaArq:
     """Enfileira no `arq`, na fila própria da DCA. Um job só, parametrizado por anexo (P4)."""
 
@@ -173,6 +146,26 @@ class FilaArq:
             )
 
 
+    def enfileirar_percurso(self, ente: str, exercicio: int, job_id: str, **parametros) -> None:
+        """Job do percurso completo: um para todos os anexos, sem `anexo` no payload."""
+        import asyncio
+
+        from app.services.pipeline.registry import JOB_COMPLETO
+
+        corrotina = self._pool.enqueue_job(
+            JOB_COMPLETO, _job_id=job_id, _queue_name=self._fila,
+            job_id=job_id, ente=ente, exercicio=exercicio, **parametros,
+        )
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(corrotina)
+        else:
+            raise RuntimeError(
+                "FilaArq.enfileirar_percurso chamada de dentro de um event loop — use FilaArqAsync"
+            )
+
+
 class FilaArqAsync:
     """Mesma fila, para quem já está no event loop da API.
 
@@ -198,4 +191,12 @@ class FilaArqAsync:
             exercicio=exercicio,
             anexo=anexo,
             **parametros,
+        )
+
+    def enfileirar_percurso(self, ente: str, exercicio: int, job_id: str, **parametros) -> None:
+        from app.services.pipeline.registry import JOB_COMPLETO
+
+        self.pendente = self._pool.enqueue_job(
+            JOB_COMPLETO, _job_id=job_id, _queue_name=self._fila,
+            job_id=job_id, ente=ente, exercicio=exercicio, **parametros,
         )

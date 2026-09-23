@@ -55,6 +55,15 @@ A identidade de um resultado SHALL ser `(id_ente, an_referencia, anexo)`. O cach
 como inválido quando `versao_api` ou `versao_regras` divergirem das atuais. A apuração NÃO DEVE
 servir resultado cuja versão de regras não seja a vigente.
 
+**O resultado apurado persiste, e a retificação da declaração NÃO o invalida sozinha** (decisão do
+PO, 2026-09-23). É a diferença deliberada em relação ao **dado** da MSC, que não é persistido em
+lugar nenhum: o dado bruto é rebaixado a cada job porque o ente retifica declaração já publicada; o
+demonstrativo apurado permanece e só sai de cena por mudança de versão de API ou de regra, ou por
+reprocessamento explícito. Reapurar depois de uma retificação é, portanto, **ação de quem pede** —
+`POST /dca/{anexo}/reprocessar` — e não efeito automático de tempo. Não há TTL no resultado: um
+prazo arbitrário reapuraria o que ninguém retificou e continuaria servindo velho o que foi
+retificado no minuto seguinte.
+
 #### Scenario: regra alterada invalida o cache
 
 - **GIVEN** cache `ok` gravado com `versao_regras` `A`
@@ -401,13 +410,14 @@ e implementada na borda.
 - **WHEN** a apuração roda com cada uma
 - **THEN** nenhum arquivo do domínio precisa mudar
 
-### Requirement: Estado de execução isolado; cache de dados compartilhado
+### Requirement: Estado de execução isolado; dado da MSC não persistido
 
 No Redis comum aos pipelines, o **estado de execução** da DCA — fila, jobs, locks e resultados —
 SHALL ser isolado por prefixo próprio, e seu worker NÃO DEVE consumir job de outro pipeline. O
-**cache de dados da MSC**, ao contrário, SHALL usar o espaço comum: os mesmos ente, exercício,
-competência e classe produzem o mesmo dado para qualquer pipeline, e uma leitura já feita NÃO DEVE
-ser refeita só porque partiu de outro módulo.
+**dado da MSC** NÃO DEVE ser persistido entre execuções: o ente pode retificar declaração já
+publicada, de qualquer exercício, e um recorte guardado serviria o número anterior à retificação
+sem que nada acusasse a diferença. A leitura SHALL valer apenas para a execução que a fez — dentro
+dela, o mesmo recorte NÃO DEVE ser consultado duas vezes.
 
 #### Scenario: job não vaza entre pipelines
 
@@ -416,16 +426,17 @@ ser refeita só porque partiu de outro módulo.
 - **THEN** apenas o worker da DCA o consome
 - **AND** as chaves de job, lock e resultado da DCA trazem prefixo próprio
 
-#### Scenario: dado de MSC já em cache é reaproveitado
+#### Scenario: dado de MSC não é reaproveitado entre execuções
 
-- **GIVEN** que outro pipeline já leu e cacheou a MSC de um ente, exercício, competência e classe
-- **WHEN** a DCA precisa exatamente desse recorte
-- **THEN** ela reaproveita o dado cacheado
-- **AND** nenhuma nova consulta à fonte é feita
+- **GIVEN** um recorte de MSC lido durante a apuração de um anexo
+- **WHEN** o mesmo recorte é pedido de novo na mesma execução
+- **THEN** a fonte não é consultada outra vez
+- **AND** numa execução seguinte a fonte é consultada de novo, porque a declaração pode ter sido
+  retificada
 
 #### Scenario: recortes diferentes não se confundem
 
-- **GIVEN** dados cacheados para classes ou competências distintas
+- **GIVEN** recortes lidos para classes ou competências distintas
 - **WHEN** um recorte é solicitado
 - **THEN** o dado devolvido corresponde exatamente ao recorte pedido
 

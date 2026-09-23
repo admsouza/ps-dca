@@ -43,6 +43,7 @@ async def apurar_anexo(ctx: dict, *, job_id: str, ente: str, exercicio: int, ane
     from app.core.database import sessao
     from app.infra.cache.repositorio import RepositorioCache
     from app.infra.cache.vigencias_repo import RepositorioVigencias
+    from app.infra.msc.escopo import escopo
     from app.services.pipeline import apuracao
     from app.services.pipeline.job import executar
 
@@ -53,7 +54,6 @@ async def apurar_anexo(ctx: dict, *, job_id: str, ente: str, exercicio: int, ane
         apurador = apuracao.apurador(
             anexo,
             token=credencial,
-            cache=ctx.get("cache_msc"),
             repo_vigencias=RepositorioVigencias(db),
             parametros=parametros,
         )
@@ -63,13 +63,70 @@ async def apurar_anexo(ctx: dict, *, job_id: str, ente: str, exercicio: int, ane
             parametros,
         )
 
-        await asyncio.to_thread(
-            executar,
-            ente=ente, exercicio=exercicio, anexo=anexo,
-            repo=repo, lock=ctx["lock"], jobs=ctx["jobs"],
-            apurador=apurador, versao_api=apuracao.VERSAO_API, versao_regras=versao,
-            job_id=job_id, notificador=ctx.get("notificador"),
+        # O escopo abre aqui e fecha com o job: é a única memória de dado da MSC que existe, e
+        # ela morre com a execução — o ente retifica declaração publicada, e nada do que foi lido
+        # pode ser servido a um job seguinte. Dentro do job, ela evita as leituras repetidas da
+        # apuração (três origens × seis classes no BF) e o gate de auditoria da fonte.
+        # `to_thread` copia o contexto, então a thread da apuração enxerga o mesmo escopo.
+        with escopo():
+            await asyncio.to_thread(
+                executar,
+                ente=ente, exercicio=exercicio, anexo=anexo,
+                repo=repo, lock=ctx["lock"], jobs=ctx["jobs"],
+                apurador=apurador, versao_api=apuracao.VERSAO_API, versao_regras=versao,
+                job_id=job_id, notificador=ctx.get("notificador"),
+            )
+    finally:
+        db.close()
+
+
+async def apurar_completo(ctx: dict, *, job_id: str, ente: str, exercicio: int,
+                          forcar: bool = False, solicitado_por: int | None = None,
+                          **parametros) -> None:
+    """O percurso inteiro num job. Wrapper fino, como o job por anexo.
+
+    A memória de execução da MSC abre **uma vez** para todos os anexos: o BO reaproveita as classes
+    que o BF já leu (18 consultas à fonte contra 20 em jobs separados) e nada disso sobrevive ao
+    job. O percurso é remontado aqui, e não herdado da rota: entre o `202` e a execução, um anexo
+    pode ter sido apurado por outro pedido.
+    """
+    import asyncio
+
+    from app.core.database import sessao
+    from app.infra.cache.repositorio import RepositorioCache
+    from app.infra.cache.vigencias_repo import RepositorioVigencias
+    from app.infra.msc.escopo import escopo
+    from app.services.pipeline import apuracao, completo
+
+    db = sessao()
+    try:
+        repo = RepositorioCache(db)
+        vigencias = RepositorioVigencias(db)
+        credencial = _credencial(ctx, job_id)
+
+        def versao_de(anexo: str) -> str:
+            return versao_do_pedido(
+                apuracao.versao_regras(exercicio, anexo, vigencias), anexo, parametros
+            )
+
+        def apurador_de(anexo: str):
+            return apuracao.apurador(anexo, token=credencial, repo_vigencias=vigencias,
+                                     parametros=parametros)
+
+        percurso = completo.montar_percurso(
+            ente=ente, exercicio=exercicio, repo=repo, lock=ctx["lock"], jobs=ctx["jobs"],
+            versao_api=apuracao.VERSAO_API, versao_de_regras=versao_de, forcar=forcar,
         )
+
+        with escopo():
+            await asyncio.to_thread(
+                completo.executar_percurso,
+                ente=ente, exercicio=exercicio, percurso=percurso,
+                repo=repo, lock=ctx["lock"], jobs=ctx["jobs"], job_id=job_id,
+                apurador_de=apurador_de, versao_api=apuracao.VERSAO_API,
+                versao_de_regras=versao_de, notificador=ctx.get("notificador"),
+                solicitado_por=solicitado_por,
+            )
     finally:
         db.close()
 
@@ -95,7 +152,6 @@ async def startup(ctx: dict) -> None:
     """
     from app.core.database import ping as ping_banco
     from app.infra.fila.redis_adapters import (
-        CacheMscRedis,
         CofreRedis,
         JobsRedis,
         LockRedis,
@@ -117,7 +173,6 @@ async def startup(ctx: dict) -> None:
     ctx["jobs"] = JobsRedis(sincrono)
     ctx["lock"] = LockRedis(sincrono)
     ctx["cofre"] = CofreRedis(sincrono)
-    ctx["cache_msc"] = CacheMscRedis(sincrono)
     ctx["notificador"] = _notificador()
 
     preparar(ctx["lock"])
@@ -163,7 +218,7 @@ async def shutdown(ctx: dict) -> None:
 class WorkerSettings:
     """Configuração do `arq`. Fila própria: o worker da DCA não consome job de outro pipeline."""
 
-    functions = [apurar_anexo]
+    functions = [apurar_anexo, apurar_completo]
     queue_name = cfg.fila
     redis_settings = RedisSettings(
         host=cfg.redis_host,

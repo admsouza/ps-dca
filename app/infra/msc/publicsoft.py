@@ -36,14 +36,16 @@ URL_SALDOS = os.getenv("PUBLICSOFT_API_URL", "")
 URL_AUDITORIA = os.getenv("PUBLICSOFT_AUDIT_URL", "")
 TIMEOUT = int(os.getenv("PUBLICSOFT_TIMEOUT", "120"))
 SSL_VERIFY = os.getenv("PUBLICSOFT_SSL_VERIFY", "true").lower() not in ("false", "0", "no")
+POOL = int(os.getenv("PUBLICSOFT_POOL_MAXSIZE") or 12)   # `or`: variável vazia no .env
 
 
 def _http_requests(url: str, params: dict | None = None, headers: dict | None = None,
                    timeout: int = TIMEOUT) -> dict:
-    import requests
+    from app.infra.msc.http import sessao
 
-    resposta = requests.get(url, params=params, headers=headers, timeout=timeout,
-                            verify=SSL_VERIFY)
+    resposta = sessao(pool=POOL, verificar_ssl=SSL_VERIFY).get(
+        url, params=params, headers=headers, timeout=timeout
+    )
     resposta.raise_for_status()
     return resposta.json()
 
@@ -88,6 +90,20 @@ class PublicSoftMSC:
         return COMPETENCIA_13 if matriz is Matriz.ENCERRAMENTO else mes
 
     def _auditoria_liberada(self, ano: int, mes: int) -> bool:
+        """Uma consulta por competência **por job**: o gate é o mesmo para as seis classes.
+
+        Sem a memória de execução eram seis chamadas idênticas por leitura de matriz — dezoito num
+        BF — para a API responder sempre a mesma coisa. Fora de um escopo aberto (CLI, teste), o
+        comportamento é o de antes: consulta a cada chamada.
+        """
+        from app.infra.msc.escopo import obter_ou_buscar
+
+        # ponytail: chave sem o ente — um job apura um ente só. Se um job passar a apurar vários,
+        # o ente entra aqui.
+        return obter_ou_buscar(f"auditoria:{ano}:{mes}",
+                               lambda: self._consultar_auditoria(ano, mes))
+
+    def _consultar_auditoria(self, ano: int, mes: int) -> bool:
         resposta = self._http(
             self._url_auditoria,
             params={"exercicio": ano, "mesMsc": mes},

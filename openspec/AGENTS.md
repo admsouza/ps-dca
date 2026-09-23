@@ -68,6 +68,10 @@ centavos.
 
 Handoff do BF para quem retoma: **`docs/PONTO-DE-PARADA-BF.md`**.
 
+**Change em fase SPEC, aguardando o PO: `pipeline-completo-dca`** — `POST /dca/processar` e
+`POST /dca/reprocessar`, um job percorrendo os anexos implementados (11 cenários, capability nova
+`pipeline/processamento-completo`). Nenhum código antes da aprovação.
+
 **Changes ativas: `plataforma-pipeline-dca` e `vigencia-por-anexo`** (esta implementada e verde,
 aguardando aprovação e arquivamento) — 63 cenários, F2/F3 implementadas, spec ainda não mesclada.
 

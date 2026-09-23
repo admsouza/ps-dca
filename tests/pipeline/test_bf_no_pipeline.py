@@ -1,9 +1,9 @@
 """O Balanço Financeiro servido pelo mesmo pipeline do BO.
 
-O defeito que estes testes existem para pegar é **silencioso**: o envelope de cache de dados foi
-escrito quando só havia o BO, que lê uma origem de saldo. O BF lê três. Se o envelope não repassar
-o par de leitura, as três viram uma, e `L25`, `L26` e `L29`–`L32` saem com números plausíveis e
-errados — sem exceção, sem log, sem célula não apurada.
+O defeito que estes testes existem para pegar é **silencioso**: o envelope que envolve a fonte na
+memória da execução foi escrito quando só havia o BO, que lê uma origem de saldo. O BF lê três. Se
+o envelope não repassar o par de leitura, as três viram uma, e `L25`, `L26` e `L29`–`L32` saem com
+números plausíveis e errados — sem exceção, sem log, sem célula não apurada.
 """
 from __future__ import annotations
 
@@ -26,25 +26,12 @@ class FonteEspiã:
         return []
 
 
-class CacheFalso:
-    def __init__(self):
-        self.chaves: list[str] = []
-        self._dados: dict[str, object] = {}
-
-    def obter(self, chave):
-        self.chaves.append(chave)
-        return self._dados.get(chave)
-
-    def guardar(self, chave, valor, ttl=None):
-        self._dados[chave] = valor
-
-
 def test_envelope_de_cache_repassa_o_par_de_leitura():
     """Scenario: as três origens do BF chegam à fonte"""
-    from app.services.pipeline.apuracao import _ComCache
+    from app.services.pipeline.apuracao import _NoEscopo
 
-    fonte, cache = FonteEspiã(), CacheFalso()
-    envelope = _ComCache(fonte, cache)
+    fonte = FonteEspiã()
+    envelope = _NoEscopo(fonte, "siconfi")
     envelope.registros(1, 2025, 12, 1, matriz=Matriz.ENCERRAMENTO, tipo_saldo=TipoSaldo.ABERTURA)
     envelope.registros(1, 2025, 12, 1, matriz=Matriz.ENCERRAMENTO,
                        tipo_saldo=TipoSaldo.ENCERRAMENTO)
@@ -53,15 +40,14 @@ def test_envelope_de_cache_repassa_o_par_de_leitura():
     assert [p["tipo_saldo"] for p in fonte.pedidos] == [
         TipoSaldo.ABERTURA, TipoSaldo.ENCERRAMENTO, TipoSaldo.ABERTURA]
     assert [p["ano"] for p in fonte.pedidos] == [2025, 2025, 2024]
-    assert len(set(cache.chaves)) == 3, "cada origem ocupa uma entrada de cache própria"
 
 
 def test_envelope_nao_inventa_o_par_de_leitura():
     """Scenario: o par de leitura não é inventado pelo envelope"""
-    from app.services.pipeline.apuracao import _ComCache
+    from app.services.pipeline.apuracao import _NoEscopo
 
     fonte = FonteEspiã()
-    _ComCache(fonte, CacheFalso()).registros(1, 2025, 12, 5)
+    _NoEscopo(fonte, "siconfi").registros(1, 2025, 12, 5)
     assert fonte.pedidos[0]["matriz"] is None
     assert fonte.pedidos[0]["tipo_saldo"] is None
 

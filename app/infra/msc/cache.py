@@ -1,21 +1,17 @@
-"""Cache de dados da MSC — o único espaço do Redis compartilhado com RREO e RGF.
+"""De onde a apuração lê a MSC, e por quanto tempo o dado lido continua valendo.
 
-Mesmo ente, exercício, competência e classe produzem o mesmo dado para qualquer pipeline: a MSC de
-João Pessoa baixada pelo RREO serve à DCA sem nova consulta à fonte. Por isso a chave é a **do
-RREO**, byte a byte (`app/infra/fila/chaves.py::msc`).
+**Nada de dado da MSC é persistido.** O ente pode retificar declaração já publicada, de qualquer
+exercício — inclusive de anos fechados —, e um recorte guardado entre execuções entregaria o
+número anterior à retificação sem que nada acusasse a diferença. Cache de dado aqui é decisão
+contábil, não de desempenho: reapurar é barato, publicar número revogado não é.
 
-**O que o RREO grava lá, e por que a DCA não lê tudo.** Ele serializa com um byte de formato à
-frente (`app/utils/redis_cache.py`): `\\x02` = parquet+lz4 (DataFrame, o caso real da MSC) e
-`\\x01` = **pickle**+lz4 (outros tipos). Desserializar pickle escrito por outro processo executa
-código arbitrário — o mesmo risco que a spec proíbe para payload de job. Então:
+O que existe é a **memória da execução** (`app/infra/msc/escopo.py`): o recorte lido uma vez no
+job é reaproveitado pelas demais leituras *daquele* job e descartado ao fim dele. É o que evita as
+18 consultas idênticas de um BF (três origens × seis classes) sem nunca atravessar execuções.
 
-| Formato no Redis | DCA |
-|---|---|
-| `\\x02` parquet | lê e reaproveita |
-| `\\x01` pickle | trata como **miss** e reconsulta a fonte |
-| desconhecido | miss — é o que o próprio RREO faz |
-
-Perde-se reuso no caso raro; não se ganha um `pickle.loads` sobre dado de terceiro.
+A chave continua sendo a do RREO byte a byte (`app/infra/fila/chaves.py::msc`): identifica o
+recorte dentro do escopo e mantém a compatibilidade documentada, caso um dia a retificação passe a
+ser detectável e o espaço comum volte a ser usável.
 """
 from __future__ import annotations
 
@@ -27,119 +23,49 @@ from app.infra.fila import chaves
 
 logger = logging.getLogger(__name__)
 
-FORMATO_PARQUET = b"\x02"
-FORMATO_PICKLE = b"\x01"
-
-
-class CacheDados(Protocol):
-    """Porta do cache de dados. O adapter Redis traduz formato; o service só vê registros."""
-
-    def obter(self, chave: str) -> Any: ...
-    def gravar(self, chave: str, valor: Any) -> None: ...
-
 
 class Fonte(Protocol):
     def registros(self, ente: int, ano: int, mes: int, classe: int,
                   matriz=None, tipo_saldo=None) -> Sequence[Any]: ...
 
 
-def para_dados(registros: Sequence[Any]) -> list[dict]:
-    """`Registro` -> dicts, para o cache guardar dado e não objeto (nada de pickle)."""
-    return [
-        {**r._asdict(), "valor": str(r.valor)} if hasattr(r, "_asdict") else dict(r)
-        for r in registros
-    ]
+def ler_ou_baixar(*, fonte: Fonte, ente: int, ano: int, mes: int, classe: int,
+                  matriz=None, tipo_saldo=None, fonte_nome: str = "") -> Any:
+    """Devolve o recorte pedido, consultando a fonte uma vez por execução.
 
+    A chave inclui competência, classe e o **par (matriz, tipo de saldo)**: um demonstrativo que
+    lê três origens — o BF lê a abertura do exercício, o encerramento e a abertura do exercício
+    anterior — receberia três vezes a mesma se o par ficasse de fora, e `L25`, `L26` e `L29`–`L32`
+    sairiam com números plausíveis e errados, sem exceção e sem célula não apurada.
 
-def de_dados(brutos: Sequence[Any]) -> list[Any] | None:
-    """dicts -> `Registro`, pelo **mesmo** normalizador dos adapters de fonte.
-
-    Serve aos dois formatos de uma vez: o nosso (chaves de `Registro`) e o do RREO (colunas da API
-    do SICONFI). `normalizacao.CAMPOS` já cobre as duas grafias, então reidratar aqui não duplica
-    conhecimento de payload.
-
-    `None` quando o payload **não** é reconhecível — formato antigo, de outro produtor, ou
-    corrompido. Num Redis compartilhado por três pipelines, isso acontece: o correto é tratar como
-    miss e reconsultar a fonte, nunca deixar a apuração morrer por um dado alheio.
+    Fora de um escopo aberto (CLI, teste), consulta a fonte a cada chamada.
     """
-    from app.infra.msc.normalizacao import normalizar
+    from app.infra.msc.escopo import obter_ou_buscar
 
-    reidratados = []
-    for bruto in brutos:
-        if hasattr(bruto, "conta"):
-            reidratados.append(bruto)
-            continue
-        if not isinstance(bruto, dict):
-            logger.info("cache MSC em formato não reconhecido (%s) — tratado como miss",
-                        type(bruto).__name__)
-            return None
-        reidratados.append(normalizar(bruto))
-    return reidratados
+    chave = _chave(ente, ano, mes, classe, matriz, tipo_saldo, fonte_nome)
+    return obter_ou_buscar(
+        chave,
+        lambda: fonte.registros(ente, ano, mes, classe, matriz=matriz, tipo_saldo=tipo_saldo),
+    )
 
 
-def ler_ou_baixar(*, fonte: Fonte, cache: CacheDados | None, ente: int, ano: int,
-                  mes: int, classe: int, matriz=None, tipo_saldo=None) -> Any:
-    """Devolve o recorte pedido, do cache comum quando houver.
+def _chave(ente: int, ano: int, mes: int, classe: int, matriz, tipo_saldo,
+           fonte_nome: str = "") -> str:
+    """Identidade do recorte, no formato de chave do RREO.
 
-    A chave inclui competência e classe: uma chave por ente/exercício devolveria despesa onde se
-    pediu receita. E inclui o **par (matriz, tipo de saldo)** quando ele não é o do RREO: o espaço
-    do Redis é compartilhado, e gravar ali a matriz de encerramento sob a chave que o RREO usa para
-    a consolidada serviria dado de outra origem aos três pipelines.
+    `id_tv` e `fonte_dados` entram preenchidos com o vocabulário que o RREO grava
+    (`ending_balance`, `siconfi`/`publicsoft`) — é o texto deles que compõe o hash, e deixá-los
+    vazios produzia uma identidade que não corresponde a recorte nenhum dos irmãos.
     """
-    if cache is None:
-        return fonte.registros(ente, ano, mes, classe, matriz=matriz, tipo_saldo=tipo_saldo)
-
-    chave = _chave(ente, ano, mes, classe, matriz, tipo_saldo)
-    guardado = cache.obter(chave)
-    if guardado:
-        registros = de_dados(guardado)
-        if registros is not None:
-            logger.debug("cache MSC hit | ente=%s ano=%s mes=%s classe=%s",
-                         ente, ano, mes, classe)
-            return registros
-
-    registros = fonte.registros(ente, ano, mes, classe, matriz=matriz, tipo_saldo=tipo_saldo)
-    if registros:            # vazio pode ser falha de fonte; não se cacheia, como no RREO
-        cache.gravar(chave, para_dados(registros))
-    return registros
-
-
-def _chave(ente: int, ano: int, mes: int, classe: int, matriz, tipo_saldo) -> str:
-    """Chave do RREO quando o par é o dele; chave própria quando não é."""
     from app.infra.msc.fonte import Matriz, TipoSaldo
+    from app.infra.msc.siconfi import ID_TV  # o vocabulário de API que o RREO grava na chave
 
     do_rreo = matriz in (None, Matriz.CONSOLIDADA) and tipo_saldo in (
         None, TipoSaldo.ENCERRAMENTO
     )
     if do_rreo:
-        return chaves.msc(ente, ano, mes, classe)
-    return chaves.msc(ente, ano, mes, classe,
-                      id_tv=str(tipo_saldo or ""), extra=str(matriz or ""))
-
-
-def decodificar(bruto: bytes | None) -> Any:
-    """Lê o que o RREO gravou. `None` = miss, e quem chama reconsulta a fonte."""
-    if not bruto:
-        return None
-
-    formato, corpo = bruto[:1], bruto[1:]
-    if formato == FORMATO_PICKLE:
-        logger.info("cache MSC em pickle — ignorado por segurança (A08); refazendo a consulta")
-        return None
-    if formato != FORMATO_PARQUET:
-        return None
-
-    try:
-        import io
-
-        import pyarrow.parquet as pq
-    except ImportError:
-        logger.debug("pyarrow ausente — cache MSC do RREO não é lido neste processo")
-        return None
-
-    try:
-        tabela = pq.read_table(io.BytesIO(corpo))
-    except Exception:
-        logger.warning("cache MSC ilegível — tratado como miss", exc_info=True)
-        return None
-    return tabela.to_pylist()
+        return chaves.msc(ente, ano, mes, classe,
+                          id_tv=ID_TV[TipoSaldo.ENCERRAMENTO], fonte=fonte_nome)
+    return chaves.msc(ente, ano, mes, classe, fonte=fonte_nome,
+                      id_tv=ID_TV[tipo_saldo or TipoSaldo.ENCERRAMENTO],
+                      extra=str(matriz or ""))

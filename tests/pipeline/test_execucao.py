@@ -41,19 +41,6 @@ from tests.test_fronteira_camadas import _fecho_de, _importados
 ENTE_NUM = int(ENTE)
 
 
-class CacheFake:
-    """Dublê do Redis de dados: dicionário puro, sem TTL nem serialização."""
-
-    def __init__(self, conteudo: dict | None = None):
-        self.conteudo = dict(conteudo or {})
-
-    def obter(self, chave: str):
-        return self.conteudo.get(chave)
-
-    def gravar(self, chave: str, valor) -> None:
-        self.conteudo[chave] = valor
-
-
 CONTA_RECEITA = "521110000"
 CONTA_DESPESA = "621200000"
 NR = "1100.00.00"
@@ -303,51 +290,52 @@ def test_job_nao_vaza_entre_pipelines():
     assert not any(c.startswith(("rreo", "rgf", chaves.PREFIXO_MSC)) for c in produzidas)
 
 
-def test_dado_de_msc_ja_em_cache_e_reaproveitado(fonte):
-    """Scenario: dado de MSC já em cache é reaproveitado.
+def test_dado_de_msc_nao_sobrevive_a_execucao(fonte):
+    """Scenario: dado de MSC não é reaproveitado entre execuções.
 
-    O recorte foi cacheado por outro pipeline, sob o prefixo comum. A DCA lê do cache e **não**
-    consulta a fonte — é o reuso que justifica compartilhar `msc_cache:`.
+    O ente retifica declaração já publicada, de qualquer exercício. Um recorte guardado entre
+    execuções serviria o número anterior à retificação sem nada acusar — por isso a leitura vale
+    para o job que a fez e some com ele.
     """
-    from app.infra.fila import chaves
     from app.infra.msc.cache import ler_ou_baixar
+    from app.infra.msc.escopo import escopo
 
-    recorte = dict(ente=ENTE_NUM, ano=EXERCICIO, mes=12, classe=5)
-    chave = chaves.msc(**recorte)
-    assert chave.startswith("msc_cache:"), chave
+    recorte = dict(ente=ENTE_NUM, ano=EXERCICIO, mes=12, classe=5, fonte_nome="siconfi")
 
-    ja_baixado = [{"conta": CONTA_RECEITA, "natureza": "C", "valor": "1.00"}]
-    cache = CacheFake({chave: ja_baixado})
-
-    # O que volta é `Registro` do domínio, não o dict cru: o cache guarda dado (nunca objeto
-    # serializado), e a reidratação usa o mesmo normalizador dos adapters de fonte.
-    devolvidos = ler_ou_baixar(fonte=fonte, cache=cache, **recorte)
+    with escopo():
+        for _ in range(3):
+            devolvidos = ler_ou_baixar(fonte=fonte, **recorte)
     assert [r.conta for r in devolvidos] == [CONTA_RECEITA]
-    assert fonte.chamadas == [], "consultou a fonte com o recorte já em cache"
+    assert len(fonte.chamadas) == 1, "leituras repetidas do mesmo job foram à fonte de novo"
+
+    with escopo():
+        ler_ou_baixar(fonte=fonte, **recorte)
+    assert len(fonte.chamadas) == 2, "o dado do job anterior sobreviveu ao job"
 
 
 def test_recortes_diferentes_nao_se_confundem(fonte):
     """Scenario: recortes diferentes não se confundem.
 
-    Classe e competência entram na chave. Uma chave por ente/exercício devolveria despesa onde se
-    pediu receita.
+    Classe e competência entram na identidade do recorte. Uma identidade por ente/exercício
+    devolveria despesa onde se pediu receita.
     """
-    from app.infra.fila import chaves
-    from app.infra.msc.cache import ler_ou_baixar
+    from app.infra.msc.cache import _chave, ler_ou_baixar
+    from app.infra.msc.escopo import escopo
 
-    cache = CacheFake({
-        chaves.msc(ENTE_NUM, EXERCICIO, 12, 5): [{"conta": CONTA_RECEITA, "natureza": "C"}],
-        chaves.msc(ENTE_NUM, EXERCICIO, 12, 6): [{"conta": CONTA_DESPESA, "natureza": "D"}],
-        chaves.msc(ENTE_NUM, EXERCICIO, 11, 5): [],
-    })
+    def chave(mes, classe):
+        return _chave(ENTE_NUM, EXERCICIO, mes, classe, None, None, "siconfi")
 
-    assert len({chaves.msc(ENTE_NUM, EXERCICIO, m, c)
-                for m in (11, 12) for c in (5, 6)}) == 4, "chave não distingue os recortes"
+    distintas = {chave(m, c) for m in (11, 12) for c in (5, 6)}
+    assert len(distintas) == 4, "identidade não distingue os recortes"
 
-    devolvidos = ler_ou_baixar(fonte=fonte, cache=cache, ente=ENTE_NUM, ano=EXERCICIO,
-                               mes=12, classe=6)
-    assert [r.conta for r in devolvidos] == [CONTA_DESPESA], "veio o recorte de outra classe"
-    assert fonte.chamadas == []
+    with escopo():
+        ler_ou_baixar(fonte=fonte, ente=ENTE_NUM, ano=EXERCICIO, mes=12, classe=5,
+                      fonte_nome="siconfi")
+        devolvidos = ler_ou_baixar(fonte=fonte, ente=ENTE_NUM, ano=EXERCICIO, mes=12, classe=6,
+                                   fonte_nome="siconfi")
+
+    assert [c["classe"] for c in fonte.chamadas] == [5, 6], "recorte de uma classe serviu a outra"
+    assert devolvidos, "a segunda classe não chegou a ser lida"
 
 
 # ─── Requirement: Estado do job é serializado sem execução de código ────────
