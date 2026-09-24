@@ -36,7 +36,7 @@ def apurar(mapa: MapaBO, registros: Sequence[Registro], direcao, por_conta: bool
     """
     matriz = Matriz(vigencia=mapa.vigencia)
     linhas = mapa.por_id()
-    ordem = _ordem_topologica(linhas)
+    ordem = ordem_topologica(linhas)
     derivadas = _catalogo_de_derivadas(mapa)
     por_regra = registros_por_regra or {}
 
@@ -215,7 +215,7 @@ def _aplicar_condicao(linha: Linha, matriz: Matriz) -> None:
 
 # ─── ordem topológica ────────────────────────────────────────────────────────
 
-def _ordem_topologica(linhas: dict[str, Linha]) -> list[str]:
+def ordem_topologica(linhas: dict[str, Linha]) -> list[str]:
     ordem: list[str] = []
     estado: dict[str, int] = {}    # 0 = não visto, 1 = na pilha, 2 = fechado
     pilha: list[str] = []

@@ -125,7 +125,7 @@ def _parametros_do_corpo(corpo: CorpoAnterior, exercicio: int) -> dict:
     valor aqui também significaria converter cada um duas vezes, e a segunda conversão é a que
     vale.
     """
-    from app.services.bf.quadro_principal import validar_valores_anteriores
+    from app.services.bf.informados import validar_valores_anteriores
 
     origem = corpo.origem_exercicio_anterior
     if origem == "msce_exercicio_anterior":

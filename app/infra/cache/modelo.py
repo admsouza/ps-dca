@@ -55,7 +55,9 @@ class AnexoCache(Base):
     calculado_em = Column(DateTime(timezone=True), server_default=func.now())
     duracao_ms = Column(Integer)
     versao_api = Column(String(20))
-    versao_regras = Column(String(64))
+    # Hash das regras + sufixo da identidade do pedido (competência, origem manual, …).
+    # Era String(64); o sufixo do BF manual estoura esse teto.
+    versao_regras = Column(Text)
     procedencia = Column(JSONB)
     diagnostico = Column(JSONB)
     erro_detalhe = Column(Text)

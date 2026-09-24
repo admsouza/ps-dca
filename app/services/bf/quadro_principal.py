@@ -19,20 +19,24 @@ O que difere do BO, e por quê (tudo medido em 2026-09-18,
 """
 from __future__ import annotations
 
+import re
 import time
+import unicodedata
 from dataclasses import dataclass, field
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from enum import Enum
 
 from app.domain.bo.matriz import apurar as apurar_matriz
+from app.domain.bo.matriz import ordem_topologica
 from app.domain.bo.modelo import Linha, MapaBO, NaoApurada, Registro, Residuo
 from app.infra.msc.fonte import COMPETENCIA_DE_ENCERRAMENTO, TipoSaldo, fonte_de
 from app.infra.pcasp.natureza import do_pcasp
-from app.infra.regras.carregador import carregar
+from app.services.bf.informados import QUADRO_ANEXO, QUADRO_PRINCIPAL
+from app.services.bf.informados import mapa_bf as _mapa
+from app.services.bf.informados import partir_informados as _partir_informados
+from app.services.bf.informados import validar_informados as _validar_informados
 
 DEMONSTRATIVO = "BF"
-QUADRO_PRINCIPAL = "QUADRO_PRINCIPAL"
-QUADRO_ANEXO = "QUADRO_ANEXO"
 COLUNA_ATUAL = "exercicio_atual"
 COLUNA_ANTERIOR = "exercicio_anterior"
 SUFIXO_ATUAL = "_atual"
@@ -55,10 +59,6 @@ class Anterior(Enum):
 
     MSCE = "msce_exercicio_anterior"
     MANUAL = "manual"
-
-
-class LinhaDesconhecida(ValueError):
-    """Valor informado para uma linha que o IPC 06 não declara. Recusado antes de apurar."""
 
 
 @dataclass(frozen=True)
@@ -134,6 +134,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
         coluna_anterior, _, sem_dados_anterior, _ = _apurar_exercicio(
             mapa, ente, exercicio - 1, competencia, fonte, direcao, origem)
     else:
+        principal, saldos_anexo = _completar_manual(mapa, principal, anexo)
         coluna_anterior = {}
         for linha in mapa.linhas:
             if linha.quadro != QUADRO_ANEXO:
@@ -141,13 +142,22 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
                 continue
             info = anexo.get(linha.codigo, {})
             receita, deducoes = info.get("receita"), info.get("deducoes")
-            saldo = receita - deducoes if receita is not None and deducoes is not None else None
-            coluna_anterior[linha.id] = {"receita_orcamentaria_atual": receita,
-                                         "deducoes_atual": deducoes, "saldo_atual": saldo}
-            nao_apuradas += [NaoApurada(linha.id, coluna, "-", NAO_INFORMADO)
-                             for coluna, valor in (("receita_orcamentaria_anterior", receita),
-                                                   ("deducoes_anterior", deducoes))
-                             if valor is None]
+            saldo = saldos_anexo.get(linha.codigo)
+            if saldo is None and receita is not None and deducoes is not None:
+                saldo = receita - deducoes
+            coluna_anterior[linha.id] = {
+                "receita_orcamentaria_atual": receita,
+                "deducoes_atual": deducoes,
+                "saldo_atual": saldo,
+            }
+            nao_apuradas += [
+                NaoApurada(linha.id, coluna, "-", NAO_INFORMADO)
+                for coluna, valor in (
+                    ("receita_orcamentaria_anterior", receita),
+                    ("deducoes_anterior", deducoes),
+                )
+                if valor is None and not linha.composta
+            ]
         nao_apuradas += [
             NaoApurada(linha.id, COLUNA_ANTERIOR, "-", NAO_INFORMADO)
             for linha in mapa.linhas
@@ -244,48 +254,152 @@ def _tem_conta(linha: Linha) -> bool:
 
 # ─── apoio ───────────────────────────────────────────────────────────────────
 
-def validar_valores_anteriores(exercicio: int, valores: dict[str, str]) -> None:
-    """Recusa valor não-numérico e código que o IPC 06 não declara, antes de enfileirar o job."""
-    decimais = {}
-    for codigo, valor in valores.items():
-        try:
-            decimais[codigo] = Decimal(valor)
-        except InvalidOperation as erro:
-            raise ValueError(f"valor inválido em {codigo}") from erro
-    mapa = _mapa(exercicio)
-    principal, anexo = _partir_informados(decimais)
-    _validar_informados(principal, mapa, QUADRO_PRINCIPAL)
-    _validar_informados(anexo, mapa, QUADRO_ANEXO)
+def _normalizar_rotulo(rotulo: str) -> str:
+    texto = unicodedata.normalize("NFD", rotulo)
+    texto = "".join(c for c in texto if unicodedata.category(c) != "Mn")
+    texto = re.sub(r"\([^)]*\)", " ", texto)
+    return re.sub(r"[^a-zA-Z0-9]+", " ", texto).lower().strip()
 
 
-def _mapa(exercicio: int) -> MapaBO:
-    """Os dois quadros do BF — o principal e o anexo — num mapa só.
+def _codigos_bloco_receita_i(mapa: MapaBO) -> set[str]:
+    ingressos = [
+        linha for linha in mapa.linhas
+        if linha.quadro == QUADRO_PRINCIPAL and linha.grupo == "INGRESSOS"
+    ]
+    inicio = next((i for i, linha in enumerate(ingressos) if linha.codigo == "L1"), None)
+    if inicio is None:
+        return set()
+    nivel = ingressos[inicio].nivel
+    saida = {ingressos[inicio].codigo}
+    for linha in ingressos[inicio + 1:]:
+        if linha.nivel <= nivel:
+            break
+        saida.add(linha.codigo)
+    return saida
 
-    Separá-los em dois serviços duplicaria a leitura da MSC: as mesmas classes, o mesmo ente, o
-    mesmo exercício, para produzir dois pedaços do mesmo demonstrativo.
-    """
-    return carregar(exercicio=exercicio, demonstrativo="bf")
+
+def _saldos_anexo_manual(
+    mapa: MapaBO, anexo: dict[str, dict[str, Decimal]],
+) -> dict[str, Decimal]:
+    """Saldo (f) por código do anexo a partir do mapa Manual."""
+    saldos: dict[str, Decimal] = {}
+    for linha in mapa.linhas:
+        if linha.quadro != QUADRO_ANEXO or linha.composta:
+            continue
+        info = anexo.get(linha.codigo, {})
+        receita, deducoes = info.get("receita"), info.get("deducoes")
+        if receita is None and deducoes is None:
+            continue
+        saldos[linha.codigo] = (receita or Decimal("0.00")) - (deducoes or Decimal("0.00"))
+    folhas = list(saldos)
+
+    por_id = mapa.por_id()
+    for linha in mapa.linhas:
+        if linha.quadro != QUADRO_ANEXO:
+            continue
+        if not (linha.composta or _normalizar_rotulo(linha.rotulo) == "total"):
+            continue
+        if linha.referencias:
+            soma = Decimal("0.00")
+            algum = False
+            for ref in linha.referencias:
+                filha = por_id.get(ref.regra)
+                if filha is None or filha.codigo not in saldos:
+                    continue
+                parcela = saldos[filha.codigo]
+                soma += parcela if ref.sinal == "+" else -parcela
+                algum = True
+            if algum:
+                saldos[linha.codigo] = soma
+                continue
+        if _normalizar_rotulo(linha.rotulo) == "total" and folhas:
+            saldos[linha.codigo] = sum(
+                (saldos[c] for c in folhas), Decimal("0.00"),
+            )
+    return saldos
 
 
-def _partir_informados(informados: dict[str, Decimal]):
-    """Principal é `L2`. Anexo é `A:L1:receita` e `A:L1:deducoes` — o código L1 existe nos dois."""
-    principal: dict[str, Decimal] = {}
-    anexo: dict[str, dict[str, Decimal]] = {}
-    for chave, valor in informados.items():
-        partes = chave.split(":")
-        if len(partes) == 3 and partes[0] == "A" and partes[2] in ("receita", "deducoes"):
-            anexo.setdefault(partes[1], {})[partes[2]] = valor
+def _derivar_receita_i_do_anexo(
+    mapa: MapaBO, saldos: dict[str, Decimal],
+) -> dict[str, Decimal]:
+    bloco = _codigos_bloco_receita_i(mapa)
+    if not bloco or not saldos:
+        return {}
+    por_rotulo: dict[str, Decimal] = {}
+    saldo_total: Decimal | None = None
+    for linha in mapa.linhas:
+        if linha.quadro != QUADRO_ANEXO:
+            continue
+        valor = saldos.get(linha.codigo)
+        if valor is None:
+            continue
+        if linha.composta or _normalizar_rotulo(linha.rotulo) == "total":
+            saldo_total = valor
         else:
-            principal[chave] = valor
-    return principal, anexo
+            por_rotulo[_normalizar_rotulo(linha.rotulo)] = valor
+
+    out: dict[str, Decimal] = {}
+    for linha in mapa.linhas:
+        if linha.codigo not in bloco:
+            continue
+        if linha.codigo == "L1":
+            if saldo_total is not None:
+                out[linha.codigo] = saldo_total
+            continue
+        casado = por_rotulo.get(_normalizar_rotulo(linha.rotulo))
+        if casado is not None:
+            out[linha.codigo] = casado
+    return out
 
 
-def _validar_informados(informados: dict, mapa: MapaBO, quadro: str) -> None:
-    declarados = {linha.codigo for linha in mapa.linhas if linha.quadro == quadro}
-    desconhecidas = sorted(set(informados) - declarados)
-    if desconhecidas:
-        raise LinhaDesconhecida(
-            f"linhas informadas que o IPC 06 não declara: {', '.join(desconhecidas)}")
+def _aplicar_compostas_manual(
+    mapa: MapaBO,
+    principal: dict[str, Decimal],
+    preservar: frozenset[str],
+) -> dict[str, Decimal]:
+    """Preenche totalizadoras do principal somando parcelas disponíveis (D6)."""
+    linhas = {
+        linha.id: linha for linha in mapa.linhas if linha.quadro == QUADRO_PRINCIPAL
+    }
+    if not linhas:
+        return principal
+    out = dict(principal)
+    codigo_por_id = {linha.id: linha.codigo for linha in linhas.values()}
+    for rule_id in ordem_topologica(linhas):
+        linha = linhas[rule_id]
+        if not linha.composta or linha.codigo in preservar:
+            continue
+        soma = Decimal("0.00")
+        algum = False
+        for ref in linha.referencias:
+            codigo = codigo_por_id.get(ref.regra)
+            if codigo is None:
+                continue
+            parcela = out.get(codigo)
+            if parcela is None:
+                continue
+            soma += parcela if ref.sinal == "+" else -parcela
+            algum = True
+        if algum:
+            out[linha.codigo] = soma
+    return out
+
+
+def _completar_manual(
+    mapa: MapaBO,
+    principal: dict[str, Decimal],
+    anexo: dict[str, dict[str, Decimal]],
+) -> tuple[dict[str, Decimal], dict[str, Decimal]]:
+    """De-para anexo → (I) e totalizadoras do principal na coluna anterior."""
+    saldos = _saldos_anexo_manual(mapa, anexo)
+    derivados = _derivar_receita_i_do_anexo(mapa, saldos)
+    if anexo:
+        bloco_i = _codigos_bloco_receita_i(mapa)
+        principal = {k: v for k, v in principal.items() if k not in bloco_i}
+    principal = {**principal, **derivados}
+    # L1 é o TOTAL do anexo: as compostas do principal não podem sobrescrevê-lo.
+    preservar = frozenset({"L1"}) & derivados.keys()
+    return _aplicar_compostas_manual(mapa, principal, preservar), saldos
 
 
 def _origens(mapa: MapaBO, origem) -> dict[str, str]:
@@ -334,22 +448,25 @@ def _colunas_de(linha: Linha, atual: dict) -> tuple[str, ...]:
 
 
 def _conferir_anexo(mapa: MapaBO, matriz: dict) -> dict | None:
-    """`L14 (c)` do anexo contra `L1` do principal — a mesma receita líquida por dois caminhos.
-
-    Diferente é achado, não erro: em Recife a diferença é exatamente a receita sem fonte de
-    recursos na MSC, que o principal perde por compor `L1` das linhas por fonte.
-    """
+    """`L14` do anexo contra `L1` do principal — atual e, no Manual, também anterior."""
     por_quadro = {(linha.quadro, linha.codigo): linha.id for linha in mapa.linhas}
     anexo = por_quadro.get((QUADRO_ANEXO, "L14"))
     principal = por_quadro.get((QUADRO_PRINCIPAL, "L1"))
     if anexo is None or principal is None:
         return None
-    do_anexo = (matriz.get(anexo) or {}).get("saldo_atual")
-    do_principal = (matriz.get(principal) or {}).get(COLUNA_ATUAL)
-    if do_anexo is None or do_principal is None:
-        return None
-    return {"anexo_l14_saldo": do_anexo, "principal_l1": do_principal,
-            "diferenca": do_anexo - do_principal}
+    saida: dict = {}
+    for sufixo, col_anexo, col_principal in (
+        ("", "saldo_atual", COLUNA_ATUAL),
+        ("_anterior", "saldo_anterior", COLUNA_ANTERIOR),
+    ):
+        do_anexo = (matriz.get(anexo) or {}).get(col_anexo)
+        do_principal = (matriz.get(principal) or {}).get(col_principal)
+        if do_anexo is None or do_principal is None:
+            continue
+        saida[f"anexo_l14_saldo{sufixo}"] = do_anexo
+        saida[f"principal_l1{sufixo}"] = do_principal
+        saida[f"diferenca{sufixo}"] = do_anexo - do_principal
+    return saida or None
 
 
 def _residuos_de_fonte(mapa: MapaBO, registros) -> list[Residuo]:

@@ -29,8 +29,9 @@ CENARIOS_ESPERADOS = {
     # 12 da fonte por demonstrativo + 3 da competência de encerramento por API.
     "dca/fonte-msc": 15,
     # 63 da plataforma + 9 da entrada do BF no pipeline (`bf-no-pipeline`)
-    # + 4 da vigência por anexo (`vigencia-por-anexo`).
-    "pipeline/plataforma": 76,
+    # + 4 da vigência por anexo (`vigencia-por-anexo`)
+    # + 4 do mapa manual persistido (`bf-anterior-manual-persistido`).
+    "pipeline/plataforma": 80,
     # 11 do percurso completo (`pipeline-completo-dca`).
     "pipeline/processamento-completo": 11,
 }

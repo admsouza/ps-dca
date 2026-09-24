@@ -80,6 +80,10 @@ exercício anterior do BF fica na procedência da linha de cache; pedido sem ori
 só explícita apaga; `valores_anteriores` na query responde `400`. A UI irmã está em
 `front-declaracoes`, change de mesmo nome. Nenhum código antes da aprovação.
 
+**Change em fase VERIFY (implementada): `bf-manual-anexo-alimenta-receita-i`** — Manual:
+anexo alimenta `(I)`; totalizadoras/`TOTAL (VI)` pela `calculation` (parcelas disponíveis).
+Aguardando mescla da spec e archive. Front irmão já faz preview; pode deixar de injetar `(I)`.
+
 Pendências abertas que **não** bloqueiam o front:
 
 - as 10 decisões de `docs/decisoes-bf-para-po-2026-09-18.md`, adotadas conforme a recomendação

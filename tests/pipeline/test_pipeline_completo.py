@@ -141,7 +141,7 @@ def test_exercicio_ausente_ou_invalido(cliente):
 
 
 def test_fila_indisponivel_nao_deixa_o_job_em_processing(cliente, jobs):
-    """Caso de erro: fila indisponível no enfileiramento.
+    """Requisito: fila indisponível no enfileiramento não deixa o job em `processing`.
 
     O estado do percurso é gravado antes do enfileiramento. Se a fila recusar, o job tem de
     terminar em `error` — `processing` faria o cliente acompanhar um job que ninguém executa.

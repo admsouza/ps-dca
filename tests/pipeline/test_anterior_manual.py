@@ -9,6 +9,7 @@ from tests.pipeline.conftest import LockFake
 ENTE = "2611606"
 EXERCICIO = 2025
 HDR = {"Authorization": "Bearer t", "X-Unidade-Id": ENTE}
+OUTRO_ENTE = "2507507"
 L17 = "628456869.17"
 
 
@@ -45,14 +46,15 @@ class _Fila:
                               "job_id": job_id, **kwargs})
 
 
-def _cliente(repo, fila):
+def _cliente(repo, fila, unidade=ENTE):
     from app.routes import anexos as rotas
     from app.routes.dependencias import repositorio, unidade_autorizada
 
     app = FastAPI()
     app.include_router(rotas.router)
     app.dependency_overrides[repositorio] = lambda: repo
-    app.dependency_overrides[unidade_autorizada] = lambda: ENTE
+    if unidade:                                  # `unidade=None` exercita a autorização real
+        app.dependency_overrides[unidade_autorizada] = lambda: unidade
     app.state.portas = {
         "fila_async": lambda: fila,
         "lock": LockFake(),
@@ -175,5 +177,43 @@ def test_codigo_fora_do_ipc_responde_422(monkeypatch):
     )
     assert resposta.status_code == 422
     assert "L99" in resposta.json()["detail"]
+    assert repo.registro.procedencia["valores_anteriores"] == {"L17": L17}
+    assert fila.chamadas == []
+
+
+def test_percurso_completo_reaplica_o_mapa(monkeypatch):
+    """Scenario: percurso completo reaplica o mapa."""
+    from app.services.pipeline import apuracao
+    from app.services.pipeline.cache import parametros_efetivos
+    from tests.bf.conftest import fonte_com
+
+    monkeypatch.setattr(apuracao, "fonte",
+                        lambda *_a, **_k: fonte_com(a2025={}, e2025={}, a2024={}))
+    registro = _Registro({"origem_exercicio_anterior": "manual",
+                          "valores_anteriores": {"L17": L17}})
+    # É o que o worker monta por anexo no percurso: pedido sem origem + a procedência gravada.
+    apurar = apuracao.apurador("BF", parametros=parametros_efetivos({}, registro))
+    resultado = apurar(int(ENTE), EXERCICIO)
+
+    assert resultado.procedencia.origem_exercicio_anterior == "manual"
+    assert resultado.procedencia.valores_anteriores == {"L17": L17}
+
+
+def test_post_do_mapa_para_ente_alheio_responde_403(monkeypatch):
+    """Scenario: ente não autorizado."""
+    monkeypatch.setattr(
+        "app.auth.autorizacao.verificar_jwt",
+        lambda _t: {"sub": "u@x", "unidade": ENTE},
+    )
+    repo = _Repo(_Registro({"origem_exercicio_anterior": "manual",
+                            "valores_anteriores": {"L17": L17}}))
+    fila = _Fila()
+    resposta = _cliente(repo, fila, unidade=None).post(
+        f"/dca/BF/reprocessar?anReferencia={EXERCICIO}",
+        headers={"Authorization": "Bearer t", "X-Unidade-Id": OUTRO_ENTE},
+        json={"origem_exercicio_anterior": "manual", "valores_anteriores": {"L17": "1.00"}},
+    )
+    assert resposta.status_code == 403
+    assert repo.gravados == []
     assert repo.registro.procedencia["valores_anteriores"] == {"L17": L17}
     assert fila.chamadas == []

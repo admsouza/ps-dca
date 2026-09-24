@@ -250,6 +250,65 @@ def test_anexo_manual_calcula_o_saldo(apurar_bf):
     assert anexo["L1"]["saldo_anterior"] == Decimal("60.00")
 
 
+def test_anexo_manual_alimenta_folha_e_l1_sob_receita_i(apurar_bf):
+    """Scenario: saldo (f) do anexo preenche a folha de mesmo rótulo sob (I).
+    Scenario: TOTAL do anexo alimenta Receita Orçamentária (I).
+    """
+    from app.services.bf.quadro_principal import Anterior
+
+    fonte = fonte_com(a2025={}, e2025={}, a2024={})
+    resultado = apurar_bf(
+        ENTE, EXERCICIO, fonte, anterior=Anterior.MANUAL,
+        valores_anteriores={"A:L1:receita": Decimal("100.00"), "A:L1:deducoes": Decimal("40.00")},
+    )
+    m = {
+        linha.codigo: resultado.matriz[linha.id].get("exercicio_anterior")
+        for linha in resultado.mapa.linhas if linha.quadro == "QUADRO_PRINCIPAL"
+    }
+    assert m["L2"] == Decimal("60.00")
+    assert m["L1"] == Decimal("60.00")
+
+
+def test_manual_total_vi_soma_secoes_disponiveis(apurar_bf):
+    """Scenario: TOTAL (VI) oficial após Apurar Manual."""
+    from app.services.bf.quadro_principal import Anterior
+
+    fonte = fonte_com(a2025={}, e2025={}, a2024={})
+    resultado = apurar_bf(
+        ENTE, EXERCICIO, fonte, anterior=Anterior.MANUAL,
+        valores_anteriores={
+            "A:L1:receita": Decimal("100.00"),
+            "A:L1:deducoes": Decimal("40.00"),
+            "L17": Decimal("10.00"),
+        },
+    )
+    m = {
+        linha.codigo: resultado.matriz[linha.id].get("exercicio_anterior")
+        for linha in resultado.mapa.linhas if linha.quadro == "QUADRO_PRINCIPAL"
+    }
+    assert m["L2"] == Decimal("60.00")
+    assert m["L1"] == Decimal("60.00")
+    assert m["L15"] == Decimal("10.00")
+    assert m["L17"] == Decimal("10.00")
+    assert m["L33"] == Decimal("70.00")  # I + II
+
+
+def test_conferencia_anexo_inclui_exercicio_anterior(apurar_bf):
+    """Scenario: diferença (f) × L1 anterior no diagnóstico."""
+    from app.services.bf.quadro_principal import Anterior
+
+    fonte = fonte_com(a2025={}, e2025={}, a2024={})
+    resultado = apurar_bf(
+        ENTE, EXERCICIO, fonte, anterior=Anterior.MANUAL,
+        valores_anteriores={"A:L1:receita": Decimal("100.00"), "A:L1:deducoes": Decimal("40.00")},
+    )
+    conf = resultado.diagnostico.conferencia_anexo
+    assert conf is not None
+    assert conf["anexo_l14_saldo_anterior"] == Decimal("60.00")
+    assert conf["principal_l1_anterior"] == Decimal("60.00")
+    assert conf["diferenca_anterior"] == Decimal("0.00")
+
+
 def test_coluna_anterior_manual_sem_a_linha_nao_vira_zero(apurar_bf):
     """Requisito: valor não informado é `None` + motivo, nunca zero.
 
@@ -267,7 +326,8 @@ def test_coluna_anterior_manual_sem_a_linha_nao_vira_zero(apurar_bf):
 
 def test_coluna_anterior_manual_recusa_linha_fora_do_ipc(apurar_bf):
     """Scenario: linha informada fora do IPC 06"""
-    from app.services.bf.quadro_principal import Anterior, LinhaDesconhecida
+    from app.services.bf.informados import LinhaDesconhecida
+    from app.services.bf.quadro_principal import Anterior
 
     fonte = fonte_com(a2025={}, e2025={}, a2024={})
     with pytest.raises(LinhaDesconhecida, match="L99"):
