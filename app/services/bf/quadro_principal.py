@@ -78,6 +78,8 @@ class Procedencia:
     origem_exercicio_anterior: str = Anterior.MSCE.value
     # Mapa informado, na forma em que chegou. É o que o pedido seguinte reaplica.
     valores_anteriores: dict[str, str] | None = None
+    # Override G8 do exercício atual (D1/D2) — independente do mapa acima.
+    valores_sem_mapeamento: dict[str, str] | None = None
 
 
 @dataclass
@@ -107,7 +109,8 @@ class Resultado:
 def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None = None,
            competencia: int = COMPETENCIA_DE_ENCERRAMENTO,
            anterior: Anterior = Anterior.MSCE,
-           valores_anteriores: dict[str, Decimal] | None = None) -> Resultado:
+           valores_anteriores: dict[str, Decimal] | None = None,
+           valores_sem_mapeamento: dict[str, Decimal] | None = None) -> Resultado:
     """Apura as 66 linhas do quadro principal, nas duas colunas."""
     inicio = time.monotonic()
     anterior = Anterior(anterior)                # o job chega com string; a apuração compara o enum
@@ -115,6 +118,11 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
     informado = dict(valores_anteriores) if manual else None
     if valores_anteriores:
         valores_anteriores = {str(c): Decimal(str(v)) for c, v in valores_anteriores.items()}
+    informado_g8 = dict(valores_sem_mapeamento) if valores_sem_mapeamento else None
+    if valores_sem_mapeamento:
+        valores_sem_mapeamento = {
+            str(c): Decimal(str(v)) for c, v in valores_sem_mapeamento.items()
+        }
     mapa = mapa or _mapa(exercicio)
     direcao = direcao or do_pcasp()
     origem = fonte_de(DEMONSTRATIVO, competencia)
@@ -128,6 +136,10 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
 
     atual, nao_apuradas, sem_dados, registros_do_exercicio = _apurar_exercicio(
         mapa, ente, exercicio, competencia, fonte, direcao, origem)
+
+    if valores_sem_mapeamento:
+        atual, nao_apuradas = _completar_sem_mapeamento(
+            mapa, atual, nao_apuradas, valores_sem_mapeamento)
 
     sem_dados_anterior = False
     if anterior is Anterior.MSCE:
@@ -183,6 +195,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
             origens_por_linha=_origens(mapa, origem),
             origem_exercicio_anterior=anterior.value,
             valores_anteriores=informado,
+            valores_sem_mapeamento=informado_g8,
         ),
         diagnostico=Diagnostico(
             nao_apuradas=nao_apuradas,
@@ -250,6 +263,39 @@ def _sem_conta_declarada(mapa: MapaBO, matriz):
 
 def _tem_conta(linha: Linha) -> bool:
     return any(coluna.contas or coluna.derivada for coluna in linha.colunas)
+
+
+def _completar_sem_mapeamento(
+    mapa: MapaBO, atual: dict, nao_apuradas: list[NaoApurada], g8: dict[str, Decimal],
+) -> tuple[dict, list[NaoApurada]]:
+    """Sobrescreve as células G8 informadas no atual e reaplica as compostas (D6).
+
+    Só o `exercicio_atual` do quadro principal; código fora da whitelist já foi recusado na rota.
+    """
+    por_codigo = {linha.codigo: linha.id for linha in mapa.linhas
+                 if linha.quadro == QUADRO_PRINCIPAL}
+    informados = {codigo for codigo in g8 if codigo in por_codigo}
+    if not informados:
+        return atual, nao_apuradas
+
+    principal = {
+        linha.codigo: (atual.get(linha.id) or {}).get(COLUNA_ATUAL)
+        for linha in mapa.linhas if linha.quadro == QUADRO_PRINCIPAL
+    }
+    principal.update({codigo: g8[codigo] for codigo in informados})
+    principal = _aplicar_compostas_manual(mapa, principal, preservar=frozenset())
+
+    saida = dict(atual)
+    for codigo, valor in principal.items():
+        rule_id = por_codigo[codigo]
+        saida[rule_id] = {**(saida.get(rule_id) or {}), COLUNA_ATUAL: valor}
+
+    ids_informados = {por_codigo[codigo] for codigo in informados}
+    restante = [
+        n for n in nao_apuradas
+        if not (n.coluna == COLUNA_ATUAL and n.rule_id in ids_informados)
+    ]
+    return saida, restante
 
 
 # ─── apoio ───────────────────────────────────────────────────────────────────

@@ -75,6 +75,11 @@ Handoff do BF para quem retoma: **`docs/PONTO-DE-PARADA-BF.md`**.
 **Changes ativas: `plataforma-pipeline-dca` e `vigencia-por-anexo`** (esta implementada e verde,
 aguardando aprovação e arquivamento) — 63 cenários, F2/F3 implementadas, spec ainda não mesclada.
 
+**Change em fase SPEC, aguardando o PO: `bf-completar-nao-apuradas-g8`** — completar as seis
+linhas sem conta no IPC 06 no **exercício atual** via `valores_sem_mapeamento` no corpo (desacoplado
+do Manual do anterior). UI irmã em `front-declaracoes`, mesmo change-id. Nenhum código antes da
+aprovação da proposal.
+
 **Change em fase SPEC, aguardando o PO: `bf-anterior-manual-persistido`** — o mapa manual do
 exercício anterior do BF fica na procedência da linha de cache; pedido sem origem reaplica; MSC
 só explícita apaga; `valores_anteriores` na query responde `400`. A UI irmã está em

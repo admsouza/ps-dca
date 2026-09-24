@@ -94,21 +94,24 @@ def _erro_422(detalhe: str) -> HTTPException:
 
 
 class CorpoAnterior(BaseModel):
-    """Mapa manual do exercício anterior. Vai no corpo, nunca na query."""
+    """Mapa manual do exercício anterior e override G8 do atual. Vai no corpo, nunca na query."""
 
     origem_exercicio_anterior: str | None = None
     valores_anteriores: dict[str, str] | None = None
+    valores_sem_mapeamento: dict[str, str] | None = None
 
 
 def _parametros_bf(
     anexo: Annotated[str, Depends(_anexo_valido)],
     origem: Annotated[str | None, Query(alias="origem_exercicio_anterior")] = None,
     valores_json: Annotated[str | None, Query(alias="valores_anteriores")] = None,
+    g8_json: Annotated[str | None, Query(alias="valores_sem_mapeamento")] = None,
 ) -> dict:
-    """Origem na query. O mapa em si não entra aqui: query com valores responde `400`."""
-    if valores_json is not None or (anexo == "BF" and origem == "manual"):
+    """Origem na query. Os mapas em si não entram aqui: query com eles responde `400`."""
+    if valores_json is not None or g8_json is not None or (anexo == "BF" and origem == "manual"):
         raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                            detail="valores_anteriores não é aceito na query")
+                            detail="valores_anteriores/valores_sem_mapeamento não é aceito na "
+                                   "query")
     if anexo != "BF":
         return {}
     if origem == "msce_exercicio_anterior":
@@ -140,6 +143,21 @@ def _parametros_do_corpo(corpo: CorpoAnterior, exercicio: int) -> dict:
     except ValueError as erro:                   # `LinhaDesconhecida` é `ValueError`
         raise _erro_422(str(erro)) from erro
     return {"origem_anterior": "manual", "anterior": "manual", "valores_anteriores": valores}
+
+
+def _parametros_g8_do_corpo(corpo: CorpoAnterior) -> dict:
+    """G8 do exercício atual — independente do Manual do anterior (D2)."""
+    from app.services.bf.informados import validar_valores_sem_mapeamento
+
+    valores = {
+        str(codigo): str(valor)
+        for codigo, valor in (corpo.valores_sem_mapeamento or {}).items()
+    }
+    try:
+        validar_valores_sem_mapeamento(valores)
+    except ValueError as erro:
+        raise _erro_422(str(erro)) from erro
+    return {"valores_sem_mapeamento": valores}
 
 
 async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo,
@@ -310,7 +328,10 @@ async def reprocessar_anexo(
     corpo: Annotated[CorpoAnterior | None, Body()] = None,
     solicitante: Annotated[int | None, Depends(usuario_id)] = None,
 ):
-    if corpo is not None and corpo.origem_exercicio_anterior:
-        parametros = _parametros_do_corpo(corpo, exercicio)
+    if corpo is not None:
+        if corpo.origem_exercicio_anterior:
+            parametros = {**parametros, **_parametros_do_corpo(corpo, exercicio)}
+        if "valores_sem_mapeamento" in corpo.model_fields_set:
+            parametros = {**parametros, **_parametros_g8_do_corpo(corpo)}
     return await _decidir(request, ente, exercicio, anexo, repo,
                           forcar=True, solicitante=solicitante, parametros=parametros)

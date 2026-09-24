@@ -69,7 +69,7 @@ class Fila(Protocol):
 
 def identidade_do_pedido(*, anexo: str, competencia: int = 12,
                          origem_anterior: str = "", valores_anteriores=None,
-                         **_ignorados) -> str:
+                         valores_sem_mapeamento=None, **_ignorados) -> str:
     """O que, além de ente/exercício/anexo, distingue dois resultados do mesmo demonstrativo.
 
     `versao_api` e `versao_regras` invalidam o cache quando **código** ou **regra** mudam. Há
@@ -85,23 +85,41 @@ def identidade_do_pedido(*, anexo: str, competencia: int = 12,
         pares = ";".join(f"{codigo}={valor}"
                          for codigo, valor in sorted(valores_anteriores.items()))
         partes.append(hashlib.sha256(pares.encode("utf-8")).hexdigest()[:16])
+    if valores_sem_mapeamento:
+        pares = ";".join(f"{codigo}={valor}"
+                         for codigo, valor in sorted(valores_sem_mapeamento.items()))
+        partes.append("g8-" + hashlib.sha256(pares.encode("utf-8")).hexdigest()[:16])
     return ":".join(partes)
 
 
 def parametros_efetivos(pedido: dict | None, registro) -> dict:
     """O que o BF vai apurar.
 
-    Origem MSC explícita não reaproveita mapa. Manual no pedido vale o que veio.
+    Origem MSC explícita não reaproveita mapa do anterior. Manual no pedido vale o que veio.
     Pedido sem origem reaplica `procedencia.valores_anteriores` da linha, quando houver.
+
+    O mapa G8 do atual é independente disso (D2): pedido com a chave `valores_sem_mapeamento`
+    vale o que veio (vazio limpa); pedido sem a chave reaplica `procedencia.valores_sem_mapeamento`.
     """
     pedido = dict(pedido or {})
     origem = pedido.get("origem_anterior") or ""
     if origem == "msce_exercicio_anterior":
-        return {}
-    if origem == "manual":
-        return _manual(pedido.get("valores_anteriores") or {})
-    salvos = _mapa_salvo(registro)
-    return _manual(salvos) if salvos else {}
+        saida = {}
+    elif origem == "manual":
+        saida = _manual(pedido.get("valores_anteriores") or {})
+    else:
+        salvos = _mapa_salvo(registro)
+        saida = _manual(salvos) if salvos else {}
+
+    if "valores_sem_mapeamento" in pedido:
+        g8 = pedido["valores_sem_mapeamento"]
+        if g8:
+            saida["valores_sem_mapeamento"] = dict(g8)
+    else:
+        g8_salvo = _g8_salvo(registro)
+        if g8_salvo:
+            saida["valores_sem_mapeamento"] = g8_salvo
+    return saida
 
 
 def _manual(valores) -> dict:
@@ -114,6 +132,14 @@ def _mapa_salvo(registro) -> dict[str, str]:
             or procedencia.get("origem_exercicio_anterior") != "manual"):
         return {}
     valores = procedencia.get("valores_anteriores")
+    return {str(c): str(v) for c, v in valores.items()} if isinstance(valores, dict) else {}
+
+
+def _g8_salvo(registro) -> dict[str, str]:
+    procedencia = getattr(registro, "procedencia", None) or {}
+    if not isinstance(procedencia, dict):
+        return {}
+    valores = procedencia.get("valores_sem_mapeamento")
     return {str(c): str(v) for c, v in valores.items()} if isinstance(valores, dict) else {}
 
 
