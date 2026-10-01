@@ -164,14 +164,22 @@ def _completar_apresentacao(linhas: tuple[Linha, ...], exercicio: int,
                 ordem=linha.ordem or posicao,
             ))
             continue
-        ids = {c.id for c in linha.colunas}
+        por_coluna = {c.id: c for c in referencia.colunas}
+        colunas = tuple(
+            c._replace(contas=por_coluna[c.id].contas)
+            if c.id in por_coluna and not c.contas and por_coluna[c.id].contas
+            else c
+            for c in linha.colunas
+        )
+        ids = {c.id for c in colunas}
         extras = tuple(c for c in referencia.colunas if c.id not in ids)
         if extras:
             colunas_extra += len(extras)
         completadas.append(linha._replace(
             nivel=linha.nivel or referencia.nivel,
             ordem=linha.ordem or referencia.ordem,
-            colunas=linha.colunas + extras,
+            colunas=colunas + extras,
+            apenas_natureza=linha.apenas_natureza or referencia.apenas_natureza,
         ))
 
     if any(not (origem.nivel and origem.ordem) for origem in linhas) or colunas_extra:
@@ -244,6 +252,7 @@ def _achatar(linha: Linha) -> dict:
         "condicao_coluna": linha.condicao_coluna,
         "nivel": linha.nivel,
         "ordem": linha.ordem,
+        "apenas_natureza": linha.apenas_natureza,
         "filtros": [{"campo": f.campo, "operador": f.operador, "valores": list(f.valores)}
                     for f in linha.filtros],
         "exclusoes": [[{"campo": f.campo, "operador": f.operador, "valores": list(f.valores)}
@@ -280,6 +289,7 @@ def _linha(dado: dict) -> Linha:
         condicao_coluna=dado.get("condicao_coluna"),
         nivel=int(dado.get("nivel") or 0),
         ordem=int(dado.get("ordem") or 0),
+        apenas_natureza=dado.get("apenas_natureza"),
     )
 
 

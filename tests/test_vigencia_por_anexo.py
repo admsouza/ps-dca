@@ -74,6 +74,9 @@ def test_bf_carregado_do_banco_confere_com_o_yaml(semear):
     assert ({linha.codigo for linha in banco.linhas}
             == {linha.codigo for linha in yaml.linhas})
     assert banco.vigencia.documento == yaml.vigencia.documento
+    natureza = {linha.codigo: linha.apenas_natureza for linha in banco.linhas}
+    assert natureza["L28"] == "C"
+    assert natureza["L61"] == "D"
 
 
 def test_completacao_usa_a_transcricao_do_proprio_anexo(semear):
@@ -87,3 +90,44 @@ def test_completacao_usa_a_transcricao_do_proprio_anexo(semear):
     principal = [linha for linha in mapa.linhas if linha.quadro == "QUADRO_PRINCIPAL"]
     assert all(linha.nivel and linha.ordem for linha in principal), \
         "nível e ordem vêm da transcrição do IPC 06"
+
+
+def _linha_sem_conta(rule_id: str, codigo: str) -> dict:
+    return {
+        "id": rule_id,
+        "codigo": codigo,
+        "rotulo": codigo,
+        "quadro": "QUADRO_PRINCIPAL",
+        "grupo": "INGRESSOS",
+        "colunas": [
+            {"id": "exercicio_atual", "rotulo": "Atual", "contas": [], "derivada": []},
+            {"id": "exercicio_anterior", "rotulo": "Anterior", "contas": [], "derivada": []},
+        ],
+        "referencias": [],
+    }
+
+
+def test_semente_antiga_de_l28_l61_herda_contas_e_natureza():
+    """Vigência 2024-01 sem conta em L28/L61 passa a calcular com o YAML."""
+    from app.infra.regras.vigencias import carregar as do_banco
+
+    repo = RepoVigenciasFake()
+    repo.inserir({
+        "anexo": "BF",
+        "ano_vigencia": 2024,
+        "mes_vigencia": 1,
+        "versao": "2024-01",
+        "linhas": [
+            _linha_sem_conta("bf.quadro_principal.ingressos.l28", "L28"),
+            _linha_sem_conta("bf.quadro_principal.dispendios.l61", "L61"),
+        ],
+        "origem": "seed-yaml",
+    })
+
+    por_codigo = {linha.codigo: linha for linha in do_banco(repo, "BF", 2025).linhas}
+    l28 = por_codigo["L28"]
+    l61 = por_codigo["L61"]
+    assert l28.apenas_natureza == "C"
+    assert l61.apenas_natureza == "D"
+    assert any(c.contas for c in l28.colunas)
+    assert any(c.contas for c in l61.colunas)
