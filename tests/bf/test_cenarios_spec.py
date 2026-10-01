@@ -197,7 +197,11 @@ def test_apuracao_de_um_mes_que_nao_e_dezembro(apurar_bf):
     fonte = fonte_com(a2025={}, e2025={}, a2024={})
     resultado = apurar_bf(ENTE, EXERCICIO, fonte, competencia=6)
     assert resultado.procedencia.competencia == 6
-    assert {c["mes"] for c in fonte.chamadas} == {6}
+    # L28/L61 leem `period_change` nas 12 competências, independente de `competencia` (D2) — o
+    # snapshot do resto do BF é que respeita o parâmetro.
+    snapshot = [c for c in fonte.chamadas
+               if getattr(c["tipo_saldo"], "name", str(c["tipo_saldo"])) != "PERIODO"]
+    assert {c["mes"] for c in snapshot} == {6}
 
 
 # ─── linhas sem mapeamento e totais ──────────────────────────────────────────
@@ -215,7 +219,7 @@ def test_total_com_parcela_bloqueada_entre_parcelas_apuradas(apurar_bf):
     fonte = fonte_com(a2025={2: [saldo("218810101", "300.00", fonte_recursos="1860")]},
                       e2025={5: [saldo("531700000", "100.00")]}, a2024={})
     linhas = _codigos(apurar_bf(ENTE, EXERCICIO, fonte))
-    assert linhas["L28"]["exercicio_atual"] is None, "L28 não tem conta no IPC 06"
+    assert linhas["L22"]["exercicio_atual"] is None, "L22 não tem conta no IPC 06"
     assert linhas["L24"]["exercicio_atual"] == Decimal("400.00"), "soma L25, L26 e L27"
 
 
@@ -223,10 +227,10 @@ def test_bloqueio_nao_vira_zero_na_propria_linha(apurar_bf):
     """Scenario: bloqueio não vira zero na própria linha"""
     resultado = apurar_bf(ENTE, EXERCICIO, fonte_com(a2025={}, e2025={}, a2024={}))
     linhas = _codigos(resultado)
-    for codigo in ("L22", "L23", "L28", "L55", "L56", "L61"):
+    for codigo in ("L22", "L23", "L55", "L56"):
         assert linhas[codigo]["exercicio_atual"] is None
     motivos = {a.rule_id for a in resultado.diagnostico.nao_apuradas}
-    assert len(motivos) >= 6
+    assert len(motivos) >= 4
 
 
 # ─── equilíbrio ──────────────────────────────────────────────────────────────

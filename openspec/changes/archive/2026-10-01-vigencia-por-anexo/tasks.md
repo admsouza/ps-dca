@@ -19,3 +19,8 @@
 - [x] 4.1 `python -m pytest` — **403 testes, exit 0**
 - [x] 4.2 `python -m ruff check .` — sem erro novo
 - [x] 4.3 Mapa do BF pelo banco × pelo YAML: mesmas 80 linhas e mesmos códigos (`test_bf_carregado_do_banco_confere_com_o_yaml`)
+
+## 5. Arquivamento
+- [x] 5.1 Mesclar o delta em `openspec/specs/pipeline/plataforma/spec.md` (2026-10-01)
+- [x] 5.2 Mover para `openspec/changes/archive/2026-10-01-vigencia-por-anexo/`
+- [x] 5.3 Atualizar a seção "Change ativa" em `openspec/AGENTS.md`

@@ -78,6 +78,15 @@ def fonte_de(demonstrativo: str, competencia: int = COMPETENCIA_DE_ENCERRAMENTO)
     return fonte._replace(matriz=Matriz.CONSOLIDADA, tipo_saldo=TipoSaldo.ENCERRAMENTO)
 
 
+def fonte_periodo(classes: tuple[int, ...]) -> Fonte:
+    """`period_change` da matriz consolidada, para somar competência a competência (L28/L61, D2).
+
+    Distinto de `fonte_de`: aquele devolve 1 leitura por exercício; esta é lida 1 vez por
+    competência (1 a 12) por quem chama, e concatenada.
+    """
+    return Fonte(Matriz.CONSOLIDADA, TipoSaldo.PERIODO, classes)
+
+
 def leitura_de_abertura_do_exercicio(exercicio: int) -> tuple[int, int]:
     """Onde está o saldo de abertura do exercício: competência 12 do exercício anterior.
 

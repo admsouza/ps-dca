@@ -12,7 +12,9 @@ O que difere do BO, e por quê (tudo medido em 2026-09-18,
    `L26` só existem no **encerramento** — é quando a inscrição de restos a pagar acontece — e
    `L29`–`L32` são o **exercício anterior**, porque a abertura do exercício já traz a posição
    final, que é `L62`.
-3. **Seis linhas não têm conta declarada no IPC 06** e ficam não apuradas, nunca zero (G8-b).
+3. **Quatro linhas não têm conta declarada no IPC 06** e ficam não apuradas, nunca zero (G8-b).
+   `L28`/`L61` saíram desse grupo: somam `period_change` das 12 competências, só crédito (L28) ou
+   só débito (L61), sem subtrair o lado oposto (change `bf-l28-l61-contas-especificas`, D1/D2).
 4. **O item 38 não é aplicado** (G11-a): a policy não diz quais códigos caracterizam a
    transferência intra, e a interpretação natural quebra `L1` e `L34` em dois entes que batiam
    em centavos. Fica declarada e não executada.
@@ -29,7 +31,7 @@ from enum import Enum
 from app.domain.bo.matriz import apurar as apurar_matriz
 from app.domain.bo.matriz import ordem_topologica
 from app.domain.bo.modelo import Linha, MapaBO, NaoApurada, Registro, Residuo
-from app.infra.msc.fonte import COMPETENCIA_DE_ENCERRAMENTO, TipoSaldo, fonte_de
+from app.infra.msc.fonte import COMPETENCIA_DE_ENCERRAMENTO, TipoSaldo, fonte_de, fonte_periodo
 from app.infra.pcasp.natureza import do_pcasp
 from app.services.bf.informados import QUADRO_ANEXO, QUADRO_PRINCIPAL
 from app.services.bf.informados import mapa_bf as _mapa
@@ -46,6 +48,11 @@ NAO_INFORMADO = "não informado no preenchimento manual"
 # Origem do saldo por linha. Não é preferência: é onde o saldo existe (evidência §N1 e §G2).
 DO_ENCERRAMENTO = frozenset({"L25", "L26"})
 DO_EXERCICIO_ANTERIOR = frozenset({"L29", "L30", "L31", "L32"})
+
+# L28/L61 somam period_change das 12 competências (D2) — só no exercício atual; o anterior mantém
+# o snapshot de abertura, como as demais linhas (fora de escopo da change).
+CODIGOS_PERIODO_MENSAL = frozenset({"L28", "L61"})
+CLASSE_PERIODO_MENSAL = 1  # as 15 contas de L28/L61 são todas do ativo (classe 1)
 
 POLICIES_NAO_APLICADAS = (
     "item 38 (exclusão de intraorçamentárias): a policy não declara quais códigos caracterizam a "
@@ -135,7 +142,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
         principal, anexo = {}, {}
 
     atual, nao_apuradas, sem_dados, registros_do_exercicio = _apurar_exercicio(
-        mapa, ente, exercicio, competencia, fonte, direcao, origem)
+        mapa, ente, exercicio, competencia, fonte, direcao, origem, periodo_mensal=True)
 
     if valores_sem_mapeamento:
         atual, nao_apuradas = _completar_sem_mapeamento(
@@ -211,11 +218,13 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
 
 # ─── apuração de um exercício, combinando as três origens ────────────────────
 
-def _apurar_exercicio(mapa, ente, exercicio, competencia, fonte, direcao, origem):
+def _apurar_exercicio(mapa, ente, exercicio, competencia, fonte, direcao, origem,
+                      periodo_mensal: bool = False):
     """Devolve `(valores, nao_apuradas, sem_dados, registros)` para um exercício."""
     do_exercicio = _ler(fonte, ente, exercicio, competencia, origem, origem.tipo_saldo)
     do_encerramento = _ler(fonte, ente, exercicio, competencia, origem, TipoSaldo.ENCERRAMENTO)
     do_anterior = _ler(fonte, ente, exercicio - 1, competencia, origem, origem.tipo_saldo)
+    do_periodo_mensal = _ler_periodo_mensal(fonte, ente, exercicio) if periodo_mensal else []
 
     por_regra: dict[str, list[Registro]] = {}
     for linha in mapa.linhas:
@@ -223,6 +232,8 @@ def _apurar_exercicio(mapa, ente, exercicio, competencia, fonte, direcao, origem
             por_regra[linha.id] = do_encerramento
         elif linha.codigo in DO_EXERCICIO_ANTERIOR:
             por_regra[linha.id] = do_anterior
+        elif periodo_mensal and linha.codigo in CODIGOS_PERIODO_MENSAL:
+            por_regra[linha.id] = do_periodo_mensal
 
     matriz = apurar_matriz(mapa, do_exercicio, direcao, por_conta=True,
                            registros_por_regra=por_regra)
@@ -236,6 +247,18 @@ def _ler(fonte, ente, exercicio, competencia, origem, tipo_saldo) -> list[Regist
         registros.extend(fonte.registros(
             ente=ente, ano=exercicio, mes=competencia, classe=classe,
             matriz=origem.matriz, tipo_saldo=tipo_saldo,
+        ))
+    return registros
+
+
+def _ler_periodo_mensal(fonte, ente, exercicio) -> list[Registro]:
+    """12 competências, `period_change`, classe 1 — fonte isolada de L28/L61 (D2)."""
+    origem = fonte_periodo((CLASSE_PERIODO_MENSAL,))
+    registros: list[Registro] = []
+    for competencia in range(1, 13):
+        registros.extend(fonte.registros(
+            ente=ente, ano=exercicio, mes=competencia, classe=CLASSE_PERIODO_MENSAL,
+            matriz=origem.matriz, tipo_saldo=origem.tipo_saldo,
         ))
     return registros
 
@@ -551,7 +574,7 @@ def _equilibrio(mapa: MapaBO, matriz: dict) -> dict[str, Decimal]:
     """`L33 − L66` em cada coluna do quadro principal.
 
     Zero é o esperado: ingressos e dispêndios fecham por construção quando todas as linhas existem.
-    Diferente de zero é **achado**, e fica declarado — as seis linhas sem conta no IPC 06 e a
+    Diferente de zero é **achado**, e fica declarado — as quatro linhas sem conta no IPC 06 e a
     receita sem fonte de recursos aparecem aqui como resíduo, não como ajuste.
     """
     por_codigo = {linha.codigo: linha.id for linha in mapa.linhas

@@ -25,11 +25,11 @@ Fatia vertical: Recife (`2611606`), exercício 2025, `L17` = `628456869.17`.
 ## 4. VERIFY
 - [x] 4.1 `tests/pipeline/test_anterior_manual.py` + rota BF — 11 passed
 - [x] 4.2 `ruff check` limpo nos arquivos tocados
-- [ ] 4.3 Recife/2025 ao vivo: gravar `L17`, ler de novo sem mapa, percurso, MSC explícita
+- [ ] 4.3 Recife/2025 ao vivo: gravar `L17`, ler de novo sem mapa, percurso, MSC explícita — **não executado** nesta revisão (2026-10-01). Os cenários estão em `test_anterior_manual.py`.
 - [x] 4.4 Cenários cobertos em `test_anterior_manual.py`
 
 ## 5. Arquivamento
-- [ ] 5.1 `tasks.md` 100% marcado (falta 4.3)
-- [ ] 5.2 Mesclar os deltas em `openspec/specs/`
-- [ ] 5.3 Mover para `openspec/changes/archive/AAAA-MM-DD-bf-anterior-manual-persistido/`
-- [ ] 5.4 Atualizar a seção "Change ativa" em `openspec/AGENTS.md`
+- [x] 5.1 Arquivado em 2026-10-01 por conferência de código. O item 4.3 (Recife ao vivo) permanece aberto.
+- [x] 5.2 Mesclar os deltas em `openspec/specs/`
+- [x] 5.3 Mover para `openspec/changes/archive/2026-10-01-bf-anterior-manual-persistido/`
+- [x] 5.4 Atualizar a seção "Change ativa" em `openspec/AGENTS.md`

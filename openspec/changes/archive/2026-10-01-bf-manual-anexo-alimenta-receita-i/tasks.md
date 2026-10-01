@@ -23,7 +23,7 @@
 - [x] 4.2 ruff nos arquivos tocados
 
 ## 5. Arquivamento
-- [ ] 5.1 Mesclar delta em `openspec/specs/dca/balanco-financeiro/spec.md`
-- [ ] 5.2 Mover para `archive/AAAA-MM-DD-bf-manual-anexo-alimenta-receita-i/`
-- [ ] 5.3 Atualizar `openspec/AGENTS.md`
-- [ ] 5.4 Avisar front: pode parar de injetar `(I)` / preview de totais pode espelhar API
+- [x] 5.1 Mesclar delta em `openspec/specs/dca/balanco-financeiro/spec.md` (2026-10-01)
+- [x] 5.2 Mover para `archive/2026-10-01-bf-manual-anexo-alimenta-receita-i/`
+- [x] 5.3 Atualizar `openspec/AGENTS.md`
+- [x] 5.4 Front: pode parar de injetar `(I)`; o preview de totais pode espelhar a API. Registrado no índice do OpenSpec.

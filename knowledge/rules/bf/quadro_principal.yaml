@@ -1764,9 +1764,56 @@ rules:
     descricao: Outros Recebimentos Extraorçamentários
     nivel: 2
     ordem: 28
+  apenas_natureza: credito
   columns:
     exercicio_atual:
       label: Exercício Atual
+      accounts:
+      - literal: 1.1.3.5.2.00.00
+        pattern: '113520'
+        sign: +
+      - literal: 1.1.3.5.3.00.00
+        pattern: '113530'
+        sign: +
+      - literal: 1.1.3.5.4.00.00
+        pattern: '113540'
+        sign: +
+      - literal: 1.1.3.5.5.00.00
+        pattern: '113550'
+        sign: +
+      - literal: 1.1.3.8.1.06.00
+        pattern: '1138106'
+        sign: +
+      - literal: 1.1.3.8.1.08.00
+        pattern: '1138108'
+        sign: +
+      - literal: 1.1.3.8.1.09.00
+        pattern: '1138109'
+        sign: +
+      - literal: 1.1.3.8.1.10.00
+        pattern: '1138110'
+        sign: +
+      - literal: 1.1.3.8.1.11.00
+        pattern: '1138111'
+        sign: +
+      - literal: 1.1.3.8.1.17.00
+        pattern: '1138117'
+        sign: +
+      - literal: 1.1.3.8.1.99.00
+        pattern: '1138199'
+        sign: +
+      - literal: 1.1.3.8.2.17.00
+        pattern: '1138217'
+        sign: +
+      - literal: 1.1.3.8.2.99.00
+        pattern: '1138299'
+        sign: +
+      - literal: 1.1.3.8.3.00.00
+        pattern: '113830'
+        sign: +
+      - literal: 1.1.3.8.4.00.00
+        pattern: '113840'
+        sign: +
     exercicio_anterior:
       label: Exercício Anterior
   source:
@@ -1792,13 +1839,12 @@ rules:
   status: review_required
   review:
     required: true
-    blocker: 'IPC 06 item 29, p. 9: <contas sob demanda> — cabe a cada ente adaptá-las'
-    candidate:
-      classes:
-      - '7'
-      - '8'
-      nota: Controles devedores e credores do PCASP (IPC 06 item 20 (e), p. 7). Registrado, não aplicado
-        — depende do plano de contas do ente.
+    blocker: 'change bf-l28-l61-contas-especificas: medido contra João Pessoa/2025 (API SICONFI,
+      2026-10-01) e reprovado — apurado R$ 15.251,40 x publicado R$ 13.227.595.529,71, seis ordens
+      de grandeza de diferença. As 15 contas de classe 1 (ativo) informadas na proposal não são a
+      fonte real de L28 neste ente. O YAML anterior já sugeria `classes 7/8` (controle devedor/
+      credor do PCASP, IPC 06 item 20 (e)) como candidato — não testado ainda. Pendência do PO:
+      revisar a lista de contas antes de qualquer novo teste de status extracted (D3)'
 - rule_id: bf.quadro_principal.ingressos.l29
   demonstrativo:
     codigo: BF
@@ -3767,9 +3813,56 @@ rules:
     descricao: Outros Pagamentos Extraorçamentários
     nivel: 2
     ordem: 61
+  apenas_natureza: debito
   columns:
     exercicio_atual:
       label: Exercício Atual
+      accounts:
+      - literal: 1.1.3.5.2.00.00
+        pattern: '113520'
+        sign: +
+      - literal: 1.1.3.5.3.00.00
+        pattern: '113530'
+        sign: +
+      - literal: 1.1.3.5.4.00.00
+        pattern: '113540'
+        sign: +
+      - literal: 1.1.3.5.5.00.00
+        pattern: '113550'
+        sign: +
+      - literal: 1.1.3.8.1.06.00
+        pattern: '1138106'
+        sign: +
+      - literal: 1.1.3.8.1.08.00
+        pattern: '1138108'
+        sign: +
+      - literal: 1.1.3.8.1.09.00
+        pattern: '1138109'
+        sign: +
+      - literal: 1.1.3.8.1.10.00
+        pattern: '1138110'
+        sign: +
+      - literal: 1.1.3.8.1.11.00
+        pattern: '1138111'
+        sign: +
+      - literal: 1.1.3.8.1.17.00
+        pattern: '1138117'
+        sign: +
+      - literal: 1.1.3.8.1.99.00
+        pattern: '1138199'
+        sign: +
+      - literal: 1.1.3.8.2.17.00
+        pattern: '1138217'
+        sign: +
+      - literal: 1.1.3.8.2.99.00
+        pattern: '1138299'
+        sign: +
+      - literal: 1.1.3.8.3.00.00
+        pattern: '113830'
+        sign: +
+      - literal: 1.1.3.8.4.00.00
+        pattern: '113840'
+        sign: +
     exercicio_anterior:
       label: Exercício Anterior
   source:
@@ -3795,13 +3888,11 @@ rules:
   status: review_required
   review:
     required: true
-    blocker: 'IPC 06 item 29, p. 9: <contas sob demanda> — cabe a cada ente adaptá-las'
-    candidate:
-      classes:
-      - '7'
-      - '8'
-      nota: Controles devedores e credores do PCASP (IPC 06 item 20 (e), p. 7). Registrado, não aplicado
-        — depende do plano de contas do ente.
+    blocker: 'change bf-l28-l61-contas-especificas: medido contra João Pessoa/2025 (API SICONFI,
+      2026-10-01) e reprovado — apurado R$ 15.005,24 x publicado R$ 12.295.961.584,22, seis ordens
+      de grandeza de diferença. Mesma conclusão de L28: as 15 contas de classe 1 (ativo) não são a
+      fonte real. Pendência do PO: revisar a lista de contas (ver candidato classes 7/8, registrado
+      no blocker de L28) antes de qualquer novo teste de status extracted (D3)'
 - rule_id: bf.quadro_principal.dispendios.l62
   demonstrativo:
     codigo: BF

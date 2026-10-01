@@ -19,17 +19,18 @@ class LinhaDesconhecida(ValueError):
     """Valor informado para uma linha que o IPC 06 não declara. Recusado antes de apurar."""
 
 
-# Seis linhas do quadro principal sem conta declarada no IPC 06 (G8-b) — override pontual do
-# exercício atual, independente do modo Manual do exercício anterior (D3).
-CODIGOS_SEM_MAPEAMENTO = frozenset({"L22", "L23", "L28", "L55", "L56", "L61"})
+# Quatro linhas do quadro principal sem conta declarada no IPC 06 (G8-b) — override pontual do
+# exercício atual, independente do modo Manual do exercício anterior (D3). L28/L61 saíram da
+# whitelist (change `bf-l28-l61-contas-especificas`): passaram a ter conta e cálculo próprios.
+CODIGOS_SEM_MAPEAMENTO = frozenset({"L22", "L23", "L55", "L56"})
 
 
 def validar_valores_sem_mapeamento(valores: dict[str, str]) -> None:
-    """Recusa código fora das seis linhas G8 e valor não decimal, antes de enfileirar o job."""
+    """Recusa código fora das quatro linhas G8 e valor não decimal, antes de enfileirar o job."""
     desconhecidos = sorted(set(valores) - CODIGOS_SEM_MAPEAMENTO)
     if desconhecidos:
         raise LinhaDesconhecida(
-            f"linhas fora das seis sem conta no IPC 06: {', '.join(desconhecidos)}")
+            f"linhas fora das quatro sem conta no IPC 06: {', '.join(desconhecidos)}")
     for codigo, valor in valores.items():
         try:
             Decimal(valor)

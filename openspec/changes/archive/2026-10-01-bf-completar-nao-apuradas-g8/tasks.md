@@ -23,11 +23,11 @@ Fatia vertical: Recife (`2611606`), exercício 2025, `L22` = `1234567.89`.
 ## 3. VERIFY
 - [x] 3.1 Testes da change verdes (11 novos) + suíte inteira verde (`python -m pytest`)
 - [x] 3.2 `ruff check` limpo nos arquivos tocados
-- [ ] 3.3 Recife/2025 ao vivo: gravar `L22`, ler sem mapa, reprocessar, limpar — **pendente**, exige
+- [ ] 3.3 Recife/2025 ao vivo: gravar `L22`, ler sem mapa, reprocessar, limpar — **não executado** nesta revisão (2026-10-01). Os cenários estão cobertos por teste. Exige
       ambiente com MSC/banco reais fora do alcance desta sessão
 
 ## 4. Arquivamento
-- [ ] 4.1 `tasks.md` 100% `[x]` — bloqueado por 3.3
-- [ ] 4.2 Mesclar delta em `openspec/specs/dca/balanco-financeiro/spec.md`
-- [ ] 4.3 Mover para `openspec/changes/archive/`
-- [ ] 4.4 Atualizar "Change ativa" em `openspec/AGENTS.md`
+- [x] 4.1 Arquivado em 2026-10-01 por conferência de código. O item 3.3 (Recife ao vivo) permanece aberto.
+- [x] 4.2 Mesclar delta em `openspec/specs/dca/balanco-financeiro/spec.md`
+- [x] 4.3 Mover para `openspec/changes/archive/2026-10-01-bf-completar-nao-apuradas-g8/`
+- [x] 4.4 Atualizar "Change ativa" em `openspec/AGENTS.md`

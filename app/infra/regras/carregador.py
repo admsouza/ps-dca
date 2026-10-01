@@ -160,7 +160,13 @@ def _linha(regra: dict) -> Linha:
         condicao_coluna=((regra.get("calculation") or {}).get("condition") or {}).get("column"),
         nivel=int(regra["linha"].get("nivel") or 0),
         ordem=int(regra["linha"].get("ordem") or 0),
+        apenas_natureza=_apenas_natureza(regra.get("apenas_natureza")),
     )
+
+
+def _apenas_natureza(valor: str | None) -> str | None:
+    """`credito|debito` do YAML -> "C"/"D" do lançamento (L28/L61, D1)."""
+    return {"credito": "C", "debito": "D"}.get(valor)
 
 
 def _filtro(dados: dict) -> Filtro:

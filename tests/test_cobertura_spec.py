@@ -24,8 +24,11 @@ OPENSPEC = RAIZ_REPO / "openspec"
 CENARIOS_ESPERADOS = {
     "dca/base-canonica-regras": 83,  # 51 do IPC 07 + 32 do IPC 06 (ipc06-bf-regras-canonicas)
     "dca/balanco-orcamentario": 46,
-    # 45 da apuração (`bf-apuracao-f1`) + 4 do quadro anexo (`bf-quadro-anexo`).
-    "dca/balanco-financeiro": 49,
+    # 45 da apuração + 4 do quadro anexo
+    # + 3 da persistência do mapa manual (`bf-anterior-manual-persistido`)
+    # + 7 do Manual que alimenta (I) (`bf-manual-anexo-alimenta-receita-i`)
+    # + 5 do completar G8, mantendo o total sem parcela (`bf-completar-nao-apuradas-g8`).
+    "dca/balanco-financeiro": 64,
     # 12 da fonte por demonstrativo + 3 da competência de encerramento por API.
     "dca/fonte-msc": 15,
     # 63 da plataforma + 9 da entrada do BF no pipeline (`bf-no-pipeline`)

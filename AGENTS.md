@@ -4,9 +4,10 @@ Fonte **autoritativa** de processo para qualquer agente (Claude Code, Cursor, Co
 Camada de detalhe: `openspec/AGENTS.md` (fluxo OpenSpec + tabela de changes ativas) e
 `openspec/project.md` (escopo DCA, stack alvo, convenções).
 
-> **Estado do repositório: FASE DE SPEC.**
-> Não há código, arquitetura nem migrations — e **não haverá** enquanto as specs não
-> forem fechadas com o PO. Agente que "adiantar" implementação está fora do processo.
+> **Estado do repositório: specs das changes já implementadas estão arquivadas (2026-10-01).**
+> BO, BF, plataforma, vigência por anexo e o percurso completo estão no código e em
+> `openspec/specs/`. Capability nova ou refatoração continua exigindo change aprovada pelo PO
+> antes de qualquer código. Agente que "adiantar" implementação está fora do processo.
 
 ---
 
@@ -117,4 +118,4 @@ Além dos comandos:
 
 SPEC aprovada pelo PO → design e tasks completos → **teste falhando antes do código** →
 código mínimo → review do diff → validação medida → tasks atualizadas e change arquivada.
-Enquanto a spec não fechar, **não se escreve código**.
+Capability nova sem spec fechada **não se escreve**.

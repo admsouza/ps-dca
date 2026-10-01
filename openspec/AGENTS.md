@@ -48,59 +48,50 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 ## Change ativa
 
-A base canônica do IPC 07, a F1 do Balanço Orçamentário e a plataforma (rota, cache, job, worker,
-SSE) estão **implementadas, verificadas e arquivadas**.
+Em **2026-10-01** as seis changes já implementadas foram conferidas contra o código e arquivadas.
+Specs em vigor: `dca/base-canonica-regras`, `dca/balanco-orcamentario`,
+`dca/balanco-financeiro` (64 cenários), `dca/fonte-msc`, `pipeline/plataforma` (80) e
+`pipeline/processamento-completo` (11).
 
-Em **2026-09-18** o **Balanço Financeiro foi concluído no backend** e as quatro changes dele foram
-arquivadas:
+**Change ativa, fase VERIFY, bloqueada:** `bf-l28-l61-contas-especificas` — motor, YAML e whitelist
+G8 (6→4 linhas) implementados e com suíte 100% verde, mas a medição contra o BF publicado de João
+Pessoa/2025 (2026-10-01) reprovou: `L28`/`L61` apurados com as 15 contas de classe 1 (ativo) da
+proposal saem seis ordens de grandeza abaixo do publicado. `status` continua `review_required` no
+YAML — pendência do PO: revisar a lista de contas (candidato não testado: classes 7/8, controle
+devedor/credor do PCASP) antes de qualquer novo teste.
 
-| Change arquivada | O que entregou |
+| Change arquivada em 2026-10-01 | O que o código já fazia |
 |---|---|
-| `2026-09-18-bf-apuracao-f1` | núcleo, serviço e CLI do quadro principal: 66 linhas × 2 colunas |
-| `2026-09-18-bf-quadro-anexo` | as 14 linhas × 6 colunas do quadro anexo, com as derivadas |
-| `2026-09-18-msc-competencia-de-encerramento` | competência 13 na PublicSoft, 12 no SICONFI |
-| `2026-09-18-bf-no-pipeline` | `GET /dca/BF`: registry, cache multi-origem, serializador, chave |
+| `plataforma-pipeline-dca` | ciclo único: rota, cache, job, worker, SSE, lock, vigência publicada |
+| `vigencia-por-anexo` | semente de boot publica BO e BF, cada um na transcrição do próprio anexo |
+| `pipeline-completo-dca` | `POST /batch-jobs`: um percurso pelos anexos implementados |
+| `bf-anterior-manual-persistido` | mapa manual do exercício anterior na procedência; pedido sem origem reaplica |
+| `bf-manual-anexo-alimenta-receita-i` | no Manual, o anexo alimenta `(I)` e as totalizadoras saem da calculation |
+| `bf-completar-nao-apuradas-g8` | `valores_sem_mapeamento` no corpo completa as seis linhas sem conta no exercício atual |
 
-A apuração foi medida contra a MSC do SICONFI em **5 entes de homologação**, com relatório de
-auditoria por ente em `docs/entes-homologacao/<ente>/auditoria-bf-2025.md`: as 24 identidades do
-IPC 06 fecham em todos, e **32 de 34** confrontos contra o RREO publicado pelo próprio ente batem em
-centavos.
+O front pode deixar de injetar `(I)` e de repetir o mapa manual: a API deriva `(I)` e reaplica o
+mapa salvo.
 
-Handoff do BF para quem retoma: **`docs/PONTO-DE-PARADA-BF.md`**.
+Não reexecutado nesta revisão (os cenários seguem cobertos por teste):
 
-**Change em fase SPEC, aguardando o PO: `pipeline-completo-dca`** — `POST /dca/processar` e
-`POST /dca/reprocessar`, um job percorrendo os anexos implementados (11 cenários, capability nova
-`pipeline/processamento-completo`). Nenhum código antes da aprovação.
+- Recife/2025 ao vivo do mapa manual (`L17`) e do G8 (`L22`);
+- subir API+worker e reiniciar com job em voo (itens 6.4 e 6.5 de `plataforma-pipeline-dca`).
 
-**Changes ativas: `plataforma-pipeline-dca` e `vigencia-por-anexo`** (esta implementada e verde,
-aguardando aprovação e arquivamento) — 63 cenários, F2/F3 implementadas, spec ainda não mesclada.
+Pendências que **não** voltaram a ser change:
 
-**Change em fase SPEC, aguardando o PO: `bf-completar-nao-apuradas-g8`** — completar as seis
-linhas sem conta no IPC 06 no **exercício atual** via `valores_sem_mapeamento` no corpo (desacoplado
-do Manual do anterior). UI irmã em `front-declaracoes`, mesmo change-id. Nenhum código antes da
-aprovação da proposal.
-
-**Change em fase SPEC, aguardando o PO: `bf-anterior-manual-persistido`** — o mapa manual do
-exercício anterior do BF fica na procedência da linha de cache; pedido sem origem reaplica; MSC
-só explícita apaga; `valores_anteriores` na query responde `400`. A UI irmã está em
-`front-declaracoes`, change de mesmo nome. Nenhum código antes da aprovação.
-
-**Change em fase VERIFY (implementada): `bf-manual-anexo-alimenta-receita-i`** — Manual:
-anexo alimenta `(I)`; totalizadoras/`TOTAL (VI)` pela `calculation` (parcelas disponíveis).
-Aguardando mescla da spec e archive. Front irmão já faz preview; pode deixar de injetar `(I)`.
-
-Pendências abertas que **não** bloqueiam o front:
-
-- as 10 decisões de `docs/decisoes-bf-para-po-2026-09-18.md`, adotadas conforme a recomendação
-  medida e sujeitas a confirmação na auditoria final;
-- as divergências contra o BF publicado pelos entes, remetidas à etapa de auditoria;
+- as 10 decisões de `docs/decisoes-bf-para-po-2026-09-18.md`;
+- as divergências contra o BF publicado pelos entes;
 - o critério de identificação da MSC de encerramento na periodicidade mensal
   (`docs/pendencias-periodicidade-mensal.md`).
+
+Handoff do BF: **`docs/PONTO-DE-PARADA-BF.md`**. O quadro principal, o anexo, a competência de
+encerramento e a entrada do BF no pipeline continuam em `openspec/changes/archive/2026-09-18-*`.
 
 ## Changes arquivadas (recentes)
 
 | Data | Change |
 |---|---|
+| 2026-10-01 | `plataforma-pipeline-dca`, `vigencia-por-anexo`, `pipeline-completo-dca`, `bf-anterior-manual-persistido`, `bf-manual-anexo-alimenta-receita-i`, `bf-completar-nao-apuradas-g8` — conferidas contra o código e mescladas. Ver a seção "Change ativa". |
 | 2026-09-14 | `msc-fonte-e-competencia` — **fonte MSC por demonstrativo e apuração mensal.** Decisão do PO: todos os demonstrativos sobre a matriz de **encerramento**, saldo de **abertura** no BO, BF, DVP e DFC, e de **encerramento** no BP. O par vira propriedade do demonstrativo, e a combinação errada deixa de ser exprimível. Competência passa a parâmetro (padrão 12), para entes que prestam contas mensalmente — nos meses 1–11 a leitura é a consolidada, porque a **`MSCE` só existe em dezembro** (medido). Regressão do BO: **337 células × 2 entes, zero divergências**. Retry com backoff nos adapters. Revoga a decisão C1. Capability nova `dca/fonte-msc` (12 cenários); BO passa a 46. Suíte **312 passed**. |
 | 2026-09-14 | `ipc06-bf-regras-canonicas` — **base canônica do Balanço Financeiro (IPC 06, ed. 2024-06).** 80 regras em `knowledge/rules/bf/` (Quadro Principal 66 + Quadro Anexo 14), 5 policies e 3 enums novos: `fonte_recurso`, `saldo` (inicial/final) e `movimento` (credor/devedor). Campos e colunas passam a ser validados **por documento**. Fontes por subgrupo vindas do Anexo I da Portaria STN 710/2021 (`fontes-recursos-stn-2026.xlsx`, decisão F3). `review_required 6` — L22, L23, L28, L55, L56 e L61, sem mapeamento no IPC 06 (F1/F2). Suíte **287 passed**; parte `BO` do índice bit a bit igual. Spec: 27 requisitos / 83 cenários. Análise da fonte: `docs/source-analysis-ipc06.md`. |
 | 2026-09-10 | `bo-template-no-resultado` — **template de apresentação no resultado.** `linhas` com `rule_id`, `codigo`, `rotulo`, `quadro`, `grupo`, `nivel`, `ordem` e `totalizadora`; `nivel`/`ordem` vindos da transcrição normativa, nunca derivados da composição; vigência antiga completada pela transcrição no carregamento. Aditiva: `matriz`, `procedencia` e `diagnostico` inalterados. 2 requisitos / 8 cenários mesclados na spec do BO (35 → 43). |
@@ -113,7 +104,7 @@ Pendências abertas que **não** bloqueiam o front:
 
 ## Antes de codar (regras do projeto)
 
-- **Não há código neste repositório e não haverá enquanto a spec não fechar com o PO.**
+- A implementação segue o ciclo SPEC → PLAN → TEST → IMPLEMENT. Change nova continua exigindo spec aprovada pelo PO antes do código.
 - Respeitar contrato de auth: JWT + `X-Unidade-Id`; rejeitar `x-authorization`.
 - Importação XBRL: `C:\Projetos\prd-audite` manda (ver `../AGENTS.md` §4).
 - Replicar o padrão de RREO/RGF antes de inventar abstração nova (YAGNI).

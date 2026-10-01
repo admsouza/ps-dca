@@ -180,6 +180,22 @@ def saldo_da_celula_por_conta(
     return (None if pendencias else total), pendencias
 
 
+def soma_da_celula_por_natureza(
+    registros: Sequence[Registro], contas: Sequence[ContaCC], natureza: str,
+) -> tuple[Decimal, list[tuple[str, str]]]:
+    """Soma só os lançamentos de `natureza` ("C" ou "D") das contas, sem subtrair o lado oposto.
+
+    Usado por L28/L61 (proposal `bf-l28-l61-contas-especificas`): não lê a natureza da conta no
+    PCASP, só a do lançamento — por isso nunca gera pendência de direção.
+    """
+    total = ZERO
+    for conta in contas:
+        casados = [r for r in registros if _casa(r.conta, conta.cc) and r.natureza == natureza]
+        parcial = sum((r.valor for r in casados), ZERO)
+        total += parcial if conta.operacao == "+" else -parcial
+    return total, []
+
+
 def _direcao_da_coluna(contas: Sequence[ContaCC], direcao) -> bool | None:
     """Direção do grupo, dada pela primeira conta declarada que a tabela souber resolver."""
     for conta in contas:

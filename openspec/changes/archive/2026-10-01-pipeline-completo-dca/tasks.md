@@ -43,9 +43,9 @@ Fatia vertical: João Pessoa (2507507), exercício 2025, anexos `BO` e `BF` pont
 - [x] 4.5 Reconferência da spec: cada cenário → onde é coberto
 
 ## 5. Arquivamento
-- [ ] 5.1 `tasks.md` 100% marcado
-- [ ] 5.2 Mesclar o delta em `openspec/specs/pipeline/processamento-completo/`
+- [x] 5.1 `tasks.md` marcado em 2026-10-01, na revisão contra o código
+- [x] 5.2 Mesclar o delta em `openspec/specs/pipeline/processamento-completo/`
 - [x] 5.3 Registrar a capability em `CENARIOS_ESPERADOS` e `COM_TESTES` de
       `tests/test_cobertura_spec.py` (contagem: 11 cenários)
-- [ ] 5.4 Mover para `openspec/changes/archive/AAAA-MM-DD-pipeline-completo-dca/`
-- [ ] 5.5 Atualizar a tabela "Change ativa" em `openspec/AGENTS.md`
+- [x] 5.4 Mover para `openspec/changes/archive/2026-10-01-pipeline-completo-dca/`
+- [x] 5.5 Atualizar a tabela "Change ativa" em `openspec/AGENTS.md`

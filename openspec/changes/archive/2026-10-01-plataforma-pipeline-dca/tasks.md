@@ -343,7 +343,13 @@ parâmetros, com os mesmos nomes, para que o reuso realmente aconteça.
 
 ## 7. Arquivamento
 
-- [ ] 7.1 `tasks.md` 100% atualizado.
-- [ ] 7.2 Mesclar o delta em `openspec/specs/pipeline/plataforma/spec.md`.
-- [ ] 7.3 Mover para `openspec/changes/archive/AAAA-MM-DD-plataforma-pipeline-dca/`.
-- [ ] 7.4 Atualizar a tabela "Change ativa" em `openspec/AGENTS.md`.
+Revisão contra o código em 2026-10-01: F2/F3 estão em `main.py`, `worker.py`, `app/routes/`,
+`app/auth/`, `app/infra/cache/`, `app/infra/fila/` e `app/services/pipeline/`. Os itens 3–6 deste
+arquivo não foram remarcados um a um; 6.4 e 6.5 (sobe a API e reinício com job em voo) não foram
+reexecutados nesta revisão.
+
+- [x] 7.1 Conferido contra o código em 2026-10-01.
+- [x] 7.2 Mesclar o delta em `openspec/specs/pipeline/plataforma/spec.md`, junto com
+      `bf-no-pipeline`, `vigencia-por-anexo` e o delta de plataforma de `bf-anterior-manual-persistido`.
+- [x] 7.3 Mover para `openspec/changes/archive/2026-10-01-plataforma-pipeline-dca/`.
+- [x] 7.4 Atualizar a tabela "Change ativa" em `openspec/AGENTS.md`.

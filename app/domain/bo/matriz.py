@@ -16,7 +16,13 @@ from collections.abc import Sequence
 from decimal import Decimal
 
 from app.domain.bo.modelo import Linha, MapaBO, Matriz, NaoApurada, RefColuna, Registro
-from app.domain.bo.saldo import atende, excluido, saldo_da_celula, saldo_da_celula_por_conta
+from app.domain.bo.saldo import (
+    atende,
+    excluido,
+    saldo_da_celula,
+    saldo_da_celula_por_conta,
+    soma_da_celula_por_natureza,
+)
 
 ZERO = Decimal("0.00")
 
@@ -86,8 +92,12 @@ def _celulas(linha: Linha, registros: Sequence[Registro], direcao, matriz: Matri
         if coluna.derivada:
             celulas[coluna.id] = None   # preenchida no passo (c)
             continue
-        calcular = saldo_da_celula_por_conta if por_conta else saldo_da_celula
-        valor, pendencias = calcular(elegiveis, coluna.contas, direcao)
+        if linha.apenas_natureza:
+            valor, pendencias = soma_da_celula_por_natureza(
+                elegiveis, coluna.contas, linha.apenas_natureza)
+        else:
+            calcular = saldo_da_celula_por_conta if por_conta else saldo_da_celula
+            valor, pendencias = calcular(elegiveis, coluna.contas, direcao)
         celulas[coluna.id] = valor
         for conta, motivo in pendencias:
             matriz.nao_apuradas.append(NaoApurada(linha.id, coluna.id, conta, motivo))

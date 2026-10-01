@@ -157,7 +157,7 @@ def test_procedencia_declara_a_origem_de_cada_linha(apurar_bf):
 
 # ─── G5/G8: linhas sem mapeamento de contas ──────────────────────────────────
 
-SEM_MAPEAMENTO = ("L22", "L23", "L28", "L55", "L56", "L61")
+SEM_MAPEAMENTO = ("L22", "L23", "L55", "L56")   # L28/L61 saíram do G8 (bf-l28-l61-contas...)
 
 
 @pytest.mark.parametrize("codigo", SEM_MAPEAMENTO)
@@ -181,7 +181,7 @@ def test_linha_sem_mapeamento_contribui_como_parcela_inexistente(apurar_bf):
 
     G5-(a): `L21` = `L22` + `L23`, ambas não apuráveis, sai **0,00** e não `None`.
 
-    Com a opção (b) o BF inteiro ficaria em branco por causa de 6 linhas, mesmo com 42 corretas.
+    Com a opção (b) o BF inteiro ficaria em branco por causa de 4 linhas, mesmo com 44 corretas.
     """
     fonte = fonte_com(a2025={6: [saldo("621200000", "1000.00", fonte_recursos="1500")]},
                       e2025={}, a2024={})
@@ -195,16 +195,21 @@ def test_linha_sem_mapeamento_contribui_como_parcela_inexistente(apurar_bf):
 
 def test_coluna_anterior_vem_da_msce_do_exercicio_anterior(apurar_bf):
     """Scenario: coluna anterior apurada da MSCE do exercício anterior
+    Scenario: MSC não deriva (I) do anexo Manual
 
     Cobre `as duas colunas saem da mesma regra`: as duas colunas da linha declaram as mesmas
     contas e os mesmos filtros; muda o exercício de onde os saldos vêm.
+    Chaves `A:…` no pedido não entram quando a origem é a MSC.
     """
     fonte = fonte_com(
         a2025={6: [saldo("621200000", "1000.00", fonte_recursos="1500")]},
         a2024={6: [saldo("621200000", "800.00", fonte_recursos="1500")]},
         e2025={}, e2024={}, a2023={},
     )
-    resultado = apurar_bf(ENTE, EXERCICIO, fonte)
+    resultado = apurar_bf(
+        ENTE, EXERCICIO, fonte,
+        valores_anteriores={"A:L1:receita": "100.00", "A:L1:deducoes": "40.00"},
+    )
     por_codigo = {linha.codigo: linha.id for linha in resultado.mapa.linhas}
     celulas = resultado.matriz[por_codigo["L2"]]
     assert celulas["exercicio_atual"] == Decimal("1000.00")
@@ -253,6 +258,7 @@ def test_anexo_manual_calcula_o_saldo(apurar_bf):
 def test_anexo_manual_alimenta_folha_e_l1_sob_receita_i(apurar_bf):
     """Scenario: saldo (f) do anexo preenche a folha de mesmo rótulo sob (I).
     Scenario: TOTAL do anexo alimenta Receita Orçamentária (I).
+    Scenario: composta sem parcelas permanece não informada
     """
     from app.services.bf.quadro_principal import Anterior
 
@@ -267,10 +273,13 @@ def test_anexo_manual_alimenta_folha_e_l1_sob_receita_i(apurar_bf):
     }
     assert m["L2"] == Decimal("60.00")
     assert m["L1"] == Decimal("60.00")
+    assert m["L15"] is None
 
 
 def test_manual_total_vi_soma_secoes_disponiveis(apurar_bf):
-    """Scenario: TOTAL (VI) oficial após Apurar Manual."""
+    """Scenario: TOTAL (VI) oficial após Apurar Manual.
+    Scenario: folhas fora de (I) continuam só pelo mapa
+    """
     from app.services.bf.quadro_principal import Anterior
 
     fonte = fonte_com(a2025={}, e2025={}, a2024={})

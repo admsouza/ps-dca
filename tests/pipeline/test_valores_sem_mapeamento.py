@@ -79,6 +79,7 @@ def test_post_grava_o_mapa_g8_no_corpo(monkeypatch):
 
 
 def test_query_com_mapa_g8_responde_400(monkeypatch):
+    """Scenario: mapa G8 na query é recusado."""
     monkeypatch.setattr(
         "app.auth.autorizacao.verificar_jwt",
         lambda _t: {"sub": "u@x", "unidade": ENTE},
@@ -111,6 +112,7 @@ def test_codigo_fora_de_g8_no_corpo_responde_422(monkeypatch):
 
 
 def test_pedido_sem_o_mapa_reaplica_o_salvo():
+    """Scenario: GET seguinte reaplica o mapa G8."""
     from app.services.pipeline.cache import parametros_efetivos
 
     registro = _Registro({"valores_sem_mapeamento": {"L22": L22}})

@@ -168,6 +168,11 @@ def _apurar_um(no: NoPercurso, *, ente, exercicio, repo, lock, jobs, job_id, apu
     )
 
 
+def _isoformat(valor: Any) -> Any:
+    """`datetime` não é JSON — vira string antes de `jobs.gravar` (mesma regra de `resumo.py`)."""
+    return valor.isoformat() if hasattr(valor, "isoformat") else valor
+
+
 def _status_final(estados: dict[str, NoPercurso]) -> str:
     """`error` só quando nada concluiu. Com um anexo de pé, o percurso terminou — com falhas."""
     concluidos = [no for no in estados.values() if no.estado in ("ok", EM_CACHE, ALREADY_QUEUED)]
@@ -180,7 +185,7 @@ def _publicar(jobs, job_id: str, ente: str, exercicio: int, estados: dict[str, N
     anexos = [
         {"anexo": no.anexo, "status": no.estado, "job_id": no.job_id,
          "duracao_ms": no.duracao_ms, "erro_detalhe": no.erro_detalhe,
-         "calculado_em": no.calculado_em}
+         "calculado_em": _isoformat(no.calculado_em)}
         for no in estados.values()
     ]
     concluidos = sum(1 for no in estados.values() if no.estado != A_APURAR)

@@ -179,6 +179,33 @@ def test_anexo_ja_apurado_nao_e_reapurado(repo, lock, jobs, montar, versao_de):
     assert por_anexo[BF].estado == "a_apurar"
 
 
+def test_estado_publicado_e_serializavel_com_calculado_em_datetime(repo, lock, jobs, montar,
+                                                                    versao_de):
+    """Requisito: estado do percurso é sempre JSON-serializável, mesmo com `calculado_em` datetime.
+
+    Bug de produção: `_publicar` gravava o `datetime` cru, e `json.dumps` não serializa `datetime`
+    (TypeError no worker, percurso inteiro perdido).
+    """
+    from datetime import UTC, datetime
+
+    from app.infra.fila.serializacao import desserializar, serializar
+    from app.services.pipeline.completo import registrar
+
+    agora = datetime.now(UTC)
+    repo.gravar(RegistroFake(ENTE, EXERCICIO, BO, status="ok", resultado={"matriz": {}},
+                             calculado_em=agora))
+
+    percurso = montar(ente=ENTE, exercicio=EXERCICIO, repo=repo, lock=lock, jobs=jobs,
+                      versao_api=VERSAO_API, versao_de_regras=versao_de)
+    job_id = "job-datetime"
+    registrar(jobs, job_id, ente=ENTE, exercicio=EXERCICIO, percurso=percurso)
+
+    bruto = serializar(jobs.registros[job_id])        # não pode levantar TypeError
+    estado = desserializar(bruto)
+    anexo_bo = next(a for a in estado["anexos"] if a["anexo"] == BO)
+    assert anexo_bo["calculado_em"] == agora.isoformat()
+
+
 def test_reprocessamento_completo_reapura_tudo(repo, lock, jobs, montar, executar, versao_de):
     """Scenario: reprocessamento completo reapura tudo."""
     anterior = {"matriz": {"L1": {"C1": 0}}}

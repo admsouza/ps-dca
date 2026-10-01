@@ -1,4 +1,9 @@
-# dca/balanco-financeiro — Delta spec
+# dca/balanco-financeiro
+
+> Comportamento acordado e em vigor. Inclui as changes arquivadas em 2026-10-01
+> `bf-anterior-manual-persistido`, `bf-manual-anexo-alimenta-receita-i` e
+> `bf-completar-nao-apuradas-g8`.
+> Alterações entram por nova change, nunca por edição direta deste arquivo.
 
 ## Purpose
 
@@ -157,8 +162,8 @@ A procedência SHALL declarar a origem usada por cada linha.
 ### Requirement: Linha sem conta declarada no IPC 06 não é apurada
 
 Seis linhas do quadro principal — `L22`, `L23`, `L28`, `L55`, `L56`, `L61` — não têm conta
-declarada na base canônica. Elas SHALL sair **não apuradas**, com motivo no diagnóstico, e NÃO
-DEVEM sair como zero: zero afirma que não houve movimento, e aqui não se sabe.
+declarada na base canônica. Por padrão elas SHALL sair **não apuradas** (`None`), com motivo no
+diagnóstico, e NÃO DEVEM sair como zero.
 
 Medido em 2026-09-18: os valores que os entes publicam nessas linhas **não existem na MSC** — busca
 em 7 combinações de matriz e tipo de saldo, em todos os prefixos de conta de 3 a 9 dígitos, como
@@ -169,17 +174,61 @@ No total que as agrega, a linha não apurada SHALL contribuir como **parcela ine
 soma as demais e declara o bloqueio. Propagar `None` até o total deixaria o demonstrativo inteiro em
 branco por causa de seis linhas.
 
+Quem apura MAY completar a coluna **`exercicio_atual`** dessas seis linhas informando
+`valores_sem_mapeamento` no corpo de `POST /dca/BF/reprocessar`. Esse override NÃO É o modo Manual
+do exercício anterior e NÃO DEVE exigir `origem_exercicio_anterior: manual`.
+
+Após o merge, a apuração SHALL reaplicar as compostas da coluna atual (para o total refletir a
+parcela) e SHALL remover as células completadas de `diagnostico.nao_apuradas`. O mapa informado
+SHALL ser gravado em `procedencia.valores_sem_mapeamento`. Pedido seguinte do mesmo ente e exercício
+**sem** a chave no body SHALL reaplicar o mapa salvo. Corpo com `valores_sem_mapeamento: {}` SHALL
+limpar o override.
+
+Código fora da whitelist G8 ou decimal inválido SHALL ser recusado com `422` sem substituir o mapa
+já salvo. `valores_sem_mapeamento` na query SHALL responder `400`.
+
+A coluna do exercício atual, **fora** dessas seis linhas, NÃO DEVE aceitar preenchimento manual.
+
 #### Scenario: linha sem conta sai não apurada
 
+- **GIVEN** nenhum `valores_sem_mapeamento` salvo
 - **WHEN** `L22` é apurada
-- **THEN** a célula é `None` nas duas colunas
+- **THEN** a célula `exercicio_atual` é `None`
 - **AND** o diagnóstico nomeia a linha e o motivo
 
 #### Scenario: o total soma as parcelas que existem
 
-- **GIVEN** `L21` = `L22` + `L23`, ambas sem conta declarada
+- **GIVEN** `L21` = `L22` + `L23`, ambas sem conta declarada e sem `valores_sem_mapeamento`
 - **WHEN** a matriz é apurada
 - **THEN** `L21` vale 0,00 e `L33` é apurada normalmente
+
+#### Scenario: completar G8 no exercício atual
+
+- **GIVEN** Recife (`2611606`), exercício 2025, corpo com `valores_sem_mapeamento.L22` = `1234567.89`
+- **WHEN** o job de reprocessar termina
+- **THEN** `exercicio_atual` de `L22` é `1234567.89`
+- **AND** `procedencia.valores_sem_mapeamento` contém `L22`
+- **AND** o diagnóstico NÃO lista `l22.exercicio_atual` como não apurada
+- **AND** `origem_exercicio_anterior` permanece a que já estava (MSC ou manual), sem ser forçada a `manual`
+
+#### Scenario: GET seguinte reaplica o mapa G8
+
+- **GIVEN** a procedência do BF de Recife/2025 já contém `L22` = `1234567.89` em `valores_sem_mapeamento`
+- **WHEN** um `GET /dca/BF` roda sem o mapa no body
+- **THEN** `exercicio_atual` de `L22` continua `1234567.89`
+
+#### Scenario: código fora de G8 é recusado
+
+- **GIVEN** corpo com `valores_sem_mapeamento.L17` = `1.00`
+- **WHEN** a request é validada
+- **THEN** a API responde `422`
+- **AND** o mapa G8 já salvo NÃO é substituído
+
+#### Scenario: o total soma a parcela G8 informada
+
+- **GIVEN** `L21` = `L22` + `L23` e `L22` informada em `valores_sem_mapeamento`
+- **WHEN** a matriz é apurada
+- **THEN** `L21.exercicio_atual` reflete a composta com a parcela de `L22`
 
 ### Requirement: Policy declarada e não aplicada é publicada como tal
 
@@ -223,35 +272,62 @@ publicado nem estimada.
 
 A coluna do exercício anterior SHALL aceitar duas origens:
 
-1. **`MSCE` do exercício anterior** (padrão) — apurada pelas mesmas regras do IPC 06.
+1. **`MSCE` do exercício anterior** (padrão, enquanto não houver mapa salvo) — apurada pelas mesmas regras do IPC 06.
 2. **Preenchimento manual**, linha a linha, informado por quem apura.
 
-A segunda existe porque o ente pode ter publicado o exercício anterior com números que a matriz
-daquele ano não reproduz: medido em Recife, `L17` e `L50` de 2024 saem 628.456.869,17 da MSC contra
-**0,00** publicado.
+A segunda existe porque o ente pode ter publicado o exercício anterior com números que a matriz daquele ano não reproduz: medido em Recife, `L17` e `L50` de 2024 saem 628.456.869,17 da MSC contra **0,00** publicado.
 
-A procedência SHALL declarar a origem usada. No modo manual, linha não informada SHALL ser `None`
-com motivo — nunca zero. Linha informada que o IPC 06 não declara SHALL ser recusada antes de
-apurar. A coluna do exercício **atual** NÃO DEVE aceitar preenchimento manual.
+O mapa informado SHALL ser gravado em `procedencia.valores_anteriores` da linha de cache do BF. Pedido seguinte do mesmo ente e exercício **sem** origem SHALL reaplicar esse mapa: a coluna do exercício anterior sai dele, e o exercício corrente é recalculado na MSC. A procedência SHALL continuar declarando `manual`.
+
+Só a origem explícita `msce_exercicio_anterior` SHALL deixar de reaplicar o mapa e SHALL removê-lo da procedência. Ausência de origem NÃO DEVE ser lida como MSC quando há mapa salvo.
+
+A procedência SHALL declarar a origem usada. No modo manual, linha não informada SHALL ser `None` com motivo — nunca zero. Linha informada que o IPC 06 não declara SHALL ser recusada antes de apurar, e o mapa já salvo NÃO DEVE ser substituído. A coluna do exercício **atual** NÃO DEVE aceitar preenchimento manual.
+
+Falha do job NÃO DEVE apagar `procedencia.valores_anteriores` já gravado.
+
+No Manual, o bloco `(I)` SHALL ser derivado do anexo quando houver `A:…`; totalizadoras SHALL ser preenchidas pela calculation (Requirement *Totalizadoras Manual pela calculation*). Chaves `(I)` no mapa, se o anexo informou, SHALL ser ignoradas em favor do derivado.
 
 #### Scenario: coluna anterior apurada da MSCE do exercício anterior
 
-- **WHEN** a apuração corre com a origem padrão
+- **GIVEN** nenhum mapa manual salvo para o ente e o exercício
+- **WHEN** a apuração corre sem origem informada
 - **THEN** `exercicio_anterior` vem da matriz do exercício anterior, pelas mesmas regras
 - **AND** a procedência declara `msce_exercicio_anterior`
 
 #### Scenario: coluna anterior preenchida manualmente
 
-- **GIVEN** valores informados para parte das linhas
+- **GIVEN** o corpo com `L17` = `628456869.17` para Recife (`2611606`), exercício 2025
 - **WHEN** a apuração corre no modo manual
-- **THEN** as linhas informadas trazem o valor informado
-- **AND** as demais saem `None`, com `não informado` no diagnóstico
-- **AND** a procedência declara `manual`
+- **THEN** `exercicio_anterior` de `L17` é `628456869.17`
+- **AND** as linhas não informadas saem `None`, com `não informado` no diagnóstico
+- **AND** a procedência declara `manual` e `valores_anteriores` contém `L17`
+
+#### Scenario: processamento seguinte reaplica o mapa salvo
+
+- **GIVEN** a procedência do BF de Recife/2025 já contém `L17` = `628456869.17`
+- **WHEN** um `GET /dca/BF`, um reprocessamento ou o percurso completo roda sem origem e sem mapa
+- **THEN** `exercicio_anterior` de `L17` continua `628456869.17`
+- **AND** a procedência continua `manual`
+
+#### Scenario: MSC explícita remove o mapa
+
+- **GIVEN** um mapa manual já salvo
+- **WHEN** a apuração é pedida com `origem_exercicio_anterior=msce_exercicio_anterior`
+- **THEN** a coluna anterior sai da MSC do exercício anterior
+- **AND** `procedencia.valores_anteriores` deixa de existir
+- **AND** a procedência declara `msce_exercicio_anterior`
 
 #### Scenario: linha informada fora do IPC 06
 
 - **WHEN** o preenchimento manual traz um código que a base canônica não declara
 - **THEN** a apuração é recusada, nomeando o código
+- **AND** o mapa já salvo permanece
+
+#### Scenario: job que falha conserva o mapa
+
+- **GIVEN** um mapa manual já salvo
+- **WHEN** um job posterior do BF termina em erro
+- **THEN** `procedencia.valores_anteriores` continua o mapa anterior
 
 ### Requirement: Classes da MSC lidas pelo Balanço Financeiro
 
@@ -567,3 +643,77 @@ Medido em Recife, 2026-09-18: 450.202.814,72 em dois registros da conta sintéti
 - **WHEN** o anexo é apurado
 - **THEN** o valor aparece no diagnóstico como resíduo de fonte
 - **AND** nenhuma linha por fonte o recebe
+
+### Requirement: Anexo Manual alimenta Receita Orçamentária (I)
+
+No modo Manual, o sistema SHALL tratar o quadro anexo por fonte como origem do bloco
+**Receita Orçamentária (I)** do quadro principal quando houver valores `A:…` no mapa.
+O saldo `(f)` de cada linha do anexo SHALL preencher a linha do principal com o mesmo
+rótulo (normalizado); o TOTAL do anexo SHALL preencher `L1`. O de-para MUST NOT usar
+igualdade de código entre quadros.
+
+#### Scenario: saldo (f) do anexo preenche a folha de mesmo rótulo sob (I)
+
+- **GIVEN** origem Manual e mapa com `A:L1:receita` e `A:L1:deducoes`
+- **WHEN** a apuração Manual conclui
+- **THEN** `exercicio_anterior` de `L2` é a diferença receita − deduções
+- **AND** a linha NÃO fica “não informado” por ausência de chave `L2`
+
+#### Scenario: TOTAL do anexo alimenta Receita Orçamentária (I)
+
+- **GIVEN** origem Manual e anexo com saldos `(f)`
+- **WHEN** a apuração Manual conclui
+- **THEN** `exercicio_anterior` de `L1` é o total `(f)` do anexo
+
+#### Scenario: folhas fora de (I) continuam só pelo mapa
+
+- **GIVEN** Manual com `L17` no mapa e anexo informado
+- **WHEN** a apuração conclui
+- **THEN** `L17` traz o valor informado
+
+#### Scenario: MSC não deriva (I) do anexo Manual
+
+- **GIVEN** origem `msce_exercicio_anterior`
+- **WHEN** a apuração corre
+- **THEN** a coluna anterior sai da MSC, sem de-para Manual
+
+### Requirement: Totalizadoras Manual pela calculation
+
+No modo Manual, após montar o mapa efetivo (informado + `(I)` derivado), o sistema SHALL
+preencher linhas compostas do quadro principal (`calculation.references`) na coluna do
+exercício anterior, incluindo totais de seção (`TOTAL (VI)`, `TOTAL (XII)`, …). Parcelas
+`None` MUST NOT tornar o total indeterminado: soma-se o disponível.
+
+#### Scenario: TOTAL (VI) oficial após Apurar Manual
+
+- **GIVEN** Manual com `(I)` derivado e `L17` informado
+- **WHEN** a apuração Manual conclui
+- **THEN** `L15` / `exercicio_anterior` reflete as transferências informadas
+- **AND** `L33` / `exercicio_anterior` é a soma das seções disponíveis (I+II+…)
+
+#### Scenario: composta sem parcelas permanece não informada
+
+- **GIVEN** Manual sem valores que alimentem uma composta
+- **WHEN** a apuração conclui
+- **THEN** essa linha permanece `None` com motivo de não informado
+
+### Requirement: Conferência anexo × (I) no exercício anterior
+
+O diagnóstico SHALL registrar a diferença entre `saldo_anterior` do TOTAL do anexo e
+`L1` / `exercicio_anterior` quando ambos existirem, sem alterar a matriz.
+
+#### Scenario: diferença (f) × L1 anterior no diagnóstico
+
+- **GIVEN** Manual com anexo e `(I)` derivados
+- **WHEN** a conferência corre
+- **THEN** a diferença entra no diagnóstico
+
+### Requirement: `valores_sem_mapeamento` só no corpo
+
+`valores_sem_mapeamento` SHALL viajar só no corpo JSON de `POST /dca/BF/reprocessar`. Na query
+SHALL ser recusado com `400`.
+
+#### Scenario: mapa G8 na query é recusado
+
+- **WHEN** `valores_sem_mapeamento` aparece na query
+- **THEN** a API responde `400`
