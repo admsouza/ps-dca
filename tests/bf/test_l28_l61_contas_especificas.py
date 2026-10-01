@@ -33,13 +33,28 @@ def test_l28_soma_creditos_de_todos_os_meses(apurar_bf):
     """Scenario: L28 soma os créditos de todos os meses."""
     conta = "1.1.3.5.2.00.00"
     por_mes = {
-        1: [registro(conta, "C", "100.00")],
-        6: [registro(conta, "C", "250.00"), registro(conta, "D", "40.00")],
-        12: [registro(conta, "C", "10.00")],
+        1: [registro(conta, "C", "100.00", fonte_recursos="1860")],
+        6: [registro(conta, "C", "250.00", fonte_recursos="1861"),
+            registro(conta, "D", "40.00", fonte_recursos="1861")],
+        12: [registro(conta, "C", "10.00", fonte_recursos="1869")],
     }
     resultado = apurar_bf(ENTE, EXERCICIO, FontePorMes(por_mes))
     l28 = _id_de(resultado, "L28")
     assert resultado.matriz[l28]["exercicio_atual"] == Decimal("360.00")   # débito não subtraído
+
+
+def test_l28_ignora_fonte_fora_das_extraorcamentarias(apurar_bf):
+    """Scenario: L28 ignora fonte fora das extraorçamentárias."""
+    conta = "1.1.3.5.2.00.00"
+    por_mes = {
+        1: [
+            registro(conta, "C", "10.00", fonte_recursos="1860"),
+            registro(conta, "C", "99.00", fonte_recursos="1500"),
+        ],
+    }
+    resultado = apurar_bf(ENTE, EXERCICIO, FontePorMes(por_mes))
+    l28 = _id_de(resultado, "L28")
+    assert resultado.matriz[l28]["exercicio_atual"] == Decimal("10.00")
 
 
 def test_l28_conta_sem_escrituracao_contribui_zero(apurar_bf):
@@ -54,12 +69,49 @@ def test_l61_soma_debitos_de_todos_os_meses(apurar_bf):
     """Scenario: L61 soma os débitos de todos os meses."""
     conta = "1.1.3.8.1.06.00"
     por_mes = {
-        3: [registro(conta, "D", "500.00"), registro(conta, "C", "30.00")],
-        9: [registro(conta, "D", "75.00")],
+        3: [registro(conta, "D", "500.00", fonte_recursos="1860"),
+            registro(conta, "C", "30.00", fonte_recursos="1860")],
+        9: [registro(conta, "D", "75.00", fonte_recursos="1869")],
     }
     resultado = apurar_bf(ENTE, EXERCICIO, FontePorMes(por_mes))
     l61 = _id_de(resultado, "L61")
     assert resultado.matriz[l61]["exercicio_atual"] == Decimal("575.00")   # crédito não subtraído
+
+
+def test_l61_soma_debitos_dos_doze_meses_nos_dois_exercicios(apurar_bf):
+    """Scenario: L61 soma os débitos dos doze meses nos dois exercícios."""
+    from tests.bf.conftest import fonte_com
+
+    conta = "1.1.3.5.2.00.00"
+    fonte = fonte_com(
+        p2025={1: [registro(conta, "D", "10.00", fonte_recursos="1860"),
+                   registro(conta, "C", "4.00", fonte_recursos="1860")]},
+        p2024={1: [registro(conta, "D", "3.00", fonte_recursos="1861"),
+                   registro(conta, "C", "8.00", fonte_recursos="1861")]},
+        a2024={1: [registro(conta, "C", "7.00", fonte_recursos="1860")]},
+        a2025={}, e2025={},
+    )
+    resultado = apurar_bf(ENTE, EXERCICIO, fonte)
+    l61 = resultado.matriz[_id_de(resultado, "L61")]
+    l28 = resultado.matriz[_id_de(resultado, "L28")]
+    assert l61["exercicio_atual"] == Decimal("120.00")        # 10 × 12; crédito não entra
+    assert l61["exercicio_anterior"] == Decimal("36.00")      # 3 × 12 do ano anterior
+    assert l28["exercicio_anterior"] == Decimal("7.00")       # snapshot, não os 8 × 12
+
+
+def test_l61_ignora_fonte_fora_das_extraorcamentarias(apurar_bf):
+    """Scenario: L61 ignora fonte fora das extraorçamentárias."""
+    conta = "1.1.3.8.1.06.00"
+    por_mes = {
+        3: [
+            registro(conta, "D", "10.00", fonte_recursos="1860"),
+            registro(conta, "D", "99.00", fonte_recursos="1500"),
+            registro(conta, "C", "4.00", fonte_recursos="1860"),
+        ],
+    }
+    resultado = apurar_bf(ENTE, EXERCICIO, FontePorMes(por_mes))
+    l61 = _id_de(resultado, "L61")
+    assert resultado.matriz[l61]["exercicio_atual"] == Decimal("10.00")
 
 
 def test_l28_l61_fora_da_whitelist_de_override_manual():

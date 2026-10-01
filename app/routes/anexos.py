@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
+from fastapi import APIRouter, Body, Depends, Header, HTTPException, Path, Query, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -283,6 +283,51 @@ def resumo(
     repo: Annotated[Any, Depends(repositorio)],
 ) -> list[dict]:
     return resumo_service.resumir(ente=ente, exercicio=exercicio, repo=repo)
+
+
+async def _auditor_regra(
+    authorization: Annotated[str | None, Header()] = None,
+) -> None:
+    """`auditor_mapeamentos` ou `adm_sistema` no hub. O corpo de erro não cita contas."""
+    from app.auth.perfil import HubIndisponivel, SessaoRecusada, pode_ver_regra
+    from app.routes.dependencias import _claims
+
+    token = (authorization or "").removeprefix("Bearer ").strip()
+    _claims(token or None)
+    try:
+        if not await pode_ver_regra(token):
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Acesso negado.")
+    except SessaoRecusada:
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED, detail="requisição sem JWT",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from None
+    except HubIndisponivel:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="serviço de autorização indisponível",
+        ) from None
+
+
+@router.get(
+    "/dca/{anexo}/regra",
+    summary="Regra de cálculo de uma célula",
+    description="Não recalcula o valor e não lê a MSC. Exige a flag de auditor do hub.",
+)
+async def regra_da_celula(
+    anexo: Annotated[str, Depends(_anexo_valido)],
+    exercicio: Annotated[int, Depends(_exercicio)],
+    linha: Annotated[str, Query(min_length=1, max_length=16)],
+    coluna: Annotated[str, Query(min_length=1, max_length=64)],
+    quadro: Annotated[str | None, Query(max_length=40)] = None,
+    _: Annotated[None, Depends(_auditor_regra)] = None,
+) -> dict:
+    from app.services.regra_celula import RegraIndisponivel, consultar
+
+    try:
+        return consultar(anexo, exercicio, linha, coluna, quadro)
+    except RegraIndisponivel:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Consulta indisponível.") from None
 
 
 @router.get(

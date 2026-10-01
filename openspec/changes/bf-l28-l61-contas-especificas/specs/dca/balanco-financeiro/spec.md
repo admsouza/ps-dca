@@ -15,8 +15,10 @@
 ```
 
 O lado devedor desses lançamentos NÃO DEVE ser subtraído — a regra é soma de um lado, não saldo
-líquido. Conta sem escrituração no exercício contribui zero; conta sem natureza de saldo conhecida
-no PCASP torna a célula inteira `None`, listada em `diagnostico.nao_apuradas`.
+líquido. Entra só fonte extraorçamentária `860`, `861`, `862`, `863` ou `869` (os 3 dígitos do IPC,
+depois de descartar o 1º dígito da MSC). Conta sem escrituração no exercício contribui zero; conta
+sem natureza de saldo conhecida no PCASP torna a célula inteira `None`, listada em
+`diagnostico.nao_apuradas`.
 
 #### Scenario: L28 soma os créditos de todos os meses
 
@@ -25,6 +27,13 @@ no PCASP torna a célula inteira `None`, listada em `diagnostico.nao_apuradas`.
 - **THEN** `L28.exercicio_atual` é a soma de todos os lançamentos a crédito dessas contas, nas 12
   competências
 - **AND** lançamentos a débito nessas mesmas contas NÃO são subtraídos do total
+
+#### Scenario: L28 ignora fonte fora das extraorçamentárias
+
+- **GIVEN** crédito na conta `1.1.3.5.2` com fonte `1860` e outro com fonte `1500`, no mesmo mês
+- **WHEN** `L28` é apurada
+- **THEN** só o crédito da fonte `860` entra
+- **AND** a fonte `500` não reduz nem aumenta o total
 
 #### Scenario: conta sem escrituração contribui zero
 
@@ -35,8 +44,12 @@ no PCASP torna a célula inteira `None`, listada em `diagnostico.nao_apuradas`.
 ### Requirement: `L61` apurada por soma de lançamentos a débito
 
 `L61` (Outros Pagamentos Extraorçamentários) SHALL ser apurada somando, mês a mês (competências 1 a
-12, `period_change`), apenas os lançamentos de **natureza débito** das mesmas 15 contas de `L28`.
-O lado credor desses lançamentos NÃO DEVE ser subtraído.
+12, `period_change`), apenas os lançamentos de **natureza débito** das mesmas 15 contas de `L28`,
+nos dois exercícios. O lado credor NÃO DEVE ser subtraído. Entra só fonte extraorçamentária `860`,
+`861`, `862`, `863` ou `869`.
+
+`L60` SHALL ser a soma dos débitos de `period_change` das competências 1 a 12, nos dois exercícios,
+nas contas `2.1.8.8` e `2.2.8.8`, com o mesmo filtro de fonte. Crédito NÃO entra.
 
 #### Scenario: L61 soma os débitos de todos os meses
 
@@ -45,6 +58,13 @@ O lado credor desses lançamentos NÃO DEVE ser subtraído.
 - **THEN** `L61.exercicio_atual` é a soma de todos os lançamentos a débito dessas contas, nas 12
   competências
 - **AND** lançamentos a crédito nessas mesmas contas NÃO são subtraídos do total
+
+#### Scenario: L61 ignora fonte fora das extraorçamentárias
+
+- **GIVEN** débito na conta `1.1.3.8.1.06` com fonte `1860` e outro com fonte `1500`, no mesmo mês
+- **WHEN** `L61` é apurada
+- **THEN** só o débito da fonte `860` entra
+- **AND** a fonte `500` não reduz nem aumenta o total
 
 ## MODIFIED Requirements
 

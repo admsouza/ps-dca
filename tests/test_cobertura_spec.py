@@ -27,8 +27,9 @@ CENARIOS_ESPERADOS = {
     # 45 da apuração + 4 do quadro anexo
     # + 3 da persistência do mapa manual (`bf-anterior-manual-persistido`)
     # + 7 do Manual que alimenta (I) (`bf-manual-anexo-alimenta-receita-i`)
-    # + 5 do completar G8, mantendo o total sem parcela (`bf-completar-nao-apuradas-g8`).
-    "dca/balanco-financeiro": 64,
+    # + 5 do completar G8, mantendo o total sem parcela (`bf-completar-nao-apuradas-g8`)
+    # + 1 de L61 nos dois exercícios (soma dos débitos de period_change).
+    "dca/balanco-financeiro": 65,
     # 12 da fonte por demonstrativo + 3 da competência de encerramento por API.
     "dca/fonte-msc": 15,
     # 63 da plataforma + 9 da entrada do BF no pipeline (`bf-no-pipeline`)

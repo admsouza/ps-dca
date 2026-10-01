@@ -134,12 +134,23 @@ def test_tipo_de_valor_nao_suportado_pela_fonte():
 # ─── depósitos restituíveis ──────────────────────────────────────────────────
 
 def test_depositos_restituiveis_apurados_pelo_saldo_declarado(apurar_bf):
-    """Scenario: depósitos restituíveis apurados pelo saldo declarado"""
-    fonte = fonte_com(a2025={2: [saldo("218810101", "300.00", fonte_recursos="1860")]},
-                      e2025={}, a2024={})
+    """Scenario: L27 soma os créditos dos doze meses nos dois exercícios"""
+    credito = registro("218810101", "C", "10.00", fonte_recursos="1860")
+    debito = registro("218810101", "D", "4.00", fonte_recursos="1860")
+    fora = registro("218810101", "C", "99.00", fonte_recursos="1500")
+    debito_fora = registro("218810101", "D", "7.00", fonte_recursos="1500")
+    fonte = fonte_com(
+        p2025={2: [credito, debito, fora, debito_fora]},
+        p2024={2: [registro("218810101", "C", "3.00", fonte_recursos="1860"),
+                   registro("218810101", "D", "2.00", fonte_recursos="1860")]},
+        a2025={2: [saldo("218810101", "300.00", fonte_recursos="1860")]},
+        e2025={}, a2024={},
+    )
     linhas = _codigos(apurar_bf(ENTE, EXERCICIO, fonte))
-    assert linhas["L27"]["exercicio_atual"] == Decimal("300.00")
-    assert linhas["L60"]["exercicio_atual"] == Decimal("300.00")
+    assert linhas["L27"]["exercicio_atual"] == Decimal("120.00")       # 10 × 12 meses
+    assert linhas["L27"]["exercicio_anterior"] == Decimal("36.00")     # 3 × 12 meses
+    assert linhas["L60"]["exercicio_atual"] == Decimal("48.00")        # 4 × 12; crédito fora
+    assert linhas["L60"]["exercicio_anterior"] == Decimal("24.00")     # 2 × 12 meses
 
 
 def test_nenhuma_linha_do_bf_depende_de_movimento_bruto(mapa_bf):
@@ -197,7 +208,7 @@ def test_apuracao_de_um_mes_que_nao_e_dezembro(apurar_bf):
     fonte = fonte_com(a2025={}, e2025={}, a2024={})
     resultado = apurar_bf(ENTE, EXERCICIO, fonte, competencia=6)
     assert resultado.procedencia.competencia == 6
-    # L28/L61 leem `period_change` nas 12 competências, independente de `competencia` (D2) — o
+    # L27/L28/L60/L61 leem `period_change` nas 12 competências, independente de `competencia` — o
     # snapshot do resto do BF é que respeita o parâmetro.
     snapshot = [c for c in fonte.chamadas
                if getattr(c["tipo_saldo"], "name", str(c["tipo_saldo"])) != "PERIODO"]
@@ -216,8 +227,11 @@ def test_total_de_um_grupo_inteiramente_bloqueado(apurar_bf):
 
 def test_total_com_parcela_bloqueada_entre_parcelas_apuradas(apurar_bf):
     """Scenario: total com parcela bloqueada entre parcelas apuradas"""
-    fonte = fonte_com(a2025={2: [saldo("218810101", "300.00", fonte_recursos="1860")]},
-                      e2025={5: [saldo("531700000", "100.00")]}, a2024={})
+    fonte = fonte_com(
+        p2025={2: [registro("218810101", "C", "25.00", fonte_recursos="1860")]},
+        a2025={2: [saldo("218810101", "300.00", fonte_recursos="1860")]},
+        e2025={5: [saldo("531700000", "100.00")]}, a2024={},
+    )
     linhas = _codigos(apurar_bf(ENTE, EXERCICIO, fonte))
     assert linhas["L22"]["exercicio_atual"] is None, "L22 não tem conta no IPC 06"
     assert linhas["L24"]["exercicio_atual"] == Decimal("400.00"), "soma L25, L26 e L27"

@@ -180,6 +180,7 @@ def _completar_apresentacao(linhas: tuple[Linha, ...], exercicio: int,
             ordem=linha.ordem or referencia.ordem,
             colunas=colunas + extras,
             apenas_natureza=linha.apenas_natureza or referencia.apenas_natureza,
+            filtros=linha.filtros or referencia.filtros,
         ))
 
     if any(not (origem.nivel and origem.ordem) for origem in linhas) or colunas_extra:

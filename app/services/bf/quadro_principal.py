@@ -15,6 +15,9 @@ O que difere do BO, e por quê (tudo medido em 2026-09-18,
 3. **Quatro linhas não têm conta declarada no IPC 06** e ficam não apuradas, nunca zero (G8-b).
    `L28`/`L61` saíram desse grupo: somam `period_change` das 12 competências, só crédito (L28) ou
    só débito (L61), sem subtrair o lado oposto (change `bf-l28-l61-contas-especificas`, D1/D2).
+   `L27` soma créditos e `L60` soma débitos nos dois exercícios (classe 2, fontes
+   extraorçamentárias). `L61` soma débitos nos dois exercícios, nas mesmas 15 contas de classe 1
+   e nas mesmas fontes. `L28` continua só no exercício atual.
 4. **O item 38 não é aplicado** (G11-a): a policy não diz quais códigos caracterizam a
    transferência intra, e a interpretação natural quebra `L1` e `L34` em dois entes que batiam
    em centavos. Fica declarada e não executada.
@@ -37,6 +40,17 @@ from app.services.bf.informados import QUADRO_ANEXO, QUADRO_PRINCIPAL
 from app.services.bf.informados import mapa_bf as _mapa
 from app.services.bf.informados import partir_informados as _partir_informados
 from app.services.bf.informados import validar_informados as _validar_informados
+from app.services.bf.origem import (
+    DO_ENCERRAMENTO,
+    DO_EXERCICIO_ANTERIOR,
+    origem_da_celula,
+)
+from app.services.bf.origem import (
+    PERIODO_MENSAL as _PERIODO_MENSAL,
+)
+from app.services.bf.origem import (
+    PERIODO_MENSAL_ANTERIOR as _PERIODO_MENSAL_ANTERIOR,
+)
 
 DEMONSTRATIVO = "BF"
 COLUNA_ATUAL = "exercicio_atual"
@@ -44,15 +58,6 @@ COLUNA_ANTERIOR = "exercicio_anterior"
 SUFIXO_ATUAL = "_atual"
 SUFIXO_ANTERIOR = "_anterior"
 NAO_INFORMADO = "não informado no preenchimento manual"
-
-# Origem do saldo por linha. Não é preferência: é onde o saldo existe (evidência §N1 e §G2).
-DO_ENCERRAMENTO = frozenset({"L25", "L26"})
-DO_EXERCICIO_ANTERIOR = frozenset({"L29", "L30", "L31", "L32"})
-
-# L28/L61 somam period_change das 12 competências (D2) — só no exercício atual; o anterior mantém
-# o snapshot de abertura, como as demais linhas (fora de escopo da change).
-CODIGOS_PERIODO_MENSAL = frozenset({"L28", "L61"})
-CLASSE_PERIODO_MENSAL = 1  # as 15 contas de L28/L61 são todas do ativo (classe 1)
 
 POLICIES_NAO_APLICADAS = (
     "item 38 (exclusão de intraorçamentárias): a policy não declara quais códigos caracterizam a "
@@ -142,7 +147,8 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
         principal, anexo = {}, {}
 
     atual, nao_apuradas, sem_dados, registros_do_exercicio = _apurar_exercicio(
-        mapa, ente, exercicio, competencia, fonte, direcao, origem, periodo_mensal=True)
+        mapa, ente, exercicio, competencia, fonte, direcao, origem,
+        codigos_periodo=frozenset(_PERIODO_MENSAL))
 
     if valores_sem_mapeamento:
         atual, nao_apuradas = _completar_sem_mapeamento(
@@ -151,7 +157,8 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
     sem_dados_anterior = False
     if anterior is Anterior.MSCE:
         coluna_anterior, _, sem_dados_anterior, _ = _apurar_exercicio(
-            mapa, ente, exercicio - 1, competencia, fonte, direcao, origem)
+            mapa, ente, exercicio - 1, competencia, fonte, direcao, origem,
+            codigos_periodo=_PERIODO_MENSAL_ANTERIOR)
     else:
         principal, saldos_anexo = _completar_manual(mapa, principal, anexo)
         coluna_anterior = {}
@@ -219,12 +226,13 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
 # ─── apuração de um exercício, combinando as três origens ────────────────────
 
 def _apurar_exercicio(mapa, ente, exercicio, competencia, fonte, direcao, origem,
-                      periodo_mensal: bool = False):
+                      codigos_periodo: frozenset[str] = frozenset()):
     """Devolve `(valores, nao_apuradas, sem_dados, registros)` para um exercício."""
     do_exercicio = _ler(fonte, ente, exercicio, competencia, origem, origem.tipo_saldo)
     do_encerramento = _ler(fonte, ente, exercicio, competencia, origem, TipoSaldo.ENCERRAMENTO)
     do_anterior = _ler(fonte, ente, exercicio - 1, competencia, origem, origem.tipo_saldo)
-    do_periodo_mensal = _ler_periodo_mensal(fonte, ente, exercicio) if periodo_mensal else []
+    classes = {_PERIODO_MENSAL[codigo] for codigo in codigos_periodo}
+    por_classe = _ler_periodo_mensal(fonte, ente, exercicio, classes) if classes else {}
 
     por_regra: dict[str, list[Registro]] = {}
     for linha in mapa.linhas:
@@ -232,8 +240,8 @@ def _apurar_exercicio(mapa, ente, exercicio, competencia, fonte, direcao, origem
             por_regra[linha.id] = do_encerramento
         elif linha.codigo in DO_EXERCICIO_ANTERIOR:
             por_regra[linha.id] = do_anterior
-        elif periodo_mensal and linha.codigo in CODIGOS_PERIODO_MENSAL:
-            por_regra[linha.id] = do_periodo_mensal
+        elif linha.codigo in codigos_periodo:
+            por_regra[linha.id] = por_classe[_PERIODO_MENSAL[linha.codigo]]
 
     matriz = apurar_matriz(mapa, do_exercicio, direcao, por_conta=True,
                            registros_por_regra=por_regra)
@@ -251,16 +259,18 @@ def _ler(fonte, ente, exercicio, competencia, origem, tipo_saldo) -> list[Regist
     return registros
 
 
-def _ler_periodo_mensal(fonte, ente, exercicio) -> list[Registro]:
-    """12 competências, `period_change`, classe 1 — fonte isolada de L28/L61 (D2)."""
-    origem = fonte_periodo((CLASSE_PERIODO_MENSAL,))
-    registros: list[Registro] = []
-    for competencia in range(1, 13):
-        registros.extend(fonte.registros(
-            ente=ente, ano=exercicio, mes=competencia, classe=CLASSE_PERIODO_MENSAL,
-            matriz=origem.matriz, tipo_saldo=origem.tipo_saldo,
-        ))
-    return registros
+def _ler_periodo_mensal(fonte, ente, exercicio, classes: set[int]) -> dict[int, list[Registro]]:
+    """12 competências de `period_change` por classe. Cada linha lê só a classe das suas contas."""
+    saida: dict[int, list[Registro]] = {}
+    for classe in classes:
+        origem = fonte_periodo((classe,))
+        saida[classe] = [
+            registro for competencia in range(1, 13) for registro in fonte.registros(
+                ente=ente, ano=exercicio, mes=competencia, classe=classe,
+                matriz=origem.matriz, tipo_saldo=origem.tipo_saldo,
+            )
+        ]
+    return saida
 
 
 def _sem_conta_declarada(mapa: MapaBO, matriz):
@@ -473,15 +483,14 @@ def _completar_manual(
 
 def _origens(mapa: MapaBO, origem) -> dict[str, str]:
     """Qual saldo cada linha leu — parte da procedência, porque muda o valor."""
-    saida = {}
-    for linha in mapa.linhas:
-        if linha.codigo in DO_ENCERRAMENTO:
-            saida[linha.codigo] = f"{origem.matriz}/{TipoSaldo.ENCERRAMENTO} do exercício"
-        elif linha.codigo in DO_EXERCICIO_ANTERIOR:
-            saida[linha.codigo] = f"{origem.matriz}/{origem.tipo_saldo} do exercício anterior"
-        else:
-            saida[linha.codigo] = f"{origem.matriz}/{origem.tipo_saldo} do exercício"
-    return saida
+    descricao = {
+        "period_change": "MSCC/period_change dos meses 1 a 12",
+        "encerramento": f"{origem.matriz}/{TipoSaldo.ENCERRAMENTO} do exercício",
+        "exercicio_anterior": f"{origem.matriz}/{origem.tipo_saldo} do exercício anterior",
+        "abertura": f"{origem.matriz}/{origem.tipo_saldo} do exercício",
+    }
+    return {linha.codigo: descricao[origem_da_celula(linha.codigo, COLUNA_ATUAL).nome]
+            for linha in mapa.linhas}
 
 
 # ─── montagem das colunas e conferências ─────────────────────────────────────

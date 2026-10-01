@@ -53,6 +53,9 @@ Specs em vigor: `dca/base-canonica-regras`, `dca/balanco-orcamentario`,
 `dca/balanco-financeiro` (64 cenários), `dca/fonte-msc`, `pipeline/plataforma` (80) e
 `pipeline/processamento-completo` (11).
 
+**Change ativa, em implementação:** `dca-regra-na-celula` — `GET /dca/{anexo}/regra` e diálogo no BF.
+Anexo sem projeção registrada responde 404. Não arquivada.
+
 **Change ativa, fase VERIFY, bloqueada:** `bf-l28-l61-contas-especificas` — motor, YAML e whitelist
 G8 (6→4 linhas) implementados e com suíte 100% verde, mas a medição contra o BF publicado de João
 Pessoa/2025 (2026-10-01) reprovou: `L28`/`L61` apurados com as 15 contas de classe 1 (ativo) da

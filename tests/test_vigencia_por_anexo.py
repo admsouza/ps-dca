@@ -108,7 +108,7 @@ def _linha_sem_conta(rule_id: str, codigo: str) -> dict:
 
 
 def test_semente_antiga_de_l28_l61_herda_contas_e_natureza():
-    """Vigência 2024-01 sem conta em L28/L61 passa a calcular com o YAML."""
+    """Requisito: vigência 2024-01 sem conta em L28/L61 passa a calcular com o YAML."""
     from app.infra.regras.vigencias import carregar as do_banco
 
     repo = RepoVigenciasFake()
@@ -129,5 +129,11 @@ def test_semente_antiga_de_l28_l61_herda_contas_e_natureza():
     l61 = por_codigo["L61"]
     assert l28.apenas_natureza == "C"
     assert l61.apenas_natureza == "D"
+    assert next(f.valores for f in l28.filtros if f.campo == "fonte_recurso") == (
+        "860", "861", "862", "863", "869",
+    )
+    assert next(f.valores for f in l61.filtros if f.campo == "fonte_recurso") == (
+        "860", "861", "862", "863", "869",
+    )
     assert any(c.contas for c in l28.colunas)
     assert any(c.contas for c in l61.colunas)

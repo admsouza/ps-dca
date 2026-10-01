@@ -1689,6 +1689,7 @@ rules:
     descricao: Depósitos Restituíveis e Valores Vinculados
     nivel: 2
     ordem: 27
+  apenas_natureza: credito
   filters:
   - field: fonte_recurso
     operator: in
@@ -1765,6 +1766,20 @@ rules:
     nivel: 2
     ordem: 28
   apenas_natureza: credito
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '860'
+      pattern: '860'
+    - literal: '861'
+      pattern: '861'
+    - literal: '862'
+      pattern: '862'
+    - literal: '863'
+      pattern: '863'
+    - literal: '869'
+      pattern: '869'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -3738,6 +3753,7 @@ rules:
     descricao: Depósitos Restituíveis e Valores Vinculados
     nivel: 2
     ordem: 60
+  apenas_natureza: debito
   filters:
   - field: fonte_recurso
     operator: in
@@ -3814,6 +3830,20 @@ rules:
     nivel: 2
     ordem: 61
   apenas_natureza: debito
+  filters:
+  - field: fonte_recurso
+    operator: in
+    values:
+    - literal: '860'
+      pattern: '860'
+    - literal: '861'
+      pattern: '861'
+    - literal: '862'
+      pattern: '862'
+    - literal: '863'
+      pattern: '863'
+    - literal: '869'
+      pattern: '869'
   columns:
     exercicio_atual:
       label: Exercício Atual

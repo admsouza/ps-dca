@@ -99,29 +99,42 @@ pré-encerramento do próprio exercício, e na `MSCC` é a abertura de dezembro.
 
 ### Requirement: Movimento bruto de depósitos restituíveis declarado como indisponível
 
-`L27` e `L60` declaram as **mesmas contas** (`2.1.8.8` e `2.2.8.8`) e, no demonstrativo publicado,
-representam fluxos brutos em sentidos opostos. A MSC **não expõe esse movimento bruto**: entrega
-saldo e variação, e nenhum dos dois reproduz o publicado. Medido em Recife, 2026-09-18 — saldo de
-`2.1.8.8`: 132.890.609,07 (2024) e 176.421.602,57 (2025), variação +43.530.993,50; `period_change`
-da MSCC: líquido -6.107.254,33; o publicado implica +123.944.269,55. Três números, nenhum igual.
+`L27` e `L60` declaram as **mesmas contas** (`2.1.8.8` e `2.2.8.8`) e o mesmo filtro de fonte
+(`860`, `861`, `862`, `863`, `869`).
 
-As duas linhas SHALL ser apuradas pelo saldo das contas declaradas, como as demais, e a diferença
-contra o publicado SHALL ser registrada no relatório de auditoria do ente. A apuração NÃO DEVE
-inventar um fluxo bruto que a fonte não tem.
+`L27` SHALL ser a soma dos lançamentos a **crédito** de `period_change` das competências 1 a 12,
+no exercício atual e no exercício anterior. Débito NÃO entra.
 
-#### Scenario: depósitos restituíveis apurados pelo saldo declarado
+`L60` SHALL ser a soma dos lançamentos a **débito** de `period_change` das competências 1 a 12,
+no exercício atual e no exercício anterior. Crédito NÃO entra. Decisão do PO em 2026-10-01.
 
-- **GIVEN** as contas `2.1.8.8` e `2.2.8.8` na matriz do exercício
-- **WHEN** `L27` e `L60` são apuradas
-- **THEN** ambas trazem o saldo das contas declaradas, na direção do PCASP
-- **AND** a divergência contra o BF publicado aparece no relatório de auditoria do ente, com os
-  dois valores
+#### Scenario: L27 soma os créditos dos doze meses nos dois exercícios
+
+- **GIVEN** créditos e débitos de `2.1.8.8` em `period_change`, fonte `1860`, nos meses do exercício e do exercício anterior
+- **WHEN** `L27` é apurada
+- **THEN** `exercicio_atual` é a soma dos créditos dos doze meses do exercício
+- **AND** `exercicio_anterior` é a soma dos créditos dos doze meses do exercício anterior
+- **AND** o débito não reduz o total
+- **AND** lançamento de fonte fora de `860`–`869` não entra
+- **AND** `L60.exercicio_atual` é a soma dos débitos dos doze meses do exercício
+- **AND** `L60.exercicio_anterior` é a soma dos débitos dos doze meses do exercício anterior
+- **AND** o crédito não reduz `L60`
+
+#### Scenario: L61 soma os débitos dos doze meses nos dois exercícios
+
+- **GIVEN** débitos e créditos das contas de `L61` em `period_change` dos dois exercícios
+- **WHEN** `L61` é apurada
+- **THEN** `exercicio_atual` é a soma dos débitos dos doze meses do exercício
+- **AND** `exercicio_anterior` é a soma dos débitos dos doze meses do exercício anterior
+- **AND** o crédito não reduz o total
+- **AND** lançamento de fonte fora de `860`–`869` não entra
+- **AND** `L28` no exercício anterior continua o snapshot, não `period_change`
 
 #### Scenario: nenhuma linha do BF depende de movimento bruto
 
 - **WHEN** a base do BF é carregada
 - **THEN** nenhuma coluna declara `movimento`
-- **AND** todas as linhas somam o saldo das contas declaradas
+- **AND** `L27` soma créditos de `period_change` nos dois exercícios; `L60` e `L61` somam débitos nos dois, com filtro de fonte `860`–`869`; `L28` só no atual
 
 ### Requirement: Origem do saldo declarada por linha
 
