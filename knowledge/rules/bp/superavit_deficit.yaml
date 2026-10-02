@@ -1,0 +1,61 @@
+# Quadro do Superávit/Déficit Financeiro — IPC 04, p. 13.
+rules:
+- rule_id: bp.superavit_deficit.total
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: SUPERAVIT_DEFICIT
+    descricao: Quadro do Superávit / Déficit Financeiro
+  linha:
+    codigo: Total
+    descricao: Total
+    nivel: 1
+    ordem: 1
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 13
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro do Superávit / Déficit Financeiro
+    row: Total
+  evidence:
+    page: 13
+    text: 8.2.1.1.1.00.00 (saldo por fonte/destinação de recurso) — Total = somatório das contas acima
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: review_required
+  review:
+    required: true
+    reason: A IPC define abertura paramétrica por fonte/destinação de recurso e não enumera linhas.
+    blocker: A cardinalidade e os códigos das linhas por fonte dependem da classificação do ente; a skill determina gerar
+      somente a regra de total.
+    candidate:
+      account_literal: 8.2.1.1.1.00.00
+      account_pattern: '82111'
+      dimension: fonte/destinação de recurso
+      total_rule_applied: true
+      per_source_rows_applied: false
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 8.2.1.1.1.00.00
+        pattern: '82111'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 8.2.1.1.1.00.00
+        pattern: '82111'
+        sign: +
+        saldo: final

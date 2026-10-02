@@ -63,6 +63,11 @@ proposal saem seis ordens de grandeza abaixo do publicado. `status` continua `re
 YAML — pendência do PO: revisar a lista de contas (candidato não testado: classes 7/8, controle
 devedor/credor do PCASP) antes de qualquer novo teste.
 
+**Change ativa, fase SPEC:** `bf-revisao-linhas-extraorcamentarias` — revisão de `L27`, `L28`,
+`L60` e `L61` a partir da SPEC-0001. Gabarito: PM Cuitegi (`2504801`), outubro/2025, `L24` (IV) =
+R$ 387.665,33 e `L57` (X) = R$ 520.551,46. Não reutiliza as 15 contas da change bloqueada.
+Aguardando aprovação do PO e o fechamento de D1 (competência), D2 (valor por linha) e D3 (contas).
+
 | Change arquivada em 2026-10-01 | O que o código já fazia |
 |---|---|
 | `plataforma-pipeline-dca` | ciclo único: rota, cache, job, worker, SSE, lock, vigência publicada |

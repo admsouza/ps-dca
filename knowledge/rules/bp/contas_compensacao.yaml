@@ -1,0 +1,548 @@
+# Quadro das Contas de Compensação — IPC 04, p. 12.
+rules:
+- rule_id: bp.contas_compensacao.l1
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: CONTAS_COMPENSACAO
+    descricao: Quadro das Contas de Compensação
+  linha:
+    codigo: L1
+    descricao: Atos Potenciais Ativos
+    nivel: 1
+    ordem: 1
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro das Contas de Compensação
+    row: L1
+  evidence:
+    page: 12
+    text: L1 Atos Potenciais Ativos (L2 + L3 + L4 + L5)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bp.contas_compensacao.l2
+      sign: +
+    - rule: bp.contas_compensacao.l3
+      sign: +
+    - rule: bp.contas_compensacao.l4
+      sign: +
+    - rule: bp.contas_compensacao.l5
+      sign: +
+- rule_id: bp.contas_compensacao.l2
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: CONTAS_COMPENSACAO
+    descricao: Quadro das Contas de Compensação
+  linha:
+    codigo: L2
+    descricao: Garantias e Contragarantias recebidas
+    nivel: 2
+    ordem: 2
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro das Contas de Compensação
+    row: L2
+  evidence:
+    page: 12
+    text: L2 Garantias e Contragarantias recebidas 8.1.1.1.0.00.00 (somente saldo a executar)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: review_required
+  review:
+    required: true
+    reason: O IPC limita a linha a 'somente saldo a executar'.
+    blocker: 'IPC04 itens 12–13: o PCASP não padroniza desdobramento suficiente para separar executado de a executar; depende
+      de 6º/7º nível definido pelo ente.'
+    candidate:
+      account_literal: 8.1.1.1.0.00.00
+      account_pattern: '8111'
+      required_dimension: saldo_a_executar
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 8.1.1.1.0.00.00
+        pattern: '8111'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 8.1.1.1.0.00.00
+        pattern: '8111'
+        sign: +
+        saldo: final
+- rule_id: bp.contas_compensacao.l3
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: CONTAS_COMPENSACAO
+    descricao: Quadro das Contas de Compensação
+  linha:
+    codigo: L3
+    descricao: Direitos Conveniados e outros instrumentos congêneres
+    nivel: 2
+    ordem: 3
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro das Contas de Compensação
+    row: L3
+  evidence:
+    page: 12
+    text: L3 Direitos Conveniados e outros instrumentos congêneres 8.1.1.2.0.00.00 (somente saldo a executar)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: review_required
+  review:
+    required: true
+    reason: O IPC limita a linha a 'somente saldo a executar'.
+    blocker: 'IPC04 itens 12–13: o PCASP não padroniza desdobramento suficiente para separar executado de a executar; depende
+      de 6º/7º nível definido pelo ente.'
+    candidate:
+      account_literal: 8.1.1.2.0.00.00
+      account_pattern: '8112'
+      required_dimension: saldo_a_executar
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 8.1.1.2.0.00.00
+        pattern: '8112'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 8.1.1.2.0.00.00
+        pattern: '8112'
+        sign: +
+        saldo: final
+- rule_id: bp.contas_compensacao.l4
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: CONTAS_COMPENSACAO
+    descricao: Quadro das Contas de Compensação
+  linha:
+    codigo: L4
+    descricao: Direitos Contratuais
+    nivel: 2
+    ordem: 4
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro das Contas de Compensação
+    row: L4
+  evidence:
+    page: 12
+    text: L4 Direitos Contratuais 8.1.1.3.0.00.00 (somente saldo a executar)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: review_required
+  review:
+    required: true
+    reason: O IPC limita a linha a 'somente saldo a executar'.
+    blocker: 'IPC04 itens 12–13: o PCASP não padroniza desdobramento suficiente para separar executado de a executar; depende
+      de 6º/7º nível definido pelo ente.'
+    candidate:
+      account_literal: 8.1.1.3.0.00.00
+      account_pattern: '8113'
+      required_dimension: saldo_a_executar
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 8.1.1.3.0.00.00
+        pattern: '8113'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 8.1.1.3.0.00.00
+        pattern: '8113'
+        sign: +
+        saldo: final
+- rule_id: bp.contas_compensacao.l5
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: CONTAS_COMPENSACAO
+    descricao: Quadro das Contas de Compensação
+  linha:
+    codigo: L5
+    descricao: Outros atos potenciais ativos
+    nivel: 2
+    ordem: 5
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro das Contas de Compensação
+    row: L5
+  evidence:
+    page: 12
+    text: L5 Outros atos potenciais ativos 8.1.1.9.0.00.00 (somente saldo a executar)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: review_required
+  review:
+    required: true
+    reason: O IPC limita a linha a 'somente saldo a executar'.
+    blocker: 'IPC04 itens 12–13: o PCASP não padroniza desdobramento suficiente para separar executado de a executar; depende
+      de 6º/7º nível definido pelo ente.'
+    candidate:
+      account_literal: 8.1.1.9.0.00.00
+      account_pattern: '8119'
+      required_dimension: saldo_a_executar
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 8.1.1.9.0.00.00
+        pattern: '8119'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 8.1.1.9.0.00.00
+        pattern: '8119'
+        sign: +
+        saldo: final
+- rule_id: bp.contas_compensacao.l6
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: CONTAS_COMPENSACAO
+    descricao: Quadro das Contas de Compensação
+  linha:
+    codigo: L6
+    descricao: Atos Potenciais Passivos
+    nivel: 1
+    ordem: 6
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro das Contas de Compensação
+    row: L6
+  evidence:
+    page: 12
+    text: L6 Atos Potenciais Passivos (L7 + L8 + L9 + L10)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bp.contas_compensacao.l7
+      sign: +
+    - rule: bp.contas_compensacao.l8
+      sign: +
+    - rule: bp.contas_compensacao.l9
+      sign: +
+    - rule: bp.contas_compensacao.l10
+      sign: +
+- rule_id: bp.contas_compensacao.l7
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: CONTAS_COMPENSACAO
+    descricao: Quadro das Contas de Compensação
+  linha:
+    codigo: L7
+    descricao: Garantias e Contragarantias concedidas
+    nivel: 2
+    ordem: 7
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro das Contas de Compensação
+    row: L7
+  evidence:
+    page: 12
+    text: L7 Garantias e Contragarantias concedidas 8.1.2.1.0.00.00 (somente saldo a executar)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: review_required
+  review:
+    required: true
+    reason: O IPC limita a linha a 'somente saldo a executar'.
+    blocker: 'IPC04 itens 12–13: o PCASP não padroniza desdobramento suficiente para separar executado de a executar; depende
+      de 6º/7º nível definido pelo ente.'
+    candidate:
+      account_literal: 8.1.2.1.0.00.00
+      account_pattern: '8121'
+      required_dimension: saldo_a_executar
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 8.1.2.1.0.00.00
+        pattern: '8121'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 8.1.2.1.0.00.00
+        pattern: '8121'
+        sign: +
+        saldo: final
+- rule_id: bp.contas_compensacao.l8
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: CONTAS_COMPENSACAO
+    descricao: Quadro das Contas de Compensação
+  linha:
+    codigo: L8
+    descricao: Obrigações conveniadas e outros instrumentos congêneres
+    nivel: 2
+    ordem: 8
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro das Contas de Compensação
+    row: L8
+  evidence:
+    page: 12
+    text: L8 Obrigações conveniadas e outros instrumentos congêneres 8.1.2.2.0.00.00 (somente saldo a executar)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: review_required
+  review:
+    required: true
+    reason: O IPC limita a linha a 'somente saldo a executar'.
+    blocker: 'IPC04 itens 12–13: o PCASP não padroniza desdobramento suficiente para separar executado de a executar; depende
+      de 6º/7º nível definido pelo ente.'
+    candidate:
+      account_literal: 8.1.2.2.0.00.00
+      account_pattern: '8122'
+      required_dimension: saldo_a_executar
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 8.1.2.2.0.00.00
+        pattern: '8122'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 8.1.2.2.0.00.00
+        pattern: '8122'
+        sign: +
+        saldo: final
+- rule_id: bp.contas_compensacao.l9
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: CONTAS_COMPENSACAO
+    descricao: Quadro das Contas de Compensação
+  linha:
+    codigo: L9
+    descricao: Obrigações contratuais
+    nivel: 2
+    ordem: 9
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro das Contas de Compensação
+    row: L9
+  evidence:
+    page: 12
+    text: L9 Obrigações contratuais 8.1.2.3.0.00.00 (somente saldo a executar)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: review_required
+  review:
+    required: true
+    reason: O IPC limita a linha a 'somente saldo a executar'.
+    blocker: 'IPC04 itens 12–13: o PCASP não padroniza desdobramento suficiente para separar executado de a executar; depende
+      de 6º/7º nível definido pelo ente.'
+    candidate:
+      account_literal: 8.1.2.3.0.00.00
+      account_pattern: '8123'
+      required_dimension: saldo_a_executar
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 8.1.2.3.0.00.00
+        pattern: '8123'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 8.1.2.3.0.00.00
+        pattern: '8123'
+        sign: +
+        saldo: final
+- rule_id: bp.contas_compensacao.l10
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: CONTAS_COMPENSACAO
+    descricao: Quadro das Contas de Compensação
+  linha:
+    codigo: L10
+    descricao: Outros atos potenciais passivos
+    nivel: 2
+    ordem: 10
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 12
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro das Contas de Compensação
+    row: L10
+  evidence:
+    page: 12
+    text: L10 Outros atos potenciais passivos 8.1.2.9.0.00.00 (somente saldo a executar)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: review_required
+  review:
+    required: true
+    reason: O IPC limita a linha a 'somente saldo a executar'.
+    blocker: 'IPC04 itens 12–13: o PCASP não padroniza desdobramento suficiente para separar executado de a executar; depende
+      de 6º/7º nível definido pelo ente.'
+    candidate:
+      account_literal: 8.1.2.9.0.00.00
+      account_pattern: '8129'
+      required_dimension: saldo_a_executar
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 8.1.2.9.0.00.00
+        pattern: '8129'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 8.1.2.9.0.00.00
+        pattern: '8129'
+        sign: +
+        saldo: final

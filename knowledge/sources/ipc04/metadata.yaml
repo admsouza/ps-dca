@@ -1,0 +1,10 @@
+# Fonte normativa do Balanço Patrimonial. O PDF vive em docs/referencia/ipc/ e nunca é
+# copiado para dentro de knowledge/ — scripts/check_sources.py falha se isso acontecer.
+document: IPC04
+title: "IPC 04 — Metodologia para Elaboração do Balanço Patrimonial"
+file: "IPC04 - BP atualizacao - 20200117.pdf"
+path: "docs/referencia/ipc/IPC04 - BP atualizacao - 20200117.pdf"
+pages: 18
+edition: "2020-01"
+published_at: "2020-01-20"
+sha256: "9967ed1e6e266c62a9b0c997ac5e8f745cf8de3a1e65b9f9b3e69447c6f3b541"

@@ -1,0 +1,2384 @@
+# Quadro Principal do Balanço Patrimonial — IPC 04, pp. 8–10.
+rules:
+- rule_id: bp.quadro_principal.ativo.l1
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L1
+    descricao: ATIVO
+    nivel: 1
+    ordem: 1
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L1
+  evidence:
+    page: 8
+    text: L1 ATIVO (L2 + L9)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bp.quadro_principal.ativo.l2
+      sign: +
+    - rule: bp.quadro_principal.ativo.l9
+      sign: +
+- rule_id: bp.quadro_principal.ativo.l2
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L2
+    descricao: Ativo Circulante
+    nivel: 2
+    ordem: 2
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L2
+  evidence:
+    page: 8
+    text: L2 Ativo Circulante (L3 + L4 +L5 + L6 + L7 + L8)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bp.quadro_principal.ativo.l3
+      sign: +
+    - rule: bp.quadro_principal.ativo.l4
+      sign: +
+    - rule: bp.quadro_principal.ativo.l5
+      sign: +
+    - rule: bp.quadro_principal.ativo.l6
+      sign: +
+    - rule: bp.quadro_principal.ativo.l7
+      sign: +
+    - rule: bp.quadro_principal.ativo.l8
+      sign: +
+- rule_id: bp.quadro_principal.ativo.l3
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L3
+    descricao: Caixa e Equivalentes de Caixa
+    nivel: 3
+    ordem: 3
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L3
+  evidence:
+    page: 8
+    text: 'L3 Caixa e Equivalentes de Caixa 1.1.1.0.0.00.00 Exclusões: 1.1.1.1.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.1.1.0.0.00.00
+        pattern: '111'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.1.1.0.0.00.00
+        pattern: '111'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 1.1.1.1.2.00.00
+      pattern: '11112'
+- rule_id: bp.quadro_principal.ativo.l4
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L4
+    descricao: Créditos a Curto Prazo
+    nivel: 3
+    ordem: 4
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L4
+  evidence:
+    page: 8
+    text: 'L4 Créditos a Curto Prazo 1.1.2.0.0.00.00; 1.1.3.0.0.00.00 Exclusões: 1.1.2.1.2.00.00; 1.1.2.2.2.00.00; 1.1.2.4.2.00.00;
+      1.1.2.5.2.00.00; 1.1.2.6.2.00.00; 1.1.2.9.2.00.00; 1.1.3.2.2.00.00; 1.1.3.6.2.00.00; 1.1.3.8.2.000.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: review_required
+  review:
+    required: true
+    reason: O literal 1.1.3.8.2.000.00 possui grupo de três dígitos no PDF.
+    blocker: IPC04 p. 8 contém 1.1.3.8.2.000.00; o PCASP sustenta o prefixo candidato 11382, mas a skill proíbe corrigir o
+      literal em silêncio.
+    candidate:
+      literal: 1.1.3.8.2.00.00
+      pattern: '11382'
+      pcasp_matches: 3
+      applied: false
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.1.2.0.0.00.00
+        pattern: '112'
+        sign: +
+        saldo: final
+      - literal: 1.1.3.0.0.00.00
+        pattern: '113'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.1.2.0.0.00.00
+        pattern: '112'
+        sign: +
+        saldo: final
+      - literal: 1.1.3.0.0.00.00
+        pattern: '113'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 1.1.2.1.2.00.00
+      pattern: '11212'
+    - literal: 1.1.2.2.2.00.00
+      pattern: '11222'
+    - literal: 1.1.2.4.2.00.00
+      pattern: '11242'
+    - literal: 1.1.2.5.2.00.00
+      pattern: '11252'
+    - literal: 1.1.2.6.2.00.00
+      pattern: '11262'
+    - literal: 1.1.2.9.2.00.00
+      pattern: '11292'
+    - literal: 1.1.3.2.2.00.00
+      pattern: '11322'
+    - literal: 1.1.3.6.2.00.00
+      pattern: '11362'
+- rule_id: bp.quadro_principal.ativo.l5
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L5
+    descricao: Investimentos e Aplicações Temporárias a Curto Prazo
+    nivel: 3
+    ordem: 5
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L5
+  evidence:
+    page: 8
+    text: L5 Investimentos e Aplicações Temporárias a Curto Prazo 1.1.4.0.0.00.00
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.1.4.0.0.00.00
+        pattern: '114'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.1.4.0.0.00.00
+        pattern: '114'
+        sign: +
+        saldo: final
+- rule_id: bp.quadro_principal.ativo.l6
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L6
+    descricao: Estoques
+    nivel: 3
+    ordem: 6
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L6
+  evidence:
+    page: 8
+    text: L6 Estoques 1.1.5.0.0.00.00
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.1.5.0.0.00.00
+        pattern: '115'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.1.5.0.0.00.00
+        pattern: '115'
+        sign: +
+        saldo: final
+- rule_id: bp.quadro_principal.ativo.l7
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L7
+    descricao: Ativo Não Circulante Mantido para Venda
+    nivel: 3
+    ordem: 7
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L7
+  evidence:
+    page: 8
+    text: 'L7 Ativo Não Circulante Mantido para Venda 1.1.6.0.0.00.00 Exclusões: 1.1.6.1.2.00.00; 1.1.6.9.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.1.6.0.0.00.00
+        pattern: '116'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.1.6.0.0.00.00
+        pattern: '116'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 1.1.6.1.2.00.00
+      pattern: '11612'
+    - literal: 1.1.6.9.2.00.00
+      pattern: '11692'
+- rule_id: bp.quadro_principal.ativo.l8
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L8
+    descricao: VPD Pagas Antecipadamente
+    nivel: 3
+    ordem: 8
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L8
+  evidence:
+    page: 8
+    text: L8 VPD Pagas Antecipadamente 1.1.9.0.0.00.00
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.1.9.0.0.00.00
+        pattern: '119'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.1.9.0.0.00.00
+        pattern: '119'
+        sign: +
+        saldo: final
+- rule_id: bp.quadro_principal.ativo.l9
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L9
+    descricao: Ativo Não Circulante
+    nivel: 2
+    ordem: 9
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L9
+  evidence:
+    page: 8
+    text: L9 Ativo Não Circulante (L10 + L11 + L12 + L13+L14)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bp.quadro_principal.ativo.l10
+      sign: +
+    - rule: bp.quadro_principal.ativo.l11
+      sign: +
+    - rule: bp.quadro_principal.ativo.l12
+      sign: +
+    - rule: bp.quadro_principal.ativo.l13
+      sign: +
+    - rule: bp.quadro_principal.ativo.l14
+      sign: +
+- rule_id: bp.quadro_principal.ativo.l10
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L10
+    descricao: Realizável a Longo Prazo
+    nivel: 3
+    ordem: 10
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L10
+  evidence:
+    page: 8
+    text: 'L10 Realizável a Longo Prazo 1.2.1.0.0.00.00 Exclusões: 1.2.1.1.2.00.00; 1.2.1.2.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.2.1.0.0.00.00
+        pattern: '121'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.2.1.0.0.00.00
+        pattern: '121'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 1.2.1.1.2.00.00
+      pattern: '12112'
+    - literal: 1.2.1.2.2.00.00
+      pattern: '12122'
+- rule_id: bp.quadro_principal.ativo.l11
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L11
+    descricao: Investimentos
+    nivel: 3
+    ordem: 11
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L11
+  evidence:
+    page: 8
+    text: 'L11 Investimentos 1.2.2.0.0.00.00 Exclusões: 1.2.2.1.2.00.00; 1.2.2.9.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.2.2.0.0.00.00
+        pattern: '122'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.2.2.0.0.00.00
+        pattern: '122'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 1.2.2.1.2.00.00
+      pattern: '12212'
+    - literal: 1.2.2.9.2.00.00
+      pattern: '12292'
+- rule_id: bp.quadro_principal.ativo.l12
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L12
+    descricao: Imobilizado
+    nivel: 3
+    ordem: 12
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L12
+  evidence:
+    page: 8
+    text: 'L12 Imobilizado 1.2.3.0.0.00.00 Exclusões: 1.2.3.7.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.2.3.0.0.00.00
+        pattern: '123'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.2.3.0.0.00.00
+        pattern: '123'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 1.2.3.7.2.00.00
+      pattern: '12372'
+- rule_id: bp.quadro_principal.ativo.l13
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L13
+    descricao: Intangível
+    nivel: 3
+    ordem: 13
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L13
+  evidence:
+    page: 8
+    text: L13 Intangível 1.2.4.0.0.00.00
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.2.4.0.0.00.00
+        pattern: '124'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.2.4.0.0.00.00
+        pattern: '124'
+        sign: +
+        saldo: final
+- rule_id: bp.quadro_principal.ativo.l14
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: ATIVO
+    descricao: Ativo
+  linha:
+    codigo: L14
+    descricao: Diferido
+    nivel: 3
+    ordem: 14
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L14
+  evidence:
+    page: 8
+    text: L14 Diferido 1.2.5.0.0.00.00
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 1.2.5.0.0.00.00
+        pattern: '125'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 1.2.5.0.0.00.00
+        pattern: '125'
+        sign: +
+        saldo: final
+- rule_id: bp.quadro_principal.passivo.l15
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L15
+    descricao: PASSIVO E PATRIMÔNIO LÍQUIDO
+    nivel: 1
+    ordem: 15
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L15
+  evidence:
+    page: 9
+    text: L15 PASSIVO E PATRIMÔNIO LÍQUIDO (L16 + L24 + L32)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bp.quadro_principal.passivo.l16
+      sign: +
+    - rule: bp.quadro_principal.passivo.l24
+      sign: +
+    - rule: bp.quadro_principal.passivo.l32
+      sign: +
+- rule_id: bp.quadro_principal.passivo.l16
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L16
+    descricao: Passivo Circulante
+    nivel: 2
+    ordem: 16
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L16
+  evidence:
+    page: 9
+    text: L16 Passivo Circulante (L17 + L18 + L19 + L20 + L21 + L22 + L23)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bp.quadro_principal.passivo.l17
+      sign: +
+    - rule: bp.quadro_principal.passivo.l18
+      sign: +
+    - rule: bp.quadro_principal.passivo.l19
+      sign: +
+    - rule: bp.quadro_principal.passivo.l20
+      sign: +
+    - rule: bp.quadro_principal.passivo.l21
+      sign: +
+    - rule: bp.quadro_principal.passivo.l22
+      sign: +
+    - rule: bp.quadro_principal.passivo.l23
+      sign: +
+- rule_id: bp.quadro_principal.passivo.l17
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L17
+    descricao: Obrigações Trabalhistas, Previdenciárias e Assistenciais a Pagar a Curto Prazo
+    nivel: 3
+    ordem: 17
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L17
+  evidence:
+    page: 9
+    text: 'L17 Obrigações Trabalhistas, Previdenciárias e Assistenciais a Pagar a Curto Prazo 2.1.1.0.0.00.00 Exclusões: 2.1.1.2.2.00.00;
+      2.1.1.4.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.1.1.0.0.00.00
+        pattern: '211'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.1.1.0.0.00.00
+        pattern: '211'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.1.1.2.2.00.00
+      pattern: '21122'
+    - literal: 2.1.1.4.2.00.00
+      pattern: '21142'
+- rule_id: bp.quadro_principal.passivo.l18
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L18
+    descricao: Empréstimos e Financiamentos a Curto Prazo
+    nivel: 3
+    ordem: 18
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L18
+  evidence:
+    page: 9
+    text: 'L18 Empréstimos e Financiamentos a Curto Prazo 2.1.2.0.0.00.00 Exclusões: 2.1.2.1.2.00.00; 2.1.2.5.2.00.00; 2.1.2.8.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.1.2.0.0.00.00
+        pattern: '212'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.1.2.0.0.00.00
+        pattern: '212'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.1.2.1.2.00.00
+      pattern: '21212'
+    - literal: 2.1.2.5.2.00.00
+      pattern: '21252'
+    - literal: 2.1.2.8.2.00.00
+      pattern: '21282'
+- rule_id: bp.quadro_principal.passivo.l19
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L19
+    descricao: Fornecedores e Contas a Pagar a Curto Prazo
+    nivel: 3
+    ordem: 19
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L19
+  evidence:
+    page: 9
+    text: L19 Fornecedores e Contas a Pagar a Curto Prazo 2.1.3.0.0.00.00
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.1.3.0.0.00.00
+        pattern: '213'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.1.3.0.0.00.00
+        pattern: '213'
+        sign: +
+        saldo: final
+- rule_id: bp.quadro_principal.passivo.l20
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L20
+    descricao: Obrigações Fiscais a Curto Prazo
+    nivel: 3
+    ordem: 20
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L20
+  evidence:
+    page: 9
+    text: 'L20 Obrigações Fiscais a Curto Prazo 2.1.4.0.0.00.00 Exclusões: 2.1.4.1.2.00.00; 2.1.4.2.2.00.00; 2.1.4.3.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.1.4.0.0.00.00
+        pattern: '214'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.1.4.0.0.00.00
+        pattern: '214'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.1.4.1.2.00.00
+      pattern: '21412'
+    - literal: 2.1.4.2.2.00.00
+      pattern: '21422'
+    - literal: 2.1.4.3.2.00.00
+      pattern: '21432'
+- rule_id: bp.quadro_principal.passivo.l21
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L21
+    descricao: Obrigações de Repartições a Outros Entes
+    nivel: 3
+    ordem: 21
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L21
+  evidence:
+    page: 9
+    text: L21 Obrigações de Repartições a Outros Entes 2.1.5.0.0.00.00
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.1.5.0.0.00.00
+        pattern: '215'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.1.5.0.0.00.00
+        pattern: '215'
+        sign: +
+        saldo: final
+- rule_id: bp.quadro_principal.passivo.l22
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L22
+    descricao: Provisões a Curto Prazo
+    nivel: 3
+    ordem: 22
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L22
+  evidence:
+    page: 9
+    text: L22 Provisões a Curto Prazo 2.1.7.0.0.00.00
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.1.7.0.0.00.00
+        pattern: '217'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.1.7.0.0.00.00
+        pattern: '217'
+        sign: +
+        saldo: final
+- rule_id: bp.quadro_principal.passivo.l23
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L23
+    descricao: Demais Obrigações a Curto Prazo
+    nivel: 3
+    ordem: 23
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L23
+  evidence:
+    page: 9
+    text: 'L23 Demais Obrigações a Curto Prazo 2.1.8.0.0.00.00 Exclusões: 2.1.8.9.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.1.8.0.0.00.00
+        pattern: '218'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.1.8.0.0.00.00
+        pattern: '218'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.1.8.9.2.00.00
+      pattern: '21892'
+- rule_id: bp.quadro_principal.passivo.l24
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L24
+    descricao: Passivo Não Circulante
+    nivel: 2
+    ordem: 24
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L24
+  evidence:
+    page: 9
+    text: L24 Passivo Não Circulante (L25 + L26 + L27 + L28 + L29 + L30 + L31)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bp.quadro_principal.passivo.l25
+      sign: +
+    - rule: bp.quadro_principal.passivo.l26
+      sign: +
+    - rule: bp.quadro_principal.passivo.l27
+      sign: +
+    - rule: bp.quadro_principal.passivo.l28
+      sign: +
+    - rule: bp.quadro_principal.passivo.l29
+      sign: +
+    - rule: bp.quadro_principal.passivo.l30
+      sign: +
+    - rule: bp.quadro_principal.passivo.l31
+      sign: +
+- rule_id: bp.quadro_principal.passivo.l25
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L25
+    descricao: Obrigações Trabalhistas, Previdenciárias e Assistenciais a Pagar a Longo Prazo
+    nivel: 3
+    ordem: 25
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L25
+  evidence:
+    page: 9
+    text: 'L25 Obrigações Trabalhistas, Previdenciárias e Assistenciais a Pagar a Longo Prazo 2.2.1.0.0.00.00 Exclusões: 2.2.1.4.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.2.1.0.0.00.00
+        pattern: '221'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.2.1.0.0.00.00
+        pattern: '221'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.2.1.4.2.00.00
+      pattern: '22142'
+- rule_id: bp.quadro_principal.passivo.l26
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L26
+    descricao: Empréstimos e Financiamentos a Longo Prazo
+    nivel: 3
+    ordem: 26
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L26
+  evidence:
+    page: 9
+    text: 'L26 Empréstimos e Financiamentos a Longo Prazo 2.2.2.0.0.00.00 Exclusões: 2.2.2.1.2.00.00; 2.2.2.8.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.2.2.0.0.00.00
+        pattern: '222'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.2.2.0.0.00.00
+        pattern: '222'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.2.2.1.2.00.00
+      pattern: '22212'
+    - literal: 2.2.2.8.2.00.00
+      pattern: '22282'
+- rule_id: bp.quadro_principal.passivo.l27
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L27
+    descricao: Fornecedores e Contas a Pagar a Longo Prazo
+    nivel: 3
+    ordem: 27
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L27
+  evidence:
+    page: 9
+    text: L27 Fornecedores e Contas a Pagar a Longo Prazo 2.2.3.0.0.00.00
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.2.3.0.0.00.00
+        pattern: '223'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.2.3.0.0.00.00
+        pattern: '223'
+        sign: +
+        saldo: final
+- rule_id: bp.quadro_principal.passivo.l28
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L28
+    descricao: Obrigações Fiscais a Longo Prazo
+    nivel: 3
+    ordem: 28
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L28
+  evidence:
+    page: 9
+    text: 'L28 Obrigações Fiscais a Longo Prazo 2.2.4.0.0.00.00 Exclusões: 2.2.4.1.2.00.00; 2.2.4.2.2.00.00; 2.2.4.3.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.2.4.0.0.00.00
+        pattern: '224'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.2.4.0.0.00.00
+        pattern: '224'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.2.4.1.2.00.00
+      pattern: '22412'
+    - literal: 2.2.4.2.2.00.00
+      pattern: '22422'
+    - literal: 2.2.4.3.2.00.00
+      pattern: '22432'
+- rule_id: bp.quadro_principal.passivo.l29
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L29
+    descricao: Provisões a Longo Prazo
+    nivel: 3
+    ordem: 29
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L29
+  evidence:
+    page: 9
+    text: L29 Provisões a Longo Prazo 2.2.7.0.0.00.00
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.2.7.0.0.00.00
+        pattern: '227'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.2.7.0.0.00.00
+        pattern: '227'
+        sign: +
+        saldo: final
+- rule_id: bp.quadro_principal.passivo.l30
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L30
+    descricao: Demais Obrigações a Longo Prazo
+    nivel: 3
+    ordem: 30
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L30
+  evidence:
+    page: 9
+    text: 'L30 Demais Obrigações a Longo Prazo 2.2.8.0.0.00.00 Exclusões: 2.2.8.9.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.2.8.0.0.00.00
+        pattern: '228'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.2.8.0.0.00.00
+        pattern: '228'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.2.8.9.2.00.00
+      pattern: '22892'
+- rule_id: bp.quadro_principal.passivo.l31
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L31
+    descricao: Resultado Diferido
+    nivel: 3
+    ordem: 31
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L31
+  evidence:
+    page: 9
+    text: L31 Resultado Diferido 2.2.9.0.0.00.00
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.2.9.0.0.00.00
+        pattern: '229'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.2.9.0.0.00.00
+        pattern: '229'
+        sign: +
+        saldo: final
+- rule_id: bp.quadro_principal.passivo.l32
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L32
+    descricao: Patrimônio Líquido
+    nivel: 2
+    ordem: 32
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L32
+  evidence:
+    page: 9
+    text: L32 Patrimônio Líquido (L33 + L34 + L35 + L36 + L37 + L38 + L39 + L40)
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: bp.quadro_principal.passivo.l33
+      sign: +
+    - rule: bp.quadro_principal.passivo.l34
+      sign: +
+    - rule: bp.quadro_principal.passivo.l35
+      sign: +
+    - rule: bp.quadro_principal.passivo.l36
+      sign: +
+    - rule: bp.quadro_principal.passivo.l37
+      sign: +
+    - rule: bp.quadro_principal.passivo.l38
+      sign: +
+    - rule: bp.quadro_principal.passivo.l39
+      sign: +
+    - rule: bp.quadro_principal.passivo.l40
+      sign: +
+- rule_id: bp.quadro_principal.passivo.l33
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L33
+    descricao: Patrimônio Social e Capital Social
+    nivel: 3
+    ordem: 33
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L33
+  evidence:
+    page: 9
+    text: 'L33 Patrimônio Social e Capital Social 2.3.1.0.0.00.00 Exclusões: 2.3.1.2.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.3.1.0.0.00.00
+        pattern: '231'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.3.1.0.0.00.00
+        pattern: '231'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.3.1.2.2.00.00
+      pattern: '23122'
+- rule_id: bp.quadro_principal.passivo.l34
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L34
+    descricao: Adiantamento Para Futuro Aumento de Capital
+    nivel: 3
+    ordem: 34
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L34
+  evidence:
+    page: 9
+    text: 'L34 Adiantamento Para Futuro Aumento de Capital 2.3.2.0.0.00.00 Exclusões: 2.3.2.0.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: review_required
+  review:
+    required: true
+    reason: A exclusão literal 2.3.2.0.2.00.00 não existe no PCASP oficial consultado.
+    blocker: IPC04 p. 9 traz 2.3.2.0.2.00.00; o PCASP não possui prefixo 23202.
+    candidate:
+      pdf_literal: 2.3.2.0.2.00.00
+      candidate_literal: 2.3.2.1.2.00.00
+      candidate_pattern: '23212'
+      pcasp_matches: 1
+      applied: false
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.3.2.0.0.00.00
+        pattern: '232'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.3.2.0.0.00.00
+        pattern: '232'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+- rule_id: bp.quadro_principal.passivo.l35
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L35
+    descricao: Reservas de Capital
+    nivel: 3
+    ordem: 35
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L35
+  evidence:
+    page: 10
+    text: 'L35 Reservas de Capital 2.3.3.0.0.00.00 Exclusões: 2.3.3.1.2.00.00; 2.3.3.2.2.00.00; 2.3.3.3.2.00.00; 2.3.3.4.2.00.00;
+      2.3.3.9.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.3.3.0.0.00.00
+        pattern: '233'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.3.3.0.0.00.00
+        pattern: '233'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.3.3.1.2.00.00
+      pattern: '23312'
+    - literal: 2.3.3.2.2.00.00
+      pattern: '23322'
+    - literal: 2.3.3.3.2.00.00
+      pattern: '23332'
+    - literal: 2.3.3.4.2.00.00
+      pattern: '23342'
+    - literal: 2.3.3.9.2.00.00
+      pattern: '23392'
+- rule_id: bp.quadro_principal.passivo.l36
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L36
+    descricao: Ajustes de Avaliação Patrimonial
+    nivel: 3
+    ordem: 36
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L36
+  evidence:
+    page: 10
+    text: L36 Ajustes de Avaliação Patrimonial 2.3.4.0.0.00.00
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.3.4.0.0.00.00
+        pattern: '234'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.3.4.0.0.00.00
+        pattern: '234'
+        sign: +
+        saldo: final
+- rule_id: bp.quadro_principal.passivo.l37
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L37
+    descricao: Reservas de Lucros
+    nivel: 3
+    ordem: 37
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L37
+  evidence:
+    page: 10
+    text: 'L37 Reservas de Lucros 2.3.5.0.0.00.00 Exclusões: 2.3.5.1.2.00.00; 2.3.5.2.2.00.00; 2.3.5.3.2.00.00; 2.3.5.4.2.00.00;
+      2.3.5.5.2.00.00; 2.3.5.6.2.00.00; 2.3.5.7.2.00.00; 2.3.5.8.2.00.00; 2.3.5.9.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.3.5.0.0.00.00
+        pattern: '235'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.3.5.0.0.00.00
+        pattern: '235'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.3.5.1.2.00.00
+      pattern: '23512'
+    - literal: 2.3.5.2.2.00.00
+      pattern: '23522'
+    - literal: 2.3.5.3.2.00.00
+      pattern: '23532'
+    - literal: 2.3.5.4.2.00.00
+      pattern: '23542'
+    - literal: 2.3.5.5.2.00.00
+      pattern: '23552'
+    - literal: 2.3.5.6.2.00.00
+      pattern: '23562'
+    - literal: 2.3.5.7.2.00.00
+      pattern: '23572'
+    - literal: 2.3.5.8.2.00.00
+      pattern: '23582'
+    - literal: 2.3.5.9.2.00.00
+      pattern: '23592'
+- rule_id: bp.quadro_principal.passivo.l38
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L38
+    descricao: Demais Reservas
+    nivel: 3
+    ordem: 38
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L38
+  evidence:
+    page: 10
+    text: 'L38 Demais Reservas 2.3.6.0.0.00.00 Exclusões: 2.3.6.1.2.00.00; 2.3.6.9.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.3.6.0.0.00.00
+        pattern: '236'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.3.6.0.0.00.00
+        pattern: '236'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.3.6.1.2.00.00
+      pattern: '23612'
+    - literal: 2.3.6.9.2.00.00
+      pattern: '23692'
+- rule_id: bp.quadro_principal.passivo.l39
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L39
+    descricao: Resultados Acumulados
+    nivel: 3
+    ordem: 39
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L39
+  evidence:
+    page: 10
+    text: 'L39 Resultados Acumulados 2.3.7.0.0.00.00 Exclusões: 2.3.7.1.2.00.00; 2.3.7.2.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.3.7.0.0.00.00
+        pattern: '237'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.3.7.0.0.00.00
+        pattern: '237'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.3.7.1.2.00.00
+      pattern: '23712'
+    - literal: 2.3.7.2.2.00.00
+      pattern: '23722'
+- rule_id: bp.quadro_principal.passivo.l40
+  demonstrativo:
+    codigo: BP
+    descricao: Balanço Patrimonial
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: PASSIVO
+    descricao: Passivo e Patrimônio Líquido
+  linha:
+    codigo: L40
+    descricao: (-) Ações / Cotas em Tesouraria
+    nivel: 3
+    ordem: 40
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '17'
+    table: Quadro Principal
+    row: L40
+  evidence:
+    page: 10
+    text: 'L40 (-) Ações / Cotas em Tesouraria 2.3.9.0.0.00.00 Exclusões: 2.3.9.1.2.00.00; 2.3.9.2.2.00.00'
+  version:
+    source_document: IPC04
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-02'
+  status: extracted
+  review:
+    required: true
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 2.3.9.0.0.00.00
+        pattern: '239'
+        sign: +
+        saldo: final
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 2.3.9.0.0.00.00
+        pattern: '239'
+        sign: +
+        saldo: final
+  policies:
+  - ipc04.exclusao_intra_so_no_consolidado
+  - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    values:
+    - literal: 2.3.9.1.2.00.00
+      pattern: '23912'
+    - literal: 2.3.9.2.2.00.00
+      pattern: '23922'

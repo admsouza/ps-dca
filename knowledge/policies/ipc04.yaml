@@ -1,0 +1,36 @@
+# Regras gerais do Balanço Patrimonial — IPC 04, p. 7.
+policies:
+- policy_id: ipc04.exclusao_intra_so_no_consolidado
+  descricao: As exclusões de contas intraorçamentárias aplicam-se ao Balanço Patrimonial consolidado do ente. No
+    levantamento de órgão ou unidade específica, as operações intraorçamentárias não devem ser excluídas.
+  aplica_a:
+    demonstrativo: BP
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 7
+    section: INSTRUÇÕES PARA PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '8'
+  evidence:
+    page: 7
+    text: O mapeamento a seguir apresenta as regras de elaboração do BP consolidado do ente federado (União, estado,
+      DF ou município), contemplando, portanto, as exclusões das contas intraorçamentárias. No levantamento da DVP
+      de um órgão ou unidade específico do ente, as operações intraorçamentárias não devem ser excluídas.
+  status: extracted
+- policy_id: ipc04.intra_quinto_nivel_criada_pelo_ente
+  descricao: O ente deve deduzir contas intraorçamentárias de 5º nível = 2 eventualmente criadas além das previstas
+    no PCASP. Esta policy não autoriza um filtro genérico por 5º nível; as exclusões executáveis permanecem as listas
+    explícitas do quadro.
+  aplica_a:
+    demonstrativo: BP
+  source:
+    document: IPC04
+    document_version: 2020-01
+    page: 7
+    section: INSTRUÇÕES PARA PREENCHIMENTO DO BALANÇO PATRIMONIAL
+    item: '9'
+  evidence:
+    page: 7
+    text: Tendo em vista a faculdade do ente público em criar detalhamentos em 5º nível além dos previstos no PCASP,
+      o ente deverá deduzir as contas de nível intraorçamentário (5º nível = 2) eventualmente criadas.
+  status: extracted
