@@ -17,6 +17,8 @@ from __future__ import annotations
 
 import os
 from collections.abc import Sequence
+from decimal import Decimal
+from urllib.parse import urlsplit, urlunsplit
 
 from app.domain.bo.modelo import Registro
 from app.infra.msc.fonte import Matriz, TipoSaldo
@@ -37,6 +39,11 @@ URL_AUDITORIA = os.getenv("PUBLICSOFT_AUDIT_URL", "")
 TIMEOUT = int(os.getenv("PUBLICSOFT_TIMEOUT", "120"))
 SSL_VERIFY = os.getenv("PUBLICSOFT_SSL_VERIFY", "true").lower() not in ("false", "0", "no")
 POOL = int(os.getenv("PUBLICSOFT_POOL_MAXSIZE") or 12)   # `or`: variável vazia no .env
+CAMINHO_ESTORNO = "/contabilidade-tools/relatorios-gerenciais/estorno-receita-extra"
+
+
+class EstornoIndisponivel(RuntimeError):
+    """O relatório não trouxe `totalGeral`. O bruto da MSC não pode sair como líquido."""
 
 
 def _http_requests(url: str, params: dict | None = None, headers: dict | None = None,
@@ -111,6 +118,28 @@ class PublicSoftMSC:
             timeout=self._timeout,
         ) or {}
         return resposta.get("status") == "validado" and resposta.get("podeGerar") is True
+
+    def estorno_receita_extra(self, exercicio: int) -> Decimal:
+        """`totalGeral` do relatório sintético. SICONFI não tem este método."""
+        resposta = self._http(
+            self._url_estorno(),
+            params={"exercicio": exercicio, "tipo": "sintetico"},
+            headers=self._cabecalhos(),
+            timeout=self._timeout,
+        ) or {}
+        bruto = (resposta.get("data") or {}).get("totalGeral")
+        if bruto is None:
+            raise EstornoIndisponivel(
+                f"estorno de receita extra sem totalGeral no exercício {exercicio}"
+            )
+        return Decimal(str(bruto))
+
+    def _url_estorno(self) -> str:
+        marca = "/contabilidade-tools/"
+        if marca in self._url_saldos:
+            return self._url_saldos.split(marca)[0] + CAMINHO_ESTORNO
+        partes = urlsplit(self._url_saldos)
+        return urlunsplit((partes.scheme, partes.netloc, CAMINHO_ESTORNO, "", ""))
 
     def _cabecalhos(self) -> dict:
         return {"x-authorization": self._token} if self._token else {}

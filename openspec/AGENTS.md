@@ -68,6 +68,10 @@ devedor/credor do PCASP) antes de qualquer novo teste.
 R$ 387.665,33 e `L57` (X) = R$ 520.551,46. Não reutiliza as 15 contas da change bloqueada.
 Aguardando aprovação do PO e o fechamento de D1 (competência), D2 (valor por linha) e D3 (contas).
 
+**Change ativa, em implementação:** `bf-estorno-receita-extra` — na PublicSoft, `L27` e `L60`
+saem líquidas (movimento MSC − `totalGeral` do estorno de receita extra do exercício da coluna).
+SICONFI permanece o movimento da MSC. PO aprovou em 2026-10-05.
+
 | Change arquivada em 2026-10-01 | O que o código já fazia |
 |---|---|
 | `plataforma-pipeline-dca` | ciclo único: rota, cache, job, worker, SSE, lock, vigência publicada |

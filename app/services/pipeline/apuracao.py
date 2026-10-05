@@ -63,6 +63,10 @@ class _NoEscopo:
         return ler_ou_baixar(fonte=self._bruta, ente=ente, ano=ano, mes=mes, classe=classe,
                              matriz=matriz, tipo_saldo=tipo_saldo, fonte_nome=self._nome)
 
+    def __getattr__(self, nome: str):
+        """O que a fonte bruta sabe fazer além de `registros` — o estorno, na PublicSoft."""
+        return getattr(self._bruta, nome)
+
 
 def mapa_vigente(exercicio: int, anexo: str = "BO", repo_vigencias=None):
     """Mapa do anexo para o exercício. Do banco quando houver repositório; do YAML na semente.

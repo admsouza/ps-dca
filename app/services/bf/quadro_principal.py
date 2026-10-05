@@ -92,6 +92,8 @@ class Procedencia:
     valores_anteriores: dict[str, str] | None = None
     # Override G8 do exercício atual (D1/D2) — independente do mapa acima.
     valores_sem_mapeamento: dict[str, str] | None = None
+    # Ano → totalGeral abatido de L27 e L60. Ausente na fonte que não tem o relatório.
+    estorno_receita_extra: dict[str, str] | None = None
 
 
 @dataclass
@@ -146,7 +148,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
     else:
         principal, anexo = {}, {}
 
-    atual, nao_apuradas, sem_dados, registros_do_exercicio = _apurar_exercicio(
+    atual, nao_apuradas, sem_dados, registros_do_exercicio, estornos = _apurar_exercicio(
         mapa, ente, exercicio, competencia, fonte, direcao, origem,
         codigos_periodo=frozenset(_PERIODO_MENSAL))
 
@@ -156,9 +158,10 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
 
     sem_dados_anterior = False
     if anterior is Anterior.MSCE:
-        coluna_anterior, _, sem_dados_anterior, _ = _apurar_exercicio(
+        coluna_anterior, _, sem_dados_anterior, _, estorno_anterior = _apurar_exercicio(
             mapa, ente, exercicio - 1, competencia, fonte, direcao, origem,
             codigos_periodo=_PERIODO_MENSAL_ANTERIOR)
+        estornos = {**estorno_anterior, **estornos}
     else:
         principal, saldos_anexo = _completar_manual(mapa, principal, anexo)
         coluna_anterior = {}
@@ -210,6 +213,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
             origem_exercicio_anterior=anterior.value,
             valores_anteriores=informado,
             valores_sem_mapeamento=informado_g8,
+            estorno_receita_extra=estornos or None,
         ),
         diagnostico=Diagnostico(
             nao_apuradas=nao_apuradas,
@@ -246,7 +250,59 @@ def _apurar_exercicio(mapa, ente, exercicio, competencia, fonte, direcao, origem
     matriz = apurar_matriz(mapa, do_exercicio, direcao, por_conta=True,
                            registros_por_regra=por_regra)
     valores, nao_apuradas = _sem_conta_declarada(mapa, matriz)
-    return valores, nao_apuradas, not do_exercicio, do_exercicio
+    estorno = _abater_estorno(mapa, valores, fonte, exercicio)
+    return valores, nao_apuradas, not do_exercicio, do_exercicio, estorno
+
+
+_LINHAS_ESTORNO = ("L27", "L60")
+
+
+def _abater_estorno(mapa, valores, fonte, exercicio: int) -> dict[str, str]:
+    """Líquido = movimento MSC − totalGeral. Fonte sem o relatório (SICONFI) não entra."""
+    consultar = getattr(fonte, "estorno_receita_extra", None)
+    if consultar is None:
+        return {}
+    estorno = consultar(exercicio)
+    if not isinstance(estorno, Decimal):
+        estorno = Decimal(str(estorno))
+    por_codigo = {linha.codigo: linha for linha in mapa.linhas}
+    abatido: dict[str, Decimal] = {}
+    for codigo in _LINHAS_ESTORNO:
+        linha = por_codigo[codigo]
+        celulas = dict(valores.get(linha.id) or {})
+        bruto = celulas.get(COLUNA_ATUAL)
+        if bruto is None:
+            continue
+        celulas[COLUNA_ATUAL] = bruto - estorno
+        valores[linha.id] = celulas
+        abatido[linha.id] = estorno
+    if abatido:
+        _propagar_estorno(mapa, valores, abatido)
+    return {str(exercicio): format(estorno, ".2f")}
+
+
+def _propagar_estorno(mapa, valores, abatido: dict[str, Decimal]) -> None:
+    """A totalizadora que já era número acompanha o abatimento da filha."""
+    linhas = {linha.id: linha for linha in mapa.linhas}
+    for rule_id in ordem_topologica(linhas):
+        linha = linhas[rule_id]
+        if not linha.composta:
+            continue
+        ajuste = Decimal("0")
+        for referencia in linha.referencias:
+            parcela = abatido.get(referencia.regra)
+            if parcela is None:
+                continue
+            ajuste += parcela if referencia.sinal == "+" else -parcela
+        if ajuste == 0:
+            continue
+        celulas = dict(valores.get(linha.id) or {})
+        atual = celulas.get(COLUNA_ATUAL)
+        if atual is None:
+            continue
+        celulas[COLUNA_ATUAL] = atual - ajuste
+        valores[linha.id] = celulas
+        abatido[linha.id] = ajuste
 
 
 def _ler(fonte, ente, exercicio, competencia, origem, tipo_saldo) -> list[Registro]:
