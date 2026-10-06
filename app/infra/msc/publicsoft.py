@@ -39,6 +39,8 @@ URL_AUDITORIA = os.getenv("PUBLICSOFT_AUDIT_URL", "")
 TIMEOUT = int(os.getenv("PUBLICSOFT_TIMEOUT", "120"))
 SSL_VERIFY = os.getenv("PUBLICSOFT_SSL_VERIFY", "true").lower() not in ("false", "0", "no")
 POOL = int(os.getenv("PUBLICSOFT_POOL_MAXSIZE") or 12)   # `or`: variável vazia no .env
+# Exigido pela API junto do `x-authorization` (sem ele, 401), como no RREO e no RGF.
+RESPONSAVEL = (os.getenv("PUBLICSOFT_RESPONSAVEL_CONTABILIDADE") or "").strip()
 CAMINHO_ESTORNO_RECEITA = "/contabilidade-tools/relatorios-gerenciais/estorno-receita-extra"
 CAMINHO_ESTORNO_DESPESA = "/contabilidade-tools/relatorios-gerenciais/estorno-despesa-extra"
 
@@ -63,12 +65,13 @@ class PublicSoftMSC:
 
     def __init__(self, http=_http_requests, token: str = "",
                  url_saldos: str = URL_SALDOS, url_auditoria: str = URL_AUDITORIA,
-                 timeout: int = TIMEOUT):
+                 timeout: int = TIMEOUT, responsavel: str = RESPONSAVEL):
         self._http = http
         self._token = token
         self._url_saldos = url_saldos
         self._url_auditoria = url_auditoria
         self._timeout = timeout
+        self._responsavel = responsavel
 
     def registros(self, ente: int, ano: int, mes: int, classe: int,
                   matriz: Matriz = Matriz.CONSOLIDADA,
@@ -148,4 +151,7 @@ class PublicSoftMSC:
         return urlunsplit((partes.scheme, partes.netloc, caminho, "", ""))
 
     def _cabecalhos(self) -> dict:
-        return {"x-authorization": self._token} if self._token else {}
+        cabecalhos = {"x-authorization": self._token} if self._token else {}
+        if self._responsavel:
+            cabecalhos["x-responsavel-contabilidade"] = self._responsavel
+        return cabecalhos

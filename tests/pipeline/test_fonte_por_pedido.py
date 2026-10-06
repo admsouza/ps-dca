@@ -311,3 +311,22 @@ def test_worker_apura_na_fonte_do_payload(monkeypatch):
                                     exercicio=EXERCICIO, anexo="BF", fonte="publicsoft"))
 
     assert pedidos["fonte_nome"] == "publicsoft"
+
+
+def test_publicsoft_envia_token_e_responsavel():
+    """Scenario: token guardado para o job — com `x-responsavel-contabilidade`, como RREO/RGF.
+
+    Regressão de produção (2026-10-06): `401` em `/matriz-saldo/auditorias` sem esse header.
+    """
+    from app.infra.msc.publicsoft import PublicSoftMSC
+
+    chamadas = []
+
+    def http(url, params=None, headers=None, timeout=None):
+        chamadas.append(headers)
+        return {"status": "validado", "podeGerar": True}
+
+    PublicSoftMSC(http=http, token=TOKEN, url_auditoria="https://api/auditorias",
+                  responsavel="resp")._consultar_auditoria(2025, 13)
+
+    assert chamadas == [{"x-authorization": TOKEN, "x-responsavel-contabilidade": "resp"}]

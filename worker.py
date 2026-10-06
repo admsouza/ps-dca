@@ -51,6 +51,9 @@ async def apurar_anexo(ctx: dict, *, job_id: str, ente: str, exercicio: int, ane
     try:
         repo = RepositorioCache(db)
         credencial = _credencial(ctx, job_id)
+        if parametros.get("fonte") == "publicsoft" and not credencial:
+            # Sem token a PublicSoft responde 401; TOKEN_ENCRYPTION_KEY ausente ou diferente da API.
+            logger.warning("job PublicSoft sem credencial no cofre | job=%s ente=%s", job_id, ente)
         apurador = apuracao.apurador(
             anexo,
             fonte_nome=parametros.get("fonte"),      # escolhida pelo front; sem ela, DATA_SOURCE
