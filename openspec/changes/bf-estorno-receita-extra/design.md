@@ -23,9 +23,11 @@
 apurar BF
   → se a fonte não tem estorno_receita_extra: matriz como hoje
   → senão, por exercício da coluna:
-       totalGeral = GET estorno-receita-extra?exercicio={ano}&tipo=sintetico
-       L27 e L60 −= totalGeral
-       totalizadora que soma a linha −= o mesmo valor, se a célula já era número
+       receita = GET estorno-receita-extra?exercicio={ano}&tipo=sintetico
+       despesa = GET estorno-despesa-extra?exercicio={ano}&tipo=sintetico
+       L27 −= receita
+       L60 −= receita + despesa
+       totalizadora que soma a linha −= o abatimento da filha, se a célula já era número
 ```
 
 ## Contratos

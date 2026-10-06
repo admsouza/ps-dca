@@ -14,7 +14,7 @@
 
 ## 3. IMPLEMENT
 - [x] 3.1 Consulta do relatório na PublicSoft
-- [x] 3.2 Abatimento de `L27`/`L60` e das somas
+- [x] 3.2 Abatimento de `L27` (receita) e `L60` (receita + despesa) e das somas
 - [x] 3.3 SICONFI sem chamada e sem mudança de valor
 
 ## 4. REVIEW

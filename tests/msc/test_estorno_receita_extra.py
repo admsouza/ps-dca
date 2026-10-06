@@ -35,6 +35,18 @@ def test_le_o_total_geral_com_o_token_da_fonte():
     assert chamada["headers"] == {"x-authorization": "tok"}
 
 
+def test_estorno_de_despesa_le_o_total_geral_zero():
+    http = _Http({"data": {"totaisPorUnidadeGestora": [], "totalGeral": 0}, "statusCode": 200})
+    total = _fonte(http).estorno_despesa_extra(2025)
+
+    assert total == Decimal("0")
+    assert http.chamadas[0]["url"].endswith(
+        "/contabilidade-tools/relatorios-gerenciais/estorno-despesa-extra"
+    )
+    assert http.chamadas[0]["params"] == {"exercicio": 2025, "tipo": "sintetico"}
+    assert http.chamadas[0]["headers"] == {"x-authorization": "tok"}
+
+
 def test_sem_total_geral_falha():
     from app.infra.msc.publicsoft import EstornoIndisponivel
 

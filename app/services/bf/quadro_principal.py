@@ -35,6 +35,7 @@ from app.domain.bo.matriz import apurar as apurar_matriz
 from app.domain.bo.matriz import ordem_topologica
 from app.domain.bo.modelo import Linha, MapaBO, NaoApurada, Registro, Residuo
 from app.infra.msc.fonte import COMPETENCIA_DE_ENCERRAMENTO, TipoSaldo, fonte_de, fonte_periodo
+from app.infra.msc.publicsoft import EstornoIndisponivel
 from app.infra.pcasp.natureza import do_pcasp
 from app.services.bf.informados import QUADRO_ANEXO, QUADRO_PRINCIPAL
 from app.services.bf.informados import mapa_bf as _mapa
@@ -92,8 +93,9 @@ class Procedencia:
     valores_anteriores: dict[str, str] | None = None
     # Override G8 do exercício atual (D1/D2) — independente do mapa acima.
     valores_sem_mapeamento: dict[str, str] | None = None
-    # Ano → totalGeral abatido de L27 e L60. Ausente na fonte que não tem o relatório.
+    # Ano → totalGeral. Receita sai de L27 e L60; despesa sai só de L60.
     estorno_receita_extra: dict[str, str] | None = None
+    estorno_despesa_extra: dict[str, str] | None = None
 
 
 @dataclass
@@ -148,7 +150,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
     else:
         principal, anexo = {}, {}
 
-    atual, nao_apuradas, sem_dados, registros_do_exercicio, estornos = _apurar_exercicio(
+    atual, nao_apuradas, sem_dados, registros_do_exercicio, receitas, despesas = _apurar_exercicio(
         mapa, ente, exercicio, competencia, fonte, direcao, origem,
         codigos_periodo=frozenset(_PERIODO_MENSAL))
 
@@ -158,10 +160,13 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
 
     sem_dados_anterior = False
     if anterior is Anterior.MSCE:
-        coluna_anterior, _, sem_dados_anterior, _, estorno_anterior = _apurar_exercicio(
-            mapa, ente, exercicio - 1, competencia, fonte, direcao, origem,
-            codigos_periodo=_PERIODO_MENSAL_ANTERIOR)
-        estornos = {**estorno_anterior, **estornos}
+        coluna_anterior, _, sem_dados_anterior, _, receita_anterior, despesa_anterior = (
+            _apurar_exercicio(
+                mapa, ente, exercicio - 1, competencia, fonte, direcao, origem,
+                codigos_periodo=_PERIODO_MENSAL_ANTERIOR)
+        )
+        receitas = {**receita_anterior, **receitas}
+        despesas = {**despesa_anterior, **despesas}
     else:
         principal, saldos_anexo = _completar_manual(mapa, principal, anexo)
         coluna_anterior = {}
@@ -213,7 +218,8 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
             origem_exercicio_anterior=anterior.value,
             valores_anteriores=informado,
             valores_sem_mapeamento=informado_g8,
-            estorno_receita_extra=estornos or None,
+            estorno_receita_extra=receitas or None,
+            estorno_despesa_extra=despesas or None,
         ),
         diagnostico=Diagnostico(
             nao_apuradas=nao_apuradas,
@@ -250,24 +256,27 @@ def _apurar_exercicio(mapa, ente, exercicio, competencia, fonte, direcao, origem
     matriz = apurar_matriz(mapa, do_exercicio, direcao, por_conta=True,
                            registros_por_regra=por_regra)
     valores, nao_apuradas = _sem_conta_declarada(mapa, matriz)
-    estorno = _abater_estorno(mapa, valores, fonte, exercicio)
-    return valores, nao_apuradas, not do_exercicio, do_exercicio, estorno
+    receita, despesa = _abater_estorno(mapa, valores, fonte, exercicio)
+    return valores, nao_apuradas, not do_exercicio, do_exercicio, receita, despesa
 
 
-_LINHAS_ESTORNO = ("L27", "L60")
+def _moeda(valor) -> Decimal:
+    return valor if isinstance(valor, Decimal) else Decimal(str(valor))
 
 
-def _abater_estorno(mapa, valores, fonte, exercicio: int) -> dict[str, str]:
-    """Líquido = movimento MSC − totalGeral. Fonte sem o relatório (SICONFI) não entra."""
-    consultar = getattr(fonte, "estorno_receita_extra", None)
-    if consultar is None:
-        return {}
-    estorno = consultar(exercicio)
-    if not isinstance(estorno, Decimal):
-        estorno = Decimal(str(estorno))
+def _abater_estorno(mapa, valores, fonte, exercicio: int) -> tuple[dict[str, str], dict[str, str]]:
+    """L27 − receita. L60 − receita − despesa. SICONFI não tem os dois métodos."""
+    consultar_receita = getattr(fonte, "estorno_receita_extra", None)
+    if consultar_receita is None:
+        return {}, {}
+    consultar_despesa = getattr(fonte, "estorno_despesa_extra", None)
+    if consultar_despesa is None:
+        raise EstornoIndisponivel("fonte com estorno de receita sem estorno de despesa")
+    receita = _moeda(consultar_receita(exercicio))
+    despesa = _moeda(consultar_despesa(exercicio))
     por_codigo = {linha.codigo: linha for linha in mapa.linhas}
     abatido: dict[str, Decimal] = {}
-    for codigo in _LINHAS_ESTORNO:
+    for codigo, estorno in (("L27", receita), ("L60", receita + despesa)):
         linha = por_codigo[codigo]
         celulas = dict(valores.get(linha.id) or {})
         bruto = celulas.get(COLUNA_ATUAL)
@@ -278,7 +287,8 @@ def _abater_estorno(mapa, valores, fonte, exercicio: int) -> dict[str, str]:
         abatido[linha.id] = estorno
     if abatido:
         _propagar_estorno(mapa, valores, abatido)
-    return {str(exercicio): format(estorno, ".2f")}
+    ano = str(exercicio)
+    return {ano: format(receita, ".2f")}, {ano: format(despesa, ".2f")}
 
 
 def _propagar_estorno(mapa, valores, abatido: dict[str, Decimal]) -> None:

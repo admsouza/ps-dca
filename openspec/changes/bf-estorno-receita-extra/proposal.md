@@ -14,8 +14,9 @@ Na fonte SICONFI o relatório não existe. `L27` e `L60` permanecem o movimento 
 
 ## What Changes
 
-- Com fonte PublicSoft, `exercicio_atual` e `exercicio_anterior` de `L27` e de `L60` passam a ser
-  movimento MSC − `totalGeral` do relatório do exercício da coluna.
+- Com fonte PublicSoft, `L27` é movimento MSC − `totalGeral` de `estorno-receita-extra`.
+  `L60` é movimento MSC − esse mesmo total − `totalGeral` de `estorno-despesa-extra`.
+  Cada coluna usa o exercício dela.
 - `L24`, `L33`, `L57` e `L66` acompanham a parcela, porque somam essas linhas.
 - Fonte sem o relatório (SICONFI) não chama a rota e não altera valor.
 
@@ -33,7 +34,7 @@ Ente: PM Cuitegi/PB (`2504801`), exercício 2025. Relatório sintético de 2025:
 | Célula | Bruto | Líquido |
 |---|---:|---:|
 | `L27` exercício atual | 4601867.61 | 4486188.21 |
-| `L60` exercício atual | 4595435.01 | 4479755.61 |
+| `L60` exercício atual | 4595435.01 | 4479755.61 (receita 115679.40 + despesa 0.00) |
 
 O exercício anterior usa o `totalGeral` de `exercicio=2024` na mesma rota.
 
