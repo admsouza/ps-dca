@@ -185,8 +185,10 @@ async def startup(ctx: dict) -> None:
     soltar_jobs_interrompidos(sincrono, cfg.fila)
     _semear()
 
-    logger.info("worker iniciado | fila=%s | max_jobs=%s | timeout=%ss",
-                cfg.fila, cfg.max_concorrentes, cfg.job_timeout)
+    from app.services.pipeline.apuracao import VERSAO_API
+
+    logger.info("worker iniciado | fila=%s | max_jobs=%s | timeout=%ss | fonte=%s | versao_api=%s",
+                cfg.fila, cfg.max_concorrentes, cfg.job_timeout, cfg.fonte_padrao, VERSAO_API)
 
 
 def _notificador():
