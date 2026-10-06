@@ -143,7 +143,8 @@ def apurador(anexo: str = "BO", *, fonte_nome: str | None = None, token: str | N
     dados = fonte(fonte_nome, token)
 
     apurar = _servico_de(descricao.codigo)
-    extras = _aceitos_por(apurar, parametros or {})
+    # `fonte` do pedido já virou `dados`; repassá-la colidiria com o `fonte=` do serviço.
+    extras = _aceitos_por(apurar, {k: v for k, v in (parametros or {}).items() if k != "fonte"})
 
     def _apurar(ente: int, exercicio: int):
         return apurar(ente, exercicio, fonte=dados,

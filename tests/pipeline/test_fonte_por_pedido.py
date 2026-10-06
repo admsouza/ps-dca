@@ -264,6 +264,27 @@ def test_resolver_token_rede_fora():
 
 # --- Worker ---------------------------------------------------------------------------------
 
+@pytest.mark.parametrize("anexo", ["BF", "BO"])
+def test_apurador_real_aceita_fonte_no_payload(monkeypatch, anexo):
+    """Scenario: SIAFIC escolhido com worker padrão SICONFI — `fonte` não vaza ao serviço.
+
+    Regressão de produção (2026-10-06): `apurar() got multiple values for keyword argument 'fonte'`.
+    """
+    from app.services.pipeline import apuracao
+
+    recebidos: dict[str, Any] = {}
+
+    def servico(ente, exercicio, fonte=None, mapa=None, **kwargs):
+        recebidos.update(fonte=fonte, **kwargs)
+
+    monkeypatch.setattr(apuracao, "_servico_de", lambda _codigo: servico)
+    monkeypatch.setattr(apuracao, "mapa_vigente", lambda *_a, **_k: None)
+
+    apuracao.apurador(anexo, fonte_nome="siconfi",
+                      parametros={"fonte": "siconfi"})(int(ENTE), EXERCICIO)
+
+    assert recebidos["fonte"].__class__.__name__ == "_NoEscopo"
+
 def test_worker_apura_na_fonte_do_payload(monkeypatch):
     """Scenario: SIAFIC escolhido com worker padrão SICONFI — o job apura pela fonte do payload."""
     # `worker` chama `load_dotenv()` na importação; o `.env` local vazaria para os outros testes.
