@@ -9,17 +9,51 @@ de conta em `knowledge/rules/**.yaml` tem de invalidar sozinha.
 """
 from __future__ import annotations
 
+import hashlib
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
+from pathlib import Path
 from typing import Any
 
 from app.core.config import config
 
 logger = logging.getLogger(__name__)
 
-# Versão da apuração da DCA. Muda quando o **código** de apuração muda; a mudança de regra é
-# capturada por `versao_regras`, que é hash do conteúdo.
-VERSAO_API = "0.1.0"
+# Código que muda o número. Rota, auth e cache ficam de fora: alteração ali não muda célula.
+_RAIZ_APP = Path(__file__).resolve().parents[2]
+_CODIGO_DA_APURACAO = (
+    _RAIZ_APP / "domain" / "bo",
+    _RAIZ_APP / "services" / "bf",
+    _RAIZ_APP / "services" / "bo",
+    _RAIZ_APP / "infra" / "msc",
+    _RAIZ_APP / "infra" / "pcasp",      # direção do saldo
+    _RAIZ_APP / "infra" / "regras",     # montagem do mapa a partir do YAML/banco
+    # ponytail: pasta inteira por causa de `apuracao.py`; job/cache também invalidam — custa
+    # reprocessamento, nunca número errado.
+    _RAIZ_APP / "services" / "pipeline",
+)
+
+
+def versao_do_codigo(raiz: Path, pastas: Sequence[Path]) -> str:
+    """Hash do fonte que produz a célula. LF, para um checkout Windows não invalidar o cache."""
+    digest = hashlib.sha256()
+    raiz = raiz.resolve()
+    relativos = {
+        arquivo.resolve().relative_to(raiz).as_posix(): arquivo
+        for pasta in pastas
+        for arquivo in pasta.rglob("*.py")
+        if "__pycache__" not in arquivo.parts
+    }
+    for relativo, arquivo in sorted(relativos.items()):
+        texto = arquivo.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        digest.update(relativo.encode())
+        digest.update(b"\0")
+        digest.update(texto)
+    return digest.hexdigest()
+
+
+# Muda sozinha quando o código da apuração muda. `versao_regras` cobre o YAML.
+VERSAO_API = versao_do_codigo(_RAIZ_APP, _CODIGO_DA_APURACAO)
 
 
 def fonte(nome: str | None = None, token: str | None = None):

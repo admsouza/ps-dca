@@ -54,7 +54,8 @@ class AnexoCache(Base):
     status = Column(String(20), nullable=False, default="ok")
     calculado_em = Column(DateTime(timezone=True), server_default=func.now())
     duracao_ms = Column(Integer)
-    versao_api = Column(String(20))
+    # Hash do código da apuração. Era String(20) para "0.1.0"; o sha256 não cabe.
+    versao_api = Column(Text)
     # Hash das regras + sufixo da identidade do pedido (competência, origem manual, …).
     # Era String(64); o sufixo do BF manual estoura esse teto.
     versao_regras = Column(Text)
