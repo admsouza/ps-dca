@@ -15,6 +15,7 @@ Implementa `FonteSaldos`. Duas diferenças que o adapter absorve, além do camel
 """
 from __future__ import annotations
 
+import logging
 import os
 from collections.abc import Sequence
 from decimal import Decimal
@@ -23,6 +24,8 @@ from urllib.parse import urlsplit, urlunsplit
 from app.domain.bo.modelo import Registro
 from app.infra.msc.fonte import Matriz, TipoSaldo
 from app.infra.msc.normalizacao import itens, normalizar
+
+logger = logging.getLogger(__name__)
 
 # Competência especial de encerramento do exercício nesta API (12 é dezembro).
 COMPETENCIA_13 = 13
@@ -56,6 +59,9 @@ def _http_requests(url: str, params: dict | None = None, headers: dict | None = 
     resposta = sessao(pool=POOL, verificar_ssl=SSL_VERIFY).get(
         url, params=params, headers=headers, timeout=timeout
     )
+    if resposta.status_code == 401:
+        # Só os nomes dos headers: mostra qual faltou, sem expor segredo.
+        logger.error("PublicSoft 401 | url=%s cabecalhos_enviados=%s", url, sorted(headers or {}))
     resposta.raise_for_status()
     return resposta.json()
 
