@@ -52,6 +52,13 @@ class EstornoIndisponivel(RuntimeError):
     """O relatório não trouxe `totalGeral`. O bruto da MSC não pode sair como líquido."""
 
 
+def _impressoes(headers: dict | None) -> dict[str, str]:
+    import hashlib
+
+    return {nome: f"len={len(str(valor))} sha={hashlib.sha256(str(valor).encode()).hexdigest()[:8]}"
+            for nome, valor in sorted((headers or {}).items())}
+
+
 def _http_requests(url: str, params: dict | None = None, headers: dict | None = None,
                    timeout: int = TIMEOUT) -> dict:
     from app.infra.msc.http import sessao
@@ -60,8 +67,8 @@ def _http_requests(url: str, params: dict | None = None, headers: dict | None = 
         url, params=params, headers=headers, timeout=timeout
     )
     if resposta.status_code == 401:
-        # Só os nomes dos headers: mostra qual faltou, sem expor segredo.
-        logger.error("PublicSoft 401 | url=%s cabecalhos_enviados=%s", url, sorted(headers or {}))
+        # Nome + sha256[:8] de cada header: compara com o valor esperado sem expor segredo.
+        logger.error("PublicSoft 401 | url=%s cabecalhos=%s", url, _impressoes(headers))
     resposta.raise_for_status()
     return resposta.json()
 
