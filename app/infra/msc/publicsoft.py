@@ -95,9 +95,10 @@ class PublicSoftMSC:
         try:
             resposta = self._http(
                 self._url_saldos,
+                # Só o que o DTO aceita: o pipe usa `forbidNonWhitelisted` (campo extra = 400).
+                # A matriz já está na competência (13 = encerramento).
                 params={"anReferencia": ano, "meReferencia": competencia,
-                        "classeConta": classe, "idTv": ID_TV[tipo_saldo],
-                        "tipoMatriz": str(matriz)},
+                        "classeConta": classe, "idTv": ID_TV[tipo_saldo]},
                 headers=self._cabecalhos(),
                 timeout=self._timeout,
             ) or {}

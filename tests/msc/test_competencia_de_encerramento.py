@@ -84,6 +84,20 @@ def test_publicsoft_propaga_erro_que_nao_e_409():
         _publicsoft(http).registros(ente=2611606, ano=EXERCICIO, mes=DEZEMBRO, classe=1)
 
 
+@pytest.mark.parametrize("matriz", list(Matriz))
+def test_publicsoft_envia_so_os_parametros_do_contrato(matriz):
+    """Scenario: query do `base-demonstrativos` dentro do DTO
+
+    O Nest valida com `forbidNonWhitelisted`: qualquer campo fora do DTO vira 400.
+    Regressão de produção (2026-10-06): `tipoMatriz=encerramento` derrubou o BF.
+    """
+    http = HttpFake()
+    _publicsoft(http).registros(ente=2611606, ano=EXERCICIO, mes=DEZEMBRO, classe=1,
+                                matriz=matriz, tipo_saldo=TipoSaldo.ABERTURA)
+    assert set(http.chamadas[0]["params"]) == {"anReferencia", "meReferencia", "classeConta",
+                                                "idTv"}
+
+
 @pytest.mark.parametrize("mes", [1, 6, 12])
 def test_publicsoft_mantem_o_mes_na_matriz_consolidada(mes):
     """Scenario: consolidada mantém o mês pedido
