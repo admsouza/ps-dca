@@ -120,27 +120,22 @@ def test_sem_escopo_nada_e_memorizado():
     assert len(fonte.chamadas) == 2
 
 
-def test_gate_de_auditoria_consultado_uma_vez_por_job():
-    """Scenario: o gate de auditoria da PublicSoft é consultado uma vez por competência.
+def test_publicsoft_nao_pre_checa_auditoria():
+    """Scenario: o worker não consulta `/auditorias` — o endpoint exige JWT (401 com token_ps).
 
-    Eram seis chamadas idênticas por leitura de matriz — dezoito num BF — para a API responder
-    sempre a mesma coisa. Como tudo aqui, vale só dentro do job.
+    Regressão de produção (2026-10-06). O gate fica no 409 do `base-demonstrativos`; uma
+    leitura por classe, nenhuma chamada extra.
     """
-    from app.infra.msc.escopo import escopo
     from app.infra.msc.publicsoft import PublicSoftMSC
 
     chamadas = []
 
     def http(url, params=None, headers=None, timeout=None):
-        chamadas.append(params)
-        if "exercicio" in (params or {}):
-            return {"status": "validado", "podeGerar": True}
+        chamadas.append(url)
         return {"items": []}
 
-    fonte = PublicSoftMSC(http=http, url_saldos="s", url_auditoria="a")
-    with escopo():
-        for classe in (1, 2, 3, 4, 5, 6):
-            fonte.registros(ENTE, EXERCICIO, 12, classe)
+    fonte = PublicSoftMSC(http=http, url_saldos="s")
+    for classe in (1, 2, 3, 4, 5, 6):
+        fonte.registros(ENTE, EXERCICIO, 12, classe)
 
-    auditorias = [p for p in chamadas if "exercicio" in p]
-    assert len(auditorias) == 1, f"gate consultado {len(auditorias)}x no mesmo job"
+    assert chamadas == ["s"] * 6

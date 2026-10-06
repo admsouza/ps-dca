@@ -19,8 +19,7 @@ class _Http:
 def _fonte(http, url="https://api.exemplo/contabilidade-tools/matriz-saldo/base-demonstrativos"):
     from app.infra.msc.publicsoft import PublicSoftMSC
 
-    return PublicSoftMSC(http=http, token="tok", url_saldos=url, url_auditoria="https://api/auditoria",
-                         responsavel="")
+    return PublicSoftMSC(http=http, token="tok", url_saldos=url, responsavel="")
 
 
 def test_le_o_total_geral_com_o_token_da_fonte():

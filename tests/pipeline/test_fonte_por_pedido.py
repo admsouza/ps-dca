@@ -327,9 +327,9 @@ def test_publicsoft_envia_token_e_responsavel():
 
     def http(url, params=None, headers=None, timeout=None):
         chamadas.append(headers)
-        return {"status": "validado", "podeGerar": True}
+        return {"items": []}
 
-    PublicSoftMSC(http=http, token=TOKEN, url_auditoria="https://api/auditorias",
-                  responsavel="resp")._consultar_auditoria(2025, 13)
+    PublicSoftMSC(http=http, token=TOKEN, url_saldos="https://api/base-demonstrativos",
+                  responsavel="resp").registros(2505204, 2025, 12, 1)
 
     assert chamadas == [{"x-authorization": TOKEN, "x-responsavel-contabilidade": "resp"}]

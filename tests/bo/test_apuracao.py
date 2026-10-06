@@ -88,19 +88,21 @@ def test_mesma_matriz_por_fontes_diferentes(apurar_quadro):
 
 
 def test_gate_de_auditoria_reprovado(apurar_quadro):
-    """Scenario: gate de auditoria da PublicSoft reprovado — sem dados, não erro nem zeros."""
+    """Scenario: gate de auditoria da PublicSoft reprovado — sem dados, não erro nem zeros.
+
+    O gate é do servidor: `base-demonstrativos` responde 409 com a auditoria não liberada.
+    """
+    import requests
+
     from app.infra.msc.publicsoft import PublicSoftMSC
 
     def http_fake(url, **kwargs):
-        if "auditorias" in url:
-            return {"status": "reprovado", "podeGerar": False}
-        raise AssertionError("não deve buscar saldos com auditoria reprovada")
+        assert "auditorias" not in url, "/auditorias exige JWT; o worker não deve chamá-lo"
+        resposta = requests.Response()
+        resposta.status_code = 409
+        raise requests.HTTPError(response=resposta)
 
-    fonte = PublicSoftMSC(
-        http=http_fake, token="x",
-        url_saldos="http://ente/base-demonstrativos",
-        url_auditoria="http://ente/auditorias",
-    )
+    fonte = PublicSoftMSC(http=http_fake, token="x", url_saldos="http://ente/base-demonstrativos")
     assert fonte.registros(ente=ENTE, ano=EXERCICIO, mes=12, classe=6) == []
 
     resultado = apurar_quadro(ente=ENTE, exercicio=EXERCICIO, fonte=FonteVazia())

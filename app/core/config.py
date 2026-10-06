@@ -72,7 +72,6 @@ class Config:
                                      "https://apidatalake.tesouro.gov.br/ords/siconfi")
         self.siconfi_timeout = _int("SICONFI_TIMEOUT", 30)
         self.publicsoft_url = os.getenv("PUBLICSOFT_API_URL", "")
-        self.publicsoft_audit_url = os.getenv("PUBLICSOFT_AUDIT_URL", "")
         self.publicsoft_timeout = _int("PUBLICSOFT_TIMEOUT", 120)
         self.publicsoft_ssl_verify = _bool("PUBLICSOFT_SSL_VERIFY")
 

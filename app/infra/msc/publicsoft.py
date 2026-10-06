@@ -1,4 +1,4 @@
-"""Fonte PublicSoft — `base-demonstrativos`, com gate de auditoria.
+"""Fonte PublicSoft — `base-demonstrativos`; o gate de auditoria é do servidor.
 
 Implementa `FonteSaldos`. Duas diferenças que o adapter absorve, além do camelCase:
 
@@ -8,10 +8,11 @@ Implementa `FonteSaldos`. Duas diferenças que o adapter absorve, além do camel
    competência 12, identificado por `co_tipo_matriz=MSCE`, e pedir 13 devolve zero registros
    (medido nos 4 entes de homologação em 2026-09-18). O domínio continua falando em competência
    1–12 mais a matriz; o número de cada API morre aqui.
-2. Antes de buscar saldos, a auditoria do exercício/mês precisa estar `validado` **e**
-   `podeGerar`. Reprovado significa **sem dados** — conjunto vazio, não exceção: um
-   demonstrativo em auditoria não é uma falha de transporte, e tratá-lo como erro esconderia a
-   diferença.
+2. A auditoria da competência é verificada pelo próprio `base-demonstrativos`, que responde
+   **409** quando ela não está liberada. 409 significa **sem dados** — conjunto vazio, não
+   exceção: um demonstrativo em auditoria não é uma falha de transporte. Não há pré-check em
+   `/matriz-saldo/auditorias`: aquele endpoint exige o JWT do usuário, que o worker não tem — com
+   o `token_ps` responde 401 (produção, 2026-10-06). RREO e RGF fazem o mesmo.
 """
 from __future__ import annotations
 
@@ -19,6 +20,7 @@ import logging
 import os
 from collections.abc import Sequence
 from decimal import Decimal
+from http import HTTPStatus
 from urllib.parse import urlsplit, urlunsplit
 
 from app.domain.bo.modelo import Registro
@@ -38,7 +40,6 @@ ID_TV = {
 }
 
 URL_SALDOS = os.getenv("PUBLICSOFT_API_URL", "")
-URL_AUDITORIA = os.getenv("PUBLICSOFT_AUDIT_URL", "")
 TIMEOUT = int(os.getenv("PUBLICSOFT_TIMEOUT", "120"))
 SSL_VERIFY = os.getenv("PUBLICSOFT_SSL_VERIFY", "true").lower() not in ("false", "0", "no")
 POOL = int(os.getenv("PUBLICSOFT_POOL_MAXSIZE") or 12)   # `or`: variável vazia no .env
@@ -77,64 +78,44 @@ class PublicSoftMSC:
     """Adapter da API do ente. `http` é injetável para teste sem rede."""
 
     def __init__(self, http=_http_requests, token: str = "",
-                 url_saldos: str = URL_SALDOS, url_auditoria: str = URL_AUDITORIA,
+                 url_saldos: str = URL_SALDOS,
                  timeout: int = TIMEOUT, responsavel: str = RESPONSAVEL):
         self._http = http
         self._token = token
         self._url_saldos = url_saldos
-        self._url_auditoria = url_auditoria
         self._timeout = timeout
         self._responsavel = responsavel
 
     def registros(self, ente: int, ano: int, mes: int, classe: int,
                   matriz: Matriz = Matriz.CONSOLIDADA,
                   tipo_saldo: TipoSaldo = TipoSaldo.ENCERRAMENTO) -> Sequence[Registro]:
-        competencia = self._competencia(mes, matriz)
-        if not self._auditoria_liberada(ano, competencia):
-            return []
+        import requests
 
-        resposta = self._http(
-            self._url_saldos,
-            params={"anReferencia": ano, "meReferencia": competencia,
-                    "classeConta": classe, "idTv": ID_TV[tipo_saldo],
-                    "tipoMatriz": str(matriz)},
-            headers=self._cabecalhos(),
-            timeout=self._timeout,
-        ) or {}
+        competencia = self._competencia(mes, matriz)
+        try:
+            resposta = self._http(
+                self._url_saldos,
+                params={"anReferencia": ano, "meReferencia": competencia,
+                        "classeConta": classe, "idTv": ID_TV[tipo_saldo],
+                        "tipoMatriz": str(matriz)},
+                headers=self._cabecalhos(),
+                timeout=self._timeout,
+            ) or {}
+        except requests.HTTPError as erro:
+            if erro.response is not None and erro.response.status_code == HTTPStatus.CONFLICT:
+                logger.warning("PublicSoft 409 auditoria não liberada | ente=%s ano=%s "
+                               "competencia=%s classe=%s", ente, ano, competencia, classe)
+                return []
+            raise
         return [normalizar(item) for item in itens(resposta)]
 
     @staticmethod
     def _competencia(mes: int, matriz: Matriz) -> int:
         """Traduz a competência do domínio para a desta API.
 
-        A matriz de encerramento vive na competência **13**; a consolidada, no próprio mês. É a
-        auditoria dessa mesma competência que libera a leitura — auditar dezembro e ler o
-        encerramento liberaria uma competência com base na validação de outra.
+        A matriz de encerramento vive na competência **13**; a consolidada, no próprio mês.
         """
         return COMPETENCIA_13 if matriz is Matriz.ENCERRAMENTO else mes
-
-    def _auditoria_liberada(self, ano: int, mes: int) -> bool:
-        """Uma consulta por competência **por job**: o gate é o mesmo para as seis classes.
-
-        Sem a memória de execução eram seis chamadas idênticas por leitura de matriz — dezoito num
-        BF — para a API responder sempre a mesma coisa. Fora de um escopo aberto (CLI, teste), o
-        comportamento é o de antes: consulta a cada chamada.
-        """
-        from app.infra.msc.escopo import obter_ou_buscar
-
-        # ponytail: chave sem o ente — um job apura um ente só. Se um job passar a apurar vários,
-        # o ente entra aqui.
-        return obter_ou_buscar(f"auditoria:{ano}:{mes}",
-                               lambda: self._consultar_auditoria(ano, mes))
-
-    def _consultar_auditoria(self, ano: int, mes: int) -> bool:
-        resposta = self._http(
-            self._url_auditoria,
-            params={"exercicio": ano, "mesMsc": mes},
-            headers=self._cabecalhos(),
-            timeout=self._timeout,
-        ) or {}
-        return resposta.get("status") == "validado" and resposta.get("podeGerar") is True
 
     def estorno_receita_extra(self, exercicio: int) -> Decimal:
         """`totalGeral` do estorno de receita. SICONFI não tem este método."""

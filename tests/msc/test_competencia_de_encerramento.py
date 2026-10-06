@@ -27,16 +27,13 @@ class HttpFake:
 
     def __call__(self, url, params=None, headers=None, timeout=None):
         self.chamadas.append({"url": url, "params": params or {}})
-        if "auditoria" in str(url):
-            return {"status": "validado", "podeGerar": True}
         return self.resposta
 
 
 def _publicsoft(http):
     from app.infra.msc.publicsoft import PublicSoftMSC
 
-    return PublicSoftMSC(http=http, token="t", url_saldos="https://api/base-demonstrativos",
-                         url_auditoria="https://api/auditoria")
+    return PublicSoftMSC(http=http, token="t", url_saldos="https://api/base-demonstrativos")
 
 
 def test_publicsoft_pede_a_competencia_13_para_a_matriz_de_encerramento():
@@ -53,18 +50,38 @@ def test_publicsoft_pede_a_competencia_13_para_a_matriz_de_encerramento():
     assert saldos["params"]["meReferencia"] == 13
 
 
-def test_publicsoft_audita_a_mesma_competencia_que_consulta():
+def test_publicsoft_encerramento_com_auditoria_pendente_e_sem_dados():
     """Scenario: encerramento na PublicSoft — o gate de auditoria
 
-    A auditoria do encerramento é a de `mesMsc=13`, não a de dezembro.
-
-    Auditar 12 e ler 13 liberaria uma competência com base na validação de outra.
+    O servidor audita a própria competência pedida (13) e responde 409 se não liberada: sem
+    dados, não erro. Não há pré-check em `/auditorias` (exige JWT; o worker só tem token_ps).
     """
-    http = HttpFake()
-    _publicsoft(http).registros(ente=2611606, ano=EXERCICIO, mes=DEZEMBRO, classe=1,
-                                matriz=Matriz.ENCERRAMENTO, tipo_saldo=TipoSaldo.ABERTURA)
-    auditoria = [c for c in http.chamadas if "auditoria" in c["url"]][0]
-    assert auditoria["params"]["mesMsc"] == 13
+    import requests
+
+    def http(url, params=None, headers=None, timeout=None):
+        assert "auditoria" not in url
+        assert params["meReferencia"] == 13
+        resposta = requests.Response()
+        resposta.status_code = 409
+        raise requests.HTTPError(response=resposta)
+
+    assert _publicsoft(http).registros(ente=2611606, ano=EXERCICIO, mes=DEZEMBRO, classe=1,
+                                       matriz=Matriz.ENCERRAMENTO,
+                                       tipo_saldo=TipoSaldo.ABERTURA) == []
+
+
+def test_publicsoft_propaga_erro_que_nao_e_409():
+    """Scenario: só o 409 é "sem dados" — 401/5xx são falha de credencial/transporte e não
+    podem virar demonstrativo vazio."""
+    import requests
+
+    def http(url, params=None, headers=None, timeout=None):
+        resposta = requests.Response()
+        resposta.status_code = 401
+        raise requests.HTTPError(response=resposta)
+
+    with pytest.raises(requests.HTTPError):
+        _publicsoft(http).registros(ente=2611606, ano=EXERCICIO, mes=DEZEMBRO, classe=1)
 
 
 @pytest.mark.parametrize("mes", [1, 6, 12])
