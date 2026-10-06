@@ -141,15 +141,51 @@ def test_siafic_escolhido_vai_publicsoft_no_job(cliente, hub):
     assert FilaFake.enfileirados[0]["fonte"] == "publicsoft"
 
 
-def test_siconfi_escolhido_nao_resolve_credencial(cliente, hub):
-    """Scenario: SICONFI escolhido."""
+def test_siconfi_escolhido_guarda_token_para_o_estorno(cliente, hub):
+    """Scenario: SICONFI escolhido — o `token_ps` vai ao cofre para o estorno do BF."""
+    from app.infra.fila.credencial import ler
+
+    cofre = CofreFake()
+    resposta = _get(cliente, "&use_siconfi=true", cofre=cofre)
+
+    assert resposta.status_code == 202, resposta.text
+    job = FilaFake.enfileirados[0]
+    assert job["fonte"] == "siconfi"
+    assert TOKEN not in str(job)
+    assert ler(cofre, job_id=job["job_id"]) == TOKEN
+
+
+@pytest.mark.parametrize("erro", ["EnteNaoEncontrado", "EnteSemToken", "HubIndisponivel"])
+def test_siconfi_sem_token_apura_sem_estorno(cliente, hub, erro):
+    """Scenario: SICONFI com ente sem `token_ps` — o job sai, sem credencial (não abate)."""
+    from app.auth import hub as modulo
+
+    hub["erro"] = getattr(modulo, erro)("x")
     cofre = CofreFake()
     resposta = _get(cliente, "&use_siconfi=true", cofre=cofre)
 
     assert resposta.status_code == 202, resposta.text
     assert FilaFake.enfileirados[0]["fonte"] == "siconfi"
-    assert hub["chamadas"] == []
     assert cofre.valores == {}
+
+
+def test_siconfi_sem_acesso_a_unidade_continua_403(cliente, hub):
+    """Scenario: SICONFI — token opcional, autorização não."""
+    from app.auth import hub as modulo
+
+    hub["erro"] = modulo.SemAcessoAUnidade("x")
+    assert _get(cliente, "&use_siconfi=true").status_code == 403
+    assert FilaFake.enfileirados == []
+
+
+@pytest.mark.parametrize(("token", "abate"), [(TOKEN, True), (None, False)])
+def test_fonte_siconfi_expoe_estorno_so_com_token(token, abate):
+    """Scenario: SICONFI abate o estorno (relatório da PublicSoft) quando há `token_ps`."""
+    from app.services.pipeline import apuracao
+
+    dados = apuracao.fonte("siconfi", token)
+    assert (getattr(dados, "estorno_receita_extra", None) is not None) is abate
+    assert (getattr(dados, "estorno_despesa_extra", None) is not None) is abate
 
 
 def test_pedido_sem_fonte_vale_publicsoft(cliente, hub):

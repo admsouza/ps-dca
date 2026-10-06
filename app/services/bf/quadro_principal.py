@@ -256,7 +256,11 @@ def _apurar_exercicio(mapa, ente, exercicio, competencia, fonte, direcao, origem
     matriz = apurar_matriz(mapa, do_exercicio, direcao, por_conta=True,
                            registros_por_regra=por_regra)
     valores, nao_apuradas = _sem_conta_declarada(mapa, matriz)
-    receita, despesa = _abater_estorno(mapa, valores, fonte, exercicio)
+    # Exercício sem nenhuma leitura (auditoria pendente → 409 → vazio) não tem bruto: abater
+    # daria `0 − estorno`.
+    leu_algo = any((do_exercicio, do_encerramento, *por_classe.values()))
+    receita, despesa = (_abater_estorno(mapa, valores, fonte, exercicio) if leu_algo
+                        else ({}, {}))
     return valores, nao_apuradas, not do_exercicio, do_exercicio, receita, despesa
 
 

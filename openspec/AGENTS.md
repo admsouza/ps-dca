@@ -76,6 +76,12 @@ SICONFI permanece o movimento da MSC. PO aprovou em 2026-10-05.
 por pedido (hoje ignorado: vale o `DATA_SOURCE` do worker) e o `token_ps` passa a ser resolvido no
 hub e guardado cifrado para o job, como no RGF/RREO. PO aprovou em 2026-10-06.
 
+**Change ativa, em implementação — aguardando PO:** `bf-estorno-siconfi` — o SICONFI com
+`token_ps` também abate o estorno extra em `L27`/`L60`. O DCA não faz pré-check em
+`/auditorias` (exige JWT; o `409` do `base-demonstrativos` vira sem dados). **A auditoria do
+exercício anterior está desligada temporariamente, aguardando o PO:** o `409` do anterior não
+bloqueia o BF e não abate o estorno sobre o zero.
+
 | Change arquivada em 2026-10-01 | O que o código já fazia |
 |---|---|
 | `plataforma-pipeline-dca` | ciclo único: rota, cache, job, worker, SSE, lock, vigência publicada |

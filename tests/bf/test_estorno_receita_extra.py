@@ -79,13 +79,33 @@ def test_publicsoft_abate_receita_nas_duas_e_despesa_so_na_l60(apurar_bf):
 
 
 def test_siconfi_nao_abate(apurar_bf):
-    """Scenario: SICONFI não abate."""
+    """Scenario: fonte sem o relatório (SICONFI sem `token_ps`) não abate."""
     resultado = apurar_bf(ENTE, EXERCICIO, _fonte(None))
 
     assert _valor(resultado, "L27", "exercicio_atual") == Decimal("100.00")
     assert _valor(resultado, "L60", "exercicio_atual") == Decimal("80.00")
     assert resultado.procedencia.estorno_receita_extra is None
     assert resultado.procedencia.estorno_despesa_extra is None
+
+
+def test_exercicio_anterior_sem_dados_nao_abate(apurar_bf):
+    """Scenario: exercício anterior com auditoria pendente (409 → sem dados) não sai negativo.
+
+    Auditoria do exercício anterior desligada temporariamente, aguardando o PO: a coluna fica
+    sem dados e o BF do exercício atual é publicado.
+    """
+    fonte = _fonte({2025: Decimal("10.00"), 2024: Decimal("3.00")},
+                   {2025: Decimal("4.00"), 2024: Decimal("1.00")})
+    ler = fonte.registros
+    fonte.registros = lambda ente, ano, *a, **k: [] if ano < EXERCICIO else ler(ente, ano, *a, **k)
+
+    resultado = apurar_bf(ENTE, EXERCICIO, fonte)
+
+    assert _valor(resultado, "L27", "exercicio_atual") == Decimal("90.00")
+    assert _valor(resultado, "L27", "exercicio_anterior") == Decimal("0.00")
+    assert _valor(resultado, "L60", "exercicio_anterior") == Decimal("0.00")
+    assert resultado.diagnostico.sem_dados_exercicio_anterior is True
+    assert resultado.procedencia.estorno_receita_extra == {"2025": "10.00"}
 
 
 def test_relatorio_sem_total_geral_nao_publica_o_bruto(apurar_bf):

@@ -58,17 +58,21 @@ VERSAO_API = versao_do_codigo(_RAIZ_APP, _CODIGO_DA_APURACAO)
 
 def fonte(nome: str | None = None, token: str | None = None):
     """Adapter de MSC pelo nome, com a memória da execução por cima."""
-    escolhido = (nome or config().fonte_padrao).strip().lower()
-    if escolhido == "publicsoft":
-        from app.infra.msc.publicsoft import PublicSoftMSC
+    from app.infra.msc.publicsoft import PublicSoftMSC
 
+    escolhido = (nome or config().fonte_padrao).strip().lower()
+    estorno = None
+    if escolhido == "publicsoft":
         bruta = PublicSoftMSC(token=token or "")
     else:
         from app.infra.msc.siconfi import SiconfiMSC
 
         bruta = SiconfiMSC()
+        # O SICONFI não tem o relatório de estorno: vem da PublicSoft, com o token_ps do ente.
+        # Sem token (ente só SICONFI), não abate.
+        estorno = PublicSoftMSC(token=token) if token else None
 
-    return _NoEscopo(bruta, escolhido)
+    return _NoEscopo(bruta, escolhido, estorno)
 
 
 class _NoEscopo:
@@ -79,9 +83,10 @@ class _NoEscopo:
     retificação (`app/infra/msc/cache.py`).
     """
 
-    def __init__(self, bruta, nome: str = "") -> None:
+    def __init__(self, bruta, nome: str = "", estorno=None) -> None:
         self._bruta = bruta
         self._nome = nome
+        self._estorno = estorno
 
     def registros(self, ente: int, ano: int, mes: int, classe: int,
                   matriz=None, tipo_saldo=None):
@@ -98,7 +103,10 @@ class _NoEscopo:
                              matriz=matriz, tipo_saldo=tipo_saldo, fonte_nome=self._nome)
 
     def __getattr__(self, nome: str):
-        """O que a fonte bruta sabe fazer além de `registros` — o estorno, na PublicSoft."""
+        """O que a fonte sabe fazer além de `registros`. O estorno vem de `estorno` quando houver;
+        senão da fonte bruta — o SICONFI não o tem, e o BF não abate."""
+        if nome.startswith("estorno_") and self._estorno is not None:
+            return getattr(self._estorno, nome)
         return getattr(self._bruta, nome)
 
 

@@ -134,7 +134,7 @@ async def fonte_do_pedido(
     """`use_siconfi` → fonte. PublicSoft resolve o `token_ps` no hub, como `resolve_publicsoft_auth`
     do RGF; o token vem do servidor, nunca do browser."""
     if use_siconfi:
-        return FontePedido("siconfi")
+        return FontePedido("siconfi", await _token_opcional(request, ente))
 
     hub = AutorizadorHub()
     if not hub.configurado:
@@ -158,6 +158,27 @@ async def fonte_do_pedido(
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE,
                             detail="serviço de autorização indisponível") from erro
     return FontePedido("publicsoft", token)
+
+
+async def _token_opcional(request: Request, ente: str) -> str | None:
+    """SICONFI: `token_ps` só para o estorno de receita/despesa extra do BF.
+
+    Ente sem token (externo, só SICONFI) apura sem abater — a procedência sai sem o estorno. Sem
+    acesso à unidade continua 403: o token é opcional, a autorização não.
+    """
+    hub = AutorizadorHub()
+    if not hub.configurado:
+        return None
+    claims = getattr(request.state, "claims", {}) or {}
+    sub = str(claims.get("sub") or claims.get("email") or "").strip()
+    try:
+        return await hub.resolver_token(sub, ente)
+    except SemAcessoAUnidade as erro:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(erro)) from erro
+    except (EnteNaoEncontrado, EnteSemToken, HubIndisponivel) as erro:
+        logger.warning("SICONFI sem token_ps — BF sem estorno | unidade=%s motivo=%s",
+                       ente, type(erro).__name__)
+        return None
 
 
 def usuario_id(request: Request) -> int | None:
