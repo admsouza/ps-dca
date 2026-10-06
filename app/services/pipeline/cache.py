@@ -22,6 +22,7 @@ a decisão, e é o mesmo motivo pelo qual a apuração é alcançável sem rota 
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Protocol
 
@@ -69,7 +70,7 @@ class Fila(Protocol):
 
 def identidade_do_pedido(*, anexo: str, competencia: int = 12,
                          origem_anterior: str = "", valores_anteriores=None,
-                         valores_sem_mapeamento=None, **_ignorados) -> str:
+                         valores_sem_mapeamento=None, fonte: str = "", **_ignorados) -> str:
     """O que, além de ente/exercício/anexo, distingue dois resultados do mesmo demonstrativo.
 
     `versao_api` e `versao_regras` invalidam o cache quando **código** ou **regra** mudam. Há
@@ -89,6 +90,8 @@ def identidade_do_pedido(*, anexo: str, competencia: int = 12,
         pares = ";".join(f"{codigo}={valor}"
                          for codigo, valor in sorted(valores_sem_mapeamento.items()))
         partes.append("g8-" + hashlib.sha256(pares.encode("utf-8")).hexdigest()[:16])
+    if fonte:
+        partes.append(f"f={fonte}")      # SICONFI e PublicSoft dão números diferentes
     return ":".join(partes)
 
 
@@ -119,6 +122,8 @@ def parametros_efetivos(pedido: dict | None, registro) -> dict:
         g8_salvo = _g8_salvo(registro)
         if g8_salvo:
             saida["valores_sem_mapeamento"] = g8_salvo
+    if pedido.get("fonte"):
+        saida["fonte"] = pedido["fonte"]
     return saida
 
 
@@ -173,7 +178,8 @@ def servivel(registro, versao_api: str, versao_regras: str) -> bool:
 def ler_ou_enfileirar(*, ente: str, exercicio: int, anexo: str, repo: Repo, fila: Fila,
                       lock, versao_api: str, versao_regras: str, jobs=None,
                       forcar: bool = False, solicitado_por: int | None = None,
-                      base_url: str = "", parametros: dict | None = None) -> Resposta:
+                      base_url: str = "", parametros: dict | None = None,
+                      guardar_credencial: Callable[[str], None] | None = None) -> Resposta:
     """Decide entre servir o cache e criar job. Nunca apura — a apuração é do worker.
 
     `parametros` são as escolhas do pedido que **mudam o valor** sem mudar código nem regra — a
@@ -214,6 +220,9 @@ def ler_ou_enfileirar(*, ente: str, exercicio: int, anexo: str, repo: Repo, fila
     _marcar_processando(repo, registro, ente, exercicio, anexo,
                         versao_api, versao_regras, solicitado_por)
     try:
+        if guardar_credencial is not None:
+            # No cofre, cifrada e com o `job_id`: o payload da fila não carrega segredo.
+            guardar_credencial(job_id)
         fila.enfileirar(ente, exercicio, anexo, job_id, **parametros)
     except Exception as falha:
         # Fila fora do ar não pode virar `202` mentiroso, nem deixar a identidade presa em

@@ -90,5 +90,5 @@ Código, YAML e teste ficam para depois da aprovação do PO e do fechamento de 
 ## Pendências conhecidas
 
 - D1, D2 e D3 abertas. Sem elas não há teste nem implementação.
-- A SPEC-0001 não cita o código IBGE. Esta change usa `2504801`, que o repositório já associa a
+- A SPEC-0001 não cita o código IBGE. Esta change usa `2505204` (IBGE confirmado pelo PO em 2026-10-06), em
   Cuitegi/PB em `docs/entes-homologacao/cuitegi/`.

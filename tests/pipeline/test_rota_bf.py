@@ -73,11 +73,14 @@ def test_rota_do_bf_serve_o_resultado_em_cache(cliente):
     """Scenario: a rota do BF responde"""
     from app.services.bf.quadro_principal import apurar
     from app.services.pipeline.apuracao import VERSAO_API, versao_regras
+    from app.services.pipeline.cache import versao_do_pedido
     from app.services.pipeline.resultado import para_dados
     from tests.bf.conftest import fonte_com
 
     resultado = apurar(int(ENTE), EXERCICIO, fonte_com(a2025={}, e2025={}, a2024={}))
-    registro = RegistroFake(para_dados(resultado), VERSAO_API, versao_regras(EXERCICIO, "BF"))
+    # Sem `use_siconfi` o pedido é PublicSoft (como RREO/RGF), e a fonte entra na identidade.
+    versao = versao_do_pedido(versao_regras(EXERCICIO, "BF"), "BF", {"fonte": "publicsoft"})
+    registro = RegistroFake(para_dados(resultado), VERSAO_API, versao)
 
     resposta = cliente(RepoFake(registro)).get(f"/dca/BF?anReferencia={EXERCICIO}", headers=HDR)
 

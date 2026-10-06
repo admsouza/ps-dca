@@ -1,7 +1,7 @@
 # Tasks — Revisar linhas extraorçamentárias do Balanço Financeiro
 
 **Repo:** `ps-dca` · **Não implementar sem aprovação explícita do PO.**
-Fatia vertical: PM Cuitegi (`2504801`), caso outubro/2025 da SPEC-0001, totais `L24` e `L57`.
+Fatia vertical: PM Cuitegi (`2505204`), caso outubro/2025 da SPEC-0001, totais `L24` e `L57`.
 
 ## 0. Fundação
 - [ ] 0.1 PO aprova `proposal.md`

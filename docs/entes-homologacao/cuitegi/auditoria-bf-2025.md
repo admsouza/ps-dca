@@ -1,4 +1,4 @@
-# Auditoria do Balanço Financeiro 2025 — Cuitegi/PB (2504801)
+# Auditoria do Balanço Financeiro 2025 — Cuitegi/PB (2505204)
 
 **Gerado em:** 2026-09-18 · **Regras:** IPC 06, ed. 2024-06 (`knowledge/rules/bf/quadro_principal.yaml`)
 **Fonte dos valores apurados:** MSC do ente na API do SICONFI (matriz de encerramento), direção do saldo pelo PCASP da STN

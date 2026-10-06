@@ -40,14 +40,14 @@ de saldo do BF inteiro.
 
 | Interface | Entrada | Saída |
 |---|---|---|
-| Apuração do BF | ente Cuitegi (`2504801`), caso da SPEC-0001 | `L24` e `L57` do exercício nos totais abaixo; origem de `L27`, `L28`, `L60` e `L61` na procedência |
+| Apuração do BF | ente Cuitegi (`2505204`), caso da SPEC-0001 | `L24` e `L57` do exercício nos totais abaixo; origem de `L27`, `L28`, `L60` e `L61` na procedência |
 
 A competência que corresponde a "outubro/2025" não está fechada (ver design, D1). O contrato HTTP
 do `GET /dca/BF` não muda.
 
 ## Exemplo concreto
 
-Ente: PM Cuitegi/PB (`2504801`). Caso: outubro/2025, como nomeado na SPEC-0001.
+Ente: PM Cuitegi/PB (`2505204`). Caso: outubro/2025, como nomeado na SPEC-0001.
 
 | Grupo | Composição informada | Total esperado |
 |---|---|---|

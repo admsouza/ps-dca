@@ -53,6 +53,7 @@ async def apurar_anexo(ctx: dict, *, job_id: str, ente: str, exercicio: int, ane
         credencial = _credencial(ctx, job_id)
         apurador = apuracao.apurador(
             anexo,
+            fonte_nome=parametros.get("fonte"),      # escolhida pelo front; sem ela, DATA_SOURCE
             token=credencial,
             repo_vigencias=RepositorioVigencias(db),
             parametros=parametros,

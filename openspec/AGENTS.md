@@ -64,13 +64,17 @@ YAML — pendência do PO: revisar a lista de contas (candidato não testado: cl
 devedor/credor do PCASP) antes de qualquer novo teste.
 
 **Change ativa, fase SPEC:** `bf-revisao-linhas-extraorcamentarias` — revisão de `L27`, `L28`,
-`L60` e `L61` a partir da SPEC-0001. Gabarito: PM Cuitegi (`2504801`), outubro/2025, `L24` (IV) =
+`L60` e `L61` a partir da SPEC-0001. Gabarito: PM Cuitegi (`2505204`), outubro/2025, `L24` (IV) =
 R$ 387.665,33 e `L57` (X) = R$ 520.551,46. Não reutiliza as 15 contas da change bloqueada.
 Aguardando aprovação do PO e o fechamento de D1 (competência), D2 (valor por linha) e D3 (contas).
 
 **Change ativa, em implementação:** `bf-estorno-receita-extra` — na PublicSoft, `L27` e `L60`
 saem líquidas (movimento MSC − `totalGeral` do estorno de receita extra do exercício da coluna).
 SICONFI permanece o movimento da MSC. PO aprovou em 2026-10-05.
+
+**Change ativa, em implementação:** `pipeline-fonte-por-pedido` — `use_siconfi` do front escolhe a fonte
+por pedido (hoje ignorado: vale o `DATA_SOURCE` do worker) e o `token_ps` passa a ser resolvido no
+hub e guardado cifrado para o job, como no RGF/RREO. PO aprovou em 2026-10-06.
 
 | Change arquivada em 2026-10-01 | O que o código já fazia |
 |---|---|

@@ -29,7 +29,7 @@ Na fonte SICONFI o relatório não existe. `L27` e `L60` permanecem o movimento 
 
 ## Exemplo concreto
 
-Ente: PM Cuitegi/PB (`2504801`), exercício 2025. Relatório sintético de 2025: `totalGeral` = 115679.40.
+Ente: PM Cuitegi/PB (`2505204`), exercício 2025. Relatório sintético de 2025: `totalGeral` = 115679.40.
 
 | Célula | Bruto | Líquido |
 |---|---:|---:|

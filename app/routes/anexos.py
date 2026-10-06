@@ -15,8 +15,14 @@ from fastapi import APIRouter, Body, Depends, Header, HTTPException, Path, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from app.infra.fila import job_manager
-from app.routes.dependencias import repositorio, unidade_autorizada, usuario_id
+from app.infra.fila import credencial, job_manager
+from app.routes.dependencias import (
+    FontePedido,
+    fonte_do_pedido,
+    repositorio,
+    unidade_autorizada,
+    usuario_id,
+)
 from app.services.pipeline import apuracao, completo
 from app.services.pipeline import cache as cache_service
 from app.services.pipeline import resumo as resumo_service
@@ -161,12 +167,19 @@ def _parametros_g8_do_corpo(corpo: CorpoAnterior) -> dict:
 
 
 async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo,
-                   forcar: bool, solicitante: int | None, parametros: dict | None = None):
+                   forcar: bool, solicitante: int | None, parametros: dict | None = None,
+                   fonte: FontePedido | None = None):
     """Caminho comum de leitura e reprocessamento. Difere só em `forcar`."""
+    if fonte is not None:
+        parametros = {**(parametros or {}), "fonte": fonte.nome}
     parametros = cache_service.parametros_efetivos(
         parametros, repo.obter(ente, exercicio, anexo),
     )
     portas = request.app.state.portas
+    guardar = None
+    if fonte is not None and fonte.token:
+        def guardar(job_id: str) -> None:
+            credencial.guardar(portas["cofre"], job_id=job_id, token=fonte.token)
     fila = portas["fila_async"]()
 
     try:
@@ -184,6 +197,7 @@ async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo
             forcar=forcar, solicitado_por=solicitante,
             base_url=str(request.base_url).rstrip("/"),
             parametros=parametros,
+            guardar_credencial=guardar,
         )
     except RuntimeError as erro:                 # fila indisponível — não vira `202` mentiroso
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(erro)) from erro
@@ -348,9 +362,10 @@ async def obter_anexo(
     exercicio: Annotated[int, Depends(_exercicio)],
     repo: Annotated[Any, Depends(repositorio)],
     parametros: Annotated[dict, Depends(_parametros_bf)],
+    fonte: Annotated[FontePedido, Depends(fonte_do_pedido)],
 ):
     return await _decidir(request, ente, exercicio, anexo, repo,
-                          forcar=False, solicitante=None, parametros=parametros)
+                          forcar=False, solicitante=None, parametros=parametros, fonte=fonte)
 
 
 @router.post(
@@ -370,6 +385,7 @@ async def reprocessar_anexo(
     exercicio: Annotated[int, Depends(_exercicio)],
     repo: Annotated[Any, Depends(repositorio)],
     parametros: Annotated[dict, Depends(_parametros_bf)],
+    fonte: Annotated[FontePedido, Depends(fonte_do_pedido)],
     corpo: Annotated[CorpoAnterior | None, Body()] = None,
     solicitante: Annotated[int | None, Depends(usuario_id)] = None,
 ):
@@ -379,4 +395,5 @@ async def reprocessar_anexo(
         if "valores_sem_mapeamento" in corpo.model_fields_set:
             parametros = {**parametros, **_parametros_g8_do_corpo(corpo)}
     return await _decidir(request, ente, exercicio, anexo, repo,
-                          forcar=True, solicitante=solicitante, parametros=parametros)
+                          forcar=True, solicitante=solicitante, parametros=parametros,
+                          fonte=fonte)

@@ -1,4 +1,4 @@
-# Gabarito BF 2025 — Cuitegi/PB (2504801)
+# Gabarito BF 2025 — Cuitegi/PB (2505204)
 
 **Fonte:** SIAFIC PublicSoft Contabilidade 2026.19.4.0 — *Balanço Financeiro*, Balanços Gerais 2025, Consolidado (`docs/entes-homologacao/Balanço Financeiro_2025_TCE-PB.pdf`).
 

@@ -15,9 +15,10 @@ o claim de unidade do próprio token — modo de desenvolvimento local, e o log 
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from typing import Annotated
 
-from fastapi import Header, HTTPException, Query, Request, status
+from fastapi import Depends, Header, HTTPException, Query, Request, status
 
 from app.auth.autorizacao import (
     CredencialDeFonteRecusada,
@@ -26,7 +27,13 @@ from app.auth.autorizacao import (
     autorizar,
     recusar_credencial_de_fonte,
 )
-from app.auth.hub import AutorizadorHub, HubIndisponivel, SemAcessoAUnidade
+from app.auth.hub import (
+    AutorizadorHub,
+    EnteNaoEncontrado,
+    EnteSemToken,
+    HubIndisponivel,
+    SemAcessoAUnidade,
+)
 from app.core.config import config
 
 logger = logging.getLogger(__name__)
@@ -108,6 +115,49 @@ def _autorizar_pelo_token(claims: dict, ente: str) -> None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail=str(erro)) from erro
     except NaoAutorizado as erro:
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(erro)) from erro
+
+
+@dataclass(frozen=True)
+class FontePedido:
+    """Fonte escolhida pelo front e o `token_ps` que ela exige. `token` nunca vai para a fila."""
+
+    nome: str
+    token: str | None = None
+
+
+async def fonte_do_pedido(
+    request: Request,
+    ente: Annotated[str, Depends(unidade_autorizada)],
+    use_siconfi: Annotated[bool, Query(description="SICONFI (true) ou PublicSoft/SIAFIC (false), "
+                                                   "como no RREO e no RGF.")] = False,
+) -> FontePedido:
+    """`use_siconfi` → fonte. PublicSoft resolve o `token_ps` no hub, como `resolve_publicsoft_auth`
+    do RGF; o token vem do servidor, nunca do browser."""
+    if use_siconfi:
+        return FontePedido("siconfi")
+
+    hub = AutorizadorHub()
+    if not hub.configurado:
+        if config().ambiente in ("development", "test", "local"):
+            logger.warning("hub não configurado — PublicSoft sem token_ps | unidade=%s", ente)
+            return FontePedido("publicsoft")
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE,
+                            detail="AUTH_API_URL/S2S_API_SECRET não configurados")
+
+    claims = getattr(request.state, "claims", {}) or {}
+    sub = str(claims.get("sub") or claims.get("email") or "").strip()
+    try:
+        token = await hub.resolver_token(sub, ente)
+    except SemAcessoAUnidade as erro:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(erro)) from erro
+    except EnteNaoEncontrado as erro:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(erro)) from erro
+    except EnteSemToken as erro:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=str(erro)) from erro
+    except HubIndisponivel as erro:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE,
+                            detail="serviço de autorização indisponível") from erro
+    return FontePedido("publicsoft", token)
 
 
 def usuario_id(request: Request) -> int | None:

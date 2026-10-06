@@ -13,7 +13,7 @@ a partir dele.
 | João Pessoa/PB (2507507) | SIGEF/JPA | `docs/entes-homologacao/joao-pessoa/gabarito-bf-2025.md` | 66/66, com 4 vinculações próprias agregadas em L10/L43 |
 | Belo Horizonte/MG (3106200) | Consolidação Geral | `docs/entes-homologacao/<ente>/belo-horizonte/gabarito-bf-2025.md` | 62/66; **origem OCR** |
 | Porto Alegre/RS (4314902) | Balanço Financeiro (adm. direta) | `docs/entes-homologacao/porto-alegre/gabarito-bf-2025.md` | 66/66; **PDF imagem**, transcrição visual; recorte **não consolidado** |
-| Cuitegi/PB (2504801) | PublicSoft | `docs/entes-homologacao/cuitegi/gabarito-bf-2025.md` | 48/66, sem segregação do RPPS |
+| Cuitegi/PB (2505204) | PublicSoft | `docs/entes-homologacao/cuitegi/gabarito-bf-2025.md` | 48/66, sem segregação do RPPS |
 
 O mapeamento é **por posição no demonstrativo**, não por semelhança de texto: cada SIAFIC usa
 nomenclatura própria e nenhum deles segue a do IPC 06 palavra a palavra.
@@ -402,7 +402,7 @@ nomenclatura própria e nenhum deles segue a do IPC 06 palavra a palavra.
 | `L62` = `L63` + `L64` + `L65` | 3.785.580.034,23 | 3.785.580.034,23 | sim |
 | `L66` = `L34` + `L48` + `L54` + `L57` + `L62` | 43.943.182.310,44 | 43.943.182.310,44 | sim |
 
-### Cuitegi/PB (2504801) — PublicSoft Contabilidade
+### Cuitegi/PB (2505204) — PublicSoft Contabilidade
 
 | Linha IPC 06 | Descrição canônica | Rótulo no SIAFIC | Valor 2025 | Nota |
 |---|---|---|---|---|

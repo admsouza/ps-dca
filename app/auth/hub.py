@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 TIMEOUT = 3.0
 CAMINHO = "/internal/authorize"
+CAMINHO_TENANT = "/internal/resolve-tenant"
 
 
 class HubIndisponivel(RuntimeError):
@@ -28,6 +29,14 @@ class HubIndisponivel(RuntimeError):
 
 class SemAcessoAUnidade(PermissionError):
     """O hub negou: este usuário não tem a unidade pedida."""
+
+
+class EnteNaoEncontrado(LookupError):
+    """O hub não conhece a unidade."""
+
+
+class EnteSemToken(LookupError):
+    """A unidade não tem `token_ps` configurado no hub."""
 
 
 class AutorizadorHub:
@@ -60,16 +69,45 @@ class AutorizadorHub:
             # 401 e 5xx são problema **nosso** com o hub, não do requisitante.
             raise HubIndisponivel(f"hub respondeu {codigo}")
 
-    async def _chamar(self, sub: str, cod_ibge: str) -> dict:
+    async def resolver_token(self, sub: str, cod_ibge: str) -> str:
+        """`token_ps` da unidade — `POST /internal/resolve-tenant`, o contrato do RGF e do RREO.
+
+        Vai para a PublicSoft em `x-authorization`. Nunca é logado.
+        """
+        if not self.configurado:
+            raise HubIndisponivel("AUTH_API_URL/S2S_API_SECRET não configurados")
+
+        try:
+            resposta = await self._chamar(sub, cod_ibge, CAMINHO_TENANT)
+        except Exception as erro:
+            logger.error("hub inacessível ao resolver token | unidade=%s -> %s", cod_ibge, erro)
+            raise HubIndisponivel(str(erro)) from erro
+
+        codigo = resposta["status"]
+        if codigo == 403:
+            raise SemAcessoAUnidade(f"usuário sem acesso à unidade {cod_ibge}")
+        if codigo == 404:
+            raise EnteNaoEncontrado(f"unidade {cod_ibge} não encontrada no hub")
+        if codigo == 409:
+            raise EnteSemToken(f"unidade {cod_ibge} sem token PublicSoft configurado")
+        if codigo != 200:
+            raise HubIndisponivel(f"hub respondeu {codigo}")
+        token = (resposta.get("corpo") or {}).get("token_ps")
+        if not token:
+            raise EnteSemToken(f"unidade {cod_ibge} sem token PublicSoft configurado")
+        return str(token)
+
+    async def _chamar(self, sub: str, cod_ibge: str, caminho: str = CAMINHO) -> dict:
         corpo = {"sub": sub, "cod_ibge": cod_ibge}
         cabecalhos = {"X-Internal-Secret": self._secret}
 
         if self._http is not None:                      # dublê nos testes
-            return await self._http(f"{self._base}{CAMINHO}", json=corpo, headers=cabecalhos)
+            return await self._http(f"{self._base}{caminho}", json=corpo, headers=cabecalhos)
 
         import httpx
 
         async with httpx.AsyncClient(timeout=TIMEOUT) as cliente:
-            resposta = await cliente.post(f"{self._base}{CAMINHO}", json=corpo,
+            resposta = await cliente.post(f"{self._base}{caminho}", json=corpo,
                                           headers=cabecalhos)
-        return {"status": resposta.status_code}
+        dados = resposta.json() if resposta.status_code == 200 else {}
+        return {"status": resposta.status_code, "corpo": dados if isinstance(dados, dict) else {}}

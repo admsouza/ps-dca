@@ -4,7 +4,7 @@
 
 ### Requirement: Totais extraorçamentários no caso Cuitegi da SPEC-0001
 
-No caso PM Cuitegi/PB (`2504801`), outubro/2025, da SPEC-0001, o sistema SHALL apurar:
+No caso PM Cuitegi/PB (`2505204`), outubro/2025, da SPEC-0001, o sistema SHALL apurar:
 
 - `L24` Recebimentos Extraorçamentários (IV) = R$ 387.665,33
 - `L57` Pagamentos Extraorçamentários (X) = R$ 520.551,46
@@ -17,7 +17,7 @@ fechar D1 do design; o número do gabarito não muda com essa escolha.
 
 #### Scenario: recebimentos extraorçamentários de Cuitegi
 
-- **GIVEN** PM Cuitegi (`2504801`) no caso outubro/2025 da SPEC-0001
+- **GIVEN** PM Cuitegi (`2505204`) no caso outubro/2025 da SPEC-0001
 - **AND** a composição informada da receita extraorçamentária é ativo R$ 0,00 e passivo
   R$ 394.823,97 − R$ 7.158,64
 - **WHEN** o Balanço Financeiro desse caso é apurado
