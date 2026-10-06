@@ -92,9 +92,12 @@ class AutorizadorHub:
             raise EnteSemToken(f"unidade {cod_ibge} sem token PublicSoft configurado")
         if codigo != 200:
             raise HubIndisponivel(f"hub respondeu {codigo}")
-        token = (resposta.get("corpo") or {}).get("token_ps")
-        if not token:
-            raise EnteSemToken(f"unidade {cod_ibge} sem token PublicSoft configurado")
+        corpo = resposta.get("corpo") or {}
+        token = corpo.get("token_ps")
+        # Sem token SIAFIC o hub responde 200 com `token_ps = cod_ibge` e `siafic_disponivel=false`
+        # (fallback MSC CSV do RREO/RGF). Usar isso como `x-authorization` dá 401 na PublicSoft.
+        if not token or corpo.get("siafic_disponivel") is False:
+            raise EnteSemToken(f"unidade {cod_ibge} sem token PublicSoft (SIAFIC) no hub")
         return str(token)
 
     async def _chamar(self, sub: str, cod_ibge: str, caminho: str = CAMINHO) -> dict:

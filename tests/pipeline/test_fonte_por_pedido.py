@@ -229,6 +229,9 @@ def test_falha_do_hub_nao_cria_job(cliente, hub, erro, status_http):
     (401, {}, "HubIndisponivel"),
     (500, {}, "HubIndisponivel"),
     (200, {}, "EnteSemToken"),
+    # Regressão de produção (2026-10-06): hub devolve o cod_ibge como token quando não há SIAFIC.
+    (200, {"token_ps": ENTE, "siafic_disponivel": False}, "EnteSemToken"),
+    (200, {"token_ps": TOKEN, "siafic_disponivel": True}, TOKEN),
 ])
 def test_resolver_token_no_hub(status_hub, corpo, esperado):
     """Requisito: Credencial PublicSoft resolvida no servidor — contrato do RGF."""
