@@ -101,8 +101,11 @@ def identidade_do_pedido(*, anexo: str, competencia: int = 12,
     return ":".join(partes)
 
 
-def parametros_efetivos(pedido: dict | None, registro) -> dict:
-    """O que o BF vai apurar.
+ORIGEM_PADRAO_BP = "publicado_siconfi"
+
+
+def parametros_efetivos(pedido: dict | None, registro, anexo: str = "") -> dict:
+    """O que o BF vai apurar. O BP tem regra própria (`_parametros_bp`).
 
     Origem MSC explícita não reaproveita mapa do anterior. Manual no pedido vale o que veio.
     Pedido sem origem reaplica `procedencia.valores_anteriores` da linha, quando houver.
@@ -111,6 +114,8 @@ def parametros_efetivos(pedido: dict | None, registro) -> dict:
     vale o que veio (vazio limpa); pedido sem a chave reaplica `procedencia.valores_sem_mapeamento`.
     """
     pedido = dict(pedido or {})
+    if anexo == "BP":
+        return _parametros_bp(pedido)
     origem = pedido.get("origem_anterior") or ""
     if origem == "msce_exercicio_anterior":
         saida = {}
@@ -128,6 +133,20 @@ def parametros_efetivos(pedido: dict | None, registro) -> dict:
         g8_salvo = _g8_salvo(registro)
         if g8_salvo:
             saida["valores_sem_mapeamento"] = g8_salvo
+    if pedido.get("fonte"):
+        saida["fonte"] = pedido["fonte"]
+    return saida
+
+
+def _parametros_bp(pedido: dict) -> dict:
+    """BP: a origem da coluna anterior é sempre explícita (D2 de `bp-anterior-publicado-siconfi`).
+
+    Omitida, vale o padrão `publicado_siconfi`. Sem isso o mesmo resultado teria duas identidades
+    (`-` e `publicado_siconfi`) e a leitura o marcaria `pedido` sem motivo. Não há mapa salvo a
+    reaplicar: a escolha vem sempre do pedido.
+    """
+    origem = pedido.get("origem_anterior") or ORIGEM_PADRAO_BP
+    saida = {"origem_anterior": origem, "anterior": origem}
     if pedido.get("fonte"):
         saida["fonte"] = pedido["fonte"]
     return saida

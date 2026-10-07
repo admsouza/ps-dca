@@ -20,8 +20,12 @@ EXERCICIO = 2025
 
 @pytest.fixture
 def apurar_bp():
-    from app.services.bp.quadro_principal import apurar
-    return apurar
+    """O BP pela MSC nas duas colunas: a origem `msce_exercicio_anterior`, que é a apuração vigente
+    antes de `bp-anterior-publicado-siconfi`. O padrão do serviço agora é o publicado."""
+    from functools import partial
+
+    from app.services.bp.quadro_principal import Anterior, apurar
+    return partial(apurar, anterior=Anterior.MSCE)
 
 
 class FontePorAno(FonteFake):

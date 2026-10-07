@@ -41,8 +41,9 @@ CENARIOS_ESPERADOS = {
     # 11 do percurso completo (`pipeline-completo-dca`) + 2 da notificação por anexo
     # (`pipeline-notificacao-discord-padrao`).
     "pipeline/processamento-completo": 13,
-    # 16 da apuração do BP, IPC 04 (`bp-apuracao-f1`).
-    "dca/balanco-patrimonial": 16,
+    # 16 da apuração do BP (`bp-apuracao-f1`) + 7 da origem publicada
+    # (`bp-anterior-publicado-siconfi`).
+    "dca/balanco-patrimonial": 23,
 }
 
 # Capabilities cuja fase TEST já começou — só delas se exige teste por cenário.

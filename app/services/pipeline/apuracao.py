@@ -27,6 +27,7 @@ _CODIGO_DA_APURACAO = (
     _RAIZ_APP / "services" / "bo",
     _RAIZ_APP / "services" / "bp",
     _RAIZ_APP / "infra" / "msc",
+    _RAIZ_APP / "infra" / "siconfi",    # DCA publicada (BP, coluna anterior)
     _RAIZ_APP / "infra" / "pcasp",      # direção do saldo
     _RAIZ_APP / "infra" / "regras",     # montagem do mapa a partir do YAML/banco
     # ponytail: pasta inteira por causa de `apuracao.py`; job/cache também invalidam — custa

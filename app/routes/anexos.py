@@ -110,6 +110,9 @@ class CorpoAnterior(BaseModel):
     valores_sem_mapeamento: dict[str, str] | None = None
 
 
+ORIGENS_BP = ("publicado_siconfi", "msce_exercicio_anterior")
+
+
 def _parametros_bf(
     anexo: Annotated[str, Depends(_anexo_valido)],
     origem: Annotated[str | None, Query(alias="origem_exercicio_anterior")] = None,
@@ -121,6 +124,10 @@ def _parametros_bf(
         raise HTTPException(status.HTTP_400_BAD_REQUEST,
                             detail="valores_anteriores/valores_sem_mapeamento não é aceito na "
                                    "query")
+    if anexo == "BP":
+        if origem in (None, *ORIGENS_BP):
+            return {"origem_anterior": origem} if origem else {}
+        raise _erro_422("origem_exercicio_anterior inválida")
     if anexo != "BF":
         return {}
     if origem == "msce_exercicio_anterior":
@@ -130,7 +137,7 @@ def _parametros_bf(
     return {}
 
 
-def _parametros_do_corpo(corpo: CorpoAnterior, exercicio: int) -> dict:
+def _parametros_do_corpo(corpo: CorpoAnterior, exercicio: int, anexo: str = "BF") -> dict:
     """Manual no corpo, ou MSC explícita. Valor não-numérico e código fora do IPC 06 são `422`.
 
     A recusa é do serviço, que já percorre o mapa informado para conferir os códigos: validar o
@@ -140,6 +147,10 @@ def _parametros_do_corpo(corpo: CorpoAnterior, exercicio: int) -> dict:
     from app.services.bf.informados import validar_valores_anteriores
 
     origem = corpo.origem_exercicio_anterior
+    if anexo == "BP":
+        if origem not in ORIGENS_BP:
+            raise _erro_422("origem_exercicio_anterior inválida")
+        return {"origem_anterior": origem}
     if origem == "msce_exercicio_anterior":
         return {"origem_anterior": "msce_exercicio_anterior"}
     if origem != "manual":
@@ -176,7 +187,7 @@ async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo
     if fonte is not None:
         parametros = {**(parametros or {}), "fonte": fonte.nome}
     parametros = cache_service.parametros_efetivos(
-        parametros, repo.obter(ente, exercicio, anexo),
+        parametros, repo.obter(ente, exercicio, anexo), anexo,
     )
     portas = request.app.state.portas
     guardar = None
@@ -271,7 +282,8 @@ async def processar_percurso(
     def versao_de(anexo: str) -> str:
         return cache_service.versao_do_pedido(
             apuracao.versao_regras(exercicio, anexo, portas.get("repo_vigencias")), anexo,
-            completo.pedido_do_percurso(repo.obter(ente, exercicio, anexo), config().fonte_padrao),
+            completo.pedido_do_percurso(repo.obter(ente, exercicio, anexo), config().fonte_padrao,
+                                        anexo),
         )
 
     try:
@@ -424,7 +436,7 @@ async def reprocessar_anexo(
 ):
     if corpo is not None:
         if corpo.origem_exercicio_anterior:
-            parametros = {**parametros, **_parametros_do_corpo(corpo, exercicio)}
+            parametros = {**parametros, **_parametros_do_corpo(corpo, exercicio, anexo)}
         if "valores_sem_mapeamento" in corpo.model_fields_set:
             parametros = {**parametros, **_parametros_g8_do_corpo(corpo)}
     return await _decidir(request, ente, exercicio, anexo, repo,

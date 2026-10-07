@@ -12,7 +12,10 @@ O que é próprio do BP (change `bp-apuracao-f1`, medido em `docs/evidencia-bp-f
 3. **Conta mista assume a direção da classe**: `2.3.4` e `2.3.7` são `Credora/Devedora` no PCASP, e
    o BP apresenta o PL credor — déficit acumulado sai negativo, como Cuitegi publica. Conta fora
    do PCASP continua não apurada.
-4. **Linha `review_required` é parcela inexistente** (D2b): `None` com o bloqueio no diagnóstico, e
+4. **Coluna anterior de duas origens** (`bp-anterior-publicado-siconfi`): `publicado_siconfi`
+   (padrão) apura as contas folha do `DCA-Anexo I-AB` do ano anterior pelas mesmas regras; a
+   `msce_exercicio_anterior` lê a MSC como sempre. Sem `I-AB`, a coluna é `None` — nunca a MSC.
+5. **Linha `review_required` é parcela inexistente** (D2b): `None` com o bloqueio no diagnóstico, e
    o total soma as demais. Total cujas parcelas são todas bloqueadas também é `None`.
 """
 from __future__ import annotations
@@ -20,6 +23,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
+from enum import StrEnum
 
 from app.domain.bo.matriz import apurar as apurar_matriz
 from app.domain.bo.matriz import ordem_topologica
@@ -28,6 +32,7 @@ from app.domain.bo.saldo import _casa, saldo_da_conta
 from app.infra.msc.fonte import COMPETENCIA_DE_ENCERRAMENTO, fonte_de
 from app.infra.pcasp.natureza import do_pcasp
 from app.infra.regras.carregador import carregar_em_cache
+from app.services.bp.publicado import DirecaoDoPublicado, registros_publicados, totais_fp
 
 DEMONSTRATIVO = "BP"
 COLUNA_ATUAL = "exercicio_atual"
@@ -35,6 +40,20 @@ COLUNA_ANTERIOR = "exercicio_anterior"
 QUADRO_PRINCIPAL = "QUADRO_PRINCIPAL"
 SEM_ATRIBUTO = "a MSC não traz o atributo financeiro/permanente em nenhum fato (IPC 04, P4)"
 TODAS_BLOQUEADAS = "todas as parcelas são não apuráveis"
+
+# Quadro F/P: o `I-AB` publica estes totais, e o atributo F/P não vem por conta.
+FP_PUBLICADO = {"L2": "AtivoFinanceiro", "L3": "AtivoPermanente",
+                "L5": "PassivoFinanceiro", "L6": "PassivoPermanente"}
+QUADRO_FP = "ATIVOS_PASSIVOS_FINANCEIROS"
+NAO_PUBLICADO = "total F/P não publicado no I-AB"
+
+
+class Anterior(StrEnum):
+    """De onde vem a coluna do exercício anterior."""
+
+    PUBLICADO = "publicado_siconfi"
+    MSCE = "msce_exercicio_anterior"
+
 
 POLICIES_NAO_APLICADAS = (
     "itens 8 e 9 (intraorçamentárias de 5º nível = 2 criadas pelo ente): declarados, não "
@@ -54,6 +73,7 @@ class Procedencia:
     tipo_saldo: str = ""
     competencia: int = COMPETENCIA_DE_ENCERRAMENTO
     classes: tuple[int, ...] = ()
+    origem_exercicio_anterior: str = Anterior.PUBLICADO.value
 
 
 @dataclass
@@ -66,6 +86,10 @@ class Diagnostico:
     sem_dados: bool = False
     sem_dados_exercicio_anterior: bool = False
     sem_atributo_fp: bool = False
+    # `I-AB` do ano anterior ausente no `tt/dca`: coluna anterior `None`, sem cair para a MSC.
+    sem_publicacao_exercicio_anterior: bool = False
+    # `L7` apurado × `SaldoPatrimonial` publicado. Diferença é achado, nunca ajuste.
+    conferencia_publicado: dict[str, Decimal | None] | None = None
     policies_nao_aplicadas: tuple[str, ...] = POLICIES_NAO_APLICADAS
 
 
@@ -87,20 +111,37 @@ class _Coluna:
 
 
 def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None = None,
-           competencia: int = COMPETENCIA_DE_ENCERRAMENTO) -> Resultado:
-    """Apura os quatro quadros do BP, nas duas colunas."""
+           competencia: int = COMPETENCIA_DE_ENCERRAMENTO,
+           anterior: Anterior = Anterior.PUBLICADO, dca=None) -> Resultado:
+    """Apura os quatro quadros do BP, nas duas colunas.
+
+    `dca` lê o `I-AB` publicado (`.itens(ente, ano)`); sem ele, o `tt/dca` do SICONFI.
+    """
     inicio = time.monotonic()
+    anterior = Anterior(anterior)                # o job chega com string
     mapa = mapa or carregar_em_cache(exercicio, demonstrativo="bp")
     direcao = _DirecaoDoBP(direcao or do_pcasp())
     origem = fonte_de(DEMONSTRATIVO, competencia)
 
-    atual = _apurar_exercicio(mapa, ente, exercicio, competencia, fonte, direcao, origem,
-                              COLUNA_ATUAL)
-    anterior = _apurar_exercicio(mapa, ente, exercicio - 1, competencia, fonte, direcao, origem,
-                                 COLUNA_ANTERIOR)
+    def da_msc(ano: int) -> list[Registro]:
+        return [registro for classe in origem.classes for registro in fonte.registros(
+            ente=ente, ano=ano, mes=competencia, classe=classe,
+            matriz=origem.matriz, tipo_saldo=origem.tipo_saldo,
+        )]
+
+    atual = _apurar_exercicio(mapa, da_msc(exercicio), direcao, COLUNA_ATUAL)
+    publicado: list[dict] = []
+    if anterior is Anterior.MSCE:
+        coluna_anterior = _apurar_exercicio(mapa, da_msc(exercicio - 1), direcao, COLUNA_ANTERIOR)
+    else:
+        if dca is None:
+            from app.infra.siconfi.dca import SiconfiDCA
+            dca = SiconfiDCA()
+        publicado = dca.itens(ente, exercicio - 1)
+        coluna_anterior = _apurar_publicado(mapa, publicado, direcao)
     matriz = {
         linha.id: {COLUNA_ATUAL: atual.valores[linha.id],
-                   COLUNA_ANTERIOR: anterior.valores[linha.id]}
+                   COLUNA_ANTERIOR: coluna_anterior.valores[linha.id]}
         for linha in mapa.linhas
     }
 
@@ -118,35 +159,61 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
             tipo_saldo=str(origem.tipo_saldo),
             competencia=competencia,
             classes=origem.classes,
+            origem_exercicio_anterior=anterior.value,
         ),
         diagnostico=Diagnostico(
-            nao_apuradas=atual.nao_apuradas + anterior.nao_apuradas,
+            nao_apuradas=atual.nao_apuradas + coluna_anterior.nao_apuradas,
             residuos=atual.residuos,
             equilibrio=_equilibrio(mapa, matriz),
             duracao_ms=int((time.monotonic() - inicio) * 1000),
             sem_dados=atual.sem_dados,
-            sem_dados_exercicio_anterior=anterior.sem_dados,
-            sem_atributo_fp=atual.sem_atributo_fp or anterior.sem_atributo_fp,
+            sem_dados_exercicio_anterior=(anterior is Anterior.MSCE and coluna_anterior.sem_dados),
+            sem_atributo_fp=atual.sem_atributo_fp or coluna_anterior.sem_atributo_fp,
+            sem_publicacao_exercicio_anterior=(anterior is Anterior.PUBLICADO
+                                               and coluna_anterior.sem_dados),
+            conferencia_publicado=_conferencia(mapa, matriz, publicado),
         ),
     )
 
 
-def _apurar_exercicio(mapa: MapaBO, ente, exercicio, competencia, fonte, direcao, origem,
-                      coluna: str) -> _Coluna:
-    """Uma coluna: a `exercicio_atual` do exercício pedido, publicada sob o nome `coluna`."""
-    registros: list[Registro] = [
-        registro for classe in origem.classes for registro in fonte.registros(
-            ente=ente, ano=exercicio, mes=competencia, classe=classe,
-            matriz=origem.matriz, tipo_saldo=origem.tipo_saldo,
-        )
-    ]
+def _apurar_publicado(mapa: MapaBO, itens: list[dict], direcao) -> _Coluna:
+    """Coluna anterior pelo `I-AB`: folhas pelas regras do IPC 04, F/P pelos totais publicados."""
+    registros = registros_publicados(itens, DirecaoDoPublicado(direcao))
+    if not registros:
+        return _Coluna({linha.id: None for linha in mapa.linhas}, [], [], True, False)
+    totais = totais_fp(itens)
+    fixos = {linha.id: totais.get(FP_PUBLICADO[linha.codigo])
+             for linha in mapa.linhas if linha.quadro == QUADRO_FP and linha.codigo in FP_PUBLICADO}
+    return _apurar_exercicio(mapa, registros, DirecaoDoPublicado(direcao), COLUNA_ANTERIOR, fixos)
+
+
+def _conferencia(mapa: MapaBO, matriz: dict, itens: list[dict]) -> dict | None:
+    """`L7` apurado pelo publicado × `SaldoPatrimonial` publicado."""
+    publicado = totais_fp(itens).get("SaldoPatrimonial")
+    l7 = next((linha.id for linha in mapa.linhas
+               if linha.quadro == QUADRO_FP and linha.codigo == "L7"), None)
+    if publicado is None or l7 is None:
+        return None
+    apurado = matriz[l7][COLUNA_ANTERIOR]
+    return {"l7_apurado": apurado, "saldo_patrimonial_publicado": publicado,
+            "diferenca": None if apurado is None else apurado - publicado}
+
+
+def _apurar_exercicio(mapa: MapaBO, registros: list[Registro], direcao, coluna: str,
+                      fixos: dict[str, Decimal | None] | None = None) -> _Coluna:
+    """Uma coluna: a `exercicio_atual` das regras sobre `registros`, publicada sob o nome `coluna`.
+
+    `fixos` são as linhas que o publicado traz prontas (F/P `L2`, `L3`, `L5`, `L6`): não passam
+    pelo motor, e os totais que as somam são refeitos sobre elas.
+    """
     if not registros:
         # Sem leitura (auditoria pendente → 409 → vazio) não há posição: `None`, nunca zero.
         return _Coluna({linha.id: None for linha in mapa.linhas}, [], [], True, False)
 
     qualificados = _termos_qualificados(mapa)
     cobertos = [r for r in registros if any(_casa(r.conta, cc) for cc in qualificados)]
-    sem_atributo = bool(cobertos) and not any(r.financeiro_permanente for r in cobertos)
+    sem_atributo = (fixos is None and bool(cobertos)
+                    and not any(r.financeiro_permanente for r in cobertos))
 
     bloqueadas = {linha.id: linha.bloqueio for linha in mapa.linhas if linha.bloqueio}
     if sem_atributo:
@@ -154,9 +221,10 @@ def _apurar_exercicio(mapa: MapaBO, ente, exercicio, competencia, fonte, direcao
                            if _qualificada(linha)})
 
     # Linha bloqueada é apurada sem contas: soma zero no total, e sai `None` abaixo (D5 do BF).
+    fixos = fixos or {}
     apuravel = replace(mapa, linhas=tuple(
         linha._replace(colunas=tuple(c._replace(contas=()) for c in linha.colunas))
-        if linha.id in bloqueadas else linha
+        if linha.id in bloqueadas or linha.id in fixos else linha
         for linha in mapa.linhas
     ))
     calculada = apurar_matriz(apuravel, registros, direcao)
@@ -167,16 +235,34 @@ def _apurar_exercicio(mapa: MapaBO, ente, exercicio, competencia, fonte, direcao
                     if n.coluna in (COLUNA_ATUAL, "-")]
 
     linhas = mapa.por_id()
+    for rule_id, valor in fixos.items():
+        valores[rule_id] = valor
+        if valor is None:
+            nao_apuradas.append(NaoApurada(rule_id, coluna, "-", NAO_PUBLICADO))
     for rule_id in ordem_topologica(linhas):
         linha = linhas[rule_id]
+        if fixos and linha.referencias and linha.quadro == QUADRO_FP:
+            valores[rule_id] = _somar(linha, valores)
+            if valores[rule_id] is None:
+                nao_apuradas.append(NaoApurada(rule_id, coluna, "-",
+                                               "agregação de célula não apurada"))
         if linha.referencias and all(r.regra in bloqueadas for r in linha.referencias):
             bloqueadas[rule_id] = TODAS_BLOQUEADAS
     for rule_id, motivo in bloqueadas.items():
         valores[rule_id] = None
         nao_apuradas.append(NaoApurada(rule_id, coluna, "-", motivo))
 
-    residuos = [] if sem_atributo else _residuos_fp(cobertos, direcao)
+    residuos = [] if sem_atributo or fixos else _residuos_fp(cobertos, direcao)
     return _Coluna(valores, nao_apuradas, residuos, False, sem_atributo)
+
+
+def _somar(linha, valores: dict[str, Decimal | None]) -> Decimal | None:
+    """Total de referências já apuradas; `None` se alguma parcela não existe."""
+    parcelas = [valores.get(r.regra) for r in linha.referencias]
+    if any(p is None for p in parcelas):
+        return None
+    sinais = zip(linha.referencias, parcelas, strict=True)
+    return sum((p if r.sinal == "+" else -p for r, p in sinais), Decimal("0.00"))
 
 
 class _DirecaoDoBP:

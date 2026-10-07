@@ -84,13 +84,14 @@ def montar_percurso(*, ente: str, exercicio: int, repo, lock, jobs,
     return percurso
 
 
-def pedido_do_percurso(registro, fonte: str) -> dict:
-    """Identidade de pedido do percurso: a fonte padrão, mais o que o BF reaplica do registro.
+def pedido_do_percurso(registro, fonte: str, anexo: str = "") -> dict:
+    """Identidade de pedido do percurso: a fonte padrão, mais o que o BF reaplica do registro e a
+    origem padrão do BP.
 
     Rota e worker gravam e conferem a mesma. Sem a fonte, o `GET` seguinte — que sempre manda a
     sua — veria todo anexo do percurso como desatualizado.
     """
-    return parametros_efetivos({"fonte": fonte}, registro)
+    return parametros_efetivos({"fonte": fonte}, registro, anexo)
 
 
 def implementados(percurso: list[NoPercurso]) -> list[NoPercurso]:

@@ -126,6 +126,7 @@ def para_dados(resultado) -> dict:
             "sem_dados": diagnostico.sem_dados,
             **_especificos(diagnostico, ("sem_dados_exercicio_anterior",
                                          "policies_nao_aplicadas", "sem_atributo_fp",
-                                         "equilibrio")),
+                                         "equilibrio", "sem_publicacao_exercicio_anterior",
+                                         "conferencia_publicado")),
         },
     }
