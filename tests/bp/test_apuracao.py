@@ -29,12 +29,16 @@ def test_caixa_de_cuitegi_2025(apurar_bp):
     assert celula(resultado, PRINCIPAL, "L3", "exercicio_anterior") == Decimal("19812433.77")
 
 
-def test_exclusao_declarada_na_linha(apurar_bp):
-    """Scenario: exclusão declarada na linha"""
+def test_linha_nao_exclui_conta_intra(apurar_bp):
+    """Requisito: (bp-espelho-iab) a conta intra entra na linha; cenário de exclusão revogado
+
+    Revogado por bp-espelho-iab (P8-a): a linha não exclui mais intra-OFSS (5º nível = 2) e a conta
+    entra. O cenário sai do spec na mescla (seção 4); até lá o teste o cita com o novo resultado.
+    """
     fonte = FontePorAno({2025: {1: [fp("111110100", "100.00", "F"),
                                     fp("111120000", "999.00", "F")]}})
     resultado = apurar_bp(ENTE, EXERCICIO, fonte)
-    assert celula(resultado, PRINCIPAL, "L3") == Decimal("100.00")
+    assert celula(resultado, PRINCIPAL, "L3") == Decimal("1099.00")
 
 
 def test_coluna_anterior_le_o_encerramento_do_exercicio_anterior(apurar_bp):
@@ -126,12 +130,11 @@ def test_saldo_patrimonial_e_ativo_menos_passivo(apurar_bp):
     fonte = FontePorAno({2025: {
         1: [fp("111110100", "26431637.72", "F"), fp("123110101", "49882694.20", "P")],
         2: [fp("211110101", "2647434.03", "F"), fp("221110100", "119311755.53", "P")],
-        6: [fp("631100000", "70972.63")],
+        6: [fp("631100000", "70972.63"), fp("631710000", "387532.93")],
     }})
     resultado = apurar_bp(ENTE, EXERCICIO, fonte)
-    assert celula(resultado, FP, "L5") == Decimal("2718406.66")
-    # Publicado: (46.103.363,20). A diferença é `6.3.1.7.1` fora do IPC 04 (P7-a): 387.532,93.
-    assert celula(resultado, FP, "L7") == Decimal("-46103363.20") + Decimal("387532.93")
+    assert celula(resultado, FP, "L5") == Decimal("3105939.59")
+    assert celula(resultado, FP, "L7") == Decimal("-46103363.20")  # igual ao I-AB declarado
 
 
 def test_fonte_sem_o_atributo(apurar_bp):

@@ -43,19 +43,21 @@ def test_termos_qualificados_do_quadro_fp():
     prefixo = "bp.ativos_passivos_financeiros"
     assert termos(f"{prefixo}.l2") == [("1", "F")]
     assert termos(f"{prefixo}.l3") == [("1", "P")]
-    assert termos(f"{prefixo}.l5") == [("21", "F"), ("22", "F"), ("6221301", None),
-                                       ("6221305", None), ("6311", None), ("6315", None)]
+    assert termos(f"{prefixo}.l5") == [("21", "F"), ("22", "F"), ("6311", None),
+                                       ("6315", None), ("63171", None)]
     assert termos(f"{prefixo}.l6") == [("21", "P"), ("22", "P")]
     for codigo in ("l2", "l3", "l5", "l6"):
         assert _base()[f"{prefixo}.{codigo}"]["status"] == "extracted", codigo
         assert termos(f"{prefixo}.{codigo}") == termos(f"{prefixo}.{codigo}", "exercicio_anterior")
 
 
-def test_l4_exclui_11382_por_decisao_p2():
-    """Requisito: P2-a — literal `1.1.3.8.2.000.00` do PDF mantido; padrão sustentado pelo PCASP."""
+def test_quadro_principal_sem_exclusao_intra():
+    """Requisito: bp-espelho-iab — nenhuma linha exclui intra (5º nível = 2); literal do PDF
+    (inclusive `1.1.3.8.2.000.00` da L4) fica só na evidência."""
     l4 = _base()["bp.quadro_principal.ativo.l4"]
-    excluidos = {v["pattern"]: v["literal"] for v in l4["filters"][0]["values"]}
-    assert excluidos["11382"] == "1.1.3.8.2.000.00"
+    assert [r for r in _base().values() if r["rule_id"].startswith("bp.quadro_principal")
+            and r.get("filters")] == []
+    assert "1.1.3.8.2.000.00" in l4["evidence"]["text"]
     assert l4["status"] == "extracted"
     assert "blocker" not in (l4.get("review") or {})
 

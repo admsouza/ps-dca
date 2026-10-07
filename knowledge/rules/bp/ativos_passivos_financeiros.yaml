@@ -232,8 +232,10 @@ rules:
   status: extracted
   review:
     required: true
-    reason: Atributo F/P lido do registro do fato e declarado por termo de conta, como o IPC 04 o escreve —
-      decisão P4 do PO (2026-10-07), medida em docs/evidencia-bp-fp-2025.md.
+    reason: 'Atributo F/P lido do registro do fato e declarado por termo de conta, como o IPC 04 o escreve —
+      decisão P4 do PO (2026-10-07), medida em docs/evidencia-bp-fp-2025.md. Composição pelo DCA-Anexo I-AB
+      declarado (change bp-espelho-iab, PO 2026-10-07): 2.1 F + 2.2 F + 6.3.1.1 + 6.3.1.5 + 6.3.1.7.1; as contas
+      6.2.2.1.3.01 e 6.2.2.1.3.05 do IPC 04 saem (decisão P7-a revogada).'
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
@@ -251,20 +253,16 @@ rules:
         sign: +
         saldo: final
         financeiro_permanente: F
-      - literal: 6.2.2.1.3.01.00
-        pattern: '6221301'
-        sign: +
-        saldo: final
-      - literal: 6.2.2.1.3.05.00
-        pattern: '6221305'
-        sign: +
-        saldo: final
       - literal: 6.3.1.1.0.00.00
         pattern: '6311'
         sign: +
         saldo: final
       - literal: 6.3.1.5.0.00.00
         pattern: '6315'
+        sign: +
+        saldo: final
+      - literal: 6.3.1.7.1.00.00
+        pattern: '63171'
         sign: +
         saldo: final
     exercicio_anterior:
@@ -280,20 +278,16 @@ rules:
         sign: +
         saldo: final
         financeiro_permanente: F
-      - literal: 6.2.2.1.3.01.00
-        pattern: '6221301'
-        sign: +
-        saldo: final
-      - literal: 6.2.2.1.3.05.00
-        pattern: '6221305'
-        sign: +
-        saldo: final
       - literal: 6.3.1.1.0.00.00
         pattern: '6311'
         sign: +
         saldo: final
       - literal: 6.3.1.5.0.00.00
         pattern: '6315'
+        sign: +
+        saldo: final
+      - literal: 6.3.1.7.1.00.00
+        pattern: '63171'
         sign: +
         saldo: final
 - rule_id: bp.ativos_passivos_financeiros.l6

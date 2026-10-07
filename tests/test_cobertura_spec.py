@@ -42,8 +42,9 @@ CENARIOS_ESPERADOS = {
     # (`pipeline-notificacao-discord-padrao`) + 4 da origem do BP (`pipeline-percurso-origem-bp`).
     "pipeline/processamento-completo": 17,
     # 16 da apuração do BP (`bp-apuracao-f1`) + 7 da origem publicada
-    # (`bp-anterior-publicado-siconfi`).
-    "dca/balanco-patrimonial": 23,
+    # (`bp-anterior-publicado-siconfi`)
+    # + 4 do espelho do I-AB, − 1 da exclusão intra revogada (`bp-espelho-iab`).
+    "dca/balanco-patrimonial": 26,
 }
 
 # Capabilities cuja fase TEST já começou — só delas se exige teste por cenário.

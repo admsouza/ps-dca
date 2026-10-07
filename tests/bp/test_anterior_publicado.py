@@ -75,11 +75,11 @@ def test_folha_publicada_sem_dupla_contagem():
     assert celula(resultado, PRINCIPAL, "L3", ANT) == Decimal("100.00")
 
 
-def test_exclusao_intra_aplicada_ao_publicado():
-    """Scenario: exclusão intra aplicada ao publicado"""
+def test_intra_entra_no_publicado():
+    """Scenario: intra entra no publicado — sem exclusão intra, espelho do I-AB."""
     dca = DCAFake([item("P1.2.1.1.1.00.00", "10.00"), item("P1.2.1.1.2.00.00", "90.00")])
     resultado = apurar(ENTE, EXERCICIO, FontePorAno(FONTE_ATUAL), dca=dca)
-    assert celula(resultado, PRINCIPAL, "L10", ANT) == Decimal("10.00")
+    assert celula(resultado, PRINCIPAL, "L10", ANT) == Decimal("100.00")
 
 
 def test_redutora_reduz_qualquer_que_seja_o_sinal_publicado():

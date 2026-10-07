@@ -2,7 +2,9 @@
 policies:
 - policy_id: ipc04.exclusao_intra_so_no_consolidado
   descricao: As exclusões de contas intraorçamentárias aplicam-se ao Balanço Patrimonial consolidado do ente. No
-    levantamento de órgão ou unidade específica, as operações intraorçamentárias não devem ser excluídas.
+    levantamento de órgão ou unidade específica, as operações intraorçamentárias não devem ser excluídas. Não é executada
+    no espelho do I-AB, pois o BP reproduz o DCA-Anexo I-AB declarado, sem exclusões intra (change bp-espelho-iab,
+    PO 2026-10-07).
   aplica_a:
     demonstrativo: BP
   source:

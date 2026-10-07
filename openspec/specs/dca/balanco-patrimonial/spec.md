@@ -1,7 +1,7 @@
 # dca/balanco-patrimonial
 
 > Comportamento acordado e em vigor. Mesclado da change `bp-apuracao-f1`, arquivada em 2026-10-07.
-> Inclui `bp-anterior-publicado-siconfi`, arquivada em 2026-10-07.
+> Inclui `bp-anterior-publicado-siconfi` e `bp-espelho-iab`, arquivadas em 2026-10-07.
 > Alterações entram por nova change, nunca por edição direta deste arquivo.
 
 ## Purpose
@@ -31,12 +31,6 @@ coluna anterior, ambas pelo **mesmo** mapa de regras. Linhas totalizadoras SHALL
 - **THEN** `L3` Caixa e Equivalentes de Caixa, coluna `exercicio_atual`, é 26.286.597,15
 - **AND** a coluna `exercicio_anterior` da mesma linha é 19.812.433,77
 
-#### Scenario: exclusão declarada na linha
-
-- **GIVEN** `bp.quadro_principal.ativo.l3`, que declara `1.1.1` com exclusão de `1.1.1.1.2`
-- **WHEN** existe saldo em `111120000`
-- **THEN** esse saldo NÃO entra em `L3`
-
 #### Scenario: coluna anterior lê o encerramento do exercício anterior
 
 - **WHEN** o BP de 2025 é apurado
@@ -49,10 +43,9 @@ O resultado SHALL conferir `L1 ATIVO = L15 PASSIVO E PATRIMÔNIO LÍQUIDO` em ca
 diferença em `diagnostico.equilibrio`. Quebra de equilíbrio NÃO DEVE impedir a publicação nem ser
 compensada em nenhuma linha.
 
-As exclusões intra-OFSS que o IPC 04 declara linha a linha (5º nível = 2) SHALL ser aplicadas mesmo
-quando quebram o equilíbrio (decisão P8 do PO, 2026-10-07). O balanço do ente só fecha quando o intra
-é recíproco entre ativo e passivo e o PL intra é zero. Medido em 2025: João Pessoa +5.946.040.575,02
-(superávit acumulado intra em `2.3.7.x.2`) e Cuitegi −2.004.721,69.
+O BP espelha o `DCA-Anexo I-AB` declarado (`bp-espelho-iab`, PO 2026-10-07): as exclusões
+intra-OFSS do IPC 04 não são aplicadas, e o balanço fecha. Diferença diferente de zero aponta
+inconsistência na matriz enviada pelo ente. Revoga a decisão P8-a de `bp-apuracao-f1`.
 
 #### Scenario: balanço fecha
 
@@ -197,8 +190,8 @@ e na procedência (`origem_exercicio_anterior`). A coluna `exercicio_atual` SHAL
 MSC nas duas origens.
 
 Conta folha é a conta publicada que não tem filha publicada. O valor publicado SHALL ser convertido
-para saldo na direção da conta (o sinal do `I-AB` é o da posição) e passar pelas mesmas regras e
-exclusões das linhas do Quadro Principal. NÃO DEVE haver dupla contagem da hierarquia publicada.
+para saldo na direção da conta (o sinal do `I-AB` é o da posição) e passar pelas mesmas regras das
+linhas do Quadro Principal (sem exclusão intra, `bp-espelho-iab`). NÃO DEVE haver dupla contagem da hierarquia publicada.
 
 No quadro dos Ativos e Passivos Financeiros e Permanentes, `L2`, `L3`, `L5` e `L6` SHALL receber
 `AtivoFinanceiro`, `AtivoPermanente`, `PassivoFinanceiro` e `PassivoPermanente` publicados; `L1`,
@@ -226,11 +219,11 @@ omissão.
 - **WHEN** a coluna anterior é apurada pelo publicado
 - **THEN** `L3` é 100,00, não 300,00
 
-#### Scenario: exclusão intra aplicada ao publicado
+#### Scenario: intra entra no publicado
 
 - **GIVEN** o `I-AB` com `P1.2.1.1.1.00.00` = 10,00 e `P1.2.1.1.2.00.00` (intra) = 90,00
 - **WHEN** `L10` é apurada pelo publicado
-- **THEN** `L10` é 10,00
+- **THEN** `L10` é 100,00 — o BP espelha o `I-AB`, sem exclusão intra (`bp-espelho-iab`)
 
 #### Scenario: quadro F/P pelo publicado
 
@@ -254,3 +247,42 @@ omissão.
 - **WHEN** chega um `GET` com `origem_exercicio_anterior=msce_exercicio_anterior`
 - **THEN** o cache é servido marcado `desatualizado` com motivo `pedido`
 - **AND** o resultado publicado nunca é apresentado como MSC atual
+
+### Requirement: O BP espelha o DCA-Anexo I-AB declarado
+
+O Balanço Patrimonial SHALL reproduzir em centavos o `DCA-Anexo I-AB` que o ente declara ao SICONFI
+(decisão do PO, 2026-10-07; aceite do projeto: espelho 1:1 contra `tt/dca`). Para isso:
+
+- as linhas do Quadro Principal NÃO DEVEM excluir as contas intra-OFSS (5º nível = 2); o resultado é o
+  consolidado declarado. Revoga a decisão P8-a.
+- `L5` Passivo Financeiro SHALL ser `2.1` Financeiro + `2.2` Financeiro + `6.3.1.1` + `6.3.1.5` +
+  `6.3.1.7.1`, a composição que o `I-AB` detalha. NÃO DEVE incluir `6.2.2.1.3.01` nem
+  `6.2.2.1.3.05`. Revoga a decisão P7-a.
+
+Vale para as duas colunas e para as duas origens da coluna do exercício anterior.
+
+#### Scenario: Cuitegi 2025 igual ao I-AB declarado
+
+- **GIVEN** a MSC de encerramento de Cuitegi (`2505204`), 2025
+- **WHEN** o BP é apurado
+- **THEN** `L1` e `L15` valem 76.314.331,92, `L32` vale −45.644.857,64
+- **AND** `diagnostico.equilibrio` é 0,00 no exercício atual
+
+#### Scenario: conta intra entra na linha
+
+- **GIVEN** registros de `121120400` (intra, 90,00) e `121110400` (consolidação, 10,00)
+- **WHEN** `L10` é apurada
+- **THEN** `L10` é 100,00
+
+#### Scenario: passivo financeiro pela composição do I-AB
+
+- **GIVEN** `2.1` Financeiro = 2.647.434,03, `6.3.1.1` = 70.972,63, `6.3.1.7.1` = 387.532,93 e
+  `6.2.2.1.3.05` = 0,00
+- **WHEN** o quadro F/P é apurado
+- **THEN** `L5` é 3.105.939,59
+
+#### Scenario: inscrição em duas contas não é contada duas vezes
+
+- **GIVEN** `6.2.2.1.3.05` = 48.335,00 e `6.3.1.7.1` = 48.335,00 (Cuitegi 2024)
+- **WHEN** `L5` é apurada
+- **THEN** só `6.3.1.7.1` entra, e `L5` é 6.618.515,01 com `2.1` F = 6.496.569,60 e `6.3.1.1` = 73.610,41

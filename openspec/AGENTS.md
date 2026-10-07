@@ -50,7 +50,7 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 Em **2026-10-01** as seis changes já implementadas foram conferidas contra o código e arquivadas.
 Specs em vigor: `dca/base-canonica-regras`, `dca/balanco-orcamentario`,
-`dca/balanco-financeiro` (64 cenários), `dca/balanco-patrimonial` (16, desde 2026-10-07), `dca/fonte-msc`, `pipeline/plataforma` (80) e
+`dca/balanco-financeiro` (64 cenários), `dca/balanco-patrimonial` (26), `dca/fonte-msc`, `pipeline/plataforma` (80) e
 `pipeline/processamento-completo` (11).
 
 **Change ativa, em implementação:** `dca-regra-na-celula` — `GET /dca/{anexo}/regra` e diálogo no BF.
@@ -81,11 +81,6 @@ hub e guardado cifrado para o job, como no RGF/RREO. PO aprovou em 2026-10-06.
 `/auditorias` (exige JWT; o `409` do `base-demonstrativos` vira sem dados). **A auditoria do
 exercício anterior está desligada temporariamente, aguardando o PO:** o `409` do anterior não
 bloqueia o BF e não abate o estorno sobre o zero.
-
-**Change ativa, fase SPEC:** `pipeline-notificacao-discord-padrao` — mensagens do Discord no padrão do
-RREO/RGF (por anexo, resumo do percurso, requisição recebida, ente `Cidade - UF` via
-`public.unidade_gestora`). Corrige o `DCA — None concluído` do resumo do percurso. Implementada
-(559 passed); aguarda o teste no Discord e o arquivamento.
 
 | Change arquivada em 2026-10-01 | O que o código já fazia |
 |---|---|
@@ -118,6 +113,10 @@ encerramento e a entrada do BF no pipeline continuam em `openspec/changes/archiv
 
 | Data | Change |
 |---|---|
+| 2026-10-07 | `bp-espelho-iab` — **o BP espelha o `DCA-Anexo I-AB` declarado.** Sem exclusões intra-OFSS no Quadro Principal e `L5` = `2.1`/`2.2` F + `6.3.1.1` + `6.3.1.5` + `6.3.1.7.1`. Revoga P7-a e P8-a. Cuitegi 2025 = `SICONFI_DCA_2831_ANUAL_1.xls` em centavos, equilíbrio 0,00; JP 2024/2025 = `I-AB` do `tt/dca`. |
+| 2026-10-07 | `pipeline-percurso-origem-bp` — `POST /batch-jobs` aceita `origem_exercicio_anterior` (só BP); o percurso grava o BP na identidade que a leitura confere. Front: `dca-percurso-origem-bp`. Falha prévia ao código não registrada (agente interrompido). |
+| 2026-10-07 | `bp-anterior-publicado-siconfi` — coluna do exercício anterior do BP com duas origens: publicado (`I-AB` do ano anterior no `tt/dca`, padrão) e MSC. `docs/evidencia-bp-publicado-2024.md`. |
+| 2026-10-07 | `pipeline-notificacao-discord-padrao` — Discord no padrão RREO/RGF: por anexo, resumo do percurso, requisição recebida, ente `Cidade - UF` via `public.unidade_gestora`. Corrige o `DCA — None concluído`. Envio real ao Discord não executado. |
 | 2026-10-07 | `pipeline-visualizar-sem-reprocessar` — **ver nunca processa.** `GET /dca/{anexo}` com cache `ok` sempre serve o resultado, com `desatualizado` e `motivos_desatualizado` (`versao_api`, `versao_regras`, `pedido`); processar é `reprocessar` ou percurso. O percurso passa a gravar a fonte padrão na identidade (antes, toda visualização pós-percurso reprocessava). Revoga "não servir resultado com regra não vigente" (decisão do PO). Cenário de troca de fonte de `pipeline-fonte-por-pedido` alinhado. `pipeline/plataforma` 80 → 83 cenários. Suíte 564 passed. |
 | 2026-10-07 | `bp-apuracao-f1` — **Balanço Patrimonial (IPC 04) no mesmo fluxo do BF.** Capability nova `dca/balanco-patrimonial` (16 cenários): Quadro Principal e quadro F/P apurados de `MSCE`/encerramento, classes 1, 2 e 6; compensação e superávit por fonte declarados não apuráveis (P5). Atributo F/P lido do fato e declarado por termo de conta (`ContaCC.financeiro_permanente`); contas mistas do PCASP (`2.3.4`/`2.3.7`) pela direção da classe. Espelho `I-AB` de JP: quadro F/P 5/5 em centavos. Exclusões intra-OFSS mantidas (P8-a): `L1 − L15` declarado, JP +5,95 bi e Cuitegi −2,0 mi. Suíte **verde**. Evidência: `docs/evidencia-bp-fp-2025.md`, `docs/depara-bp-iab-ipc04.md`. |
 | 2026-10-01 | `plataforma-pipeline-dca`, `vigencia-por-anexo`, `pipeline-completo-dca`, `bf-anterior-manual-persistido`, `bf-manual-anexo-alimenta-receita-i`, `bf-completar-nao-apuradas-g8` — conferidas contra o código e mescladas. Ver a seção "Change ativa". |
