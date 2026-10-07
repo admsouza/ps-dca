@@ -40,7 +40,7 @@ Fatia vertical: Cuitegi/PB (`2505204`), 2025 — anexo isolado, percurso BO/BF/B
 - [x] 4.2 `python -m ruff check .` — 5 achados, todos pré-existentes
 - [x] 4.2b SQL real dentro do container `dca_api`: `2505204` → Cuitegi/PB, `2507507` → João
       Pessoa/PB, `2510808` → Patos/PB, `9999999` → nada (cai no IBGE)
-- [ ] 4.3 Envio real num webhook de teste: anexo, percurso com cache e com falha, requisição recebida
+- [x] 4.3 — **não executado**: dispensado pelo PO no arquivamento (2026-10-07); envio real ao Discord pendente. Envio real num webhook de teste: anexo, percurso com cache e com falha, requisição recebida
 - [x] 4.4 Reconferência da spec — cenário → teste: job concluído →
       `test_anexo_concluido_no_formato_do_rgf` + `test_job_concluido_com_sucesso` · job com erro →
       `test_job_com_erro_tambem_notifica` + `test_anexo_com_falha_traz_o_motivo_truncado` · ente
@@ -54,8 +54,8 @@ Fatia vertical: Cuitegi/PB (`2505204`), 2025 — anexo isolado, percurso BO/BF/B
       · percurso com falha → `test_percurso_com_falha`
 
 ## 5. Arquivamento
-- [ ] 5.1 `tasks.md` 100% marcado
-- [ ] 5.2 Mesclar deltas em `openspec/specs/pipeline/plataforma` e `pipeline/processamento-completo`;
-      atualizar `CENARIOS_ESPERADOS` (plataforma +6, processamento-completo +2)
-- [ ] 5.3 Mover para `openspec/changes/archive/AAAA-MM-DD-pipeline-notificacao-discord-padrao/`
-- [ ] 5.4 Atualizar a tabela "Change ativa" em `openspec/AGENTS.md`
+- [x] 5.1 `tasks.md` 100% marcado
+- [x] 5.2 Mesclar deltas em `openspec/specs/pipeline/plataforma` e `pipeline/processamento-completo`;
+      atualizar `CENARIOS_ESPERADOS` (plataforma +6 → 89, processamento-completo +2)
+- [x] 5.3 Mover para `openspec/changes/archive/AAAA-MM-DD-pipeline-notificacao-discord-padrao/`
+- [x] 5.4 Atualizar a tabela "Change ativa" em `openspec/AGENTS.md`

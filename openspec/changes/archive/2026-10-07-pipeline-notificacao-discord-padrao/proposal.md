@@ -1,6 +1,6 @@
 # Proposal — Notificações do Discord no padrão do RREO e do RGF
 
-**Status:** em implementação
+**Status:** arquivada (2026-10-07)
 **Repositório:** `ps-dca`
 **Capabilities:** `pipeline/plataforma` (existente), `pipeline/processamento-completo` (existente)
 **Anexo DCA:** n/a — canal de operação

@@ -35,10 +35,12 @@ CENARIOS_ESPERADOS = {
     # 63 da plataforma + 9 da entrada do BF no pipeline (`bf-no-pipeline`)
     # + 4 da vigência por anexo (`vigencia-por-anexo`)
     # + 4 do mapa manual persistido (`bf-anterior-manual-persistido`)
-    # + 3 de visualizar sem reprocessar (`pipeline-visualizar-sem-reprocessar`).
-    "pipeline/plataforma": 83,
-    # 11 do percurso completo (`pipeline-completo-dca`).
-    "pipeline/processamento-completo": 11,
+    # + 3 de visualizar sem reprocessar (`pipeline-visualizar-sem-reprocessar`)
+    # + 6 das notificações no padrão RREO/RGF (`pipeline-notificacao-discord-padrao`).
+    "pipeline/plataforma": 89,
+    # 11 do percurso completo (`pipeline-completo-dca`) + 2 da notificação por anexo
+    # (`pipeline-notificacao-discord-padrao`).
+    "pipeline/processamento-completo": 13,
     # 16 da apuração do BP, IPC 04 (`bp-apuracao-f1`).
     "dca/balanco-patrimonial": 16,
 }
