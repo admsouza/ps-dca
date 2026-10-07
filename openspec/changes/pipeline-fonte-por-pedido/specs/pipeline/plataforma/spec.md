@@ -35,8 +35,13 @@ fonte NÃO DEVE ser servido a um pedido da outra.
 
 - **GIVEN** o BF apurado com `use_siconfi=true`, em cache `ok`
 - **WHEN** chega o `GET` do mesmo ente e exercício com `use_siconfi=false`
-- **THEN** a resposta é `202`
-- **AND** o resultado SICONFI não é devolvido
+- **THEN** a resposta é `200` com o resultado SICONFI, `desatualizado: true` e
+  `motivos_desatualizado: ["pedido"]`, e nenhum job é enfileirado
+- **AND** o resultado SICONFI nunca é apresentado como resultado PublicSoft atual: a marca diz que a
+  fonte pedida é outra, e apurar a PublicSoft é ação explícita (`reprocessar`)
+
+> Alterado em 2026-10-07 pela decisão do PO em `pipeline-visualizar-sem-reprocessar`: visualizar
+> nunca processa. Antes: `202` e reapuração na leitura.
 
 #### Scenario: parâmetro inválido
 

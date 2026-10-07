@@ -8,6 +8,7 @@ Uma rota para os oito anexos, com `anexo` no path. O RGF tem seis conjuntos quas
 """
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Annotated, Any
 
@@ -15,15 +16,17 @@ from fastapi import APIRouter, Body, Depends, Header, HTTPException, Path, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
+from app.core.config import config
 from app.infra.fila import credencial, job_manager
 from app.routes.dependencias import (
     FontePedido,
+    email_do_solicitante,
     fonte_do_pedido,
     repositorio,
     unidade_autorizada,
     usuario_id,
 )
-from app.services.pipeline import apuracao, completo
+from app.services.pipeline import apuracao, completo, notificacao
 from app.services.pipeline import cache as cache_service
 from app.services.pipeline import resumo as resumo_service
 from app.services.pipeline.registry import ANEXOS, AnexoDesconhecido, validar_anexo
@@ -206,7 +209,16 @@ async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo
         await fila.pendente                      # o service é síncrono; o enfileiramento é async
 
     if resposta.status == 200:
-        return JSONResponse(status_code=200, content=resposta.resultado)
+        motivos = resposta.motivos_desatualizado or []
+        return JSONResponse(status_code=200, content={
+            **resposta.resultado, "desatualizado": bool(motivos),
+            "motivos_desatualizado": motivos,
+        })
+
+    if resposta.estado_job == cache_service.PROCESSING:
+        await _notificar_recebida(request, ente, exercicio, [anexo], percurso=False,
+                                  forcar=forcar,
+                                  fonte=(parametros or {}).get("fonte") or config().fonte_padrao)
 
     return JSONResponse(
         status_code=202,
@@ -218,6 +230,18 @@ async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo
             anexo=resposta.anexo,
             mensagem=resposta.mensagem,
         ).model_dump(),
+    )
+
+
+async def _notificar_recebida(request: Request, ente: str, exercicio: int, anexos: list[str], *,
+                              percurso: bool, forcar: bool, fonte: str | None) -> None:
+    """Requisição recebida, no padrão do RGF. Em thread: o webhook é síncrono, e o pedido não
+    espera nem falha por ele (`notificacao` engole a falha do canal)."""
+    await asyncio.to_thread(
+        notificacao.notificar_recebida,
+        request.app.state.portas.get("notificador"),
+        ente=ente, exercicio=exercicio, anexos=anexos, percurso=percurso, forcar=forcar,
+        solicitante=email_do_solicitante(request), fonte=fonte,
     )
 
 
@@ -245,7 +269,10 @@ async def processar_percurso(
     fila = portas["fila_async"]()
 
     def versao_de(anexo: str) -> str:
-        return apuracao.versao_regras(exercicio, anexo, portas.get("repo_vigencias"))
+        return cache_service.versao_do_pedido(
+            apuracao.versao_regras(exercicio, anexo, portas.get("repo_vigencias")), anexo,
+            completo.pedido_do_percurso(repo.obter(ente, exercicio, anexo), config().fonte_padrao),
+        )
 
     try:
         percurso = completo.montar_percurso(
@@ -263,7 +290,8 @@ async def processar_percurso(
     completo.registrar(portas["jobs"], job_id, ente=ente, exercicio=exercicio, percurso=percurso)
     try:
         fila.enfileirar_percurso(ente, exercicio, job_id,
-                                 forcar=forcar, solicitado_por=solicitante)
+                                 forcar=forcar, solicitado_por=solicitante,
+                                 solicitante_email=email_do_solicitante(request))
         if getattr(fila, "pendente", None) is not None:
             await fila.pendente
     except Exception as erro:
@@ -273,6 +301,11 @@ async def processar_percurso(
         job_manager.falhar(portas["jobs"], job_id, detalhe)
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=detalhe) from erro
 
+    await _notificar_recebida(
+        request, ente, exercicio,
+        [no.anexo for no in completo.implementados(percurso) if no.estado == completo.A_APURAR],
+        percurso=True, forcar=forcar, fonte=config().fonte_padrao,
+    )
     raiz = str(request.base_url).rstrip("/")
     logger.info("percurso enfileirado | ente=%s exercicio=%s job=%s forcar=%s anexos=%s",
                 ente, exercicio, job_id, forcar, len(completo.implementados(percurso)))

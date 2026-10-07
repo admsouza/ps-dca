@@ -19,18 +19,22 @@ from tests.pipeline.conftest import (
 )
 
 
-def test_alteracao_real_de_regra_invalida(pedido, repo, fila):
-    """Scenario: alteração real de regra invalida."""
+def test_alteracao_real_de_regra_desatualiza(pedido, repo, fila):
+    """Scenario: alteração real de regra desatualiza"""
     repo.gravar(RegistroFake(ENTE, EXERCICIO, ANEXO, status="ok", resultado={"m": 1}))
-    assert pedido(versao_regras=VERSAO_REGRAS).status == 200
-    assert pedido(versao_regras=OUTRA_VERSAO_REGRAS).status == 202
+    assert pedido(versao_regras=VERSAO_REGRAS).motivos_desatualizado == []
+    r = pedido(versao_regras=OUTRA_VERSAO_REGRAS)
+    assert (r.status, r.motivos_desatualizado) == (200, ["versao_regras"])
+    assert fila.enfileirados == []
 
 
-def test_versao_de_api_divergente_invalida(pedido, repo):
-    """Scenario: versão da API alterada invalida o cache."""
+def test_versao_de_api_divergente_desatualiza(pedido, repo, fila):
+    """Scenario: versão da API alterada desatualiza o cache"""
     repo.gravar(RegistroFake(ENTE, EXERCICIO, ANEXO, status="ok",
                              resultado={"m": 1}, versao_api="0.0.1"))
-    assert pedido(versao_api=VERSAO_API).status == 202
+    r = pedido(versao_api=VERSAO_API)
+    assert (r.status, r.resultado, r.motivos_desatualizado) == (200, {"m": 1}, ["versao_api"])
+    assert fila.enfileirados == []
 
 
 def test_regra_de_outro_anexo_nao_invalida(pedido, repo, fila):
@@ -75,7 +79,7 @@ def test_identificador_de_regra_e_estavel_a_formatacao(carregar_mapa_de):
 
 
 def test_alteracao_de_conta_muda_o_identificador(carregar_mapa_de):
-    """Scenario: alteração real de regra invalida — o lado positivo do hash canônico."""
+    """Requisito: alteração real de regra muda o identificador — o lado positivo do hash."""
     original = carregar_mapa_de(reescrever=None).versao_regras
     assert carregar_mapa_de(reescrever="conta").versao_regras != original
 

@@ -34,8 +34,9 @@ CENARIOS_ESPERADOS = {
     "dca/fonte-msc": 15,
     # 63 da plataforma + 9 da entrada do BF no pipeline (`bf-no-pipeline`)
     # + 4 da vigência por anexo (`vigencia-por-anexo`)
-    # + 4 do mapa manual persistido (`bf-anterior-manual-persistido`).
-    "pipeline/plataforma": 80,
+    # + 4 do mapa manual persistido (`bf-anterior-manual-persistido`)
+    # + 3 de visualizar sem reprocessar (`pipeline-visualizar-sem-reprocessar`).
+    "pipeline/plataforma": 83,
     # 11 do percurso completo (`pipeline-completo-dca`).
     "pipeline/processamento-completo": 11,
     # 16 da apuração do BP, IPC 04 (`bp-apuracao-f1`).

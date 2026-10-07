@@ -11,8 +11,8 @@ Duas coisas o percurso faz que a soma de jobs individuais não faz:
   percurso, e o BO reaproveita as classes que o BF já leu: 18 consultas à fonte contra 20 em jobs
   separados (João Pessoa, 2025). Nada disso sobrevive ao job — o ente retifica declaração
   publicada, e o dado bruto nunca é persistido;
-- **notifica uma vez**, com o desfecho por anexo. Oito mensagens por percurso tornariam o canal de
-  operação ilegível.
+- **notifica como o pipeline do RGF**: uma mensagem por anexo, na ordem do registry (inclusive o
+  que veio do cache), e um resumo ao fim com o detalhamento (`pipeline-notificacao-discord-padrao`).
 
 O desfecho terminal é `done` ou `error`, nunca um terceiro nome: o consumidor fecha o
 acompanhamento em `done | error | cancelled | interrupted`
@@ -30,7 +30,7 @@ from typing import Any
 from app.infra.fila import job_manager
 from app.infra.fila import lock as trava_lock
 from app.services.pipeline import notificacao
-from app.services.pipeline.cache import servivel
+from app.services.pipeline.cache import parametros_efetivos, servivel
 
 logger = logging.getLogger(__name__)
 
@@ -84,8 +84,13 @@ def montar_percurso(*, ente: str, exercicio: int, repo, lock, jobs,
     return percurso
 
 
-def a_apurar(percurso: list[NoPercurso]) -> list[NoPercurso]:
-    return [no for no in percurso if no.estado == A_APURAR]
+def pedido_do_percurso(registro, fonte: str) -> dict:
+    """Identidade de pedido do percurso: a fonte padrão, mais o que o BF reaplica do registro.
+
+    Rota e worker gravam e conferem a mesma. Sem a fonte, o `GET` seguinte — que sempre manda a
+    sua — veria todo anexo do percurso como desatualizado.
+    """
+    return parametros_efetivos({"fonte": fonte}, registro)
 
 
 def implementados(percurso: list[NoPercurso]) -> list[NoPercurso]:
@@ -108,19 +113,34 @@ def registrar(jobs, job_id: str, *, ente: str, exercicio: int,
 def executar_percurso(*, ente: str, exercicio: int, percurso: list[NoPercurso], repo, lock, jobs,
                       job_id: str, apurador_de: Callable[[str], Callable[[int, int], Any]],
                       versao_api: str, versao_de_regras: Callable[[str], str],
-                      notificador=None, solicitado_por: int | None = None) -> dict:
+                      notificador=None, solicitado_por: int | None = None,
+                      solicitante: str | None = None, fonte: str | None = None) -> dict:
     """Apura os anexos pendentes, em série, e devolve o desfecho do percurso."""
     inicio = time.monotonic()
     estados = {no.anexo: no for no in implementados(percurso)}
     _publicar(jobs, job_id, ente, exercicio, estados, status="processing")
 
-    for no in a_apurar(percurso):
-        estados[no.anexo] = _apurar_um(
+    for no in implementados(percurso):
+        if no.estado == EM_CACHE:
+            notificacao.notificar_fim(notificador, ente=ente, exercicio=exercicio,
+                                      anexo=no.anexo, duracao_ms=0, desfecho="cache")
+            continue
+        if no.estado != A_APURAR:
+            continue                      # em voo: é de outro job, que notifica por si
+        apurado = _apurar_um(
             no, ente=ente, exercicio=exercicio, repo=repo, lock=lock, jobs=jobs,
             job_id=job_id, apurador_de=apurador_de, versao_api=versao_api,
             versao_de_regras=versao_de_regras, solicitado_por=solicitado_por,
         )
+        estados[no.anexo] = apurado
         _publicar(jobs, job_id, ente, exercicio, estados, status="processing")
+        if apurado.estado != ALREADY_QUEUED:
+            notificacao.notificar_fim(
+                notificador, ente=ente, exercicio=exercicio, anexo=no.anexo,
+                duracao_ms=apurado.duracao_ms or 0,
+                desfecho="sucesso" if apurado.estado == "ok" else "erro",
+                erro=apurado.erro_detalhe,
+            )
 
     duracao_ms = int((time.monotonic() - inicio) * 1000)
     desfecho = _publicar(jobs, job_id, ente, exercicio, estados,
@@ -129,6 +149,7 @@ def executar_percurso(*, ente: str, exercicio: int, percurso: list[NoPercurso], 
     notificacao.notificar_percurso(
         notificador, ente=ente, exercicio=exercicio, duracao_ms=duracao_ms,
         falhas=desfecho["falhas"], anexos=desfecho["anexos"],
+        solicitante=solicitante, fonte=fonte,
     )
     logger.info("percurso concluído | ente=%s exercicio=%s job=%s status=%s falhas=%s",
                 ente, exercicio, job_id, desfecho["status"], desfecho["falhas"])
@@ -140,8 +161,8 @@ def _apurar_um(no: NoPercurso, *, ente, exercicio, repo, lock, jobs, job_id, apu
     """Um anexo: lock, `job.executar`, desfecho lido do cache que ele mesmo gravou.
 
     `jobs` e `notificador` **não** vão para `executar`: o estado do job e a notificação são do
-    percurso. Passá-los ali sobrescreveria o estado do job pai a cada anexo, e devolveria as oito
-    mensagens que D5 existe para evitar.
+    percurso. Passá-los ali sobrescreveria o estado do job pai a cada anexo, e a mensagem do anexo
+    em cache — que nem passa por aqui — sairia fora de ordem.
     """
     from app.services.pipeline.job import executar
 

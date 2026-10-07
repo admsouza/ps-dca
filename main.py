@@ -51,6 +51,7 @@ async def lifespan(app: FastAPI):
         LockRedis,
         cliente,
     )
+    from app.infra.notificacao.discord import de_configuracao
 
     ajustes = RedisSettings(host=cfg.redis_host, port=cfg.redis_port,
                             password=cfg.redis_password, database=cfg.redis_db)
@@ -68,6 +69,7 @@ async def lifespan(app: FastAPI):
         "cofre": CofreRedis(sincrono),
         "repo_vigencias": RepositorioVigencias(db_vigencias),
         "fila_async": lambda: FilaArqAsync(pool, cfg.fila),
+        "notificador": de_configuracao(cfg),       # requisição recebida; `None` sem webhook
     }
     logger.info("Redis %s:%s | fila=%s | banco=%s", cfg.redis_host, cfg.redis_port,
                 cfg.fila, cfg.postgres_db)

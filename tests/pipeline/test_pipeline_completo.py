@@ -397,11 +397,33 @@ def test_conclusao_do_percurso_e_notificada_uma_vez(repo, lock, jobs, montar, ex
              job_id="batch-1", versao_api=VERSAO_API, versao_de_regras=versao_de,
              apurador_de=_apurador_de({BO: ResultadoFake(BO), BF: RuntimeError("falhou"),
                                        BP: ResultadoFake(BP)}),
-             notificador=notificador)
+             notificador=notificador, solicitante="jackson@x")
 
-    assert len(notificador.enviadas) == 1, "uma notificação por anexo faria oito num percurso"
-    mensagem = notificador.enviadas[0]
+    resumos = [m for m in notificador.enviadas if m["tipo"] == "percurso"]
+    assert len(resumos) == 1, "o resumo sai uma vez só"
+    assert notificador.enviadas[-1] is not None and notificador.enviadas[-1]["tipo"] == "percurso"
+    mensagem = resumos[0]
     assert mensagem["ente"] == ENTE
     assert mensagem["falhas"] == 1
-    assert {a["anexo"] for a in mensagem["anexos"]} == {BO, BF, BP}
+    assert [a["anexo"] for a in mensagem["anexos"]] == [BO, BF, BP]
     assert mensagem["duracao_ms"] >= 0
+    assert mensagem["solicitante"] == "jackson@x"
+
+
+def test_cada_anexo_do_percurso_tambem_notifica(repo, lock, jobs, montar, executar, versao_de,
+                                                notificador):
+    """Scenario: cada anexo do percurso também notifica"""
+    repo.gravar(RegistroFake(ENTE, EXERCICIO, BF, status="ok", resultado={"matriz": {"L1": {}}}))
+    percurso = montar(ente=ENTE, exercicio=EXERCICIO, repo=repo, lock=lock, jobs=jobs,
+                      versao_api=VERSAO_API, versao_de_regras=versao_de)
+
+    executar(ente=ENTE, exercicio=EXERCICIO, percurso=percurso, repo=repo, lock=lock, jobs=jobs,
+             job_id="batch-1", versao_api=VERSAO_API, versao_de_regras=versao_de,
+             apurador_de=_apurador_de({BO: ResultadoFake(BO), BP: ResultadoFake(BP)}),
+             notificador=notificador, solicitante="jackson@x", fonte="siconfi")
+
+    sequencia = [(m["tipo"], m.get("anexo"), m.get("desfecho")) for m in notificador.enviadas]
+    assert sequencia == [("anexo", BO, "sucesso"), ("anexo", BF, "cache"),
+                         ("anexo", BP, "sucesso"), ("percurso", None, "sucesso")]
+    detalhe = {a["anexo"]: a["status"] for a in notificador.enviadas[-1]["anexos"]}
+    assert detalhe[BF] == "em_cache"

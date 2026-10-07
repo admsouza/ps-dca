@@ -86,7 +86,7 @@ async def apurar_anexo(ctx: dict, *, job_id: str, ente: str, exercicio: int, ane
 
 async def apurar_completo(ctx: dict, *, job_id: str, ente: str, exercicio: int,
                           forcar: bool = False, solicitado_por: int | None = None,
-                          **parametros) -> None:
+                          solicitante_email: str | None = None, **parametros) -> None:
     """O percurso inteiro num job. Wrapper fino, como o job por anexo.
 
     A memória de execução da MSC abre **uma vez** para todos os anexos: o BO reaproveita as classes
@@ -110,9 +110,14 @@ async def apurar_completo(ctx: dict, *, job_id: str, ente: str, exercicio: int,
         vigencias = RepositorioVigencias(db)
         credencial = _credencial(ctx, job_id)
 
+        fonte = parametros.get("fonte") or cfg.fonte_padrao
+
         @cache                       # `versao_de` e `apurador_de` pedem o mesmo anexo
         def pedido_de(anexo: str) -> dict:
-            return parametros_efetivos(parametros, repo.obter(ente, exercicio, anexo))
+            # A mesma identidade que a rota confere: sem a fonte, o `GET` seguinte veria o anexo
+            # como desatualizado (`pipeline-visualizar-sem-reprocessar`, D3).
+            return {**parametros_efetivos(parametros, repo.obter(ente, exercicio, anexo)),
+                    **completo.pedido_do_percurso(repo.obter(ente, exercicio, anexo), fonte)}
 
         def versao_de(anexo: str) -> str:
             return versao_do_pedido(
@@ -120,8 +125,8 @@ async def apurar_completo(ctx: dict, *, job_id: str, ente: str, exercicio: int,
             )
 
         def apurador_de(anexo: str):
-            return apuracao.apurador(anexo, token=credencial, repo_vigencias=vigencias,
-                                     parametros=pedido_de(anexo))
+            return apuracao.apurador(anexo, fonte_nome=fonte, token=credencial,
+                                     repo_vigencias=vigencias, parametros=pedido_de(anexo))
 
         percurso = completo.montar_percurso(
             ente=ente, exercicio=exercicio, repo=repo, lock=ctx["lock"], jobs=ctx["jobs"],
@@ -135,7 +140,7 @@ async def apurar_completo(ctx: dict, *, job_id: str, ente: str, exercicio: int,
                 repo=repo, lock=ctx["lock"], jobs=ctx["jobs"], job_id=job_id,
                 apurador_de=apurador_de, versao_api=apuracao.VERSAO_API,
                 versao_de_regras=versao_de, notificador=ctx.get("notificador"),
-                solicitado_por=solicitado_por,
+                solicitado_por=solicitado_por, solicitante=solicitante_email, fonte=fonte,
             )
     finally:
         db.close()
@@ -197,12 +202,9 @@ async def startup(ctx: dict) -> None:
 
 def _notificador():
     """Canal de operação. `None` sem webhook configurado — ambiente local apura sem notificar."""
-    if not cfg.discord_webhook:
-        return None
+    from app.infra.notificacao.discord import de_configuracao
 
-    from app.infra.notificacao.discord import DiscordNotificador
-
-    return DiscordNotificador(cfg.discord_webhook)
+    return de_configuracao(cfg)
 
 
 def _semear() -> None:

@@ -96,7 +96,8 @@ def test_lifespan_monta_as_portas_que_as_rotas_consomem(boot):
     async def _subir():
         async with main.lifespan(app):
             portas = app.state.portas
-            assert set(portas) == {"jobs", "lock", "cofre", "repo_vigencias", "fila_async"}
+            assert set(portas) == {"jobs", "lock", "cofre", "repo_vigencias", "fila_async",
+                                   "notificador"}
             # `fila_async` é fábrica, não instância: cada requisição cria o seu adapter, que
             # guarda a corrotina do enfileiramento para a rota aguardar.
             assert callable(portas["fila_async"])

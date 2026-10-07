@@ -4,9 +4,9 @@ Quatro caminhos, e o que cada um responde:
 
 | Estado da identidade | Resposta |
 |---|---|
-| `ok` e versões conferem | **200** com o resultado |
+| `ok` (atual ou desatualizado) | **200** com o resultado e os motivos de desatualização |
 | `processando`, com job vivo | **202 + `job_id` do job em voo**, `estado_job="already_queued"` |
-| ausente, `erro`, versão divergente, ou `forcar` | **202 + `job_id`**, `estado_job="processing"` |
+| ausente, `erro`, ou `forcar` | **202 + `job_id`**, `estado_job="processing"` |
 | `processando` com lock órfão | libera, loga, e cria job novo |
 
 **O job em voo é devolvido com `job_id`, e quem diz que ele não é seu é `estado_job`.** Medido no
@@ -15,6 +15,10 @@ consumidor, não escolhido: `front-declaracoes/src/utils/rgfAnexoJob.ts` **lanç
 como "Já existe um cálculo em andamento. Acompanhe o progresso."
 (`components/rgf/RGFDialog.tsx`). Omitir o `job_id` custaria a stream SSE e, no caminho
 compartilhado do front, viraria erro na tela em vez de "aguarde".
+
+**Ver nunca processa** (`pipeline-visualizar-sem-reprocessar`, decisão do PO de 2026-10-07): sem
+`forcar`, resultado `ok` é servido mesmo com código, regra ou pedido diferentes, marcado com o
+motivo. Reapurar o que já existe é ação explícita — `reprocessar` ou o percurso.
 
 Não há HTTP aqui: a rota transporta o `status`. É o que permite trocar de framework sem reescrever
 a decisão, e é o mesmo motivo pelo qual a apuração é alcançável sem rota e sem worker.
@@ -56,6 +60,8 @@ class Resposta:
     sse_url: str | None = None
     anexo: str | None = None
     mensagem: str | None = None
+    # `versao_api` | `versao_regras` | `pedido`. Vazio = cache atual.
+    motivos_desatualizado: list[str] | None = None
 
 
 class Repo(Protocol):
@@ -161,18 +167,35 @@ def _url_de_job(job_id: str, base: str = "") -> tuple[str, str]:
     return f"{raiz}/jobs/{job_id}", f"{raiz}/sse/jobs/{job_id}"
 
 
-def servivel(registro, versao_api: str, versao_regras: str) -> bool:
-    """`ok` com as duas versões conferindo.
+def com_resultado(registro) -> bool:
+    """Há o que mostrar: `ok` com resultado. A leitura serve, atual ou não."""
+    return registro is not None and registro.status == "ok" and bool(registro.resultado)
 
-    `versao_regras` é o que a DCA tem e os irmãos não: uma correção de conta em
-    `knowledge/rules/**.yaml` sem bump de código **tem** de invalidar o cache, ou o ente recebe
-    número velho depois de a regra ser corrigida.
+
+def motivos_desatualizado(registro, versao_api: str, versao_regras: str) -> list[str]:
+    """Por que o resultado gravado não é o que se apuraria agora.
+
+    `versao_regras` vem como `<hash das regras>|<identidade do pedido>` (`versao_do_pedido`): a
+    primeira parte separa "a regra mudou" de "o pedido é outro" (fonte, competência, origem do
+    anterior). Uma correção de conta em `knowledge/rules/**.yaml` sem bump de código desatualiza o
+    cache, ou o ente veria número velho sem aviso.
     """
-    return (registro is not None
-            and registro.status == "ok"
-            and bool(registro.resultado)
-            and registro.versao_api == versao_api
-            and registro.versao_regras == versao_regras)
+    gravada_regra, _, gravado_pedido = (registro.versao_regras or "").partition("|")
+    atual_regra, _, atual_pedido = versao_regras.partition("|")
+    motivos = []
+    if registro.versao_api != versao_api:
+        motivos.append("versao_api")
+    if gravada_regra != atual_regra:
+        motivos.append("versao_regras")
+    if gravado_pedido != atual_pedido:
+        motivos.append("pedido")
+    return motivos
+
+
+def servivel(registro, versao_api: str, versao_regras: str) -> bool:
+    """Com resultado e atual — o critério do percurso, que processa o que não estiver atual."""
+    return com_resultado(registro) and not motivos_desatualizado(
+        registro, versao_api, versao_regras)
 
 
 def ler_ou_enfileirar(*, ente: str, exercicio: int, anexo: str, repo: Repo, fila: Fila,
@@ -192,8 +215,10 @@ def ler_ou_enfileirar(*, ente: str, exercicio: int, anexo: str, repo: Repo, fila
     versao_regras = versao_do_pedido(versao_regras, anexo, parametros)
     registro = repo.obter(ente, exercicio, anexo)
 
-    if not forcar and servivel(registro, versao_api, versao_regras):
-        return Resposta(status=200, resultado=registro.resultado, anexo=anexo)
+    if not forcar and com_resultado(registro):
+        return Resposta(status=200, resultado=registro.resultado, anexo=anexo,
+                        motivos_desatualizado=motivos_desatualizado(
+                            registro, versao_api, versao_regras))
 
     job_id = job_manager.novo_id()
     em_voo = trava_lock.adquirir_com_recuperacao(

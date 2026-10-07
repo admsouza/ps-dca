@@ -204,8 +204,14 @@ def test_troca_de_fonte_nao_serve_o_cache_da_outra(cliente, hub):
     siconfi = versao_do_pedido(versao_regras(EXERCICIO, "BF"), "BF", {"fonte": "siconfi"})
     repo = RepoFake(Registro(VERSAO_API, siconfi))
 
-    assert _get(cliente, "&use_siconfi=true", repo=repo).status_code == 200
-    assert _get(cliente, "&use_siconfi=false", repo=repo).status_code == 202
+    mesma = _get(cliente, "&use_siconfi=true", repo=repo)
+    assert (mesma.status_code, mesma.json()["motivos_desatualizado"]) == (200, [])
+
+    # Ver nunca processa (`pipeline-visualizar-sem-reprocessar`): a outra fonte é servida marcada.
+    outra = _get(cliente, "&use_siconfi=false", repo=repo)
+    assert outra.status_code == 200
+    assert outra.json()["desatualizado"] is True
+    assert outra.json()["motivos_desatualizado"] == ["pedido"]
 
 
 def test_use_siconfi_invalido(cliente, hub):

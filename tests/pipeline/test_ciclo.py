@@ -22,6 +22,7 @@ def test_cache_valido_serve_sem_enfileirar(pedido, registro_ok, fila):
     r = pedido()
     assert r.status == 200
     assert r.resultado == registro_ok.resultado
+    assert r.motivos_desatualizado == []
     assert fila.enfileirados == [], "cache válido não pode disparar job"
 
 
@@ -110,11 +111,12 @@ def test_rota_nunca_devolve_resultado_parcial(pedido, repo):
     assert r.resultado is None
 
 
-def test_versao_de_regras_divergente_nao_serve(pedido, repo, fila):
-    """Scenario: regra alterada invalida o cache."""
+def test_versao_de_regras_divergente_e_servida_marcada(pedido, repo, fila):
+    """Scenario: regra alterada marca o cache como desatualizado"""
     repo.gravar(RegistroFake(ENTE, EXERCICIO, ANEXO, status="ok",
                              resultado={"matriz": {}}, versao_regras=OUTRA_VERSAO_REGRAS))
     r = pedido()
-    assert r.status == 202
-    assert r.resultado is None
-    assert len(fila.enfileirados) == 1
+    assert r.status == 200
+    assert r.resultado == {"matriz": {}}
+    assert r.motivos_desatualizado == ["versao_regras"]
+    assert fila.enfileirados == []

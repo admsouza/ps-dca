@@ -191,6 +191,13 @@ def usuario_id(request: Request) -> int | None:
         return None                     # `sub` costuma ser e-mail; então não há id numérico
 
 
+def email_do_solicitante(request: Request) -> str | None:
+    """E-mail do usuário (`sub` do JWT), só para o canal de operação. Nunca o token."""
+    claims = getattr(request.state, "claims", {}) or {}
+    email = str(claims.get("email") or claims.get("sub") or "").strip()
+    return email if "@" in email else None
+
+
 def token_da_fonte(request: Request) -> str | None:
     """Token da fonte para o job, quando vem por via server-to-server.
 

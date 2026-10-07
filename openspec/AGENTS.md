@@ -82,6 +82,11 @@ hub e guardado cifrado para o job, como no RGF/RREO. PO aprovou em 2026-10-06.
 exercício anterior está desligada temporariamente, aguardando o PO:** o `409` do anterior não
 bloqueia o BF e não abate o estorno sobre o zero.
 
+**Change ativa, fase SPEC:** `pipeline-notificacao-discord-padrao` — mensagens do Discord no padrão do
+RREO/RGF (por anexo, resumo do percurso, requisição recebida, ente `Cidade - UF` via
+`public.unidade_gestora`). Corrige o `DCA — None concluído` do resumo do percurso. Implementada
+(559 passed); aguarda o teste no Discord e o arquivamento.
+
 | Change arquivada em 2026-10-01 | O que o código já fazia |
 |---|---|
 | `plataforma-pipeline-dca` | ciclo único: rota, cache, job, worker, SSE, lock, vigência publicada |
@@ -113,6 +118,7 @@ encerramento e a entrada do BF no pipeline continuam em `openspec/changes/archiv
 
 | Data | Change |
 |---|---|
+| 2026-10-07 | `pipeline-visualizar-sem-reprocessar` — **ver nunca processa.** `GET /dca/{anexo}` com cache `ok` sempre serve o resultado, com `desatualizado` e `motivos_desatualizado` (`versao_api`, `versao_regras`, `pedido`); processar é `reprocessar` ou percurso. O percurso passa a gravar a fonte padrão na identidade (antes, toda visualização pós-percurso reprocessava). Revoga "não servir resultado com regra não vigente" (decisão do PO). Cenário de troca de fonte de `pipeline-fonte-por-pedido` alinhado. `pipeline/plataforma` 80 → 83 cenários. Suíte 564 passed. |
 | 2026-10-07 | `bp-apuracao-f1` — **Balanço Patrimonial (IPC 04) no mesmo fluxo do BF.** Capability nova `dca/balanco-patrimonial` (16 cenários): Quadro Principal e quadro F/P apurados de `MSCE`/encerramento, classes 1, 2 e 6; compensação e superávit por fonte declarados não apuráveis (P5). Atributo F/P lido do fato e declarado por termo de conta (`ContaCC.financeiro_permanente`); contas mistas do PCASP (`2.3.4`/`2.3.7`) pela direção da classe. Espelho `I-AB` de JP: quadro F/P 5/5 em centavos. Exclusões intra-OFSS mantidas (P8-a): `L1 − L15` declarado, JP +5,95 bi e Cuitegi −2,0 mi. Suíte **verde**. Evidência: `docs/evidencia-bp-fp-2025.md`, `docs/depara-bp-iab-ipc04.md`. |
 | 2026-10-01 | `plataforma-pipeline-dca`, `vigencia-por-anexo`, `pipeline-completo-dca`, `bf-anterior-manual-persistido`, `bf-manual-anexo-alimenta-receita-i`, `bf-completar-nao-apuradas-g8` — conferidas contra o código e mescladas. Ver a seção "Change ativa". |
 | 2026-09-14 | `msc-fonte-e-competencia` — **fonte MSC por demonstrativo e apuração mensal.** Decisão do PO: todos os demonstrativos sobre a matriz de **encerramento**, saldo de **abertura** no BO, BF, DVP e DFC, e de **encerramento** no BP. O par vira propriedade do demonstrativo, e a combinação errada deixa de ser exprimível. Competência passa a parâmetro (padrão 12), para entes que prestam contas mensalmente — nos meses 1–11 a leitura é a consolidada, porque a **`MSCE` só existe em dezembro** (medido). Regressão do BO: **337 células × 2 entes, zero divergências**. Retry com backoff nos adapters. Revoga a decisão C1. Capability nova `dca/fonte-msc` (12 cenários); BO passa a 46. Suíte **312 passed**. |
