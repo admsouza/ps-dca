@@ -22,9 +22,11 @@ COLUNA_NATUREZA = 10
 class DirecaoPCASP:
     """Consulta a natureza do saldo por conta folha de 9 dígitos."""
 
-    def __init__(self, por_conta: dict[str, bool], redutoras: frozenset[str] = frozenset()):
+    def __init__(self, por_conta: dict[str, bool], redutoras: frozenset[str] = frozenset(),
+                 mistas: frozenset[str] = frozenset()):
         self._por_conta = por_conta
         self._redutoras = redutoras
+        self._mistas = mistas
 
     def credora(self, conta: str) -> bool | None:
         return self._por_conta.get(_digitos(conta))
@@ -53,6 +55,14 @@ class DirecaoPCASP:
         principais = [c for c in sob if c not in self._redutoras]
         return self._por_conta[(principais or sob)[0]]
 
+    def mista(self, prefixo: str) -> bool:
+        """Há conta `Credora/Devedora` sob o prefixo — no PCASP, `2.3.4` e `2.3.7` do PL.
+
+        Distinta de conta desconhecida: a mista está no plano e não tem direção fixa.
+        """
+        alvo = _digitos(prefixo)
+        return bool(alvo) and any(c.startswith(alvo) for c in self._mistas)
+
     def __len__(self) -> int:
         return len(self._por_conta)
 
@@ -67,6 +77,7 @@ def do_pcasp(tabela: Path | None = None) -> DirecaoPCASP:
     caminho = tabela or TABELA
     por_conta: dict[str, bool] = {}
     redutoras: set[str] = set()
+    mistas: set[str] = set()
 
     with caminho.open(encoding="utf-8") as fh:
         for linha in fh:
@@ -77,10 +88,13 @@ def do_pcasp(tabela: Path | None = None) -> DirecaoPCASP:
                 continue
             conta = _digitos(celulas[COLUNA_CONTA])
             natureza = celulas[COLUNA_NATUREZA].strip().lower()
+            if conta and natureza in ("credora/devedora", "devedora/credora"):
+                mistas.add(conta)
+                continue
             if not conta or natureza not in ("credora", "devedora"):
                 continue
             por_conta[conta] = natureza == "credora"
             if celulas[COLUNA_CONTA + 1].strip().startswith("(-)"):
                 redutoras.add(conta)
 
-    return DirecaoPCASP(por_conta, frozenset(redutoras))
+    return DirecaoPCASP(por_conta, frozenset(redutoras), frozenset(mistas))

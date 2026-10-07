@@ -127,7 +127,7 @@ def saldo_da_celula(
         return None, [(contas[0].cc, "direção da coluna indeterminada no PCASP e na regra")]
 
     for conta in contas:
-        casados = [r for r in registros if _casa(r.conta, conta.cc)]
+        casados = _do_termo(registros, conta)
         if not casados:
             # Conta declarada sem escrituração no período contribui zero. Não é "não sei":
             # `5.2.2.1.9` é declarada pelo IPC e pode não ter movimento no exercício.
@@ -158,7 +158,7 @@ def saldo_da_celula_por_conta(
     pendencias: list[tuple[str, str]] = []
 
     for conta in contas:
-        casados = [r for r in registros if _casa(r.conta, conta.cc)]
+        casados = _do_termo(registros, conta)
         if not casados:
             continue                      # conta declarada sem escrituração contribui zero
         por_folha: dict[str, list[Registro]] = {}
@@ -194,6 +194,13 @@ def soma_da_celula_por_natureza(
         parcial = sum((r.valor for r in casados), ZERO)
         total += parcial if conta.operacao == "+" else -parcial
     return total, []
+
+
+def _do_termo(registros: Sequence[Registro], conta: ContaCC) -> list[Registro]:
+    """Registros da conta; com atributo F/P no termo, só os fatos com o mesmo atributo (IPC 04)."""
+    return [r for r in registros if _casa(r.conta, conta.cc)
+            and (not conta.financeiro_permanente
+                 or r.financeiro_permanente == conta.financeiro_permanente)]
 
 
 def _direcao_da_coluna(contas: Sequence[ContaCC], direcao) -> bool | None:

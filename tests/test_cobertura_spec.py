@@ -38,6 +38,8 @@ CENARIOS_ESPERADOS = {
     "pipeline/plataforma": 80,
     # 11 do percurso completo (`pipeline-completo-dca`).
     "pipeline/processamento-completo": 11,
+    # 16 da apuração do BP, IPC 04 (`bp-apuracao-f1`).
+    "dca/balanco-patrimonial": 16,
 }
 
 # Capabilities cuja fase TEST já começou — só delas se exige teste por cenário.
@@ -46,7 +48,7 @@ CENARIOS_ESPERADOS = {
 # daqui para a frente, e cenário novo sem teste quebra o build.
 COM_TESTES = ("dca/base-canonica-regras", "dca/balanco-orcamentario",
               "dca/balanco-financeiro", "dca/fonte-msc", "pipeline/plataforma",
-              "pipeline/processamento-completo")
+              "pipeline/processamento-completo", "dca/balanco-patrimonial")
 
 
 def _specs() -> dict[str, list[Path]]:

@@ -33,6 +33,8 @@ ORDEM_GRUPOS = ("RECEITAS", "DESPESAS")
 # dentro dele, quadro ou grupo desconhecido vai para o fim — sem quebrar a serialização.
 ORDEM_POR_DOCUMENTO = {
     "IPC06": (("QUADRO_PRINCIPAL", "QUADRO_ANEXO"), ("INGRESSOS", "DISPENDIOS")),
+    "IPC04": (("QUADRO_PRINCIPAL", "ATIVOS_PASSIVOS_FINANCEIROS", "CONTAS_COMPENSACAO",
+               "SUPERAVIT_DEFICIT"), ("ATIVO", "PASSIVO")),
 }
 
 
@@ -82,6 +84,8 @@ def _especificos(origem, campos: tuple[str, ...]) -> dict:
         valor = getattr(origem, campo, None)
         if valor is None:
             continue
+        if isinstance(valor, dict):
+            valor = {chave: _valor(v) for chave, v in valor.items()}
         saida[campo] = list(valor) if isinstance(valor, tuple) else valor
     return saida
 
@@ -121,6 +125,7 @@ def para_dados(resultado) -> dict:
             "duracao_ms": diagnostico.duracao_ms,
             "sem_dados": diagnostico.sem_dados,
             **_especificos(diagnostico, ("sem_dados_exercicio_anterior",
-                                         "policies_nao_aplicadas")),
+                                         "policies_nao_aplicadas", "sem_atributo_fp",
+                                         "equilibrio")),
         },
     }

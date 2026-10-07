@@ -26,6 +26,7 @@ class Registro(NamedTuple):
     subfuncao: str = ""
     poder_orgao: str = ""
     fonte_recursos: str = ""
+    financeiro_permanente: str = ""   # "F" | "P" | "" — atributo do fato, nunca do PCASP (IPC 04)
 
 
 class ContaCC(NamedTuple):
@@ -33,6 +34,8 @@ class ContaCC(NamedTuple):
 
     cc: str                       # dígitos, sem separadores
     operacao: str = "+"
+    # "F" | "P" | "" — o termo só soma fatos com este atributo (IPC 04 p. 10). Vazio = todos.
+    financeiro_permanente: str = ""
 
 
 class Filtro(NamedTuple):
@@ -77,6 +80,8 @@ class Linha(NamedTuple):
     # **não** se deriva da árvore de composição: as duas coisas divergem, e a norma é a que vale.
     nivel: int = 0                                   # 1 a 3 no IPC 07
     ordem: int = 0                                   # 1-based, relativa ao GRUPO
+    # `review.blocker` da regra `review_required`. Só o BP lê: célula `None` com este motivo.
+    bloqueio: str = ""
 
     @property
     def composta(self) -> bool:

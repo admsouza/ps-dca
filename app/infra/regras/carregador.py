@@ -161,7 +161,15 @@ def _linha(regra: dict) -> Linha:
         nivel=int(regra["linha"].get("nivel") or 0),
         ordem=int(regra["linha"].get("ordem") or 0),
         apenas_natureza=_apenas_natureza(regra.get("apenas_natureza")),
+        bloqueio=_bloqueio(regra),
     )
+
+
+def _bloqueio(regra: dict) -> str:
+    """Motivo da regra `review_required`. Vazio nas demais."""
+    if regra.get("status") != "review_required":
+        return ""
+    return str((regra.get("review") or {}).get("blocker") or "")
 
 
 def _apenas_natureza(valor: str | None) -> str | None:
@@ -182,7 +190,7 @@ def _coluna(nome: str, dados: dict) -> Coluna:
         id=nome,
         rotulo=dados.get("label", nome),
         contas=tuple(
-            ContaCC(c["pattern"], c.get("sign", "+"))
+            ContaCC(c["pattern"], c.get("sign", "+"), c.get("financeiro_permanente") or "")
             for c in dados.get("accounts") or []
             if c.get("pattern")
         ),

@@ -52,7 +52,8 @@ class Fonte(NamedTuple):
 ENCERRAMENTO_DO_EXERCICIO: dict[str, Fonte] = {
     "BO": Fonte(Matriz.ENCERRAMENTO, TipoSaldo.ABERTURA, (5, 6)),
     "BF": Fonte(Matriz.ENCERRAMENTO, TipoSaldo.ABERTURA, (1, 2, 3, 4, 5, 6)),
-    "BP": Fonte(Matriz.ENCERRAMENTO, TipoSaldo.ENCERRAMENTO, (1, 2)),
+    # Classe 6: `L5` Passivo Financeiro soma RP e créditos empenhados a liquidar (IPC 04 p. 10).
+    "BP": Fonte(Matriz.ENCERRAMENTO, TipoSaldo.ENCERRAMENTO, (1, 2, 6)),
     "DVP": Fonte(Matriz.ENCERRAMENTO, TipoSaldo.ABERTURA, (3, 4)),
     "DFC": Fonte(Matriz.ENCERRAMENTO, TipoSaldo.ABERTURA, (1, 2, 3, 4, 5, 6)),
 }

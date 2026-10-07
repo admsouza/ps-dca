@@ -11,7 +11,7 @@ import pytest
 
 from tests.pipeline.conftest import ENTE, EXERCICIO, VERSAO_API, VERSAO_REGRAS, RegistroFake
 
-BO, BF = "BO", "BF"
+BO, BF, BP = "BO", "BF", "BP"
 HDR = {"Authorization": "Bearer t", "X-Unidade-Id": ENTE}
 
 
@@ -118,7 +118,7 @@ def test_rota_do_percurso_aceita_e_devolve_o_identificador(cliente):
     corpo = resposta.json()
     assert corpo["batch_job_id"]
     assert corpo["poll_url"].endswith(corpo["batch_job_id"])
-    assert {a["anexo"] for a in corpo["anexos"] if a["estado"] == "a_apurar"} == {BO, BF}
+    assert {a["anexo"] for a in corpo["anexos"] if a["estado"] == "a_apurar"} == {BO, BF, BP}
 
 
 def test_nenhum_anexo_implementado(cliente, monkeypatch):
@@ -242,7 +242,8 @@ def test_um_anexo_falha_e_os_demais_concluem(repo, lock, jobs, montar, executar,
     desfecho = executar(
         ente=ENTE, exercicio=EXERCICIO, percurso=percurso, repo=repo, lock=lock, jobs=jobs,
         job_id="batch-1", versao_api=VERSAO_API, versao_de_regras=versao_de,
-        apurador_de=_apurador_de({BO: ResultadoFake(BO), BF: RuntimeError("fonte fora do ar")}),
+        apurador_de=_apurador_de({BO: ResultadoFake(BO), BF: RuntimeError("fonte fora do ar"),
+                                  BP: ResultadoFake(BP)}),
     )
 
     assert repo.obter(ENTE, EXERCICIO, BO).status == "ok"
@@ -263,11 +264,12 @@ def test_todos_os_anexos_falham(repo, lock, jobs, montar, executar, versao_de):
     desfecho = executar(
         ente=ENTE, exercicio=EXERCICIO, percurso=percurso, repo=repo, lock=lock, jobs=jobs,
         job_id="batch-1", versao_api=VERSAO_API, versao_de_regras=versao_de,
-        apurador_de=_apurador_de({BO: RuntimeError("falhou BO"), BF: RuntimeError("falhou BF")}),
+        apurador_de=_apurador_de({BO: RuntimeError("falhou BO"), BF: RuntimeError("falhou BF"),
+                                  BP: RuntimeError("falhou BP")}),
     )
 
     assert desfecho["status"] == "error"
-    assert desfecho["falhas"] == 2
+    assert desfecho["falhas"] == 3
     assert all(r.status == "erro" for r in repo.listar(ENTE, EXERCICIO))
 
 
@@ -298,7 +300,7 @@ def test_anexo_ja_em_andamento_e_pulado(repo, lock, jobs, montar, executar, vers
                         jobs=jobs, job_id="batch-1", apurador_de=apurador_de,
                         versao_api=VERSAO_API, versao_de_regras=versao_de)
 
-    assert apurados == [BO], "o anexo em voo foi apurado de novo"
+    assert apurados == [BO, BP], "o anexo em voo foi apurado de novo"
     assert repo.obter(ENTE, EXERCICIO, BF) is None
     assert [a["status"] for a in desfecho["anexos"] if a["anexo"] == BF] == ["already_queued"]
     assert lock.dono(ENTE, EXERCICIO, BF) == "job-bf-vivo", "lock alheio foi liberado"
@@ -380,7 +382,7 @@ def test_progresso_e_legivel_durante_a_execucao(repo, lock, jobs, montar, execut
 
     # Estado visto pelo segundo anexo: o primeiro já concluiu, e o desfecho dele já aparece.
     durante_o_segundo = vistos[1]
-    assert durante_o_segundo["progresso"] == {"concluidos": 1, "total": 2}
+    assert durante_o_segundo["progresso"] == {"concluidos": 1, "total": 3}
     assert durante_o_segundo["status"] == "processing"
     assert [a["anexo"] for a in durante_o_segundo["anexos"] if a["status"] == "ok"] == [BO]
 
@@ -393,12 +395,13 @@ def test_conclusao_do_percurso_e_notificada_uma_vez(repo, lock, jobs, montar, ex
 
     executar(ente=ENTE, exercicio=EXERCICIO, percurso=percurso, repo=repo, lock=lock, jobs=jobs,
              job_id="batch-1", versao_api=VERSAO_API, versao_de_regras=versao_de,
-             apurador_de=_apurador_de({BO: ResultadoFake(BO), BF: RuntimeError("falhou")}),
+             apurador_de=_apurador_de({BO: ResultadoFake(BO), BF: RuntimeError("falhou"),
+                                       BP: ResultadoFake(BP)}),
              notificador=notificador)
 
     assert len(notificador.enviadas) == 1, "uma notificação por anexo faria oito num percurso"
     mensagem = notificador.enviadas[0]
     assert mensagem["ente"] == ENTE
     assert mensagem["falhas"] == 1
-    assert {a["anexo"] for a in mensagem["anexos"]} == {BO, BF}
+    assert {a["anexo"] for a in mensagem["anexos"]} == {BO, BF, BP}
     assert mensagem["duracao_ms"] >= 0

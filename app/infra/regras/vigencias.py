@@ -243,7 +243,8 @@ def semear(repo: RepoVigencias, base: Path | None = None, exercicio: int | None 
 # (página, evidência, hash do PDF) **não** entra: ela fica no YAML e não é lida ao apurar.
 
 def _achatar(linha: Linha) -> dict:
-    return {
+    # Campos do IPC 04 só entram preenchidos: a vigência do BO e do BF sai bit a bit igual.
+    dado = {
         "id": linha.id,
         "codigo": linha.codigo,
         "rotulo": linha.rotulo,
@@ -262,8 +263,7 @@ def _achatar(linha: Linha) -> dict:
             {
                 "id": c.id,
                 "rotulo": c.rotulo,
-                "contas": [{"cc": conta.cc, "operacao": conta.operacao, "natureza_saldo": None}
-                           for conta in c.contas],
+                "contas": [_achatar_conta(conta) for conta in c.contas],
                 "derivada": [{"coluna": r.coluna, "sinal": r.sinal} for r in c.derivada],
             }
             for c in linha.colunas
@@ -271,6 +271,16 @@ def _achatar(linha: Linha) -> dict:
         "referencias": [{"regra": r.regra, "sinal": r.sinal, "column": r.coluna}
                         for r in linha.referencias],
     }
+    if linha.bloqueio:
+        dado["bloqueio"] = linha.bloqueio
+    return dado
+
+
+def _achatar_conta(conta: ContaCC) -> dict:
+    dado = {"cc": conta.cc, "operacao": conta.operacao, "natureza_saldo": None}
+    if conta.financeiro_permanente:
+        dado["financeiro_permanente"] = conta.financeiro_permanente
+    return dado
 
 
 def _linha(dado: dict) -> Linha:
@@ -291,6 +301,7 @@ def _linha(dado: dict) -> Linha:
         nivel=int(dado.get("nivel") or 0),
         ordem=int(dado.get("ordem") or 0),
         apenas_natureza=dado.get("apenas_natureza"),
+        bloqueio=dado.get("bloqueio", ""),
     )
 
 
@@ -303,7 +314,8 @@ def _coluna(dado: dict) -> Coluna:
     return Coluna(
         id=dado["id"],
         rotulo=dado.get("rotulo", dado["id"]),
-        contas=tuple(ContaCC(c["cc"], c.get("operacao", "+"))
+        contas=tuple(ContaCC(c["cc"], c.get("operacao", "+"),
+                             c.get("financeiro_permanente", ""))
                      for c in dado.get("contas") or []),
         derivada=tuple(RefColuna(r["coluna"], r["sinal"]) for r in dado.get("derivada") or []),
     )

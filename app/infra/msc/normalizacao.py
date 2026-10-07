@@ -20,7 +20,10 @@ CAMPOS = {
     "subfuncao": ("subfuncao", "subFuncao"),
     "poder_orgao": ("poder_orgao", "poderOrgao"),
     "fonte_recursos": ("fonte_recursos", "fonteRecursos"),
+    "financeiro_permanente": ("financeiro_permanente", "financeiroPermanente"),
 }
+# Domínio confirmado pelo PO (2026-10-07). Outro valor não é inferido: vira resíduo no BP.
+FINANCEIRO_PERMANENTE = {"1": "F", "2": "P"}
 
 
 def decodificar(valor: str | bytes) -> str:
@@ -62,7 +65,16 @@ def normalizar(bruto: dict) -> Registro:
         subfuncao=_primeiro(bruto, CAMPOS["subfuncao"]),
         poder_orgao=_primeiro(bruto, CAMPOS["poder_orgao"]),
         fonte_recursos=_primeiro(bruto, CAMPOS["fonte_recursos"]),
+        financeiro_permanente=_financeiro_permanente(bruto),
     )
+
+
+def _financeiro_permanente(bruto: dict) -> str:
+    """A PublicSoft pode mandar `1` inteiro; o SICONFI manda `"1"`. Os dois são `F`."""
+    for nome in CAMPOS["financeiro_permanente"]:
+        if bruto.get(nome) is not None:
+            return FINANCEIRO_PERMANENTE.get(str(bruto[nome]), "")
+    return ""
 
 
 def itens(resposta: dict) -> list[dict]:

@@ -194,17 +194,11 @@ rules:
     extraction_method: assisted
     extractor_version: '1.0'
     extracted_at: '2026-10-02'
-  status: review_required
+  status: extracted
   review:
     required: true
-    reason: O literal 1.1.3.8.2.000.00 possui grupo de três dígitos no PDF.
-    blocker: IPC04 p. 8 contém 1.1.3.8.2.000.00; o PCASP sustenta o prefixo candidato 11382, mas a skill proíbe corrigir o
-      literal em silêncio.
-    candidate:
-      literal: 1.1.3.8.2.00.00
-      pattern: '11382'
-      pcasp_matches: 3
-      applied: false
+    reason: O literal 1.1.3.8.2.000.00 do PDF tem grupo de três dígitos; o padrão 11382 é o que o PCASP sustenta
+      (3 folhas). Aplicado por decisão P2 do PO (2026-10-07), literal preservado.
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -251,6 +245,8 @@ rules:
       pattern: '11322'
     - literal: 1.1.3.6.2.00.00
       pattern: '11362'
+    - literal: 1.1.3.8.2.000.00
+      pattern: '11382'
 - rule_id: bp.quadro_principal.ativo.l5
   demonstrativo:
     codigo: BP

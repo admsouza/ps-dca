@@ -50,7 +50,7 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 Em **2026-10-01** as seis changes já implementadas foram conferidas contra o código e arquivadas.
 Specs em vigor: `dca/base-canonica-regras`, `dca/balanco-orcamentario`,
-`dca/balanco-financeiro` (64 cenários), `dca/fonte-msc`, `pipeline/plataforma` (80) e
+`dca/balanco-financeiro` (64 cenários), `dca/balanco-patrimonial` (16, desde 2026-10-07), `dca/fonte-msc`, `pipeline/plataforma` (80) e
 `pipeline/processamento-completo` (11).
 
 **Change ativa, em implementação:** `dca-regra-na-celula` — `GET /dca/{anexo}/regra` e diálogo no BF.
@@ -113,6 +113,7 @@ encerramento e a entrada do BF no pipeline continuam em `openspec/changes/archiv
 
 | Data | Change |
 |---|---|
+| 2026-10-07 | `bp-apuracao-f1` — **Balanço Patrimonial (IPC 04) no mesmo fluxo do BF.** Capability nova `dca/balanco-patrimonial` (16 cenários): Quadro Principal e quadro F/P apurados de `MSCE`/encerramento, classes 1, 2 e 6; compensação e superávit por fonte declarados não apuráveis (P5). Atributo F/P lido do fato e declarado por termo de conta (`ContaCC.financeiro_permanente`); contas mistas do PCASP (`2.3.4`/`2.3.7`) pela direção da classe. Espelho `I-AB` de JP: quadro F/P 5/5 em centavos. Exclusões intra-OFSS mantidas (P8-a): `L1 − L15` declarado, JP +5,95 bi e Cuitegi −2,0 mi. Suíte **verde**. Evidência: `docs/evidencia-bp-fp-2025.md`, `docs/depara-bp-iab-ipc04.md`. |
 | 2026-10-01 | `plataforma-pipeline-dca`, `vigencia-por-anexo`, `pipeline-completo-dca`, `bf-anterior-manual-persistido`, `bf-manual-anexo-alimenta-receita-i`, `bf-completar-nao-apuradas-g8` — conferidas contra o código e mescladas. Ver a seção "Change ativa". |
 | 2026-09-14 | `msc-fonte-e-competencia` — **fonte MSC por demonstrativo e apuração mensal.** Decisão do PO: todos os demonstrativos sobre a matriz de **encerramento**, saldo de **abertura** no BO, BF, DVP e DFC, e de **encerramento** no BP. O par vira propriedade do demonstrativo, e a combinação errada deixa de ser exprimível. Competência passa a parâmetro (padrão 12), para entes que prestam contas mensalmente — nos meses 1–11 a leitura é a consolidada, porque a **`MSCE` só existe em dezembro** (medido). Regressão do BO: **337 células × 2 entes, zero divergências**. Retry com backoff nos adapters. Revoga a decisão C1. Capability nova `dca/fonte-msc` (12 cenários); BO passa a 46. Suíte **312 passed**. |
 | 2026-09-14 | `ipc06-bf-regras-canonicas` — **base canônica do Balanço Financeiro (IPC 06, ed. 2024-06).** 80 regras em `knowledge/rules/bf/` (Quadro Principal 66 + Quadro Anexo 14), 5 policies e 3 enums novos: `fonte_recurso`, `saldo` (inicial/final) e `movimento` (credor/devedor). Campos e colunas passam a ser validados **por documento**. Fontes por subgrupo vindas do Anexo I da Portaria STN 710/2021 (`fontes-recursos-stn-2026.xlsx`, decisão F3). `review_required 6` — L22, L23, L28, L55, L56 e L61, sem mapeamento no IPC 06 (F1/F2). Suíte **287 passed**; parte `BO` do índice bit a bit igual. Spec: 27 requisitos / 83 cenários. Análise da fonte: `docs/source-analysis-ipc06.md`. |

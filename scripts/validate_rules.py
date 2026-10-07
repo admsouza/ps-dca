@@ -28,7 +28,11 @@ CAMPOS = {"conta_contabil", "natureza_receita", "natureza_despesa", "funcao", "s
 CAMPOS_POR_DOCUMENTO = {
     "IPC07": CAMPOS,
     "IPC06": {"conta_contabil", "fonte_recurso"},
+    # O IPC 04 separa linhas por conta; o atributo F/P é do termo de conta, não filtro de linha.
+    "IPC04": {"conta_contabil"},
 }
+# Documentos em que `review.blocker` é estado declarado por decisão do PO, não inconsistência.
+BLOQUEIO_DECLARADO = {"IPC06", "IPC04"}
 COLUNAS_POR_QUADRO_IPC06 = {
     "QUADRO_PRINCIPAL": {"exercicio_atual", "exercicio_anterior"},
     "QUADRO_ANEXO": {
@@ -325,6 +329,12 @@ def _validar_colunas(rel, regra, codigos_stn, excecoes, rule_id, arquivo, linha)
             if conta.get("sign") not in SINAIS:
                 rel.erro(f"sinal inválido em columns.{nome}: {conta.get('sign')}",
                          rule_id=rule_id, arquivo=arquivo, linha=linha)
+            if conta.get("financeiro_permanente") and documento != "IPC04":
+                rel.erro(
+                    f"financeiro_permanente em columns.{nome} só vale no IPC04 — "
+                    f"documento da regra: {documento or '?'}",
+                    rule_id=rule_id, arquivo=arquivo, linha=linha,
+                )
             # A conta da coluna é código do PCASP como qualquer outro: confere igual.
             _validar_valor(rel, conta, "conta_contabil", codigos_stn, excecoes,
                            review_required, decisao, rule_id, arquivo, linha)
@@ -413,8 +423,10 @@ def _validar_status(rel, regra, rule_id, arquivo, linha) -> None:
 
     # No IPC 07 todo bloqueio foi decidido (B1/B3/B5/B6); remanescente é inconsistência. No
     # IPC 06, `<conta de controle>` e `<contas sob demanda>` seguem sem mapeamento por decisão
-    # do PO (F1/F2) — ali o bloqueio é estado declarado, não erro.
-    if review.get("blocker") and (regra.get("source") or {}).get("document") != "IPC06":
+    # do PO (F1/F2); no IPC 04, `L34`, compensação e superávit por fonte (P3/P5, 2026-10-07) —
+    # ali o bloqueio é estado declarado, não erro.
+    documento = (regra.get("source") or {}).get("document")
+    if review.get("blocker") and documento not in BLOQUEIO_DECLARADO:
         rel.erro(
             f"bloqueio documental remanescente: review.blocker={review['blocker']} — "
             f"B1, B3, B5 e B6 já foram decididos pelo PO",

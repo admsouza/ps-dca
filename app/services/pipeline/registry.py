@@ -13,6 +13,7 @@ from dataclasses import dataclass
 
 ANEXO_BO = "BO"
 ANEXO_BF = "BF"
+ANEXO_BP = "BP"
 JOB_APURAR = "apurar_anexo"
 # Um job para o percurso inteiro — os anexos vêm do próprio registry.
 JOB_COMPLETO = "apurar_completo"
@@ -33,6 +34,9 @@ REGISTRY: tuple[Anexo, ...] = (
     # O BF, como o BO, é derivado da MSC — apurado pelas regras do IPC 06 e **não publicado** pelo
     # `tt/dca`. Por isso vem junto dos derivados, antes dos anexos que o STN publica.
     Anexo(ANEXO_BF, "app.services.bf.quadro_principal:apurar", base_canonica="bf"),
+    # O BP pelo layout do IPC 04 (P1-a). O `I-AB` do `tt/dca` é o mesmo demonstrativo **por conta**
+    # e fica reservado para o espelho: a conferência casa as duas formas (D4).
+    Anexo(ANEXO_BP, "app.services.bp.quadro_principal:apurar", base_canonica="bp"),
     Anexo("I-AB", None),
     Anexo("I-C", None),
     Anexo("I-D", None),
