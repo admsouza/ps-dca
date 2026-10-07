@@ -274,8 +274,15 @@ async def processar_percurso(
     exercicio: Annotated[int, Depends(_exercicio)],
     repo: Annotated[Any, Depends(repositorio)],
     forcar: Annotated[bool, Query(description="Reapura todos, ignorando cache válido.")] = False,
+    origem_bp: Annotated[str | None, Query(
+        alias="origem_exercicio_anterior",
+        description="Origem da coluna anterior do BP; só vale para ele. Padrão: publicado_siconfi.",
+    )] = None,
     solicitante: Annotated[int | None, Depends(usuario_id)] = None,
 ):
+    if origem_bp not in (None, *ORIGENS_BP):
+        raise _erro_422("origem_exercicio_anterior inválida")
+    origem_bp = origem_bp or ORIGENS_BP[0]
     portas = request.app.state.portas
     fila = portas["fila_async"]()
 
@@ -283,7 +290,7 @@ async def processar_percurso(
         return cache_service.versao_do_pedido(
             apuracao.versao_regras(exercicio, anexo, portas.get("repo_vigencias")), anexo,
             completo.pedido_do_percurso(repo.obter(ente, exercicio, anexo), config().fonte_padrao,
-                                        anexo),
+                                        anexo, origem_bp),
         )
 
     try:
@@ -302,7 +309,7 @@ async def processar_percurso(
     completo.registrar(portas["jobs"], job_id, ente=ente, exercicio=exercicio, percurso=percurso)
     try:
         fila.enfileirar_percurso(ente, exercicio, job_id,
-                                 forcar=forcar, solicitado_por=solicitante,
+                                 forcar=forcar, solicitado_por=solicitante, origem_bp=origem_bp,
                                  solicitante_email=email_do_solicitante(request))
         if getattr(fila, "pendente", None) is not None:
             await fila.pendente

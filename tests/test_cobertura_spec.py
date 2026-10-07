@@ -39,8 +39,8 @@ CENARIOS_ESPERADOS = {
     # + 6 das notificações no padrão RREO/RGF (`pipeline-notificacao-discord-padrao`).
     "pipeline/plataforma": 89,
     # 11 do percurso completo (`pipeline-completo-dca`) + 2 da notificação por anexo
-    # (`pipeline-notificacao-discord-padrao`).
-    "pipeline/processamento-completo": 13,
+    # (`pipeline-notificacao-discord-padrao`) + 4 da origem do BP (`pipeline-percurso-origem-bp`).
+    "pipeline/processamento-completo": 17,
     # 16 da apuração do BP (`bp-apuracao-f1`) + 7 da origem publicada
     # (`bp-anterior-publicado-siconfi`).
     "dca/balanco-patrimonial": 23,

@@ -102,7 +102,6 @@ async def apurar_completo(ctx: dict, *, job_id: str, ente: str, exercicio: int,
     from app.infra.cache.vigencias_repo import RepositorioVigencias
     from app.infra.msc.escopo import escopo
     from app.services.pipeline import apuracao, completo
-    from app.services.pipeline.cache import parametros_efetivos
 
     db = sessao()
     try:
@@ -117,8 +116,7 @@ async def apurar_completo(ctx: dict, *, job_id: str, ente: str, exercicio: int,
             # A mesma identidade que a rota confere: sem a fonte, o `GET` seguinte veria o anexo
             # como desatualizado (`pipeline-visualizar-sem-reprocessar`, D3).
             registro = repo.obter(ente, exercicio, anexo)
-            return {**parametros_efetivos(parametros, registro, anexo),
-                    **completo.pedido_do_percurso(registro, fonte, anexo)}
+            return completo.pedido_do_percurso(registro, fonte, anexo, parametros.get("origem_bp"))
 
         def versao_de(anexo: str) -> str:
             return versao_do_pedido(
