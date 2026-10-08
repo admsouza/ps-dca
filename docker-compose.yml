@@ -26,7 +26,6 @@ services:
       # port-forward do Docker Desktop fecha a conexão sem responder — medido. Na rede `ps-infra`
       # o hub atende pelo nome do container e pela porta interna, como o Redis (`redis_cache`).
       AUTH_API_URL: http://rgf_api:8000
-      WEB_WORKERS: 1
       DB_POOL_SIZE: 5
       DB_MAX_OVERFLOW: 10
     extra_hosts:

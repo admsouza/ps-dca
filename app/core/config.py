@@ -26,7 +26,6 @@ class Config:
 
     def __init__(self) -> None:
         self.ambiente = os.getenv("ENVIRONMENT", "development")
-        self.debug = _bool("DEBUG")
 
         # Postgres — compartilhado com RREO e RGF; a separação da DCA é por prefixo de tabela.
         self.postgres_host = os.getenv("POSTGRES_HOST", "localhost")
@@ -78,7 +77,6 @@ class Config:
         # Operação
         self.discord_webhook = os.getenv("DISCORD_WEBHOOK_URL", "")
         self.swagger = _bool("ENABLE_SWAGGER")
-        self.swagger_publico = _bool("ENABLE_SWAGGER_PUBLIC", True)
         self.cors_origens_raw = os.getenv("CORS_ORIGINS", "")
 
     @property

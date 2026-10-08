@@ -19,7 +19,7 @@ Pendências em `proposal.md`.**
 
 ## 3. VERIFY
 - [ ] 3.1 Produção: Cuitegi/2025 com `use_siconfi=true` → `L27` = 4486188.21, `L60` = 4479755.61
-- [ ] 3.2 Remover `PUBLICSOFT_AUDIT_URL` do `.env.example` (sem uso)
+- [x] 3.2 Remover `PUBLICSOFT_AUDIT_URL` do `.env.example` (sem uso)
 
 ## 4. Arquivamento
 - [ ] 4.1 Mesclar deltas em `openspec/specs/` após a aprovação do PO

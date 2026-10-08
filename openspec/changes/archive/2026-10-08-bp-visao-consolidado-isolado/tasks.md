@@ -19,7 +19,7 @@
 ## 3. VERIFY
 - [x] 3.1 `python -m pytest`, `python -m ruff check .`, validador sem erro `bp.*`
 - [x] 3.2 Cuitegi 2025 real: isolado = planilha (regressão); consolidado medido e registrado na auditoria
-- [ ] 3.3 Front `dca-bp-visao-consolidado` contra a API local — não executada; testes do front com dublê (754 passed). Conferência no navegador fica com o PO.
+- [x] 3.3 Front `dca-bp-visao-consolidado` contra a API local — conferido no navegador pelo PO em 2026-10-08: consolidado correto.
 
 ## 4. Arquivamento
 - [x] 4.1 Mesclar delta, atualizar `CENARIOS_ESPERADOS`, arquivar e atualizar `openspec/AGENTS.md`
