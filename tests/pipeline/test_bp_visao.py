@@ -83,7 +83,7 @@ def test_trocar_a_visao_nao_processa(repo, lock, jobs):
     assert (_l1(isolado.json()), _equilibrio(isolado.json())) == (
         Decimal("100.00"), Decimal("0.00"))
     assert (_l1(consolidado.json()), _equilibrio(consolidado.json())) == (
-        Decimal("0.00"), Decimal("-100.00"))
+        Decimal("100.00"), Decimal("0.00"))
     assert "visoes" not in consolidado.json()
 
 

@@ -26,6 +26,8 @@ def test_cuitegi_2025_igual_ao_iab_declarado(apurar_bp):
     assert celula(resultado, PRINCIPAL, "L15") == Decimal("76314331.92")
     assert celula(resultado, PRINCIPAL, "L32") == Decimal("-45644857.64")
     assert resultado.diagnostico.equilibrio["exercicio_atual"] == Decimal("0.00")
+    assert resultado.visoes["consolidado"].matriz == resultado.matriz
+    assert resultado.visoes["consolidado"].equilibrio == resultado.diagnostico.equilibrio
 
 
 def test_conta_intra_entra_na_linha(apurar_bp):

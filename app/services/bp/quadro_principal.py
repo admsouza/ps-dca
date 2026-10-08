@@ -165,13 +165,14 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
         }
         return atual, anterior_, matriz_
 
+    # ponytail: as duas visões incluem todas as contas (PO 2026-10-08).
+    # Os filtros visao=consolidado ficam na regra e não entram na apuração.
     atual, coluna_anterior, matriz = apurar_visao(_sem_visao(mapa, CONSOLIDADO))
-    _, _, matriz_consolidada = apurar_visao(mapa)
 
     return Resultado(
         mapa=mapa,
         matriz=matriz,
-        visoes={CONSOLIDADO: VisaoBP(matriz_consolidada, _equilibrio(mapa, matriz_consolidada))},
+        visoes={CONSOLIDADO: VisaoBP(matriz, _equilibrio(mapa, matriz))},
         procedencia=Procedencia(
             documento=mapa.vigencia.documento,
             edicao=mapa.vigencia.edicao,

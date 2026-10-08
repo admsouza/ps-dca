@@ -261,9 +261,10 @@ omissão.
 O Balanço Patrimonial SHALL reproduzir em centavos o `DCA-Anexo I-AB` que o ente declara ao SICONFI
 (decisão do PO, 2026-10-07; aceite do projeto: espelho 1:1 contra `tt/dca`). Para isso:
 
-- na visão **isolado** (padrão), as linhas do Quadro Principal NÃO DEVEM excluir as contas intra-OFSS
-  (5º nível = 2); o resultado é o declarado. Revoga a decisão P8-a. As exclusões valem só na visão
-  `consolidado` (`bp-visao-consolidado-isolado`, PO 2026-10-08).
+- nas visões **isolado** (padrão) e **consolidado**, as linhas do Quadro Principal NÃO DEVEM excluir
+  as contas intra-OFSS (5º nível = 2); o resultado é o declarado. Revoga a execução das exclusões
+  da visão `consolidado` (`bp-visao-consolidado-isolado`, PO 2026-10-08; `bp-consolidado-sem-exclusao`,
+  PO 2026-10-08).
 - `L5` Passivo Financeiro SHALL ser `2.1` Financeiro + `2.2` Financeiro + `6.3.1.1` + `6.3.1.5` +
   `6.3.1.7.1`, a composição que o `I-AB` detalha. NÃO DEVE incluir `6.2.2.1.3.01` nem
   `6.2.2.1.3.05`. Revoga a decisão P7-a.
@@ -274,8 +275,8 @@ Vale para as duas colunas e para as duas origens da coluna do exercício anterio
 
 - **GIVEN** a MSC de encerramento de Cuitegi (`2505204`), 2025
 - **WHEN** o BP é apurado
-- **THEN** `L1` e `L15` valem 76.314.331,92, `L32` vale −45.644.857,64
-- **AND** `diagnostico.equilibrio` é 0,00 no exercício atual
+- **THEN** `L1` e `L15` valem 76.314.331,92 nas visões `isolado` e `consolidado`, e `L32` vale −45.644.857,64
+- **AND** `diagnostico.equilibrio` é 0,00 no exercício atual nas duas visões
 
 #### Scenario: conta intra entra na linha
 
@@ -298,22 +299,22 @@ Vale para as duas colunas e para as duas origens da coluna do exercício anterio
 
 ### Requirement: Visão consolidada pelas exclusões do IPC 04
 
-As exclusões da coluna **Exclusões** do Quadro Principal do IPC 04 SHALL ser regras executáveis aplicadas
-**somente** na visão `consolidado` (IPC 04 item 8). A exclusão da `L34` SHALL ser `2.3.2.1.2.00.00`
-(o `2.3.2.0.2.00.00` do PDF não existe no PCASP). Os quadros F/P, Compensação e Superávit NÃO DEVEM
-variar com a visão. O equilíbrio `L1 − L15` SHALL ser publicado por visão; diferença é achado, nunca ajuste.
+A visão `consolidado` SHALL incluir as mesmas contas da visão `isolado`. Os filtros `visao: consolidado`
+do Quadro Principal (coluna Exclusões do IPC 04, `L34` com `2.3.2.1.2.00.00`) permanecem declarados na
+regra e NÃO DEVEM ser aplicados na apuração (PO 2026-10-08). Os quadros F/P, Compensação e Superávit
+NÃO DEVEM variar com a visão. O equilíbrio `L1 − L15` SHALL ser o mesmo nas duas visões.
 
-#### Scenario: conta intra sai só no consolidado
+#### Scenario: conta intra entra nas duas visões
 
 - **GIVEN** `121120100` (intra, 90,00) e `121110101` (consolidação, 10,00)
 - **WHEN** o BP é apurado
-- **THEN** `L10` é 100,00 na visão `isolado` e 10,00 na visão `consolidado`
+- **THEN** `L10` é 100,00 na visão `isolado` e 100,00 na visão `consolidado`
 
-#### Scenario: L34 exclui a 2.3.2.1.2 no consolidado
+#### Scenario: L34 inclui a 2.3.2.1.2 nas duas visões
 
 - **GIVEN** `232110000` = 7,00 e `232120000` = 3,00
 - **WHEN** o BP é apurado
-- **THEN** `L34` é 10,00 no `isolado` e 7,00 no `consolidado`
+- **THEN** `L34` é 10,00 no `isolado` e 10,00 no `consolidado`
 
 #### Scenario: quadro F/P igual nas duas visões
 
@@ -321,11 +322,11 @@ variar com a visão. O equilíbrio `L1 − L15` SHALL ser publicado por visão; 
 - **WHEN** o BP é apurado
 - **THEN** F/P `L2` e `L3` são iguais nas duas visões
 
-#### Scenario: equilíbrio por visão
+#### Scenario: equilíbrio igual nas duas visões
 
 - **GIVEN** intra só no ativo (`121120100` = 100,00) e passivo sem intra
 - **WHEN** o BP é apurado
-- **THEN** `equilibrio` é 0,00 no `isolado` e −100,00 no `consolidado`, sem ajuste
+- **THEN** `equilibrio` é 0,00 no `isolado` e 0,00 no `consolidado`
 
 ### Requirement: Uma apuração, duas visões servidas
 
