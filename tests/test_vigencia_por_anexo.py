@@ -57,6 +57,37 @@ def test_semente_e_idempotente(semear):
     assert len(repo.publicadas) == quantas
 
 
+def test_semente_divergente_publica_o_mes_seguinte(semear):
+    """YAML novo no boot publica o mês seguinte e deixa a semente anterior intacta."""
+    from app.infra.regras.vigencias import resolver
+
+    repo = RepoVigenciasFake()
+    semear(repo)
+    bp = next(r for r in repo.publicadas if r["anexo"] == "BP" and r["mes_vigencia"] == 1)
+    bp["linhas"] = [{**bp["linhas"][0], "rotulo": "semente antiga"}] + bp["linhas"][1:]
+    repo.inserir({
+        "anexo": "BP",
+        "ano_vigencia": 2020,
+        "mes_vigencia": 5,
+        "versao": "2020-05",
+        "linhas": bp["linhas"],
+        "origem": "api-admin",
+    })
+
+    assert semear(repo) == 1
+
+    bps = [r for r in repo.publicadas if r["anexo"] == "BP"]
+    assert [(r["ano_vigencia"], r["mes_vigencia"], r["origem"]) for r in bps] == [
+        (2020, 1, "seed-yaml"),
+        (2020, 5, "api-admin"),
+        (2020, 2, "seed-yaml"),
+    ]
+    assert bps[0]["linhas"][0]["rotulo"] == "semente antiga"
+    assert bps[2]["linhas"][0]["rotulo"] != "semente antiga"
+    assert resolver(repo, "BP", 2025)["origem"] == "api-admin"
+    assert semear(repo) == 0
+
+
 def test_bf_carregado_do_banco_confere_com_o_yaml(semear):
     """Scenario: apuração do BF deixa de cair no YAML
 

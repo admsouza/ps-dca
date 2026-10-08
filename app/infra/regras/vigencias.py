@@ -196,8 +196,9 @@ def _completar_apresentacao(linhas: tuple[Linha, ...], exercicio: int,
 def semear(repo: RepoVigencias, base: Path | None = None, exercicio: int | None = None) -> int:
     """Publica o mapeamento versionado de **cada anexo implementado**, como `seed-yaml`.
 
-    Idempotente: vigência já publicada é mantida — o `PRIMARY KEY` recusa a segunda, e a recusa é
-    tratada como "já semeado", não como erro de boot.
+    Idempotente enquanto o YAML for o mesmo da última semente daquele ano. Se o conteúdo divergir,
+    publica o próximo mês livre da edição — a vigência anterior permanece. O `PRIMARY KEY` recusa
+    reescrever, e a recusa não derruba o boot.
 
     Era só o Balanço Orçamentário. Com o BF entregue, o anexo não semeado apura pelo YAML e avisa a
     cada job — e, pior, os dois anexos passariam a ter origens de regra diferentes no dia em que
@@ -220,21 +221,49 @@ def semear(repo: RepoVigencias, base: Path | None = None, exercicio: int | None 
             continue
 
         ano = _ano_da_edicao(mapa.vigencia.edicao)
-        try:
-            publicar(
-                repo,
-                anexo=anexo.codigo,
-                ano=ano,
-                mes=1,
-                linhas=[_achatar(linha) for linha in mapa.linhas],
-                origem="seed-yaml",
-                documento=mapa.vigencia.documento,
-            )
-        except PublicacaoDestrutiva:
-            logger.info("semente já aplicada para %s %s — nada a fazer", anexo.codigo, ano)
-            continue
-        publicadas += 1
+        if _publicar_semente(
+            repo,
+            anexo.codigo,
+            ano,
+            [_achatar(linha) for linha in mapa.linhas],
+            mapa.vigencia.documento,
+        ):
+            publicadas += 1
     return publicadas
+
+
+def _publicar_semente(repo: RepoVigencias, anexo: str, ano: int, linhas: list[dict],
+                      documento: str | None) -> bool:
+    """Insere a semente se a última deste ano divergir do YAML. Devolve se inseriu.
+
+    ponytail: API e worker sobem juntos e disputam o mesmo mês; o perdedor relê a linha.
+    Se esse mês já tem outro conteúdo, não avança — uma vigência posterior continuaria perdendo.
+    """
+    sementes = [v for v in repo.listar(anexo)
+                if v.get("origem") == "seed-yaml" and v["ano_vigencia"] == ano]
+    if sementes and max(sementes, key=lambda v: v["mes_vigencia"])["linhas"] == linhas:
+        logger.info("semente já aplicada para %s %s — nada a fazer", anexo, ano)
+        return False
+
+    mes = max((v["mes_vigencia"] for v in sementes), default=0) + 1
+    if mes > 12:
+        logger.warning("sem mês livre para semear %s/%s", anexo, ano)
+        return False
+    try:
+        publicar(
+            repo, anexo=anexo, ano=ano, mes=mes, linhas=linhas,
+            origem="seed-yaml", documento=documento,
+        )
+    except PublicacaoDestrutiva:
+        ocupada = next((v for v in repo.listar(anexo)
+                        if (v["ano_vigencia"], v["mes_vigencia"]) == (ano, mes)), None)
+        if ocupada is not None and ocupada["linhas"] == linhas:
+            logger.info("semente já aplicada para %s %s-%02d — nada a fazer", anexo, ano, mes)
+        else:
+            logger.info("mês %s-%02d de %s já publicado com outro conteúdo — semente não avança",
+                        ano, mes, anexo)
+        return False
+    return True
 
 
 # ─── tradução entre o shape achatado (jsonb) e o modelo do domínio ───────────
