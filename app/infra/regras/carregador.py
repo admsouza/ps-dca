@@ -182,6 +182,7 @@ def _filtro(dados: dict) -> Filtro:
         campo=dados["field"],
         operador=dados["operator"],
         valores=tuple(v["pattern"] for v in dados.get("values") or [] if v.get("pattern")),
+        visao=dados.get("visao", ""),
     )
 
 

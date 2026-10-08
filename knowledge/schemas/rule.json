@@ -278,6 +278,12 @@
             "not_in"
           ]
         },
+        "visao": {
+          "enum": [
+            "consolidado"
+          ],
+          "description": "Opcional (BP, IPC 04 item 8): o filtro só vale na visão consolidada. Sem o campo, vale sempre."
+        },
         "values": {
           "type": "array",
           "minItems": 1,

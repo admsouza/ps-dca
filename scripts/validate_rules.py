@@ -240,6 +240,9 @@ def _validar_filtros(rel, regra, codigos_stn, excecoes, rule_id, arquivo, linha)
                 rel.erro(f"campo de filtro não suportado para o {documento or 'IPC07'}: {campo}",
                          rule_id=rule_id, arquivo=arquivo, linha=linha)
                 continue
+            if filtro.get("visao") and documento != "IPC04":
+                rel.erro("filtro com visao só é aceito em regra do IPC04",
+                         rule_id=rule_id, arquivo=arquivo, linha=linha)
             if campo == "fonte_recurso":
                 _validar_fontes(rel, filtro, rule_id, arquivo, linha)
             if operador not in OPERADORES:

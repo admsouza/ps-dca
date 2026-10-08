@@ -55,9 +55,11 @@ class Anterior(StrEnum):
     MSCE = "msce_exercicio_anterior"
 
 
+CONSOLIDADO = "consolidado"
+
 POLICIES_NAO_APLICADAS = (
-    "itens 8 e 9 (intraorçamentárias de 5º nível = 2 criadas pelo ente): declarados, não "
-    "executados (P6-a); as exclusões explícitas de cada linha continuam aplicadas",
+    "item 9 (intraorçamentárias de 5º nível = 2 criadas pelo ente): declarado, não "
+    "executado (P6-a); as exclusões do item 8 valem só na visão consolidada",
 )
 
 
@@ -94,11 +96,20 @@ class Diagnostico:
 
 
 @dataclass
+class VisaoBP:
+    matriz: dict[str, dict[str, Decimal | None]]
+    equilibrio: dict[str, Decimal]
+
+
+@dataclass
 class Resultado:
+    """`matriz` e `diagnostico.equilibrio` são os da visão isolada (espelho do `I-AB`)."""
+
     matriz: dict[str, dict[str, Decimal | None]]
     procedencia: Procedencia
     diagnostico: Diagnostico
     mapa: MapaBO | None = None
+    visoes: dict[str, VisaoBP] = field(default_factory=dict)
 
 
 @dataclass
@@ -129,25 +140,38 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
             matriz=origem.matriz, tipo_saldo=origem.tipo_saldo,
         )]
 
-    atual = _apurar_exercicio(mapa, da_msc(exercicio), direcao, COLUNA_ATUAL)
+    # A fonte é lida uma vez; as duas visões são apuradas sobre os mesmos registros.
+    registros_atual = da_msc(exercicio)
     publicado: list[dict] = []
+    registros_anterior: list[Registro] = []
     if anterior is Anterior.MSCE:
-        coluna_anterior = _apurar_exercicio(mapa, da_msc(exercicio - 1), direcao, COLUNA_ANTERIOR)
+        registros_anterior = da_msc(exercicio - 1)
     else:
         if dca is None:
             from app.infra.siconfi.dca import SiconfiDCA
             dca = SiconfiDCA()
         publicado = dca.itens(ente, exercicio - 1)
-        coluna_anterior = _apurar_publicado(mapa, publicado, direcao)
-    matriz = {
-        linha.id: {COLUNA_ATUAL: atual.valores[linha.id],
-                   COLUNA_ANTERIOR: coluna_anterior.valores[linha.id]}
-        for linha in mapa.linhas
-    }
+
+    def apurar_visao(m: MapaBO) -> tuple[_Coluna, _Coluna, dict]:
+        atual = _apurar_exercicio(m, registros_atual, direcao, COLUNA_ATUAL)
+        if anterior is Anterior.MSCE:
+            anterior_ = _apurar_exercicio(m, registros_anterior, direcao, COLUNA_ANTERIOR)
+        else:
+            anterior_ = _apurar_publicado(m, publicado, direcao)
+        matriz_ = {
+            linha.id: {COLUNA_ATUAL: atual.valores[linha.id],
+                       COLUNA_ANTERIOR: anterior_.valores[linha.id]}
+            for linha in m.linhas
+        }
+        return atual, anterior_, matriz_
+
+    atual, coluna_anterior, matriz = apurar_visao(_sem_visao(mapa, CONSOLIDADO))
+    _, _, matriz_consolidada = apurar_visao(mapa)
 
     return Resultado(
         mapa=mapa,
         matriz=matriz,
+        visoes={CONSOLIDADO: VisaoBP(matriz_consolidada, _equilibrio(mapa, matriz_consolidada))},
         procedencia=Procedencia(
             documento=mapa.vigencia.documento,
             edicao=mapa.vigencia.edicao,
@@ -174,6 +198,14 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
             conferencia_publicado=_conferencia(mapa, matriz, publicado),
         ),
     )
+
+
+def _sem_visao(mapa: MapaBO, visao: str) -> MapaBO:
+    """O mapa sem os filtros que só valem na `visao` (a isolada é o mapa sem os consolidados)."""
+    return replace(mapa, linhas=tuple(
+        linha._replace(filtros=tuple(f for f in linha.filtros if f.visao != visao))
+        for linha in mapa.linhas
+    ))
 
 
 def _apurar_publicado(mapa: MapaBO, itens: list[dict], direcao) -> _Coluna:

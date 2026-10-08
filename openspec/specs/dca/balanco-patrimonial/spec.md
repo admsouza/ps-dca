@@ -44,7 +44,7 @@ diferença em `diagnostico.equilibrio`. Quebra de equilíbrio NÃO DEVE impedir 
 compensada em nenhuma linha.
 
 O BP espelha o `DCA-Anexo I-AB` declarado (`bp-espelho-iab`, PO 2026-10-07): as exclusões
-intra-OFSS do IPC 04 não são aplicadas, e o balanço fecha. Diferença diferente de zero aponta
+intra-OFSS do IPC 04 não são aplicadas na visão isolado (padrão), e o balanço fecha. Diferença diferente de zero aponta
 inconsistência na matriz enviada pelo ente. Revoga a decisão P8-a de `bp-apuracao-f1`.
 
 #### Scenario: balanço fecha
@@ -138,10 +138,18 @@ as parcelas apuradas e nomear as bloqueadas no diagnóstico.
 
 #### Scenario: linha bloqueada não zera o total
 
-- **GIVEN** `L34` `review_required` e as demais linhas do PL apuradas
+- **GIVEN** uma linha do PL com `review.blocker` e as demais linhas do PL apuradas
 - **WHEN** `L32` Patrimônio Líquido é calculada
 - **THEN** `L32` é a soma das parcelas apuradas
-- **AND** `L34` aparece no diagnóstico como parcela bloqueada
+- **AND** a linha bloqueada aparece no diagnóstico como parcela bloqueada
+
+#### Scenario: L34 apurada pela 2.3.2
+
+- **GIVEN** saldos em `2.3.2` (inclusive o intra `2.3.2.1.2`, literal corrigido do `2.3.2.0.2.00.00`
+  do IPC 04 por decisão do PO em 2026-10-08)
+- **WHEN** o BP é apurado
+- **THEN** `L34` é o saldo de `2.3.2`, sem exclusão intra (espelho do `I-AB`)
+- **AND** `L32` inclui `L34`
 
 ### Requirement: Conferência contra o DCA-Anexo I-AB
 
@@ -253,8 +261,9 @@ omissão.
 O Balanço Patrimonial SHALL reproduzir em centavos o `DCA-Anexo I-AB` que o ente declara ao SICONFI
 (decisão do PO, 2026-10-07; aceite do projeto: espelho 1:1 contra `tt/dca`). Para isso:
 
-- as linhas do Quadro Principal NÃO DEVEM excluir as contas intra-OFSS (5º nível = 2); o resultado é o
-  consolidado declarado. Revoga a decisão P8-a.
+- na visão **isolado** (padrão), as linhas do Quadro Principal NÃO DEVEM excluir as contas intra-OFSS
+  (5º nível = 2); o resultado é o declarado. Revoga a decisão P8-a. As exclusões valem só na visão
+  `consolidado` (`bp-visao-consolidado-isolado`, PO 2026-10-08).
 - `L5` Passivo Financeiro SHALL ser `2.1` Financeiro + `2.2` Financeiro + `6.3.1.1` + `6.3.1.5` +
   `6.3.1.7.1`, a composição que o `I-AB` detalha. NÃO DEVE incluir `6.2.2.1.3.01` nem
   `6.2.2.1.3.05`. Revoga a decisão P7-a.
@@ -286,3 +295,67 @@ Vale para as duas colunas e para as duas origens da coluna do exercício anterio
 - **GIVEN** `6.2.2.1.3.05` = 48.335,00 e `6.3.1.7.1` = 48.335,00 (Cuitegi 2024)
 - **WHEN** `L5` é apurada
 - **THEN** só `6.3.1.7.1` entra, e `L5` é 6.618.515,01 com `2.1` F = 6.496.569,60 e `6.3.1.1` = 73.610,41
+
+### Requirement: Visão consolidada pelas exclusões do IPC 04
+
+As exclusões da coluna **Exclusões** do Quadro Principal do IPC 04 SHALL ser regras executáveis aplicadas
+**somente** na visão `consolidado` (IPC 04 item 8). A exclusão da `L34` SHALL ser `2.3.2.1.2.00.00`
+(o `2.3.2.0.2.00.00` do PDF não existe no PCASP). Os quadros F/P, Compensação e Superávit NÃO DEVEM
+variar com a visão. O equilíbrio `L1 − L15` SHALL ser publicado por visão; diferença é achado, nunca ajuste.
+
+#### Scenario: conta intra sai só no consolidado
+
+- **GIVEN** `121120100` (intra, 90,00) e `121110101` (consolidação, 10,00)
+- **WHEN** o BP é apurado
+- **THEN** `L10` é 100,00 na visão `isolado` e 10,00 na visão `consolidado`
+
+#### Scenario: L34 exclui a 2.3.2.1.2 no consolidado
+
+- **GIVEN** `232110000` = 7,00 e `232120000` = 3,00
+- **WHEN** o BP é apurado
+- **THEN** `L34` é 10,00 no `isolado` e 7,00 no `consolidado`
+
+#### Scenario: quadro F/P igual nas duas visões
+
+- **GIVEN** `111110100` F = 26.431.637,72 e `121120100` P = 29.230.791,29
+- **WHEN** o BP é apurado
+- **THEN** F/P `L2` e `L3` são iguais nas duas visões
+
+#### Scenario: equilíbrio por visão
+
+- **GIVEN** intra só no ativo (`121120100` = 100,00) e passivo sem intra
+- **WHEN** o BP é apurado
+- **THEN** `equilibrio` é 0,00 no `isolado` e −100,00 no `consolidado`, sem ajuste
+
+### Requirement: Uma apuração, duas visões servidas
+
+Um processamento do BP SHALL produzir as duas visões a partir de uma única leitura da fonte e gravá-las no
+mesmo registro de cache. `GET /dca/BP` SHALL aceitar `visao` (`isolado` | `consolidado`, padrão `isolado`)
+e servir a visão pedida sem enfileirar job. `reprocessar` e o percurso NÃO recebem `visao`.
+
+#### Scenario: trocar a visão não processa
+
+- **GIVEN** BP de Cuitegi 2025 em cache `ok`
+- **WHEN** o front lê `visao=isolado` e depois `visao=consolidado`
+- **THEN** as duas respostas são `200` do mesmo registro, sem job, com `visao` ecoada no corpo
+
+#### Scenario: fonte lida uma vez
+
+- **WHEN** o BP é apurado com origem `msce_exercicio_anterior`
+- **THEN** a fonte é consultada uma vez por ano e classe, não uma vez por visão
+
+#### Scenario: visão inválida
+
+- **WHEN** `GET /dca/BP?visao=orgao`
+- **THEN** `422` "visao inválida"
+
+#### Scenario: visão em outro anexo
+
+- **WHEN** `GET /dca/BF?visao=consolidado`
+- **THEN** `422`
+
+#### Scenario: cache sem a visão consolidada
+
+- **GIVEN** BP em cache gravado antes desta change
+- **WHEN** `GET /dca/BP?visao=consolidado`
+- **THEN** `409` pedindo reprocessar o BP; `visao=isolado` continua `200`

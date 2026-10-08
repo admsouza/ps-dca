@@ -183,14 +183,29 @@ def test_compensacao_fora_de_escopo(apurar_bp):
 
 def test_linha_bloqueada_nao_zera_o_total(apurar_bp):
     """Scenario: linha bloqueada não zera o total"""
+    from dataclasses import replace
+
+    from app.infra.regras.carregador import carregar
+    mapa = carregar(EXERCICIO, demonstrativo="bp")
+    mapa = replace(mapa, linhas=tuple(
+        linha._replace(bloqueio="x") if linha.quadro == PRINCIPAL and linha.codigo == "L34"
+        else linha for linha in mapa.linhas))
     fonte = FontePorAno({2025: {2: [fp("231110000", "50.00"), fp("232110000", "7.00")]}})
-    resultado = apurar_bp(ENTE, EXERCICIO, fonte)
+    resultado = apurar_bp(ENTE, EXERCICIO, fonte, mapa=mapa)
     assert celula(resultado, PRINCIPAL, "L34") is None
     assert celula(resultado, PRINCIPAL, "L32") == Decimal("50.00")
     l34 = next(linha.id for linha in resultado.mapa.linhas
                if linha.quadro == PRINCIPAL and linha.codigo == "L34")
     assert l34 in {n.rule_id for n in resultado.diagnostico.nao_apuradas}
 
+
+def test_l34_apurada_pela_232(apurar_bp):
+    """Scenario: L34 apurada pela 2.3.2"""
+    fonte = FontePorAno({2025: {2: [fp("231110000", "50.00"), fp("232110000", "7.00"),
+                                    fp("232120000", "3.00")]}})   # intra entra (espelho do I-AB)
+    resultado = apurar_bp(ENTE, EXERCICIO, fonte)
+    assert celula(resultado, PRINCIPAL, "L34") == Decimal("10.00")
+    assert celula(resultado, PRINCIPAL, "L32") == Decimal("60.00")
 
 # ─── Casos de erro ───────────────────────────────────────────────────────────
 

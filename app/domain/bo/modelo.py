@@ -42,6 +42,7 @@ class Filtro(NamedTuple):
     campo: str                    # conta_contabil | natureza_receita | natureza_despesa | ...
     operador: str                 # in | not_in
     valores: tuple[str, ...]      # padrões normalizados
+    visao: str = ""               # "consolidado" | "": só vale nesta visão (BP, IPC 04 item 8)
 
 
 class RefColuna(NamedTuple):

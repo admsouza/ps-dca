@@ -94,7 +94,7 @@ def para_dados(resultado) -> dict:
     """`Resultado` como dado puro, pronto para JSONB: valores, template e rastro."""
     procedencia = resultado.procedencia
     diagnostico = resultado.diagnostico
-    return {
+    dados = {
         "linhas": template(resultado.mapa),
         "matriz": {
             rule_id: {coluna: _valor(valor) for coluna, valor in celulas.items()}
@@ -130,3 +130,12 @@ def para_dados(resultado) -> dict:
                                          "conferencia_publicado")),
         },
     }
+    # Visões extras (BP): só o demonstrativo que as produz as publica; BO e BF saem como antes.
+    if getattr(resultado, "visoes", None):
+        dados["visoes"] = {
+            nome: {"matriz": {rule_id: {coluna: _valor(v) for coluna, v in celulas.items()}
+                              for rule_id, celulas in visao.matriz.items()},
+                   "equilibrio": {coluna: _valor(v) for coluna, v in visao.equilibrio.items()}}
+            for nome, visao in resultado.visoes.items()
+        }
+    return dados

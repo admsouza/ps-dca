@@ -255,10 +255,8 @@ def _achatar(linha: Linha) -> dict:
         "nivel": linha.nivel,
         "ordem": linha.ordem,
         "apenas_natureza": linha.apenas_natureza,
-        "filtros": [{"campo": f.campo, "operador": f.operador, "valores": list(f.valores)}
-                    for f in linha.filtros],
-        "exclusoes": [[{"campo": f.campo, "operador": f.operador, "valores": list(f.valores)}
-                       for f in grupo] for grupo in linha.exclusoes],
+        "filtros": [_achatar_filtro(f) for f in linha.filtros],
+        "exclusoes": [[_achatar_filtro(f) for f in grupo] for grupo in linha.exclusoes],
         "colunas": [
             {
                 "id": c.id,
@@ -273,6 +271,13 @@ def _achatar(linha: Linha) -> dict:
     }
     if linha.bloqueio:
         dado["bloqueio"] = linha.bloqueio
+    return dado
+
+
+def _achatar_filtro(f: Filtro) -> dict:
+    dado = {"campo": f.campo, "operador": f.operador, "valores": list(f.valores)}
+    if f.visao:
+        dado["visao"] = f.visao
     return dado
 
 
@@ -307,7 +312,8 @@ def _linha(dado: dict) -> Linha:
 
 def _filtro(dado: dict) -> Filtro:
     return Filtro(campo=dado["campo"], operador=dado["operador"],
-                  valores=tuple(dado.get("valores") or []))
+                  valores=tuple(dado.get("valores") or []),
+                  visao=dado.get("visao", ""))
 
 
 def _coluna(dado: dict) -> Coluna:

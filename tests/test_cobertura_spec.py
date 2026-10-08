@@ -44,7 +44,7 @@ CENARIOS_ESPERADOS = {
     # 16 da apuração do BP (`bp-apuracao-f1`) + 7 da origem publicada
     # (`bp-anterior-publicado-siconfi`)
     # + 4 do espelho do I-AB, − 1 da exclusão intra revogada (`bp-espelho-iab`).
-    "dca/balanco-patrimonial": 26,
+    "dca/balanco-patrimonial": 36,
 }
 
 # Capabilities cuja fase TEST já começou — só delas se exige teste por cenário.

@@ -1,7 +1,8 @@
 """Base canônica do Balanço Patrimonial (IPC 04, ed. 2020-01), fechada por `bp-apuracao-f1`.
 
-Decisões do PO de 2026-10-07: P2 (`L4` com `11382`), P3 (`L34` segue bloqueada) e P4 (atributo
-F/P por termo de conta, como o IPC 04 escreve). Evidência: `docs/evidencia-bp-fp-2025.md`.
+Decisões do PO de 2026-10-07: P2 (`L4` com `11382`), P3 (`L34` bloqueada; destravada em 2026-10-08)
+e P4 (atributo F/P por termo de conta, como o IPC 04 escreve).
+Evidência: `docs/evidencia-bp-fp-2025.md`.
 """
 from __future__ import annotations
 
@@ -51,22 +52,30 @@ def test_termos_qualificados_do_quadro_fp():
         assert termos(f"{prefixo}.{codigo}") == termos(f"{prefixo}.{codigo}", "exercicio_anterior")
 
 
-def test_quadro_principal_sem_exclusao_intra():
-    """Requisito: bp-espelho-iab — nenhuma linha exclui intra (5º nível = 2); literal do PDF
-    (inclusive `1.1.3.8.2.000.00` da L4) fica só na evidência."""
+def test_exclusao_intra_so_na_visao_consolidada():
+    """Requisito: bp-visao-consolidado-isolado — toda exclusão intra do Quadro Principal é filtro
+    `visao: consolidado`; filtro sem visão não existe (valeria nas duas). Literal do PDF
+    (inclusive `1.1.3.8.2.000.00` da L4) fica na evidência."""
     l4 = _base()["bp.quadro_principal.ativo.l4"]
-    assert [r for r in _base().values() if r["rule_id"].startswith("bp.quadro_principal")
-            and r.get("filters")] == []
+    com_filtro = [r for r in _base().values() if r["rule_id"].startswith("bp.quadro_principal")
+                  and r.get("filters")]
+    assert len(com_filtro) == 21
+    for r in com_filtro:
+        assert {f.get("visao") for f in r["filters"]} == {"consolidado"}, r["rule_id"]
+        assert "só na visão consolidada" in r["review"]["reason"], r["rule_id"]
     assert "1.1.3.8.2.000.00" in l4["evidence"]["text"]
     assert l4["status"] == "extracted"
     assert "blocker" not in (l4.get("review") or {})
 
 
-def test_l34_segue_bloqueada_por_decisao_p3():
-    """Requisito: P3-b — `2.3.2.0.2` fora do PCASP; `2.3.2` medido 0,00 em Cuitegi e JP."""
+def test_l34_apurada_pela_232():
+    """Requisito: PO 2026-10-08 — `2.3.2.0.2` do PDF vira `2.3.2.1.2`; L34 apura `2.3.2`."""
     l34 = _base()["bp.quadro_principal.passivo.l34"]
-    assert l34["status"] == "review_required"
-    assert l34["review"]["blocker"]
+    assert l34["status"] == "extracted"
+    assert "blocker" not in l34["review"]
+    assert "2.3.2.1.2.00.00" in l34["review"]["reason"]
+    assert [c["pattern"] for c in l34["columns"]["exercicio_atual"]["accounts"]] == ["232"]
+    assert [v["pattern"] for v in l34["filters"][0]["values"]] == ["23212"]
 
 
 def test_atributo_fp_e_recusado_fora_do_ipc04(base, validar):
@@ -77,3 +86,11 @@ def test_atributo_fp_e_recusado_fora_do_ipc04(base, validar):
     rel = validar(base(quadro_principal=[r]))
     linhas = [m for m in mensagens(rel).splitlines() if "financeiro_permanente" in m]
     assert any("IPC04" in m for m in linhas), mensagens(rel)
+
+
+def test_visao_do_filtro_e_recusada_fora_do_ipc04(base, validar):
+    """Requisito: `visao` no filtro é vocabulário do IPC 04; numa regra do IPC 07 é erro."""
+    r = regra(filters=[{"field": "conta_contabil", "operator": "not_in", "visao": "consolidado",
+                        "values": [{"literal": "1.1.1.1.2.00.00", "pattern": "11112"}]}])
+    rel = validar(base(quadro_principal=[r]))
+    assert any("visao" in m for m in mensagens(rel).splitlines()), mensagens(rel)

@@ -113,6 +113,37 @@ class CorpoAnterior(BaseModel):
 ORIGENS_BP = ("publicado_siconfi", "msce_exercicio_anterior")
 
 
+VISOES_BP = ("isolado", "consolidado")
+
+
+def _visao(
+    anexo: Annotated[str, Depends(_anexo_valido)],
+    visao: Annotated[str | None, Query(description="BP: `isolado` (padrão), `consolidado`")] = None,
+) -> str | None:
+    """Escolha de leitura: fora da identidade do pedido. `None` fora do BP."""
+    if anexo != "BP":
+        if visao is not None:
+            raise _erro_422("visao só é aceita no BP")
+        return None
+    if visao is not None and visao not in VISOES_BP:
+        raise _erro_422("visao inválida")
+    return visao or VISOES_BP[0]
+
+
+def _na_visao(resultado: dict, visao: str) -> dict:
+    """O corpo do BP na visão pedida: troca `matriz` e `equilibrio` e ecoa `visao`."""
+    corpo = {chave: valor for chave, valor in resultado.items() if chave != "visoes"}
+    if visao == "consolidado":
+        consolidado = (resultado.get("visoes") or {}).get("consolidado")
+        if consolidado is None:
+            raise HTTPException(status.HTTP_409_CONFLICT,
+                                detail="reprocesse o BP para obter a visão consolidada")
+        corpo["matriz"] = consolidado["matriz"]
+        corpo["diagnostico"] = {**resultado["diagnostico"],
+                                "equilibrio": consolidado["equilibrio"]}
+    return {**corpo, "visao": visao}
+
+
 def _parametros_bf(
     anexo: Annotated[str, Depends(_anexo_valido)],
     origem: Annotated[str | None, Query(alias="origem_exercicio_anterior")] = None,
@@ -182,7 +213,7 @@ def _parametros_g8_do_corpo(corpo: CorpoAnterior) -> dict:
 
 async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo,
                    forcar: bool, solicitante: int | None, parametros: dict | None = None,
-                   fonte: FontePedido | None = None):
+                   fonte: FontePedido | None = None, visao: str | None = None):
     """Caminho comum de leitura e reprocessamento. Difere só em `forcar`."""
     if fonte is not None:
         parametros = {**(parametros or {}), "fonte": fonte.nome}
@@ -221,8 +252,9 @@ async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo
 
     if resposta.status == 200:
         motivos = resposta.motivos_desatualizado or []
+        resultado = _na_visao(resposta.resultado, visao) if visao else resposta.resultado
         return JSONResponse(status_code=200, content={
-            **resposta.resultado, "desatualizado": bool(motivos),
+            **resultado, "desatualizado": bool(motivos),
             "motivos_desatualizado": motivos,
         })
 
@@ -415,9 +447,11 @@ async def obter_anexo(
     repo: Annotated[Any, Depends(repositorio)],
     parametros: Annotated[dict, Depends(_parametros_bf)],
     fonte: Annotated[FontePedido, Depends(fonte_do_pedido)],
+    visao: Annotated[str | None, Depends(_visao)],
 ):
     return await _decidir(request, ente, exercicio, anexo, repo,
-                          forcar=False, solicitante=None, parametros=parametros, fonte=fonte)
+                          forcar=False, solicitante=None, parametros=parametros, fonte=fonte,
+                          visao=visao)
 
 
 @router.post(

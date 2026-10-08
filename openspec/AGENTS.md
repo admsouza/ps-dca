@@ -50,7 +50,7 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 Em **2026-10-01** as seis changes já implementadas foram conferidas contra o código e arquivadas.
 Specs em vigor: `dca/base-canonica-regras`, `dca/balanco-orcamentario`,
-`dca/balanco-financeiro` (64 cenários), `dca/balanco-patrimonial` (26), `dca/fonte-msc`, `pipeline/plataforma` (80) e
+`dca/balanco-financeiro` (64 cenários), `dca/balanco-patrimonial` (36), `dca/fonte-msc`, `pipeline/plataforma` (80) e
 `pipeline/processamento-completo` (11).
 
 **Change ativa, em implementação:** `dca-regra-na-celula` — `GET /dca/{anexo}/regra` e diálogo no BF.
@@ -113,6 +113,7 @@ encerramento e a entrada do BF no pipeline continuam em `openspec/changes/archiv
 
 | Data | Change |
 |---|---|
+| 2026-10-08 | `bp-visao-consolidado-isolado` — **BP emitido isolado (padrão) ou consolidado.** As 20 exclusões intra do IPC 04 voltam ao Quadro Principal como `filters` com `visao: consolidado` (`L34` exclui `2.3.2.1.2`, literal do PDF `2.3.2.0.2` inexistente no PCASP). Um processamento apura as duas visões sobre uma leitura da fonte; `GET /dca/BP?visao=` escolhe sem job; cache sem consolidado → `409`. F/P, Compensação e Superávit iguais nas duas. Cuitegi 2025: isolado = planilha; consolidado `L1` 47.083.540,63, `L15` 49.088.262,32, equilíbrio −2.004.721,69 (achado). Front: `dca-bp-visao-consolidado`; conferência no navegador pendente. `dca/balanco-patrimonial` 27 → 36 cenários. Suíte 606 passed. |
 | 2026-10-07 | `bp-espelho-iab` — **o BP espelha o `DCA-Anexo I-AB` declarado.** Sem exclusões intra-OFSS no Quadro Principal e `L5` = `2.1`/`2.2` F + `6.3.1.1` + `6.3.1.5` + `6.3.1.7.1`. Revoga P7-a e P8-a. Cuitegi 2025 = `SICONFI_DCA_2831_ANUAL_1.xls` em centavos, equilíbrio 0,00; JP 2024/2025 = `I-AB` do `tt/dca`. |
 | 2026-10-07 | `pipeline-percurso-origem-bp` — `POST /batch-jobs` aceita `origem_exercicio_anterior` (só BP); o percurso grava o BP na identidade que a leitura confere. Front: `dca-percurso-origem-bp`. Falha prévia ao código não registrada (agente interrompido). |
 | 2026-10-07 | `bp-anterior-publicado-siconfi` — coluna do exercício anterior do BP com duas origens: publicado (`I-AB` do ano anterior no `tt/dca`, padrão) e MSC. `docs/evidencia-bp-publicado-2024.md`. |

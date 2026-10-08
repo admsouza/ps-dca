@@ -30,7 +30,7 @@ composição do `I-AB` (`2.1` F + `2.2` F + `6.3.1.1` + `6.3.1.5` + `6.3.1.7.1`)
 | `L39` | `2.3.7` Resultados Acumulados | −45.644.857,64 | −45.644.857,64 | 0,00 |
 
 **Equilíbrio `L1 − L15`:** 0,00 nas duas colunas (antes: −2.004.721,69 em 2025 e −3.321.137,54 em 2024).
-`L34` segue não apurada (`review_required`, P3-b; `2.3.2` = 0,00 medido e publicado).
+`L34` apurada pela `2.3.2` desde 2026-10-08 (exclusão do PDF corrigida para `2.3.2.1.2`, não aplicada no espelho): 0,00 = planilha.
 
 ## Quadro dos Ativos e Passivos Financeiros e Permanentes, 2025 — 5/5
 
@@ -43,6 +43,26 @@ composição do `I-AB` (`2.1` F + `2.2` F + `6.3.1.1` + `6.3.1.5` + `6.3.1.7.1`)
 | `L7` | Saldo Patrimonial | −46.103.363,20 | −46.103.363,20 | 0,00 |
 
 `L5` = `2.1` F 2.647.434,03 + `6.3.1.1` 70.972,63 + `6.3.1.7.1` 387.532,93 (`6.2.2.1.3.05` zerada).
+
+## Visão consolidada (`bp-visao-consolidado-isolado`, 2026-10-08)
+
+Medido com `python -m app.cli.bp 2505204 2025 --anterior msce_exercicio_anterior --json` (SICONFI):
+a visão **isolada** continua igual à planilha; a **consolidada** aplica as exclusões intra-OFSS da
+coluna Exclusões do IPC 04 (`L34` com `2.3.2.1.2.00.00`).
+
+| Linha | Isolado (= `I-AB`) | Consolidado (IPC 04) |
+|---|---|---|
+| `L1` ATIVO | 76.314.331,92 | 47.083.540,63 |
+| `L15` PASSIVO E PL | 76.314.331,92 | 49.088.262,32 |
+| `L32` PL | −45.644.857,64 | −42.467.656,79 |
+| `L34` | 0,00 | 0,00 |
+| `L1 − L15` 2025 | 0,00 | −2.004.721,69 |
+| `L1 − L15` 2024 (MSC) | 0,00 | −3.321.137,54 |
+
+Os números do consolidado repetem a medição de 2026-10-07; a exclusão da `L34` não muda nada em Cuitegi
+(`2.3.2` = 0,00). O desequilíbrio é do dado do ente (intra registrado só de um lado): achado, não ajuste.
+F/P (`L1` 76.314.331,92, `L2` 26.431.637,72, `L3` 49.882.694,20, `L5` 3.105.939,59) é idêntico nas duas
+visões (D5); por isso F/P `L1` (76,3 mi) difere da `L1` principal consolidada (47,1 mi).
 
 ## Coluna 2024 — as duas origens contra o `I-AB` de 2024 (`tt/dca`)
 

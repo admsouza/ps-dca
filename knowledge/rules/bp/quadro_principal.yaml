@@ -134,7 +134,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -153,6 +153,13 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 1.1.1.1.2.00.00
+      pattern: '11112'
 - rule_id: bp.quadro_principal.ativo.l4
   demonstrativo:
     codigo: BP
@@ -193,7 +200,7 @@ rules:
   review:
     required: true
     reason: 'O literal 1.1.3.8.2.000.00 do PDF tem grupo de três dígitos; o padrão 11382 era o que o PCASP sustenta
-      (3 folhas), decisão P2 do PO (2026-10-07), literal preservado na evidência. Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+      (3 folhas), decisão P2 do PO (2026-10-07), literal preservado na evidência. Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -220,6 +227,29 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 1.1.2.1.2.00.00
+      pattern: '11212'
+    - literal: 1.1.2.2.2.00.00
+      pattern: '11222'
+    - literal: 1.1.2.4.2.00.00
+      pattern: '11242'
+    - literal: 1.1.2.5.2.00.00
+      pattern: '11252'
+    - literal: 1.1.2.6.2.00.00
+      pattern: '11262'
+    - literal: 1.1.2.9.2.00.00
+      pattern: '11292'
+    - literal: 1.1.3.2.2.00.00
+      pattern: '11322'
+    - literal: 1.1.3.6.2.00.00
+      pattern: '11362'
+    - literal: 1.1.3.8.2.000.00
+      pattern: '11382'
 - rule_id: bp.quadro_principal.ativo.l5
   demonstrativo:
     codigo: BP
@@ -364,7 +394,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -383,6 +413,15 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 1.1.6.1.2.00.00
+      pattern: '11612'
+    - literal: 1.1.6.9.2.00.00
+      pattern: '11692'
 - rule_id: bp.quadro_principal.ativo.l8
   demonstrativo:
     codigo: BP
@@ -524,7 +563,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -543,6 +582,15 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 1.2.1.1.2.00.00
+      pattern: '12112'
+    - literal: 1.2.1.2.2.00.00
+      pattern: '12122'
 - rule_id: bp.quadro_principal.ativo.l11
   demonstrativo:
     codigo: BP
@@ -581,7 +629,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -600,6 +648,15 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 1.2.2.1.2.00.00
+      pattern: '12212'
+    - literal: 1.2.2.9.2.00.00
+      pattern: '12292'
 - rule_id: bp.quadro_principal.ativo.l12
   demonstrativo:
     codigo: BP
@@ -638,7 +695,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -657,6 +714,13 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 1.2.3.7.2.00.00
+      pattern: '12372'
 - rule_id: bp.quadro_principal.ativo.l13
   demonstrativo:
     codigo: BP
@@ -902,7 +966,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -921,6 +985,15 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.1.1.2.2.00.00
+      pattern: '21122'
+    - literal: 2.1.1.4.2.00.00
+      pattern: '21142'
 - rule_id: bp.quadro_principal.passivo.l18
   demonstrativo:
     codigo: BP
@@ -959,7 +1032,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -978,6 +1051,17 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.1.2.1.2.00.00
+      pattern: '21212'
+    - literal: 2.1.2.5.2.00.00
+      pattern: '21252'
+    - literal: 2.1.2.8.2.00.00
+      pattern: '21282'
 - rule_id: bp.quadro_principal.passivo.l19
   demonstrativo:
     codigo: BP
@@ -1069,7 +1153,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -1088,6 +1172,17 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.1.4.1.2.00.00
+      pattern: '21412'
+    - literal: 2.1.4.2.2.00.00
+      pattern: '21422'
+    - literal: 2.1.4.3.2.00.00
+      pattern: '21432'
 - rule_id: bp.quadro_principal.passivo.l21
   demonstrativo:
     codigo: BP
@@ -1232,7 +1327,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -1251,6 +1346,13 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.1.8.9.2.00.00
+      pattern: '21892'
 - rule_id: bp.quadro_principal.passivo.l24
   demonstrativo:
     codigo: BP
@@ -1343,7 +1445,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -1362,6 +1464,13 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.2.1.4.2.00.00
+      pattern: '22142'
 - rule_id: bp.quadro_principal.passivo.l26
   demonstrativo:
     codigo: BP
@@ -1400,7 +1509,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -1419,6 +1528,15 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.2.2.1.2.00.00
+      pattern: '22212'
+    - literal: 2.2.2.8.2.00.00
+      pattern: '22282'
 - rule_id: bp.quadro_principal.passivo.l27
   demonstrativo:
     codigo: BP
@@ -1510,7 +1628,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -1529,6 +1647,17 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.2.4.1.2.00.00
+      pattern: '22412'
+    - literal: 2.2.4.2.2.00.00
+      pattern: '22422'
+    - literal: 2.2.4.3.2.00.00
+      pattern: '22432'
 - rule_id: bp.quadro_principal.passivo.l29
   demonstrativo:
     codigo: BP
@@ -1620,7 +1749,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -1639,6 +1768,13 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.2.8.9.2.00.00
+      pattern: '22892'
 - rule_id: bp.quadro_principal.passivo.l31
   demonstrativo:
     codigo: BP
@@ -1786,7 +1922,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -1805,6 +1941,13 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.3.1.2.2.00.00
+      pattern: '23122'
 - rule_id: bp.quadro_principal.passivo.l34
   demonstrativo:
     codigo: BP
@@ -1840,17 +1983,11 @@ rules:
     extraction_method: assisted
     extractor_version: '1.0'
     extracted_at: '2026-10-02'
-  status: review_required
+  status: extracted
   review:
     required: true
-    reason: A exclusão literal 2.3.2.0.2.00.00 não existe no PCASP oficial consultado.
-    blocker: IPC04 p. 9 traz 2.3.2.0.2.00.00; o PCASP não possui prefixo 23202.
-    candidate:
-      pdf_literal: 2.3.2.0.2.00.00
-      candidate_literal: 2.3.2.1.2.00.00
-      candidate_pattern: '23212'
-      pcasp_matches: 1
-      applied: false
+    reason: 'O literal 2.3.2.0.2.00.00 do PDF não existe no PCASP; a exclusão intra-OFSS é a 2.3.2.1.2.00.00 (padrão 23212),
+      decisão do PO (2026-10-08), literal do PDF preservado na evidência. Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -1869,6 +2006,13 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.3.2.1.2.00.00
+      pattern: '23212'
 - rule_id: bp.quadro_principal.passivo.l35
   demonstrativo:
     codigo: BP
@@ -1908,7 +2052,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -1927,6 +2071,21 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.3.3.1.2.00.00
+      pattern: '23312'
+    - literal: 2.3.3.2.2.00.00
+      pattern: '23322'
+    - literal: 2.3.3.3.2.00.00
+      pattern: '23332'
+    - literal: 2.3.3.4.2.00.00
+      pattern: '23342'
+    - literal: 2.3.3.9.2.00.00
+      pattern: '23392'
 - rule_id: bp.quadro_principal.passivo.l36
   demonstrativo:
     codigo: BP
@@ -2019,7 +2178,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -2038,6 +2197,29 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.3.5.1.2.00.00
+      pattern: '23512'
+    - literal: 2.3.5.2.2.00.00
+      pattern: '23522'
+    - literal: 2.3.5.3.2.00.00
+      pattern: '23532'
+    - literal: 2.3.5.4.2.00.00
+      pattern: '23542'
+    - literal: 2.3.5.5.2.00.00
+      pattern: '23552'
+    - literal: 2.3.5.6.2.00.00
+      pattern: '23562'
+    - literal: 2.3.5.7.2.00.00
+      pattern: '23572'
+    - literal: 2.3.5.8.2.00.00
+      pattern: '23582'
+    - literal: 2.3.5.9.2.00.00
+      pattern: '23592'
 - rule_id: bp.quadro_principal.passivo.l38
   demonstrativo:
     codigo: BP
@@ -2076,7 +2258,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -2095,6 +2277,15 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.3.6.1.2.00.00
+      pattern: '23612'
+    - literal: 2.3.6.9.2.00.00
+      pattern: '23692'
 - rule_id: bp.quadro_principal.passivo.l39
   demonstrativo:
     codigo: BP
@@ -2133,7 +2324,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -2152,6 +2343,15 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.3.7.1.2.00.00
+      pattern: '23712'
+    - literal: 2.3.7.2.2.00.00
+      pattern: '23722'
 - rule_id: bp.quadro_principal.passivo.l40
   demonstrativo:
     codigo: BP
@@ -2190,7 +2390,7 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Exclusão intra-OFSS do IPC 04 não aplicada: o BP espelha o DCA-Anexo I-AB declarado (change bp-espelho-iab, PO 2026-10-07).'
+    reason: 'Exclusão intra-OFSS do IPC 04 aplicada só na visão consolidada; a visão isolada espelha o DCA-Anexo I-AB declarado (change bp-visao-consolidado-isolado, PO 2026-10-08).'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -2209,3 +2409,12 @@ rules:
   policies:
   - ipc04.exclusao_intra_so_no_consolidado
   - ipc04.intra_quinto_nivel_criada_pelo_ente
+  filters:
+  - field: conta_contabil
+    operator: not_in
+    visao: consolidado
+    values:
+    - literal: 2.3.9.1.2.00.00
+      pattern: '23912'
+    - literal: 2.3.9.2.2.00.00
+      pattern: '23922'

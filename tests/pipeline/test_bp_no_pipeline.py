@@ -40,11 +40,11 @@ def test_vigencia_publicada_preserva_atributo_e_bloqueio():
     from app.infra.regras.vigencias import _achatar, _linha
 
     por_id = {linha.id: linha for linha in _mapa().linhas}
-    for rule_id in ("bp.ativos_passivos_financeiros.l5", "bp.quadro_principal.passivo.l34"):
+    for rule_id in ("bp.ativos_passivos_financeiros.l5", "bp.contas_compensacao.l2"):
         assert _linha(_achatar(por_id[rule_id])) == por_id[rule_id], rule_id
     l5 = por_id["bp.ativos_passivos_financeiros.l5"]
     assert {c.financeiro_permanente for c in l5.colunas[0].contas} == {"F", ""}
-    assert por_id["bp.quadro_principal.passivo.l34"].bloqueio
+    assert por_id["bp.contas_compensacao.l2"].bloqueio
 
 
 def test_ancoras_do_iab_apontam_linhas_do_ipc04():
