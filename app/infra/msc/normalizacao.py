@@ -20,7 +20,6 @@ CAMPOS = {
     "subfuncao": ("subfuncao", "subFuncao"),
     "poder_orgao": ("poder_orgao", "poderOrgao"),
     "fonte_recursos": ("fonte_recursos", "fonteRecursos"),
-    "complemento_fonte": ("complemento_fonte", "complementoFonte"),
     "financeiro_permanente": ("financeiro_permanente", "financeiroPermanente"),
 }
 # Domínio confirmado pelo PO (2026-10-07). Outro valor não é inferido: vira resíduo no BP.
@@ -67,7 +66,6 @@ def normalizar(bruto: dict) -> Registro:
         poder_orgao=_primeiro(bruto, CAMPOS["poder_orgao"]),
         fonte_recursos=_primeiro(bruto, CAMPOS["fonte_recursos"]),
         financeiro_permanente=_financeiro_permanente(bruto),
-        complemento_fonte=_primeiro(bruto, CAMPOS["complemento_fonte"]),
     )
 
 

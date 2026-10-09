@@ -53,7 +53,7 @@ Specs em vigor: `dca/base-canonica-regras`, `dca/balanco-orcamentario`,
 `dca/balanco-financeiro` (64 cenários), `dca/balanco-patrimonial` (36), `dca/fonte-msc`, `pipeline/plataforma` (80) e
 `pipeline/processamento-completo` (11).
 
-**Change ativa, em implementação:** `bp-superavit-por-fonte` — Quadro do Superávit / Déficit Financeiro por fonte+complemento, saldo `C − D` de `821110100` e `821110200`, inclusive fonte que começa com `2` (PO 2026-10-08). Cuitegi 2025: `Total` 48.827.308,73 / 13.279.106,25. Código e testes no working tree; arquivamento pendente da conferência viva (task 4.3).
+**Change ativa, em implementação:** `bp-superavit-por-fonte` — Quadro do Superávit / Déficit Financeiro por fonte+complemento, saldo `C − D` de `821110100` e `821110200`, inclusive fonte que começa com `2` (PO 2026-10-08). Cuitegi 2025: `Total` 44.986.989,00 / 13.279.106,25 (fonte vazia só no aviso). A linha publica `fonte` com 4 dígitos. Código e testes no working tree; arquivamento pendente da conferência viva (task 4.3).
 
 **Change ativa, em implementação:** `dca-regra-na-celula` — `GET /dca/{anexo}/regra` e diálogo no BF.
 Anexo sem projeção registrada responde 404. Não arquivada.

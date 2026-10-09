@@ -66,6 +66,7 @@ def template(mapa) -> list[dict]:
             "nivel": linha.nivel,
             "ordem": linha.ordem,
             "totalizadora": bool(linha.referencias),
+            **({"fonte": linha.fonte} if linha.fonte else {}),
         }
         for linha in sorted(mapa.linhas, key=lambda linha: _posicao(linha, _ordens(mapa)))
     ]
@@ -127,7 +128,7 @@ def para_dados(resultado) -> dict:
             **_especificos(diagnostico, ("sem_dados_exercicio_anterior",
                                          "policies_nao_aplicadas", "sem_atributo_fp",
                                          "equilibrio", "sem_publicacao_exercicio_anterior",
-                                         "conferencia_publicado")),
+                                         "conferencia_publicado", "fonte_vazia")),
         },
     }
     # Visões extras (BP): só o demonstrativo que as produz as publica; BO e BF saem como antes.

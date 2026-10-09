@@ -4,45 +4,49 @@
 
 ### Requirement: Quadro do Superávit / Déficit Financeiro por fonte
 
-O sistema SHALL apurar o Quadro do Superávit / Déficit Financeiro (IPC 04, p. 13) com uma linha para cada par fonte + complemento que tenha saldo em `8.2.1.1.1` no exercício ou no exercício anterior.
+O sistema SHALL apurar o Quadro do Superávit / Déficit Financeiro (IPC 04, p. 13) com uma linha para cada `fonte_recursos` de 4 dígitos que tenha saldo em `8.2.1.1.1` no exercício ou no exercício anterior. O complemento soma nessa fonte e SHALL NOT gerar outra linha. O mesmo código SHALL NOT aparecer duas vezes.
 
-O código da linha SHALL ter 8 dígitos: os 4 de `fonte_recursos` e os 4 de `complemento_fonte`. Complemento ausente SHALL valer `0000`. O rótulo SHALL ser a nomenclatura de `docs/contas-stn/fonte-recursos.md` para os dígitos 2 a 4 da fonte. Complemento diferente de `0000` SHALL identificar também a nomenclatura de `docs/contas-stn/complemento-fonte.md`.
+O código da linha e o campo `fonte` SHALL ser esses 4 dígitos (`1500`, `1800`, `2500`). O rótulo SHALL ser a nomenclatura de `docs/contas-stn/fonte-recursos.md` para os dígitos 2 a 4. Fonte que começa com `2` SHALL acrescentar ` - Exercícios Anteriores`.
+
+Saldo cuja `fonte_recursos` veio vazia SHALL NOT virar linha e SHALL NOT entrar no `Total`. O valor SHALL aparecer em `diagnostico.fonte_vazia`, um objeto `{coluna: saldo}` só com as colunas que têm saldo (vazio `{}` quando não há), e SHALL NOT aparecer em `diagnostico.nao_apuradas`.
 
 O saldo SHALL ser `C − D` das folhas `821110100` e `821110200`, em centavos. Superávit positivo, déficit negativo. A coluna do exercício SHALL ser o saldo de encerramento desse ano. A coluna do exercício anterior SHALL ser o mesmo saldo no ano anterior, lido da MSC, e NÃO o valor publicado no `I-AB`.
 
-Fonte cujo `fonte_recursos` começa com `2` SHALL entrar nas duas colunas (PO 2026-10-08: a exclusão foi revogada). Linha com as duas colunas iguais a zero SHALL ser omitida. O `Total` SHALL ser a soma das linhas que entraram. As visões `isolado` e `consolidado` SHALL devolver o mesmo quadro.
+Fonte cujo `fonte_recursos` começa com `2` SHALL entrar nas duas colunas (PO 2026-10-08: a exclusão foi revogada). Linha com as duas colunas iguais a zero SHALL ser omitida. O `Total` SHALL ser a soma das linhas que entraram e SHALL ser publicado com `totalizadora: true`. As visões `isolado` e `consolidado` SHALL devolver o mesmo quadro.
 
 #### Scenario: CIDE de Cuitegi 2025
 
 - **GIVEN** a MSC de encerramento de Cuitegi/PB (`2505204`), exercícios 2025 e 2024
 - **WHEN** o BP é apurado
-- **THEN** a linha `17500000` vale 12.879,61 no exercício e 835,46 no anterior
+- **THEN** a linha `1750` vale 12.879,61 no exercício e 835,46 no anterior
 
 #### Scenario: taxa de administração do RPPS
 
 - **GIVEN** a mesma MSC
 - **WHEN** o BP é apurado
-- **THEN** a linha `18020000` vale 61.862,85 no exercício e (212.922,03) no anterior
+- **THEN** a linha `1802` vale 61.862,85 no exercício e (212.922,03) no anterior
 
-#### Scenario: complemento é linha própria
+#### Scenario: complemento soma na mesma fonte
 
 - **GIVEN** saldo na fonte `1500` com complemento `1001` e saldo na fonte `1500` com complemento `0000`
 - **WHEN** o BP é apurado
-- **THEN** existem as linhas `15000000` e `15001001`
-- **AND** `15001001` não é somada em `15000000`
+- **THEN** existe uma única linha `1500`, com a soma dos dois saldos
+- **AND** o rótulo é o da fonte, sem a nomenclatura do complemento
 
 #### Scenario: fonte de exercício anterior da vinculação entra
 
-- **GIVEN** saldo em `fonte_recursos` `2500` (código `25000000`) na MSC de Cuitegi 2025 e 2024
+- **GIVEN** saldo em `fonte_recursos` `2500` na MSC de Cuitegi 2025 e 2024
 - **WHEN** o BP é apurado
-- **THEN** a linha `25000000` vale (15.855,84) no exercício e (1.984.731,88) no anterior
+- **THEN** a linha `2500` vale (15.855,84) no exercício e (1.984.731,88) no anterior
+- **AND** o rótulo termina com `Exercícios Anteriores`
 - **AND** esse saldo entra no `Total`
 
 #### Scenario: totais de Cuitegi
 
 - **GIVEN** a MSC de encerramento de Cuitegi 2025 e 2024
 - **WHEN** o BP é apurado
-- **THEN** o `Total` é 48.827.308,73 no exercício e 13.279.106,25 no anterior
+- **THEN** o `Total` é 44.986.989,00 no exercício e 13.279.106,25 no anterior
+- **AND** os 3.840.319,73 sem código de fonte não entram no total e constam do aviso do anexo
 
 #### Scenario: saldo só no ano anterior ainda aparece
 

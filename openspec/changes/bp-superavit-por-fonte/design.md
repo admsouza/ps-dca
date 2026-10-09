@@ -60,8 +60,11 @@ Ordem: código crescente, `Total` por último.
 ### D3 — Prefixo `2` entra
 **Escolhido:** `fonte_recursos` que começa com `2` entra nas duas colunas. · **Descartado:** omitir `25000000`. · **Porquê:** o PO corrigiu em 2026-10-08. Sem essas fontes o total de 2024 não fecha os `13.279.106,25` do impresso.
 
-### D4 — Fonte vazia entra
-**Escolhido:** saldo sem fonte vira a linha `00000000`. · **Descartado:** jogar no resíduo e omitir do total. · **Porquê:** em Cuitegi 2025 são 3.840.319,73; omitir mudaria o total sem decisão do PO.
+### D4 — Fonte vazia fica no aviso
+**Escolhido:** saldo sem `fonte_recursos` não vira linha e não entra no total; o valor sai em `diagnostico.fonte_vazia` (`{coluna: saldo}`), estruturado, e não em `nao_apuradas` (não é célula não apurada, e texto livre obrigaria o front a fazer parse). · **Descartado:** linha `00000000`. · **Porquê:** o PO pediu em 2026-10-09 que fonte vazia apareça só no aviso do anexo. Em Cuitegi 2025 são 3.840.319,73; o total do exercício passa a 44.986.989,00.
+
+### D5 — Uma linha por fonte de 4 dígitos
+**Escolhido:** o código da linha é `fonte_recursos` (`1500`, `1800`, `2500`). Complementos somam nessa linha. Fonte `2…` leva o sufixo ` - Exercícios Anteriores`. · **Descartado:** uma linha por complemento (`18001111`). · **Porquê:** o impresso `docs/Quadro do Superávit  Déficit Financeiro.pdf` não repete o código.
 
 ## Arquivos criados / alterados
 
@@ -76,5 +79,4 @@ Ordem: código crescente, `Total` por último.
 
 ## Pendências conhecidas
 
-- O total de 2025 na MSC (48.827.308,73) não é o total impresso (23.325.698,13). O aceite desta change é a MSC com a regra acima. O total de 2024 (`13.279.106,25`) fecha com o impresso.
-- `00000000` não aparece no trecho do impresso que foi conferido.
+- O total de 2025 na MSC, já sem a fonte vazia (44.986.989,00), não é o total impresso (23.325.698,13). O aceite desta change é a MSC com a regra acima. O total de 2024 (`13.279.106,25`) fecha com o impresso.

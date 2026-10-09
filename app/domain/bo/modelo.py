@@ -27,7 +27,6 @@ class Registro(NamedTuple):
     poder_orgao: str = ""
     fonte_recursos: str = ""
     financeiro_permanente: str = ""   # "F" | "P" | "" — atributo do fato, nunca do PCASP (IPC 04)
-    complemento_fonte: str = ""       # destinação; vazio no quadro de superávit vale 0000
 
 
 class ContaCC(NamedTuple):
@@ -84,6 +83,8 @@ class Linha(NamedTuple):
     ordem: int = 0                                   # 1-based, relativa ao GRUPO
     # `review.blocker` da regra `review_required`. Só o BP lê: célula `None` com este motivo.
     bloqueio: str = ""
+    # 4 dígitos da fonte (`1800`), sem o complemento. Só o quadro de superávit preenche.
+    fonte: str = ""
 
     @property
     def composta(self) -> bool:

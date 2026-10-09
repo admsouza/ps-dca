@@ -8,12 +8,12 @@
 
 ## Why
 
-O quadro sai inteiro não apurado. A regra publicada é só o total, com blocker: a cardinalidade depende do ente. O relatório do ente é uma linha por fonte e complemento, com o saldo da conta `8.2.1.1.1`. Sem isso o BP não reproduz o quadro da Lei 4.320/64.
+O quadro sai inteiro não apurado. A regra publicada é só o total, com blocker: a cardinalidade depende do ente. O relatório do ente é uma linha por fonte de 4 dígitos, com o saldo da conta `8.2.1.1.1`. Sem isso o BP não reproduz o quadro da Lei 4.320/64.
 
 ## What Changes
 
 - O quadro deixa de devolver `None`. Cada fonte com saldo em `8.2.1.1.1` vira uma linha.
-- O código da linha tem 8 dígitos: fonte da MSC (4) + complemento (4). Complemento ausente vale `0000`.
+- O código da linha tem 4 dígitos (`1500`, `1800`, `2500`). Complementos somam nessa fonte e não geram outra linha. Fonte que começa com `2` leva o sufixo ` - Exercícios Anteriores`.
 - O saldo da linha é `C − D` das folhas `821110100` e `821110200`. Superávit positivo, déficit negativo.
 - A coluna do exercício é o saldo de encerramento desse ano. A coluna anterior é o mesmo saldo no exercício anterior.
 - Fonte que começa com `2` entra (`25000000` e as demais). O PO corrigiu em 2026-10-08: a exclusão anterior foi engano.
@@ -27,7 +27,7 @@ O quadro sai inteiro não apurado. A regra publicada é só o total, com blocker
 
 | Interface | Entrada | Saída |
 |---|---|---|
-| Apuração do BP (job e `python -m app.cli.bp`) | MSC de encerramento, classe 8, exercícios N e N−1; `fonte_recursos` e `complemento_fonte` | Matriz do quadro `SUPERAVIT_DEFICIT`: uma linha por fonte+complemento com saldo, mais `Total` |
+| Apuração do BP (job e `python -m app.cli.bp`) | MSC de encerramento, classe 8, exercícios N e N−1; `fonte_recursos` | Matriz do quadro `SUPERAVIT_DEFICIT`: uma linha por fonte de 4 dígitos, mais `Total` |
 | `GET /dca/BP` | cache do BP, `visao` | O mesmo quadro nas duas visões |
 
 ## Exemplo concreto
@@ -36,20 +36,20 @@ Ente Cuitegi/PB (`2505204`), exercício 2025, SICONFI, matriz de encerramento, s
 
 | Ente | Exercício | Célula | Valor esperado |
 |---|---|---|---|
-| 2505204 | 2025 | `17500000` exercício atual | 12.879,61 |
-| 2505204 | 2025 | `17500000` exercício anterior | 835,46 |
-| 2505204 | 2025 | `18020000` exercício atual | 61.862,85 |
-| 2505204 | 2025 | `18020000` exercício anterior | (212.922,03) |
-| 2505204 | 2025 | `15010000` exercício anterior | 715.372,64 |
-| 2505204 | 2025 | `25000000` exercício atual | (15.855,84) |
-| 2505204 | 2025 | `25000000` exercício anterior | (1.984.731,88) |
-| 2505204 | 2025 | `Total` exercício atual | 48.827.308,73 |
+| 2505204 | 2025 | `1750` exercício atual | 12.879,61 |
+| 2505204 | 2025 | `1750` exercício anterior | 835,46 |
+| 2505204 | 2025 | `1802` exercício atual | 61.862,85 |
+| 2505204 | 2025 | `1802` exercício anterior | (212.922,03) |
+| 2505204 | 2025 | `1501` exercício anterior | 715.372,64 |
+| 2505204 | 2025 | `2500` exercício atual | (15.855,84) |
+| 2505204 | 2025 | `2500` exercício anterior | (1.984.731,88) |
+| 2505204 | 2025 | `Total` exercício atual | 44.986.989,00 |
 | 2505204 | 2025 | `Total` exercício anterior | 13.279.106,25 |
 
 ## Critérios de aceite
 
-- [ ] Cuitegi 2025: `17500000`, `18020000` e `25000000` batem os valores da tabela, em centavos.
-- [ ] `Total` = 48.827.308,73 no exercício e 13.279.106,25 no anterior.
+- [ ] Cuitegi 2025: `1750`, `1802` e `2500` batem os valores da tabela, em centavos, cada código uma vez.
+- [ ] `Total` = 44.986.989,00 no exercício e 13.279.106,25 no anterior. Os 3.840.319,73 sem código de fonte ficam só no aviso.
 - [ ] Linha com as duas colunas zeradas não aparece.
 - [ ] Isolado e consolidado devolvem o mesmo quadro.
 - [ ] Compensação permanece `None`.
@@ -59,7 +59,7 @@ Ente Cuitegi/PB (`2505204`), exercício 2025, SICONFI, matriz de encerramento, s
 | Situação | Comportamento esperado |
 |---|---|
 | Classe 8 sem saldo em `82111` | Nenhuma linha de fonte; `Total` = 0,00 nas duas colunas |
-| Fonte vazia com saldo | Linha `00000000` entra; o saldo não é descartado |
+| Fonte vazia com saldo | Não vira linha e não entra no total; o saldo sai em `diagnostico.nao_apuradas` |
 | Complemento ausente | Tratado como `0000` |
 | Leitura da MSC do ano anterior vazia | Coluna anterior 0,00 nas linhas que só têm saldo no exercício; diagnóstico de exercício anterior segue o do BP |
 
@@ -67,7 +67,7 @@ Ente Cuitegi/PB (`2505204`), exercício 2025, SICONFI, matriz de encerramento, s
 
 - A leitura atual do BP não pede a classe 8 e descarta `complemento_fonte`. Sem os dois, o quadro não fecha.
 - A origem `publicado_siconfi` da coluna anterior do Quadro Principal não substitui este quadro: o `I-AB` não abre por fonte.
-- Em 2025, Cuitegi tem 3.840.319,73 na conta sem fonte (`00000000`). Entra no total. O impresso não mostra essa linha no trecho conferido.
+- Em 2025, Cuitegi tem 3.840.319,73 na conta sem fonte. Fica no aviso e fora do total (PO 2026-10-09).
 
 ## Aprovação do PO
 
