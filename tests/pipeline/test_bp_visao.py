@@ -36,6 +36,7 @@ def _cliente(repo, lock, jobs, anexo: str, resultado: dict) -> TestClient:
 
     def autorizada(request: Request) -> str:
         request.state.claims = {"sub": "u@x"}
+        request.state.poderes = ("consolidado",)
         return ENTE
 
     class Fila:

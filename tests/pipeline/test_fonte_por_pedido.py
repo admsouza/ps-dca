@@ -6,6 +6,7 @@ hub, cifrado no cofre por job, nunca no payload da fila.
 from __future__ import annotations
 
 import asyncio
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -321,6 +322,7 @@ def test_apurador_real_aceita_fonte_no_payload(monkeypatch, anexo):
 
     def servico(ente, exercicio, fonte=None, mapa=None, **kwargs):
         recebidos.update(fonte=fonte, **kwargs)
+        return SimpleNamespace()    # o BO ganha `.recortes` (pipeline-dca-por-unidade-gestora)
 
     monkeypatch.setattr(apuracao, "_servico_de", lambda _codigo: servico)
     monkeypatch.setattr(apuracao, "mapa_vigente", lambda *_a, **_k: None)
@@ -328,7 +330,9 @@ def test_apurador_real_aceita_fonte_no_payload(monkeypatch, anexo):
     apuracao.apurador(anexo, fonte_nome="siconfi",
                       parametros={"fonte": "siconfi"})(int(ENTE), EXERCICIO)
 
-    assert recebidos["fonte"].__class__.__name__ == "_NoEscopo"
+    # No BO a fonte observada envolve a do escopo; a fonte do pedido continua sem vazar.
+    fonte = recebidos["fonte"]
+    assert getattr(fonte, "_fonte", fonte).__class__.__name__ == "_NoEscopo"
 
 def test_worker_apura_na_fonte_do_payload(monkeypatch):
     """Scenario: SIAFIC escolhido com worker padrão SICONFI — o job apura pela fonte do payload."""

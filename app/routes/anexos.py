@@ -17,6 +17,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from app.core.config import config
+from app.domain import recorte as recortes
 from app.infra.fila import credencial, job_manager
 from app.routes.dependencias import (
     FontePedido,
@@ -144,6 +145,58 @@ def _na_visao(resultado: dict, visao: str) -> dict:
     return {**corpo, "visao": visao}
 
 
+def _recorte(
+    anexo: Annotated[str, Depends(_anexo_valido)],
+    recorte: Annotated[str | None, Query(
+        description="BO/BP: `consolidado`, `poder:executivo`, `poder:legislativo`, "
+                    "`poder:executivo+legislativo`, `ug:<id>` ou `po:<código>`. Omitido, vale o "
+                    "padrão do poder do usuário.")] = None,
+) -> str | None:
+    """Escolha de leitura, como a `visao`: fora da identidade do pedido."""
+    if recorte is None:
+        return None
+    if anexo not in apuracao.RECORTAVEIS:
+        raise _erro_422("recorte só é aceito no BO e no BP")
+    if not recortes.valida(recorte):
+        raise _erro_422("recorte inválido")
+    return recorte
+
+
+def _no_recorte(resultado: dict, pedido: str | None, poderes: tuple[str, ...]) -> dict:
+    """O corpo do recorte pedido — ou do padrão do poder —, com os recortes visíveis.
+
+    Busca por chave no que o worker gravou: nada é somado nem calculado aqui. Sem `consolidado`,
+    nenhum valor de recorte não visível sai na resposta, nem o consolidado do ente.
+    """
+    chave = pedido or recortes.padrao(poderes)
+    if chave is None:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="sem poder para ler este anexo")
+    gravados = resultado.get("recortes")
+    if gravados is None:                         # cache anterior à change
+        if chave == recortes.CONSOLIDADO and recortes.CONSOLIDADO in poderes:
+            return resultado
+        raise HTTPException(status.HTTP_409_CONFLICT,
+                            detail="reprocesse o anexo para emitir por recorte")
+    if chave != recortes.CONSOLIDADO and chave not in gravados:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"recorte {chave} não apurado")
+
+    poder_orgao = {c: r["poderOrgao"] for c, r in gravados.items() if c not in recortes.GRUPOS}
+    disponiveis = recortes.visiveis([recortes.CONSOLIDADO, *gravados], poder_orgao, poderes)
+    if chave not in disponiveis:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="sem acesso a este recorte")
+
+    if chave == recortes.CONSOLIDADO:
+        corpo = {k: v for k, v in resultado.items() if k != "recortes"}
+    else:
+        corpo = gravados[chave]["resultado"]
+    return {**corpo, "recorte": chave, "recortesDisponiveis": [
+        {"chave": c, "tipo": recortes.tipo(c),
+         "rotulo": gravados[c]["rotulo"] if c in gravados else recortes.ROTULOS[c],
+         **({"poderOrgao": po} if (po := poder_orgao.get(c)) else {})}
+        for c in disponiveis
+    ]}
+
+
 def _parametros_bf(
     anexo: Annotated[str, Depends(_anexo_valido)],
     origem: Annotated[str | None, Query(alias="origem_exercicio_anterior")] = None,
@@ -213,7 +266,8 @@ def _parametros_g8_do_corpo(corpo: CorpoAnterior) -> dict:
 
 async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo,
                    forcar: bool, solicitante: int | None, parametros: dict | None = None,
-                   fonte: FontePedido | None = None, visao: str | None = None):
+                   fonte: FontePedido | None = None, visao: str | None = None,
+                   recorte: str | None = None):
     """Caminho comum de leitura e reprocessamento. Difere só em `forcar`."""
     if fonte is not None:
         parametros = {**(parametros or {}), "fonte": fonte.nome}
@@ -252,7 +306,12 @@ async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo
 
     if resposta.status == 200:
         motivos = resposta.motivos_desatualizado or []
-        resultado = _na_visao(resposta.resultado, visao) if visao else resposta.resultado
+        resultado = resposta.resultado
+        if anexo in apuracao.RECORTAVEIS:
+            # Sem `poderes` no estado a autorização não rodou: nenhum recorte (fail closed).
+            resultado = _no_recorte(resultado, recorte, getattr(request.state, "poderes", ()))
+        if visao:
+            resultado = _na_visao(resultado, visao)
         return JSONResponse(status_code=200, content={
             **resultado, "desatualizado": bool(motivos),
             "motivos_desatualizado": motivos,
@@ -448,10 +507,11 @@ async def obter_anexo(
     parametros: Annotated[dict, Depends(_parametros_bf)],
     fonte: Annotated[FontePedido, Depends(fonte_do_pedido)],
     visao: Annotated[str | None, Depends(_visao)],
+    recorte: Annotated[str | None, Depends(_recorte)],
 ):
     return await _decidir(request, ente, exercicio, anexo, repo,
                           forcar=False, solicitante=None, parametros=parametros, fonte=fonte,
-                          visao=visao)
+                          visao=visao, recorte=recorte)
 
 
 @router.post(

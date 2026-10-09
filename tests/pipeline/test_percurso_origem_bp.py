@@ -7,7 +7,7 @@ from __future__ import annotations
 import asyncio
 
 import pytest
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
 
 from tests.pipeline.conftest import RegistroFake
@@ -42,7 +42,11 @@ def api(repo, lock, jobs, notificador):
     app = FastAPI()
     app.include_router(rotas.router)
     app.dependency_overrides[repositorio] = lambda: repo
-    app.dependency_overrides[unidade_autorizada] = lambda: ENTE
+    def autorizada(request: Request) -> str:
+        request.state.poderes = ("consolidado",)   # o que `unidade_autorizada` grava
+        return ENTE
+
+    app.dependency_overrides[unidade_autorizada] = autorizada
     app.state.portas = {"fila_async": lambda: fila, "lock": lock, "jobs": jobs,
                         "repo_vigencias": None, "base_url": "", "notificador": notificador}
     return TestClient(app, raise_server_exceptions=False), fila

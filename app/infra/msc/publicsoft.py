@@ -85,6 +85,9 @@ class PublicSoftMSC:
         self._url_saldos = url_saldos
         self._timeout = timeout
         self._responsavel = responsavel
+        # A base por UG responde 422 a ente sem UG (MSC importada por CSV). Uma tentativa por
+        # instância — uma por job —, depois a base oficial direto: o recorte desse ente é por PO.
+        self._sem_ug = False
 
     def registros(self, ente: int, ano: int, mes: int, classe: int,
                   matriz: Matriz = Matriz.CONSOLIDADA,
@@ -92,16 +95,12 @@ class PublicSoftMSC:
         import requests
 
         competencia = self._competencia(mes, matriz)
+        # Só o que o DTO aceita: o pipe usa `forbidNonWhitelisted` (campo extra = 400).
+        # A matriz já está na competência (13 = encerramento).
+        params = {"anReferencia": ano, "meReferencia": competencia,
+                  "classeConta": classe, "idTv": ID_TV[tipo_saldo]}
         try:
-            resposta = self._http(
-                self._url_saldos,
-                # Só o que o DTO aceita: o pipe usa `forbidNonWhitelisted` (campo extra = 400).
-                # A matriz já está na competência (13 = encerramento).
-                params={"anReferencia": ano, "meReferencia": competencia,
-                        "classeConta": classe, "idTv": ID_TV[tipo_saldo]},
-                headers=self._cabecalhos(),
-                timeout=self._timeout,
-            ) or {}
+            resposta = self._saldos(params)
         except requests.HTTPError as erro:
             if erro.response is not None and erro.response.status_code == HTTPStatus.CONFLICT:
                 logger.warning("PublicSoft 409 auditoria não liberada | ente=%s ano=%s "
@@ -109,6 +108,23 @@ class PublicSoftMSC:
                 return []
             raise
         return [normalizar(item) for item in itens(resposta)]
+
+    def _saldos(self, params: dict) -> dict:
+        """Base por UG (`/unidades-gestoras`, sem filtro); a oficial se o ente não tem UG."""
+        import requests
+
+        if not self._sem_ug:
+            try:
+                return self._http(f"{self._url_saldos}/unidades-gestoras", params=params,
+                                  headers=self._cabecalhos(), timeout=self._timeout) or {}
+            except requests.HTTPError as erro:
+                resposta = erro.response
+                if resposta is None or resposta.status_code != HTTPStatus.UNPROCESSABLE_ENTITY:
+                    raise
+                logger.warning("PublicSoft sem base por UG (422) | recorte por poder/órgão")
+                self._sem_ug = True
+        return self._http(self._url_saldos, params=params, headers=self._cabecalhos(),
+                          timeout=self._timeout) or {}
 
     @staticmethod
     def _competencia(mes: int, matriz: Matriz) -> int:

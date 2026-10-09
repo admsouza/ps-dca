@@ -27,6 +27,9 @@ class Registro(NamedTuple):
     poder_orgao: str = ""
     fonte_recursos: str = ""
     financeiro_permanente: str = ""   # "F" | "P" | "" — atributo do fato, nunca do PCASP (IPC 04)
+    # Só a base por UG da PublicSoft informa; vazio no SICONFI e na base oficial (recorte por PO).
+    unidade_gestora: str = ""
+    nome_unidade_gestora: str = ""
 
 
 class ContaCC(NamedTuple):

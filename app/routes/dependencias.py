@@ -70,7 +70,7 @@ async def unidade_autorizada(
     hub = AutorizadorHub()
     if hub.configurado and sub:
         try:
-            await hub.autorizar(sub, ente)
+            request.state.poderes = await hub.autorizar(sub, ente)
         except SemAcessoAUnidade as erro:
             raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(erro)) from erro
         except HubIndisponivel as erro:
@@ -79,6 +79,7 @@ async def unidade_autorizada(
                                 detail="serviço de autorização indisponível") from erro
     else:
         _autorizar_pelo_token(claims, ente)
+        request.state.poderes = ("consolidado",)   # modo local: só development/test/local
 
     request.state.claims = claims
     request.state.ente = ente

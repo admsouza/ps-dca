@@ -139,4 +139,11 @@ def para_dados(resultado) -> dict:
                    "equilibrio": {coluna: _valor(v) for coluna, v in visao.equilibrio.items()}}
             for nome, visao in resultado.visoes.items()
         }
+    # Recortes (BO e BP): cada um é um resultado completo; a rota serve um deles, nunca soma.
+    if getattr(resultado, "recortes", None):
+        dados["recortes"] = {
+            chave: {"tipo": r.tipo, "rotulo": r.rotulo, "poderOrgao": r.poder_orgao,
+                    "resultado": para_dados(r.resultado)}
+            for chave, r in resultado.recortes.items()
+        }
     return dados

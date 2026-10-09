@@ -91,6 +91,7 @@ def test_corpo_do_200_traz_a_marca(repo, lock, jobs):
 
     def autorizada(request: Request) -> str:
         request.state.claims = {"sub": "u@x"}
+        request.state.poderes = ("consolidado",)
         return ENTE
 
     class Fila:

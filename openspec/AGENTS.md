@@ -55,6 +55,8 @@ Specs em vigor: `dca/base-canonica-regras`, `dca/balanco-orcamentario`,
 
 **Change ativa, em implementação:** `bp-superavit-por-fonte` — Quadro do Superávit / Déficit Financeiro por fonte+complemento, saldo `C − D` de `821110100` e `821110200`, inclusive fonte que começa com `2` (PO 2026-10-08). Cuitegi 2025: `Total` 44.986.989,00 / 13.279.106,25 (fonte vazia só no aviso). A linha publica `fonte` com 4 dígitos. Código e testes no working tree; arquivamento pendente da conferência viva (task 4.3).
 
+**Change ativa, fase PLAN/ARCH (proposal aprovada 2026-10-09):** `pipeline-dca-por-unidade-gestora` — BO e BP: o job apura consolidado, grupos de poder e cada unidade — UG (base `unidades-gestoras` do `ps-erp`) ou, em ente sem UG (CSV ou SICONFI), PO — e a leitura escolhe `?recorte=` sem reprocessar; recorte = mesmo serviço sobre fonte filtrada; BP fora do consolidado com anterior da MSCE; UGs visíveis pelo poder do usuário no hub (depende de `poderes` em `/internal/authorize`, change `CH-46` do `regras-rgf-api`). BF em standby (estornos sem UG). PO 2026-10-09.
+
 **Change ativa, em implementação:** `dca-regra-na-celula` — `GET /dca/{anexo}/regra` e diálogo no BF.
 Anexo sem projeção registrada responde 404. Não arquivada.
 

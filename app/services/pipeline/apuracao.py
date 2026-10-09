@@ -13,7 +13,7 @@ import hashlib
 import logging
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 from app.core.config import config
 
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 # Código que muda o número. Rota, auth e cache ficam de fora: alteração ali não muda célula.
 _RAIZ_APP = Path(__file__).resolve().parents[2]
 _CODIGO_DA_APURACAO = (
-    _RAIZ_APP / "domain" / "bo",
+    _RAIZ_APP / "domain",               # motor (bo/) e recortes por unidade (recorte.py)
     _RAIZ_APP / "services" / "bf",
     _RAIZ_APP / "services" / "bo",
     _RAIZ_APP / "services" / "bp",
@@ -112,6 +112,107 @@ class _NoEscopo:
         return getattr(self._bruta, nome)
 
 
+# Anexos apurados também por recorte (change `pipeline-dca-por-unidade-gestora`). O BF fica fora:
+# os estornos de receita/despesa extra são do ente, sem UG.
+RECORTAVEIS = ("BO", "BP")
+
+
+class Recorte(NamedTuple):
+    tipo: str              # poder | ug | po
+    rotulo: str
+    poder_orgao: str       # vazio em grupo de poder
+    resultado: Any
+
+
+class _Repasse:
+    """Base das fontes que só mexem nos registros; estorno e afins seguem para a fonte real."""
+
+    def __init__(self, fonte) -> None:
+        self._fonte = fonte
+
+    def __getattr__(self, nome: str):
+        return getattr(self._fonte, nome)
+
+
+class _Observada(_Repasse):
+    """Repassa os registros e anota as unidades que aparecem: `{unidade: (nome, {poder_orgao})}`."""
+
+    def __init__(self, fonte) -> None:
+        super().__init__(fonte)
+        self.unidades: dict[str, tuple[str, set[str]]] = {}
+
+    def registros(self, *args, **kwargs):
+        from app.domain.recorte import unidade
+
+        lidos = self._fonte.registros(*args, **kwargs)
+        for registro in lidos:
+            nome, poderes = self.unidades.setdefault(
+                unidade(registro), (registro.nome_unidade_gestora, set()))
+            poderes.add(registro.poder_orgao)
+        return lidos
+
+
+class _Filtrada(_Repasse):
+    """Só os registros das `unidades` do recorte.
+
+    ponytail: filtra a lista inteira a cada leitura — O(registros × recortes). Particionar uma vez
+    por leitura se o job de um ente grande pesar.
+    """
+
+    def __init__(self, fonte, unidades: set[str]) -> None:
+        super().__init__(fonte)
+        self._unidades = unidades
+
+    def registros(self, *args, **kwargs):
+        from app.domain.recorte import unidade
+
+        return [r for r in self._fonte.registros(*args, **kwargs) if unidade(r) in self._unidades]
+
+
+def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, **extras) -> Any:
+    """O consolidado de hoje e, em `.recortes`, cada grupo de poder e cada unidade.
+
+    Cada recorte é o mesmo `apurar` sobre a fonte filtrada: dentro do `escopo()` do job a leitura já
+    está memorizada, então nada volta à fonte. No BP, fora do consolidado, a coluna anterior é a
+    MSC do recorte — a DCA publicada só existe consolidada.
+
+    ponytail: unidade que só existe no ano anterior não vira recorte quando o consolidado do BP usa
+    o publicado (ela nunca é lida). Ler a MSC anterior para descobri-la se aparecer o caso.
+    """
+    from app.domain import recorte as dominio
+
+    observada = _Observada(fonte)
+    resultado = apurar(ente, exercicio, fonte=observada, **extras)
+    extras_recorte = {**extras, **_aceitos_por(apurar, {"anterior": "msce_exercicio_anterior"})}
+    extras_recorte.pop("dca", None)
+
+    # Unidade com mais de um PO não pertence a um poder só: fica fora dos grupos.
+    poder_orgao = {u: next(iter(pos)) if len(pos) == 1 else ""
+                   for u, (_, pos) in observada.unidades.items()}
+    resultado.recortes = {
+        chave: Recorte(
+            tipo=dominio.tipo(chave),
+            rotulo=_rotulo(chave, observada.unidades),
+            poder_orgao="" if chave in dominio.GRUPOS else poder_orgao[chave],
+            resultado=apurar(ente, exercicio, fonte=_Filtrada(fonte, membros), **extras_recorte),
+        )
+        for chave, membros in dominio.recortes(poder_orgao).items()
+        if membros         # grupo sem unidade (ex.: ente sem registro da Câmara): nada a emitir
+    }
+    return resultado
+
+
+def _rotulo(chave: str, unidades: dict[str, tuple[str, set[str]]]) -> str:
+    from app.domain.recorte import NOMES_PO, ROTULOS
+
+    if chave in ROTULOS:
+        return ROTULOS[chave]
+    codigo = chave.split(":", 1)[1]
+    if chave.startswith("ug:"):
+        return unidades[chave][0] or f"Unidade gestora {codigo}"
+    return NOMES_PO.get(codigo, f"Poder/Órgão {codigo}")
+
+
 def mapa_vigente(exercicio: int, anexo: str = "BO", repo_vigencias=None):
     """Mapa do anexo para o exercício. Do banco quando houver repositório; do YAML na semente.
 
@@ -157,9 +258,10 @@ def apurador(anexo: str = "BO", *, fonte_nome: str | None = None, token: str | N
     extras = _aceitos_por(apurar, {k: v for k, v in (parametros or {}).items() if k != "fonte"})
 
     def _apurar(ente: int, exercicio: int):
-        return apurar(ente, exercicio, fonte=dados,
-                      mapa=mapa_vigente(exercicio, descricao.codigo, repo_vigencias),
-                      **extras)
+        mapa = mapa_vigente(exercicio, descricao.codigo, repo_vigencias)
+        if descricao.codigo in RECORTAVEIS:
+            return com_recortes(apurar, ente, exercicio, dados, mapa=mapa, **extras)
+        return apurar(ente, exercicio, fonte=dados, mapa=mapa, **extras)
 
     return _apurar
 

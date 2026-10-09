@@ -21,6 +21,8 @@ CAMPOS = {
     "poder_orgao": ("poder_orgao", "poderOrgao"),
     "fonte_recursos": ("fonte_recursos", "fonteRecursos"),
     "financeiro_permanente": ("financeiro_permanente", "financeiroPermanente"),
+    "unidade_gestora": ("idUnidadeGestora", "id_unidade_gestora"),
+    "nome_unidade_gestora": ("nomeUnidadeGestora", "nome_unidade_gestora"),
 }
 # Domínio confirmado pelo PO (2026-10-07). Outro valor não é inferido: vira resíduo no BP.
 FINANCEIRO_PERMANENTE = {"1": "F", "2": "P"}
@@ -66,6 +68,9 @@ def normalizar(bruto: dict) -> Registro:
         poder_orgao=_primeiro(bruto, CAMPOS["poder_orgao"]),
         fonte_recursos=_primeiro(bruto, CAMPOS["fonte_recursos"]),
         financeiro_permanente=_financeiro_permanente(bruto),
+        # `str`: a UG vem inteira (`0` é a UG técnica "Sem unidade gestora identificada").
+        unidade_gestora=str(_primeiro(bruto, CAMPOS["unidade_gestora"])),
+        nome_unidade_gestora=_primeiro(bruto, CAMPOS["nome_unidade_gestora"]),
     )
 
 

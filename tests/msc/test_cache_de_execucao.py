@@ -138,4 +138,5 @@ def test_publicsoft_nao_pre_checa_auditoria():
     for classe in (1, 2, 3, 4, 5, 6):
         fonte.registros(ENTE, EXERCICIO, 12, classe)
 
-    assert chamadas == ["s"] * 6
+    # Base por UG desde `pipeline-dca-por-unidade-gestora`; ainda uma leitura por classe.
+    assert chamadas == ["s/unidades-gestoras"] * 6

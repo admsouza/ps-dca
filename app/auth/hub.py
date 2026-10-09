@@ -21,6 +21,8 @@ logger = logging.getLogger(__name__)
 TIMEOUT = 3.0
 CAMINHO = "/internal/authorize"
 CAMINHO_TENANT = "/internal/resolve-tenant"
+# Vocabulário de `usuario_poder` no hub. Valor fora dele não concede nada.
+PODERES = ("consolidado", "executivo", "judiciario", "legislativo")
 
 
 class HubIndisponivel(RuntimeError):
@@ -52,7 +54,12 @@ class AutorizadorHub:
     def configurado(self) -> bool:
         return bool(self._base and self._secret)
 
-    async def autorizar(self, sub: str, cod_ibge: str) -> None:
+    async def autorizar(self, sub: str, cod_ibge: str) -> tuple[str, ...]:
+        """Confirma o vínculo e devolve os poderes do usuário (`regras-rgf-api` CH-46).
+
+        Hub anterior à CH-46, sem o campo, devolve `()`: BO e BP respondem `403` até o hub subir —
+        fail closed, nunca o consolidado por omissão.
+        """
         if not self.configurado:
             raise HubIndisponivel("AUTH_API_URL/S2S_API_SECRET não configurados")
 
@@ -68,6 +75,8 @@ class AutorizadorHub:
         if codigo != 200:
             # 401 e 5xx são problema **nosso** com o hub, não do requisitante.
             raise HubIndisponivel(f"hub respondeu {codigo}")
+        poderes = (resposta.get("corpo") or {}).get("poderes") or []
+        return tuple(p for p in poderes if p in PODERES)
 
     async def resolver_token(self, sub: str, cod_ibge: str) -> str:
         """`token_ps` da unidade — `POST /internal/resolve-tenant`, o contrato do RGF e do RREO.

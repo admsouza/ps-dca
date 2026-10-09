@@ -173,6 +173,7 @@ def api(repo, lock, jobs, notificador):
 
     def autorizada(request: Request) -> str:
         request.state.claims = {"sub": "jackson@x"}   # o que `unidade_autorizada` grava
+        request.state.poderes = ("consolidado",)
         return CUITEGI
 
     class Fila:
