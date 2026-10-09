@@ -82,7 +82,7 @@ def test_classes_lidas_por_demonstrativo(fonte_de):
     """Requisito: as classes contábeis lidas entram na mesma tabela do par."""
     assert fonte_de("BO").classes == (5, 6)
     # BP: `L5` Passivo Financeiro lê RP e créditos empenhados a liquidar, da classe 6 (D3).
-    assert fonte_de("BP").classes == (1, 2, 6)
+    assert fonte_de("BP").classes == (1, 2, 6, 8)
     assert fonte_de("DVP").classes == (3, 4)
     assert set(fonte_de("BF").classes) == {1, 2, 3, 4, 5, 6}
 

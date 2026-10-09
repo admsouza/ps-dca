@@ -45,7 +45,7 @@ def test_coluna_anterior_le_o_encerramento_do_exercicio_anterior(apurar_bp):
     """Scenario: coluna anterior lê o encerramento do exercício anterior
 
     Cobre também o Scenario: leitura só pelo par do BP — toda chamada usa `MSCE`, encerramento e
-    as classes 1, 2 e 6, e `apurar` não aceita parâmetro que mude o par.
+    as classes 1, 2, 6 e 8, e `apurar` não aceita parâmetro que mude o par.
     """
     from app.infra.msc.fonte import Matriz, TipoSaldo
 
@@ -54,7 +54,7 @@ def test_coluna_anterior_le_o_encerramento_do_exercicio_anterior(apurar_bp):
 
     assert celula(resultado, PRINCIPAL, "L3", "exercicio_anterior") == Decimal("7.00")
     assert {c["ano"] for c in fonte.chamadas} == {2025, 2024}
-    assert {c["classe"] for c in fonte.chamadas} == {1, 2, 6}
+    assert {c["classe"] for c in fonte.chamadas} == {1, 2, 6, 8}
     assert {c["matriz"] for c in fonte.chamadas} == {Matriz.ENCERRAMENTO}
     assert {c["tipo_saldo"] for c in fonte.chamadas} == {TipoSaldo.ENCERRAMENTO}
 

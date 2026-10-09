@@ -21,13 +21,16 @@ O que é próprio do BP (change `bp-apuracao-f1`, medido em `docs/evidencia-bp-f
 from __future__ import annotations
 
 import time
+from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from enum import StrEnum
+from functools import lru_cache
+from pathlib import Path
 
 from app.domain.bo.matriz import apurar as apurar_matriz
 from app.domain.bo.matriz import ordem_topologica
-from app.domain.bo.modelo import MapaBO, NaoApurada, Registro, Residuo
+from app.domain.bo.modelo import Linha, MapaBO, NaoApurada, Registro, Residuo
 from app.domain.bo.saldo import _casa, saldo_da_conta
 from app.infra.msc.fonte import COMPETENCIA_DE_ENCERRAMENTO, fonte_de
 from app.infra.pcasp.natureza import do_pcasp
@@ -46,6 +49,9 @@ FP_PUBLICADO = {"L2": "AtivoFinanceiro", "L3": "AtivoPermanente",
                 "L5": "PassivoFinanceiro", "L6": "PassivoPermanente"}
 QUADRO_FP = "ATIVOS_PASSIVOS_FINANCEIROS"
 NAO_PUBLICADO = "total F/P não publicado no I-AB"
+QUADRO_SUPERAVIT = "SUPERAVIT_DEFICIT"
+CONTAS_SUPERAVIT = ("821110100", "821110200")
+_RAIZ = Path(__file__).resolve().parents[3]
 
 
 class Anterior(StrEnum):
@@ -168,6 +174,12 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
     # ponytail: as duas visões incluem todas as contas (PO 2026-10-08).
     # Os filtros visao=consolidado ficam na regra e não entram na apuração.
     atual, coluna_anterior, matriz = apurar_visao(_sem_visao(mapa, CONSOLIDADO))
+    anterior_superavit = registros_anterior if anterior is Anterior.MSCE else list(
+        fonte.registros(ente=ente, ano=exercicio - 1, mes=competencia, classe=8,
+                        matriz=origem.matriz, tipo_saldo=origem.tipo_saldo))
+    mapa, atual, coluna_anterior = _superavit(
+        mapa, matriz, registros_atual, anterior_superavit, atual, coluna_anterior,
+    )
 
     return Resultado(
         mapa=mapa,
@@ -334,6 +346,83 @@ def _residuos_fp(cobertos: list[Registro], direcao) -> list[Residuo]:
             continue
         total += saldo_da_conta([registro], bool(direcao.credora(registro.conta)))
     return [Residuo("financeiro_permanente", "(sem atributo na MSC)", total)] if total else []
+
+
+def _superavit(mapa: MapaBO, matriz: dict, atual: list[Registro], anterior: list[Registro],
+               coluna_atual: _Coluna, coluna_anterior: _Coluna,
+               ) -> tuple[MapaBO, _Coluna, _Coluna]:
+    """Uma linha por fonte+complemento. O total deixa de ser célula bloqueada."""
+    saldos_atual = _saldos_por_fonte(atual)
+    saldos_anterior = _saldos_por_fonte(anterior)
+    total = next((linha for linha in mapa.linhas
+                  if linha.quadro == QUADRO_SUPERAVIT and linha.codigo == "Total"), None)
+    if total is None:
+        return mapa, coluna_atual, coluna_anterior
+
+    linhas_fonte: list[Linha] = []
+    for codigo in sorted(set(saldos_atual) | set(saldos_anterior)):
+        valor_atual = saldos_atual.get(codigo, Decimal("0.00"))
+        valor_anterior = saldos_anterior.get(codigo, Decimal("0.00"))
+        if valor_atual == 0 and valor_anterior == 0:
+            continue
+        linhas_fonte.append(total._replace(
+            id=f"bp.superavit_deficit.{codigo}",
+            codigo=codigo,
+            rotulo=_rotulo_fonte(codigo),
+            bloqueio="",
+            ordem=len(linhas_fonte) + 1,
+            nivel=2,
+            colunas=(),
+            referencias=(),
+        ))
+        matriz[linhas_fonte[-1].id] = {COLUNA_ATUAL: valor_atual, COLUNA_ANTERIOR: valor_anterior}
+
+    matriz[total.id] = {COLUNA_ATUAL: sum(saldos_atual.values(), Decimal("0.00")),
+                        COLUNA_ANTERIOR: sum(saldos_anterior.values(), Decimal("0.00"))}
+    total = total._replace(ordem=len(linhas_fonte) + 1, bloqueio="")
+    demais = tuple(linha for linha in mapa.linhas if linha.quadro != QUADRO_SUPERAVIT)
+    mapa = replace(mapa, linhas=(*demais, *linhas_fonte, total))
+    ids = {linha.id for linha in linhas_fonte} | {total.id}
+
+    def _sem(coluna: _Coluna) -> _Coluna:
+        return replace(coluna, nao_apuradas=[
+            n for n in coluna.nao_apuradas if n.rule_id not in ids])
+
+    return mapa, _sem(coluna_atual), _sem(coluna_anterior)
+
+
+def _saldos_por_fonte(registros: list[Registro]) -> dict[str, Decimal]:
+    saldos: dict[str, Decimal] = defaultdict(Decimal)
+    for registro in registros:
+        if registro.conta not in CONTAS_SUPERAVIT:
+            continue
+        chave = _cod4(registro.fonte_recursos) + _cod4(registro.complemento_fonte, "0000")
+        saldos[chave] += registro.valor if registro.natureza == "C" else -registro.valor
+    return saldos
+
+
+def _cod4(valor: str, padrao: str = "") -> str:
+    return ("".join(filter(str.isdigit, valor)) or padrao).zfill(4)[-4:]
+
+
+@lru_cache(maxsize=2)
+def _nomes_stn(arquivo: str) -> dict[str, str]:
+    nomes: dict[str, str] = {}
+    for linha in (_RAIZ / arquivo).read_text(encoding="utf-8").splitlines():
+        if not linha.startswith("|"):
+            continue
+        celulas = [c.strip() for c in linha.strip("|").split("|")]
+        if celulas[0].isdigit():
+            nomes[celulas[0]] = celulas[1]
+    return nomes
+
+
+def _rotulo_fonte(codigo: str) -> str:
+    nome = _nomes_stn("docs/contas-stn/fonte-recursos.md").get(codigo[1:4], codigo[1:4])
+    if codigo[4:] == "0000":
+        return nome
+    extra = _nomes_stn("docs/contas-stn/complemento-fonte.md").get(codigo[4:], codigo[4:])
+    return f"{nome} — {extra}"
 
 
 def _equilibrio(mapa: MapaBO, matriz: dict) -> dict[str, Decimal]:

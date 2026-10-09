@@ -58,7 +58,7 @@ def test_semente_e_idempotente(semear):
 
 
 def test_semente_divergente_publica_o_mes_seguinte(semear):
-    """YAML novo no boot publica o mês seguinte e deixa a semente anterior intacta."""
+    """Requisito: YAML novo no boot publica o mês seguinte e deixa a semente anterior intacta."""
     from app.infra.regras.vigencias import resolver
 
     repo = RepoVigenciasFake()

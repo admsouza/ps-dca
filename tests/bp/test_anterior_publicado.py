@@ -47,7 +47,8 @@ def test_publicado_e_o_padrao():
     assert celula(resultado, PRINCIPAL, "L3", ANT) == Decimal("19812433.77")
     assert resultado.procedencia.origem_exercicio_anterior == "publicado_siconfi"
     assert dca.chamadas == [(ENTE, 2024)]
-    assert {c["ano"] for c in fonte.chamadas} == {EXERCICIO}, "o publicado não lê a MSC de 2024"
+    assert {c["ano"] for c in fonte.chamadas if c["classe"] != 8} == {EXERCICIO}
+    assert {(c["ano"], c["classe"]) for c in fonte.chamadas if c["ano"] == 2024} == {(2024, 8)}
     assert celula(resultado, PRINCIPAL, "L3") == Decimal("26286597.15")
 
 
@@ -170,10 +171,12 @@ def test_ente_sem_publicacao_no_ano_anterior():
     fonte = FontePorAno({**FONTE_ATUAL, 2024: {1: [fp("111110100", "7.00", "F")]}})
     resultado = apurar(ENTE, EXERCICIO, fonte, dca=DCAFake([]))
 
-    assert all(valores[ANT] is None for valores in resultado.matriz.values())
+    demais = {regra: valores for regra, valores in resultado.matriz.items()
+              if not regra.startswith("bp.superavit_deficit")}
+    assert all(valores[ANT] is None for valores in demais.values())
     assert resultado.diagnostico.sem_publicacao_exercicio_anterior is True
     assert celula(resultado, PRINCIPAL, "L3") == Decimal("26286597.15")
-    assert 2024 not in {c["ano"] for c in fonte.chamadas}, "nunca cai para a MSC"
+    assert {c["classe"] for c in fonte.chamadas if c["ano"] == 2024} == {8}
 
 
 def test_tt_dca_fora_do_ar_e_erro_explicito():

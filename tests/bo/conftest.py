@@ -116,6 +116,7 @@ def registro(conta: str, natureza: str, valor: str, **classificadores):
         subfuncao=classificadores.get("subfuncao", ""),
         poder_orgao=classificadores.get("poder_orgao", ""),
         fonte_recursos=classificadores.get("fonte_recursos", ""),
+        complemento_fonte=classificadores.get("complemento_fonte", ""),
     )
 
 

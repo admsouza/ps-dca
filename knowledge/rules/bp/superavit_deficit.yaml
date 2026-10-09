@@ -32,18 +32,10 @@ rules:
     extraction_method: assisted
     extractor_version: '1.0'
     extracted_at: '2026-10-02'
-  status: review_required
+  status: extracted
   review:
     required: true
-    reason: A IPC define abertura paramétrica por fonte/destinação de recurso e não enumera linhas.
-    blocker: A cardinalidade e os códigos das linhas por fonte dependem da classificação do ente; a skill determina gerar
-      somente a regra de total.
-    candidate:
-      account_literal: 8.2.1.1.1.00.00
-      account_pattern: '82111'
-      dimension: fonte/destinação de recurso
-      total_rule_applied: true
-      per_source_rows_applied: false
+    reason: As linhas por fonte saem da MSC na apuração (change bp-superavit-por-fonte, PO 2026-10-08). O YAML guarda só o total.
   columns:
     exercicio_atual:
       label: Exercício Atual

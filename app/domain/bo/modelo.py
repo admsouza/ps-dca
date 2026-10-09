@@ -27,6 +27,7 @@ class Registro(NamedTuple):
     poder_orgao: str = ""
     fonte_recursos: str = ""
     financeiro_permanente: str = ""   # "F" | "P" | "" — atributo do fato, nunca do PCASP (IPC 04)
+    complemento_fonte: str = ""       # destinação; vazio no quadro de superávit vale 0000
 
 
 class ContaCC(NamedTuple):
