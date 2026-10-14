@@ -26,6 +26,7 @@ Fatia vertical: Cuitegi (`2505204`) 2025, BO e BP, unidades por UG (PublicSoft) 
 - [x] 2.5 `resultado.para_dados`: `recortes`
 - [x] 2.6 `hub.autorizar` → `poderes`; `request.state.poderes` (D7)
 - [x] 2.7 `GET /dca/{BO|BP}`: `recorte`, padrão do poder, `recortesDisponiveis` (D6)
+- [x] 2.8 Bug (achado em 2026-10-13, PO decidiu corrigir nesta change): `PublicSoftMSC._sem_ug` vale para a instância. Um `422` em N−1 (CSV) faz as leituras seguintes de N irem à base oficial, sem UG, e os recortes saem incompletos sem nenhum erro. A flag passa a ser por `ano`. Teste antes: `422` só em 2024 mantém o UG em todas as classes de 2025 (D4 continua com uma tentativa por exercício). Os registros de 2024 sem UG não viram unidade `po:` (cenário "N−1 sem UG num job por UG")
 
 ## 3. REVIEW
 - [x] 3.1 `git diff` completo: sem arquivo fora do escopo, sem código morto, sem `print`/segredo/`TODO` órfão

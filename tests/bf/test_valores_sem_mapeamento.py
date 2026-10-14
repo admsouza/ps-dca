@@ -57,3 +57,19 @@ def test_valor_nao_decimal_e_recusado():
 
     with pytest.raises(ValueError):
         validar_valores_sem_mapeamento({"L22": "abc"})
+
+
+def test_celula_none_do_anterior_processado_vira_nao_apurada():
+    from app.services.bf.quadro_principal import Anterior, apurar
+
+    pronto = {"matriz": {("QUADRO_PRINCIPAL", "L2"): {"exercicio_anterior": None},
+                         ("QUADRO_PRINCIPAL", "L3"): {"exercicio_anterior": Decimal("1.00")}}}
+
+    r = apurar(ENTE, EXERCICIO, fonte_com(), anterior=Anterior.PROCESSADO,
+               anterior_pronto=pronto)
+
+    ids = {i.codigo: i.id for i in r.mapa.linhas if i.quadro == "QUADRO_PRINCIPAL"}
+    motivos = {(n.rule_id, n.coluna): n.motivo for n in r.diagnostico.nao_apuradas}
+    assert r.matriz[ids["L2"]]["exercicio_anterior"] is None
+    assert motivos[(ids["L2"], "exercicio_anterior")] == "não apurada no exercício anterior"
+    assert (ids["L3"], "exercicio_anterior") not in motivos

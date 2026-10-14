@@ -76,7 +76,8 @@ class Fila(Protocol):
 
 def identidade_do_pedido(*, anexo: str, competencia: int = 12,
                          origem_anterior: str = "", valores_anteriores=None,
-                         valores_sem_mapeamento=None, fonte: str = "", **_ignorados) -> str:
+                         valores_sem_mapeamento=None, fonte: str = "",
+                         anterior_por_recorte: dict | None = None, **_ignorados) -> str:
     """O que, além de ente/exercício/anexo, distingue dois resultados do mesmo demonstrativo.
 
     `versao_api` e `versao_regras` invalidam o cache quando **código** ou **regra** mudam. Há
@@ -84,6 +85,9 @@ def identidade_do_pedido(*, anexo: str, competencia: int = 12,
     origem da coluna do exercício anterior — apurada da matriz do ano anterior ou informada à mão.
     Sem entrar na identidade, um resultado com a coluna preenchida manualmente seria servido a quem
     pediu a coluna apurada, e a diferença não apareceria em lugar nenhum.
+
+    `anterior_por_recorte` (`{unidade: {origem, valores?}}`) entra por último, como `ar-<hash>`, e
+    só com escolha explícita: a origem que o padrão resolve não é escolha, e fica de fora.
     """
     import hashlib
 
@@ -98,27 +102,50 @@ def identidade_do_pedido(*, anexo: str, competencia: int = 12,
         partes.append("g8-" + hashlib.sha256(pares.encode("utf-8")).hexdigest()[:16])
     if fonte:
         partes.append(f"f={fonte}")      # SICONFI e PublicSoft dão números diferentes
+    if anterior_por_recorte:
+        partes.append(_sufixo_das_escolhas(anterior_por_recorte))
     return ":".join(partes)
+
+
+def _sufixo_das_escolhas(escolhas: dict[str, dict]) -> str:
+    import hashlib
+
+    pares = ";".join(
+        f"{unidade}={escolha['origem']}|"
+        + ",".join(f"{codigo}={valor}" for codigo, valor in sorted(
+            (escolha.get("valores") or {}).items()))
+        for unidade, escolha in sorted(escolhas.items()))
+    return "ar-" + hashlib.sha256(pares.encode("utf-8")).hexdigest()[:16]
 
 
 ORIGEM_PADRAO_BP = "publicado_siconfi"
 
 
 def parametros_efetivos(pedido: dict | None, registro, anexo: str = "") -> dict:
-    """O que o BF vai apurar. O BP tem regra própria (`_parametros_bp`).
+    """O que o anexo vai apurar: a origem do consolidado e as escolhas por unidade.
 
-    Origem MSC explícita não reaproveita mapa do anterior. Manual no pedido vale o que veio.
-    Pedido sem origem reaplica `procedencia.valores_anteriores` da linha, quando houver.
+    Consolidado do BF: `msce` explícita não reaproveita mapa do anterior; `processado` e `manual`
+    valem o que veio; pedido sem origem reaplica `procedencia.valores_anteriores` da linha, quando
+    houver. Consolidado do BP: origem sempre explícita, padrão `publicado_siconfi`, sem mapa salvo.
 
     O mapa G8 do atual é independente disso (D2): pedido com a chave `valores_sem_mapeamento`
     vale o que veio (vazio limpa); pedido sem a chave reaplica `procedencia.valores_sem_mapeamento`.
+
+    Por unidade (`anterior_por_recorte`): vale a gravada nos recortes, com o pedido por cima.
     """
     pedido = dict(pedido or {})
-    if anexo == "BP":
-        return _parametros_bp(pedido)
+    saida = (_parametros_bp(pedido) if anexo == "BP"
+             else _parametros_consolidado(pedido, registro))
+    saida.update(_por_unidade(pedido, registro))
+    return saida
+
+
+def _parametros_consolidado(pedido: dict, registro) -> dict:
     origem = pedido.get("origem_anterior") or ""
     if origem == "msce_exercicio_anterior":
         saida = {}
+    elif origem == "processado_exercicio_anterior":
+        saida = {"origem_anterior": origem, "anterior": origem}
     elif origem == "manual":
         saida = _manual(pedido.get("valores_anteriores") or {})
     else:
@@ -152,6 +179,46 @@ def _parametros_bp(pedido: dict) -> dict:
     return saida
 
 
+def _por_unidade(pedido: dict, registro) -> dict:
+    """`anterior_por_recorte`: o gravado nos recortes, com o pedido por cima (`padrao` limpa).
+
+    `anterior_agora` são as unidades que o pedido escolheu — só elas viram erro quando o
+    `processado` não encontra N−1; o gravado cai em `msce`.
+    """
+    escolhas = escolhas_gravadas(registro)
+    pedidas = pedido.get("anterior_por_recorte") or {}
+    for unidade, escolha in pedidas.items():
+        if escolha["origem"] == "padrao":
+            escolhas.pop(unidade, None)
+        else:
+            escolhas[unidade] = escolha
+    saida = {"anterior_por_recorte": escolhas} if escolhas else {}
+    if pedidas:
+        saida["anterior_agora"] = sorted(pedidas)
+    return saida
+
+
+def escolhas_gravadas(registro) -> dict[str, dict]:
+    """Escolhas da linha: procedência de topo (sobrevive a erro) ou, em cache antigo, recortes."""
+    procedencia = getattr(registro, "procedencia", None)
+    topo = procedencia.get("anterior_por_recorte") if isinstance(procedencia, dict) else None
+    if topo:
+        return {unidade: dict(escolha) for unidade, escolha in topo.items()}
+    return escolhas_do_resultado(getattr(registro, "resultado", None))
+
+
+def escolhas_do_resultado(resultado) -> dict[str, dict]:
+    """As escolhas explícitas que a procedência de cada recorte gravou (`escolha_anterior`)."""
+    gravados = resultado.get("recortes") if isinstance(resultado, dict) else None
+    saida = {}
+    for unidade, recorte in (gravados or {}).items():
+        procedencia = (recorte.get("resultado") or {}).get("procedencia") or {}
+        escolha = procedencia.get("escolha_anterior")
+        if escolha:
+            saida[unidade] = dict(escolha)
+    return saida
+
+
 def _manual(valores) -> dict:
     return {"origem_anterior": "manual", "anterior": "manual", "valores_anteriores": dict(valores)}
 
@@ -179,6 +246,22 @@ def versao_do_pedido(versao_regras: str, anexo: str, parametros: dict | None) ->
     if not parametros:
         return versao_regras
     return f"{versao_regras}|{identidade_do_pedido(anexo=anexo, **parametros)}"
+
+
+def versao_apos_apurar(versao_regras: str, dados: dict) -> str:
+    """A versão a gravar: o `ar-<hash>` refeito com as escolhas que o job de fato gravou.
+
+    A rota e o worker identificam o pedido antes de saber quais unidades existem: escolha de unidade
+    inexistente é descartada na apuração, e a leitura seguinte reconstrói a identidade só do que
+    ficou gravado. Sem refazer, ela marcaria `pedido` sem motivo.
+    """
+    regras, separador, pedido = versao_regras.partition("|")
+    if not separador:
+        return versao_regras
+    partes = [p for p in pedido.split(":") if not p.startswith("ar-")]
+    if escolhas := escolhas_do_resultado(dados):
+        partes.append(_sufixo_das_escolhas(escolhas))
+    return f"{regras}|{':'.join(partes)}"
 
 
 def _url_de_job(job_id: str, base: str = "") -> tuple[str, str]:

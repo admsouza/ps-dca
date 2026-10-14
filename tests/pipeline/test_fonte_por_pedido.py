@@ -117,6 +117,7 @@ def cliente():
 
         def _unidade(request: Request) -> str:
             request.state.claims = {"sub": "u@x"}
+            request.state.poderes = ("consolidado",)   # BF também lê por recorte (fail closed)
             return ENTE
 
         app.dependency_overrides[unidade_autorizada] = _unidade
@@ -322,7 +323,8 @@ def test_apurador_real_aceita_fonte_no_payload(monkeypatch, anexo):
 
     def servico(ente, exercicio, fonte=None, mapa=None, **kwargs):
         recebidos.update(fonte=fonte, **kwargs)
-        return SimpleNamespace()    # o BO ganha `.recortes` (pipeline-dca-por-unidade-gestora)
+        # BO, BP e BF ganham `.recortes` e leem `procedencia` (estorno sem unidade)
+        return SimpleNamespace(procedencia=SimpleNamespace(), diagnostico=SimpleNamespace())
 
     monkeypatch.setattr(apuracao, "_servico_de", lambda _codigo: servico)
     monkeypatch.setattr(apuracao, "mapa_vigente", lambda *_a, **_k: None)

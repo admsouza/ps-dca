@@ -22,6 +22,7 @@ from typing import Any
 
 from app.infra.fila import job_manager
 from app.services.pipeline import notificacao
+from app.services.pipeline.cache import versao_apos_apurar
 from app.services.pipeline.registry import validar_anexo
 from app.services.pipeline.resultado import para_dados
 
@@ -89,7 +90,7 @@ def _gravar_ok(repo, ente, exercicio, anexo, dados, duracao_ms,
     # A coluna guarda a versão **vigente** — é ela que a próxima requisição compara para decidir
     # servir ou reapurar. A procedência guarda a que a apuração de fato usou. Em produção são a
     # mesma; divergirem significa que a regra mudou entre o enfileiramento e a execução.
-    registro.versao_regras = versao_regras
+    registro.versao_regras = versao_apos_apurar(versao_regras, dados)
     apurada = dados["procedencia"]["versao_regras"]
     vigente = versao_regras.split("|", 1)[0]
     if apurada and apurada != vigente:

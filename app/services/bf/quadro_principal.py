@@ -35,9 +35,9 @@ from app.domain.bo.matriz import apurar as apurar_matriz
 from app.domain.bo.matriz import ordem_topologica
 from app.domain.bo.modelo import Linha, MapaBO, NaoApurada, Registro, Residuo
 from app.infra.msc.fonte import COMPETENCIA_DE_ENCERRAMENTO, TipoSaldo, fonte_de, fonte_periodo
-from app.infra.msc.publicsoft import EstornoIndisponivel
+from app.infra.msc.publicsoft import EstornoIndisponivel, EstornoSemPoderOrgao
 from app.infra.pcasp.natureza import do_pcasp
-from app.services.bf.informados import QUADRO_ANEXO, QUADRO_PRINCIPAL
+from app.services.bf.informados import CODIGOS_SEM_MAPEAMENTO, QUADRO_ANEXO, QUADRO_PRINCIPAL
 from app.services.bf.informados import mapa_bf as _mapa
 from app.services.bf.informados import partir_informados as _partir_informados
 from app.services.bf.informados import validar_informados as _validar_informados
@@ -59,6 +59,10 @@ COLUNA_ANTERIOR = "exercicio_anterior"
 SUFIXO_ATUAL = "_atual"
 SUFIXO_ANTERIOR = "_anterior"
 NAO_INFORMADO = "não informado no preenchimento manual"
+SEM_PODER_ORGAO = "estorno sem poder/órgão"
+SO_NO_CONSOLIDADO = "informado só no consolidado"
+SEM_LINHA_ANTERIOR = "sem linha no exercício anterior"
+SEM_VALOR_ANTERIOR = "não apurada no exercício anterior"
 
 POLICIES_NAO_APLICADAS = (
     "item 38 (exclusão de intraorçamentárias): a policy não declara quais códigos caracterizam a "
@@ -72,6 +76,7 @@ class Anterior(Enum):
 
     MSCE = "msce_exercicio_anterior"
     MANUAL = "manual"
+    PROCESSADO = "processado_exercicio_anterior"     # a coluna pronta, do cache de N−1
 
 
 @dataclass(frozen=True)
@@ -96,6 +101,10 @@ class Procedencia:
     # Ano → totalGeral. Receita sai de L27 e L60; despesa sai só de L60.
     estorno_receita_extra: dict[str, str] | None = None
     estorno_despesa_extra: dict[str, str] | None = None
+    # `pipeline-anterior-por-recorte`: escolha explícita da unidade (`null` = padrão) e o resultado
+    # de N−1 de onde veio a coluna anterior.
+    escolha_anterior: dict | None = None
+    anterior_processado: dict | None = None
 
 
 @dataclass
@@ -111,6 +120,9 @@ class Diagnostico:
     duracao_ms: int = 0
     sem_dados: bool = False
     sem_dados_exercicio_anterior: bool = False
+    # `[{exercicio, tipo, unidade, valor}]`: estorno do total que nenhuma unidade recebeu. Só o
+    # consolidado, e só quando houver.
+    estorno_sem_unidade: list[dict] | None = None
     policies_nao_aplicadas: tuple[str, ...] = POLICIES_NAO_APLICADAS
 
 
@@ -126,8 +138,16 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
            competencia: int = COMPETENCIA_DE_ENCERRAMENTO,
            anterior: Anterior = Anterior.MSCE,
            valores_anteriores: dict[str, Decimal] | None = None,
-           valores_sem_mapeamento: dict[str, Decimal] | None = None) -> Resultado:
-    """Apura as 66 linhas do quadro principal, nas duas colunas."""
+           valores_sem_mapeamento: dict[str, Decimal] | None = None,
+           g8_so_no_consolidado: bool = False,
+           anterior_pronto: dict | None = None) -> Resultado:
+    """Apura as 66 linhas do quadro principal, nas duas colunas.
+
+    `anterior_pronto`: coluna anterior já pronta, por (quadro, código) — o `PROCESSADO`, que não lê
+    N−1 (ver `pipeline/anterior.py`).
+
+    `g8_so_no_consolidado`: recorte fora do consolidado — as linhas que o G8 completaria ficam
+    não apuradas, porque o valor foi digitado para o ente."""
     inicio = time.monotonic()
     anterior = Anterior(anterior)                # o job chega com string; a apuração compara o enum
     manual = anterior is Anterior.MANUAL and valores_anteriores
@@ -157,16 +177,32 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
     if valores_sem_mapeamento:
         atual, nao_apuradas = _completar_sem_mapeamento(
             mapa, atual, nao_apuradas, valores_sem_mapeamento)
+    if g8_so_no_consolidado:
+        g8 = {linha.id for linha in mapa.linhas
+              if linha.quadro == QUADRO_PRINCIPAL and linha.codigo in CODIGOS_SEM_MAPEAMENTO}
+        nao_apuradas = [n._replace(motivo=SO_NO_CONSOLIDADO)
+                        if n.rule_id in g8 and n.coluna == COLUNA_ATUAL else n
+                        for n in nao_apuradas]
 
     sem_dados_anterior = False
     if anterior is Anterior.MSCE:
-        coluna_anterior, _, sem_dados_anterior, _, receita_anterior, despesa_anterior = (
-            _apurar_exercicio(
-                mapa, ente, exercicio - 1, competencia, fonte, direcao, origem,
-                codigos_periodo=_PERIODO_MENSAL_ANTERIOR)
-        )
+        (coluna_anterior, nao_apuradas_anterior, sem_dados_anterior, _,
+         receita_anterior, despesa_anterior) = _apurar_exercicio(
+            mapa, ente, exercicio - 1, competencia, fonte, direcao, origem,
+            codigos_periodo=_PERIODO_MENSAL_ANTERIOR)
+        nao_apuradas += [n._replace(coluna=COLUNA_ANTERIOR) for n in nao_apuradas_anterior
+                         if n.motivo == SEM_PODER_ORGAO]
         receitas = {**receita_anterior, **receitas}
         despesas = {**despesa_anterior, **despesas}
+    elif anterior is Anterior.PROCESSADO:
+        coluna_anterior = {}
+        for linha in mapa.linhas:
+            celulas = anterior_pronto["matriz"].get((linha.quadro, linha.codigo))
+            nao_apuradas += [
+                NaoApurada(linha.id, coluna, "-",
+                           SEM_LINHA_ANTERIOR if celulas is None else SEM_VALOR_ANTERIOR)
+                for coluna in _colunas_de(linha, atual)
+                if coluna.endswith(SUFIXO_ANTERIOR) and (celulas or {}).get(coluna) is None]
     else:
         principal, saldos_anexo = _completar_manual(mapa, principal, anexo)
         coluna_anterior = {}
@@ -198,7 +234,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
             if linha.quadro == QUADRO_PRINCIPAL and linha.codigo not in principal
         ]
 
-    matriz = _montar(mapa, atual, coluna_anterior, anterior)
+    matriz = _montar(mapa, atual, coluna_anterior, anterior, anterior_pronto)
 
     return Resultado(
         mapa=mapa,
@@ -259,16 +295,13 @@ def _apurar_exercicio(mapa, ente, exercicio, competencia, fonte, direcao, origem
     # Exercício sem nenhuma leitura (auditoria pendente → 409 → vazio) não tem bruto: abater
     # daria `0 − estorno`.
     leu_algo = any((do_exercicio, do_encerramento, *por_classe.values()))
-    receita, despesa = (_abater_estorno(mapa, valores, fonte, exercicio) if leu_algo
-                        else ({}, {}))
+    receita, despesa = (_abater_estorno(mapa, valores, nao_apuradas, fonte, exercicio)
+                        if leu_algo else ({}, {}))
     return valores, nao_apuradas, not do_exercicio, do_exercicio, receita, despesa
 
 
-def _moeda(valor) -> Decimal:
-    return valor if isinstance(valor, Decimal) else Decimal(str(valor))
-
-
-def _abater_estorno(mapa, valores, fonte, exercicio: int) -> tuple[dict[str, str], dict[str, str]]:
+def _abater_estorno(mapa, valores, nao_apuradas, fonte,
+                    exercicio: int) -> tuple[dict[str, str], dict[str, str]]:
     """L27 − receita. L60 − receita − despesa. SICONFI não tem os dois métodos."""
     consultar_receita = getattr(fonte, "estorno_receita_extra", None)
     if consultar_receita is None:
@@ -276,9 +309,13 @@ def _abater_estorno(mapa, valores, fonte, exercicio: int) -> tuple[dict[str, str
     consultar_despesa = getattr(fonte, "estorno_despesa_extra", None)
     if consultar_despesa is None:
         raise EstornoIndisponivel("fonte com estorno de receita sem estorno de despesa")
-    receita = _moeda(consultar_receita(exercicio))
-    despesa = _moeda(consultar_despesa(exercicio))
     por_codigo = {linha.codigo: linha for linha in mapa.linhas}
+    try:
+        receita = consultar_receita(exercicio).total
+        despesa = consultar_despesa(exercicio).total
+    except EstornoSemPoderOrgao:
+        _anular_estorno(mapa, valores, nao_apuradas, [por_codigo["L27"].id, por_codigo["L60"].id])
+        return {}, {}
     abatido: dict[str, Decimal] = {}
     for codigo, estorno in (("L27", receita), ("L60", receita + despesa)):
         linha = por_codigo[codigo]
@@ -293,6 +330,22 @@ def _abater_estorno(mapa, valores, fonte, exercicio: int) -> tuple[dict[str, str
         _propagar_estorno(mapa, valores, abatido)
     ano = str(exercicio)
     return {ano: format(receita, ".2f")}, {ano: format(despesa, ".2f")}
+
+
+def _anular_estorno(mapa, valores, nao_apuradas, ids: list[str]) -> None:
+    """Sem o PO das instituições não há como abater por PO: L27, L60 e as totalizadoras que as
+    somam ficam não apuradas — o bruto seria um número sem o estorno."""
+    linhas = {linha.id: linha for linha in mapa.linhas}
+    afetadas = set(ids)
+    for rule_id in ordem_topologica(linhas):
+        if any(ref.regra in afetadas for ref in linhas[rule_id].referencias):
+            afetadas.add(rule_id)
+    for rule_id in sorted(afetadas):
+        celulas = dict(valores.get(rule_id) or {})
+        if celulas.get(COLUNA_ATUAL) is None:
+            continue
+        valores[rule_id] = {**celulas, COLUNA_ATUAL: None}
+        nao_apuradas.append(NaoApurada(rule_id, COLUNA_ATUAL, "-", SEM_PODER_ORGAO))
 
 
 def _propagar_estorno(mapa, valores, abatido: dict[str, Decimal]) -> None:
@@ -565,7 +618,8 @@ def _origens(mapa: MapaBO, origem) -> dict[str, str]:
 
 # ─── montagem das colunas e conferências ─────────────────────────────────────
 
-def _montar(mapa: MapaBO, atual: dict, anterior_valores: dict, anterior: Anterior) -> dict:
+def _montar(mapa: MapaBO, atual: dict, anterior_valores: dict, anterior: Anterior,
+            pronto: dict | None = None) -> dict:
     """Junta as colunas do exercício e do exercício anterior, linha a linha.
 
     O par de colunas é dado pelo **sufixo** declarado na regra: `_atual` e `_anterior`. Vale para
@@ -577,7 +631,9 @@ def _montar(mapa: MapaBO, atual: dict, anterior_valores: dict, anterior: Anterio
     for linha in mapa.linhas:
         celulas: dict[str, Decimal | None] = {}
         for coluna in _colunas_de(linha, atual):
-            if coluna.endswith(SUFIXO_ANTERIOR):
+            if coluna.endswith(SUFIXO_ANTERIOR) and anterior is Anterior.PROCESSADO:
+                celulas[coluna] = pronto["matriz"].get((linha.quadro, linha.codigo), {}).get(coluna)
+            elif coluna.endswith(SUFIXO_ANTERIOR):
                 par = coluna[: -len(SUFIXO_ANTERIOR)] + SUFIXO_ATUAL
                 lido = anterior_valores.get(linha.id) or {}
                 manual_principal = anterior is Anterior.MANUAL and linha.quadro != QUADRO_ANEXO

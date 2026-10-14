@@ -35,12 +35,16 @@ from app.domain.bo.saldo import _casa, saldo_da_conta
 from app.infra.msc.fonte import COMPETENCIA_DE_ENCERRAMENTO, fonte_de
 from app.infra.pcasp.natureza import do_pcasp
 from app.infra.regras.carregador import carregar_em_cache
+from app.services.bp.informados import partir as _partir_informados
 from app.services.bp.publicado import DirecaoDoPublicado, registros_publicados, totais_fp
 
 DEMONSTRATIVO = "BP"
 COLUNA_ATUAL = "exercicio_atual"
 COLUNA_ANTERIOR = "exercicio_anterior"
 QUADRO_PRINCIPAL = "QUADRO_PRINCIPAL"
+NAO_INFORMADO = "não informado"
+SEM_LINHA_ANTERIOR = "sem linha no exercício anterior"
+SEM_VALOR_ANTERIOR = "não apurada no exercício anterior"
 SEM_ATRIBUTO = "a MSC não traz o atributo financeiro/permanente em nenhum fato (IPC 04, P4)"
 TODAS_BLOQUEADAS = "todas as parcelas são não apuráveis"
 
@@ -59,6 +63,8 @@ class Anterior(StrEnum):
 
     PUBLICADO = "publicado_siconfi"
     MSCE = "msce_exercicio_anterior"
+    PROCESSADO = "processado_exercicio_anterior"     # a coluna pronta, do cache de N−1
+    MANUAL = "manual"                                # `P:`/`FP:`/`C:`/`S:`, só por unidade
 
 
 CONSOLIDADO = "consolidado"
@@ -82,6 +88,10 @@ class Procedencia:
     competencia: int = COMPETENCIA_DE_ENCERRAMENTO
     classes: tuple[int, ...] = ()
     origem_exercicio_anterior: str = Anterior.PUBLICADO.value
+    # Mapa informado, como chegou: o pedido seguinte reaplica (`pipeline-anterior-por-recorte`).
+    valores_anteriores: dict[str, str] | None = None
+    escolha_anterior: dict | None = None        # escolha explícita da unidade; `null` = padrão
+    anterior_processado: dict | None = None     # de que resultado de N−1 veio a coluna
 
 
 @dataclass
@@ -131,10 +141,16 @@ class _Coluna:
 
 def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None = None,
            competencia: int = COMPETENCIA_DE_ENCERRAMENTO,
-           anterior: Anterior = Anterior.PUBLICADO, dca=None) -> Resultado:
+           anterior: Anterior = Anterior.PUBLICADO, dca=None,
+           anterior_pronto: dict | None = None,
+           valores_anteriores: dict[str, str] | None = None,
+           zero_sem_anterior: bool = False) -> Resultado:
     """Apura os quatro quadros do BP, nas duas colunas.
 
     `dca` lê o `I-AB` publicado (`.itens(ente, ano)`); sem ele, o `tt/dca` do SICONFI.
+    `anterior_pronto` é a coluna anterior já pronta (`PROCESSADO`, ver `pipeline/anterior.py`);
+    `valores_anteriores`, a digitada (`MANUAL`). `zero_sem_anterior`: a unidade sem MSC em N−1,
+    num job que leu N−1, sai em zero, e não não apurada.
     """
     inicio = time.monotonic()
     anterior = Anterior(anterior)                # o job chega com string
@@ -152,8 +168,16 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
     registros_atual = da_msc(exercicio)
     publicado: list[dict] = []
     registros_anterior: list[Registro] = []
+    informado = dict(valores_anteriores or {}) if anterior is Anterior.MANUAL else None
+    pronto = anterior_pronto
+    por_fonte_manual: dict[str, Decimal] | None = None
+    if anterior is Anterior.MANUAL:
+        folhas, por_fonte_manual = _partir_informados(informado or {})
+        pronto = {"matriz": _totalizar(mapa, folhas)}
     if anterior is Anterior.MSCE:
         registros_anterior = da_msc(exercicio - 1)
+    elif pronto is not None:
+        pass                                     # nenhuma leitura de N−1
     else:
         if dca is None:
             from app.infra.siconfi.dca import SiconfiDCA
@@ -163,7 +187,11 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
     def apurar_visao(m: MapaBO) -> tuple[_Coluna, _Coluna, dict]:
         atual = _apurar_exercicio(m, registros_atual, direcao, COLUNA_ATUAL)
         if anterior is Anterior.MSCE:
-            anterior_ = _apurar_exercicio(m, registros_anterior, direcao, COLUNA_ANTERIOR)
+            anterior_ = _apurar_exercicio(m, registros_anterior, direcao, COLUNA_ANTERIOR,
+                                          zero_se_vazio=zero_sem_anterior)
+        elif pronto is not None:
+            anterior_ = _coluna_pronta(m, pronto["matriz"], NAO_INFORMADO
+                                       if anterior is Anterior.MANUAL else SEM_LINHA_ANTERIOR)
         else:
             anterior_ = _apurar_publicado(m, publicado, direcao)
         matriz_ = {
@@ -176,17 +204,26 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
     # ponytail: as duas visões incluem todas as contas (PO 2026-10-08).
     # Os filtros visao=consolidado ficam na regra e não entram na apuração.
     atual, coluna_anterior, matriz = apurar_visao(_sem_visao(mapa, CONSOLIDADO))
-    anterior_superavit = registros_anterior if anterior is Anterior.MSCE else list(
-        fonte.registros(ente=ente, ano=exercicio - 1, mes=competencia, classe=8,
-                        matriz=origem.matriz, tipo_saldo=origem.tipo_saldo))
+    if pronto is not None:
+        saldos_anterior = _saldos_do_pronto(pronto, por_fonte_manual)
+    else:
+        saldos_anterior = _saldos_por_fonte(
+            registros_anterior if anterior is Anterior.MSCE else list(
+                fonte.registros(ente=ente, ano=exercicio - 1, mes=competencia, classe=8,
+                                matriz=origem.matriz, tipo_saldo=origem.tipo_saldo)))
     mapa, atual, coluna_anterior, fonte_vazia = _superavit(
-        mapa, matriz, registros_atual, anterior_superavit, atual, coluna_anterior,
+        mapa, matriz, registros_atual, saldos_anterior, atual, coluna_anterior,
+        anterior_informado=anterior is Anterior.MANUAL,
     )
+    visoes = {CONSOLIDADO: VisaoBP(matriz, _equilibrio(mapa, matriz))}
+    if anterior is Anterior.PROCESSADO and CONSOLIDADO in pronto.get("visoes", {}):
+        da_visao = _com_anterior(mapa, matriz, pronto["visoes"][CONSOLIDADO])
+        visoes[CONSOLIDADO] = VisaoBP(da_visao, _equilibrio(mapa, da_visao))
 
     return Resultado(
         mapa=mapa,
         matriz=matriz,
-        visoes={CONSOLIDADO: VisaoBP(matriz, _equilibrio(mapa, matriz))},
+        visoes=visoes,
         procedencia=Procedencia(
             documento=mapa.vigencia.documento,
             edicao=mapa.vigencia.edicao,
@@ -199,6 +236,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
             competencia=competencia,
             classes=origem.classes,
             origem_exercicio_anterior=anterior.value,
+            valores_anteriores=informado,
         ),
         diagnostico=Diagnostico(
             nao_apuradas=atual.nao_apuradas + coluna_anterior.nao_apuradas,
@@ -248,13 +286,15 @@ def _conferencia(mapa: MapaBO, matriz: dict, itens: list[dict]) -> dict | None:
 
 
 def _apurar_exercicio(mapa: MapaBO, registros: list[Registro], direcao, coluna: str,
-                      fixos: dict[str, Decimal | None] | None = None) -> _Coluna:
+                      fixos: dict[str, Decimal | None] | None = None,
+                      zero_se_vazio: bool = False) -> _Coluna:
     """Uma coluna: a `exercicio_atual` das regras sobre `registros`, publicada sob o nome `coluna`.
 
     `fixos` são as linhas que o publicado traz prontas (F/P `L2`, `L3`, `L5`, `L6`): não passam
-    pelo motor, e os totais que as somam são refeitos sobre elas.
+    pelo motor, e os totais que as somam são refeitos sobre elas. `zero_se_vazio`: sem registros,
+    apura zero e sinaliza `sem_dados` (unidade sem MSC em N−1, num job que leu N−1).
     """
-    if not registros:
+    if not registros and not zero_se_vazio:
         # Sem leitura (auditoria pendente → 409 → vazio) não há posição: `None`, nunca zero.
         return _Coluna({linha.id: None for linha in mapa.linhas}, [], [], True, False)
 
@@ -301,7 +341,60 @@ def _apurar_exercicio(mapa: MapaBO, registros: list[Registro], direcao, coluna: 
         nao_apuradas.append(NaoApurada(rule_id, coluna, "-", motivo))
 
     residuos = [] if sem_atributo or fixos else _residuos_fp(cobertos, direcao)
-    return _Coluna(valores, nao_apuradas, residuos, False, sem_atributo)
+    return _Coluna(valores, nao_apuradas, residuos, not registros, sem_atributo)
+
+
+def _totalizar(mapa: MapaBO, folhas: dict[tuple[str, str], Decimal],
+               ) -> dict[tuple[str, str], dict[str, Decimal]]:
+    """As folhas informadas e, por cima, as totalizadoras: soma das parcelas informadas, como o
+    manual do BF. Totalizadora sem nenhuma parcela informada não existe."""
+    linhas = mapa.por_id()
+    por_id = {linha.id: folhas[(linha.quadro, linha.codigo)] for linha in mapa.linhas
+              if (linha.quadro, linha.codigo) in folhas}
+    for rule_id in ordem_topologica(linhas):
+        parcelas = [por_id[r.regra] if r.sinal == "+" else -por_id[r.regra]
+                    for r in linhas[rule_id].referencias if r.regra in por_id]
+        if parcelas:
+            por_id[rule_id] = sum(parcelas, Decimal("0.00"))
+    return {(linha.quadro, linha.codigo): {COLUNA_ANTERIOR: por_id[linha.id]}
+            for linha in mapa.linhas if linha.id in por_id}
+
+
+def _coluna_pronta(mapa: MapaBO, celulas: dict, ausente: str) -> _Coluna:
+    """Coluna anterior pronta (processado de N−1 ou digitada), casada por quadro e código."""
+    valores: dict[str, Decimal | None] = {}
+    nao_apuradas: list[NaoApurada] = []
+    for linha in mapa.linhas:
+        celula = celulas.get((linha.quadro, linha.codigo))
+        valores[linha.id] = None if celula is None else celula.get(COLUNA_ANTERIOR)
+        if valores[linha.id] is None:
+            motivo = ausente if celula is None else SEM_VALOR_ANTERIOR
+            nao_apuradas.append(NaoApurada(linha.id, COLUNA_ANTERIOR, "-", motivo))
+    return _Coluna(valores, nao_apuradas, [], False, False)
+
+
+def _saldos_do_pronto(pronto: dict, informadas: dict[str, Decimal] | None,
+                      ) -> dict[str, Decimal | None]:
+    """Saldo anterior por fonte: as informadas, ou as linhas de fonte de N−1 e o saldo sem fonte."""
+    if informadas is not None:
+        return dict(informadas)
+    saldos = {codigo: celula[COLUNA_ANTERIOR]
+              for (quadro, codigo), celula in pronto["matriz"].items()
+              if quadro == QUADRO_SUPERAVIT and codigo != "Total"
+              and COLUNA_ANTERIOR in celula}           # `None` = não apurada, não ausente
+    if pronto.get("fonte_vazia"):
+        saldos["0000"] = pronto["fonte_vazia"]
+    return saldos
+
+
+def _com_anterior(mapa: MapaBO, matriz: dict, celulas: dict) -> dict:
+    """A matriz com a coluna anterior trocada pela de uma visão de N−1."""
+    por_chave = {(linha.quadro, linha.codigo): linha.id for linha in mapa.linhas}
+    saida = {rule_id: dict(coluna) for rule_id, coluna in matriz.items()}
+    for chave, celula in celulas.items():
+        if chave in por_chave and COLUNA_ANTERIOR in celula:
+            saida[por_chave[chave]][COLUNA_ANTERIOR] = celula[COLUNA_ANTERIOR]
+    return saida
 
 
 def _somar(linha, valores: dict[str, Decimal | None]) -> Decimal | None:
@@ -351,15 +444,19 @@ def _residuos_fp(cobertos: list[Registro], direcao) -> list[Residuo]:
     return [Residuo("financeiro_permanente", "(sem atributo na MSC)", total)] if total else []
 
 
-def _superavit(mapa: MapaBO, matriz: dict, atual: list[Registro], anterior: list[Registro],
-               coluna_atual: _Coluna, coluna_anterior: _Coluna,
+def _superavit(mapa: MapaBO, matriz: dict, atual: list[Registro],
+               saldos_anterior: dict[str, Decimal | None], coluna_atual: _Coluna,
+               coluna_anterior: _Coluna, anterior_informado: bool = False,
                ) -> tuple[MapaBO, _Coluna, _Coluna, dict[str, Decimal]]:
     """Uma linha por fonte de 4 dígitos. Complemento soma na fonte.
 
     O saldo sem fonte volta à parte, por coluna: não vira linha nem entra no total.
+    `anterior_informado` (manual): a fonte de N que não foi informada fica não apurada, e o total
+    anterior só existe se alguma fonte foi informada.
     """
     saldos_atual = _saldos_por_fonte(atual)
-    saldos_anterior = _saldos_por_fonte(anterior)
+    saldos_anterior = dict(saldos_anterior)
+    ausente = None if anterior_informado else Decimal("0.00")
     total = next((linha for linha in mapa.linhas
                   if linha.quadro == QUADRO_SUPERAVIT and linha.codigo == "Total"), None)
     if total is None:
@@ -370,7 +467,7 @@ def _superavit(mapa: MapaBO, matriz: dict, atual: list[Registro], anterior: list
     vazio_anterior = saldos_anterior.pop("0000", Decimal(0))
     for codigo in sorted(set(saldos_atual) | set(saldos_anterior)):
         valor_atual = saldos_atual.get(codigo, Decimal("0.00"))
-        valor_anterior = saldos_anterior.get(codigo, Decimal("0.00"))
+        valor_anterior = saldos_anterior.get(codigo, ausente)
         if valor_atual == 0 and valor_anterior == 0:
             continue
         linhas_fonte.append(total._replace(
@@ -386,8 +483,11 @@ def _superavit(mapa: MapaBO, matriz: dict, atual: list[Registro], anterior: list
         ))
         matriz[linhas_fonte[-1].id] = {COLUNA_ATUAL: valor_atual, COLUNA_ANTERIOR: valor_anterior}
 
+    total_anterior = (None if anterior_informado and not saldos_anterior
+                      or None in saldos_anterior.values()
+                      else sum(saldos_anterior.values(), Decimal("0.00")))
     matriz[total.id] = {COLUNA_ATUAL: sum(saldos_atual.values(), Decimal("0.00")),
-                        COLUNA_ANTERIOR: sum(saldos_anterior.values(), Decimal("0.00"))}
+                        COLUNA_ANTERIOR: total_anterior}
     # As referências não recalculam (a matriz do total já está acima): publicam a linha como
     # totalizadora, que é o que decide o destaque em quem renderiza.
     total = total._replace(ordem=len(linhas_fonte) + 1, bloqueio="",
@@ -402,7 +502,11 @@ def _superavit(mapa: MapaBO, matriz: dict, atual: list[Registro], anterior: list
 
     vazio = {COLUNA_ATUAL: vazio_atual, COLUNA_ANTERIOR: vazio_anterior}
     fonte_vazia = {coluna: valor for coluna, valor in vazio.items() if valor}
-    return mapa, _sem(coluna_atual), _sem(coluna_anterior), fonte_vazia
+    coluna_anterior = _sem(coluna_anterior)
+    if total_anterior is None:
+        coluna_anterior.nao_apuradas.append(
+            NaoApurada(total.id, COLUNA_ANTERIOR, "-", NAO_INFORMADO))
+    return mapa, _sem(coluna_atual), coluna_anterior, fonte_vazia
 
 
 def _saldos_por_fonte(registros: list[Registro]) -> dict[str, Decimal]:

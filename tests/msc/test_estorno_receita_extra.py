@@ -23,8 +23,9 @@ def _fonte(http, url="https://api.exemplo/contabilidade-tools/matriz-saldo/base-
 
 
 def test_le_o_total_geral_com_o_token_da_fonte():
-    http = _Http({"data": {"totalGeral": 115679.4}, "statusCode": 200})
-    total = _fonte(http).estorno_receita_extra(2025)
+    http = _Http({"data": {"totalGeral": 115679.4, "totaisPorUnidadeGestora": []},
+                  "statusCode": 200})
+    total = _fonte(http).estorno_receita_extra(2025).total
 
     assert total == Decimal("115679.4")
     chamada = http.chamadas[0]
@@ -37,7 +38,7 @@ def test_le_o_total_geral_com_o_token_da_fonte():
 
 def test_estorno_de_despesa_le_o_total_geral_zero():
     http = _Http({"data": {"totaisPorUnidadeGestora": [], "totalGeral": 0}, "statusCode": 200})
-    total = _fonte(http).estorno_despesa_extra(2025)
+    total = _fonte(http).estorno_despesa_extra(2025).total
 
     assert total == Decimal("0")
     assert http.chamadas[0]["url"].endswith(

@@ -116,7 +116,7 @@ def para_dados(resultado) -> dict:
             # listados aqui um a um: o serializador não deve aprender o vocabulário de cada norma.
             **_especificos(procedencia, ("origens_por_linha", "origem_exercicio_anterior",
                                          "valores_anteriores", "estorno_receita_extra",
-                                         "estorno_despesa_extra")),
+                                         "estorno_despesa_extra", "anterior_processado")),
         },
         "diagnostico": {
             # Declarado sempre, vazio inclusive: consumidor que não encontra a chave não sabe se a
@@ -128,7 +128,8 @@ def para_dados(resultado) -> dict:
             **_especificos(diagnostico, ("sem_dados_exercicio_anterior",
                                          "policies_nao_aplicadas", "sem_atributo_fp",
                                          "equilibrio", "sem_publicacao_exercicio_anterior",
-                                         "conferencia_publicado", "fonte_vazia")),
+                                         "conferencia_publicado", "fonte_vazia",
+                                         "estorno_sem_unidade", "avisos_anterior")),
         },
     }
     # Visões extras (BP): só o demonstrativo que as produz as publica; BO e BF saem como antes.
@@ -139,11 +140,26 @@ def para_dados(resultado) -> dict:
                    "equilibrio": {coluna: _valor(v) for coluna, v in visao.equilibrio.items()}}
             for nome, visao in resultado.visoes.items()
         }
-    # Recortes (BO e BP): cada um é um resultado completo; a rota serve um deles, nunca soma.
+    # Recortes (BO, BP e BF): cada um é um resultado completo; a rota serve um deles, nunca soma.
     if getattr(resultado, "recortes", None):
         dados["recortes"] = {
             chave: {"tipo": r.tipo, "rotulo": r.rotulo, "poderOrgao": r.poder_orgao,
-                    "resultado": para_dados(r.resultado)}
+                    "resultado": _recorte(r.resultado)}
             for chave, r in resultado.recortes.items()
         }
+        # Cópia na procedência de topo: ela sobrevive ao job em erro (`resultado = None`).
+        escolhas = {chave: r["resultado"]["procedencia"]["escolha_anterior"]
+                    for chave, r in dados["recortes"].items()
+                    if r["resultado"]["procedencia"].get("escolha_anterior")}
+        if escolhas:
+            dados["procedencia"]["anterior_por_recorte"] = escolhas
+    return dados
+
+
+def _recorte(resultado) -> dict:
+    """BF e BP declaram `escolha_anterior` em todo recorte (`null` = padrão); o consolidado e o BO
+    saem como antes."""
+    dados = para_dados(resultado)
+    if hasattr(resultado.procedencia, "escolha_anterior"):
+        dados["procedencia"]["escolha_anterior"] = resultado.procedencia.escolha_anterior
     return dados

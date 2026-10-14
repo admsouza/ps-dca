@@ -58,7 +58,7 @@ async def apurar_anexo(ctx: dict, *, job_id: str, ente: str, exercicio: int, ane
             anexo,
             fonte_nome=parametros.get("fonte"),      # escolhida pelo front; sem ela, DATA_SOURCE
             token=credencial,
-            repo_vigencias=RepositorioVigencias(db),
+            repo_vigencias=RepositorioVigencias(db), repo=repo,
             parametros=parametros,
         )
         versao = versao_do_pedido(
@@ -125,7 +125,8 @@ async def apurar_completo(ctx: dict, *, job_id: str, ente: str, exercicio: int,
 
         def apurador_de(anexo: str):
             return apuracao.apurador(anexo, fonte_nome=fonte, token=credencial,
-                                     repo_vigencias=vigencias, parametros=pedido_de(anexo))
+                                     repo_vigencias=vigencias, repo=repo,
+                                     parametros=pedido_de(anexo))
 
         percurso = completo.montar_percurso(
             ente=ente, exercicio=exercicio, repo=repo, lock=ctx["lock"], jobs=ctx["jobs"],

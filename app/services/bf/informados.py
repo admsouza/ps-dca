@@ -25,6 +25,20 @@ class LinhaDesconhecida(ValueError):
 CODIGOS_SEM_MAPEAMENTO = frozenset({"L22", "L23", "L55", "L56"})
 
 
+def decimal_informado(chave: str, bruto) -> Decimal:
+    """Valor digitado como `Decimal` finito e de escala razoável (até 10^15), ou `ValueError`.
+
+    `Decimal("1E+999999999")` e `NaN` passam em `Decimal()` e estouram só dentro do job.
+    """
+    try:
+        valor = Decimal(str(bruto))
+    except InvalidOperation as erro:
+        raise ValueError(f"valor inválido em {chave}") from erro
+    if not valor.is_finite() or abs(valor.adjusted()) > 15:
+        raise ValueError(f"valor inválido em {chave}")
+    return valor
+
+
 def validar_valores_sem_mapeamento(valores: dict[str, str]) -> None:
     """Recusa código fora das quatro linhas G8 e valor não decimal, antes de enfileirar o job."""
     desconhecidos = sorted(set(valores) - CODIGOS_SEM_MAPEAMENTO)
@@ -32,20 +46,14 @@ def validar_valores_sem_mapeamento(valores: dict[str, str]) -> None:
         raise LinhaDesconhecida(
             f"linhas fora das quatro sem conta no IPC 06: {', '.join(desconhecidos)}")
     for codigo, valor in valores.items():
-        try:
-            Decimal(valor)
-        except InvalidOperation as erro:
-            raise ValueError(f"valor inválido em {codigo}") from erro
+        decimal_informado(codigo, valor)
 
 
 def validar_valores_anteriores(exercicio: int, valores: dict[str, str]) -> None:
     """Recusa valor não-numérico e código que o IPC 06 não declara, antes de enfileirar o job."""
     decimais = {}
     for codigo, valor in valores.items():
-        try:
-            decimais[codigo] = Decimal(valor)
-        except InvalidOperation as erro:
-            raise ValueError(f"valor inválido em {codigo}") from erro
+        decimais[codigo] = decimal_informado(codigo, valor)
     mapa = mapa_bf(exercicio)
     principal, anexo = partir_informados(decimais)
     validar_informados(principal, mapa, QUADRO_PRINCIPAL)

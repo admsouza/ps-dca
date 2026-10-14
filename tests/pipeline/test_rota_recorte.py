@@ -31,9 +31,37 @@ def _resultado_bo(com_recortes: bool = True) -> dict:
     return para_dados(resultado)
 
 
-def _cliente(repo, lock, jobs, poderes, anexo: str = "BO", resultado: dict | None = None):
+def _resultado_bo_por_po() -> dict:
+    """Ente sem UG (SICONFI): recortes `po:`."""
+    from app.services.bo.quadro_principal import apurar
+    from app.services.pipeline import apuracao
+    from app.services.pipeline.resultado import para_dados
+
+    fonte = FonteFake({5: [saldo("521110000", "10.00", natureza_receita="1100.00.00",
+                                 poder_orgao="10131"),
+                           saldo("521110000", "7.00", natureza_receita="1100.00.00",
+                                 poder_orgao="20231")], 6: []})
+    return para_dados(apuracao.com_recortes(apurar, int(ENTE), EXERCICIO, fonte))
+
+
+def _resultado_bf() -> dict:
+    from app.services.pipeline.resultado import para_dados
+    from tests.recorte.test_bf_estorno_por_unidade import _bf, _fonte_ug
+
+    return para_dados(_bf(_fonte_ug()))
+
+
+def _resultado_bf_por_po() -> dict:
+    from app.services.pipeline.resultado import para_dados
+    from tests.recorte.test_bf_estorno_por_unidade import _bf, _fonte_po
+
+    return para_dados(_bf(_fonte_po()))
+
+
+def _cliente(repo, lock, jobs, poderes, anexo: str = "BO", resultado: dict | None = None,
+             fonte=None):
     from app.routes import anexos as rotas
-    from app.routes.dependencias import repositorio, unidade_autorizada
+    from app.routes.dependencias import fonte_do_pedido, repositorio, unidade_autorizada
 
     corpo = _resultado_bo() if resultado is None else resultado
     repo.gravar(RegistroFake(ENTE, EXERCICIO, anexo, status="ok", resultado=corpo))
@@ -53,6 +81,8 @@ def _cliente(repo, lock, jobs, poderes, anexo: str = "BO", resultado: dict | Non
     app.include_router(rotas.router)
     app.dependency_overrides[repositorio] = lambda: repo
     app.dependency_overrides[unidade_autorizada] = autorizada
+    if fonte is not None:
+        app.dependency_overrides[fonte_do_pedido] = lambda: fonte
     app.state.portas = {"fila_async": Fila, "lock": lock, "jobs": jobs, "repo_vigencias": None,
                         "base_url": ""}
     return TestClient(app)
@@ -132,9 +162,84 @@ def test_recorte_malformado(repo, lock, jobs):
 
 def test_anexo_sem_recorte(repo, lock, jobs):
     """Scenario: anexo sem recorte"""
-    cliente = _cliente(repo, lock, jobs, ["executivo"], anexo="BF", resultado={"matriz": {}})
-    assert _get(cliente, "BF", "&recorte=ug:1").status_code == 422
+    cliente = _cliente(repo, lock, jobs, ["executivo"], anexo="I-C", resultado={"matriz": {}})
+    assert _get(cliente, "I-C", "&recorte=ug:1").status_code == 422
+    assert _get(cliente, "I-C").status_code == 200
+
+
+def test_bf_por_ug_sem_job(repo, lock, jobs):
+    """Scenario: BF por UG"""
+    cliente = _cliente(repo, lock, jobs, ["consolidado"], anexo="BF", resultado=_resultado_bf())
+    r = _get(cliente, "BF", "&recorte=ug:3")
+    assert r.status_code == 200
+    corpo = r.json()
+    assert corpo["recorte"] == "ug:3"
+    assert corpo["procedencia"]["estorno_receita_extra"]["2025"] == "5.00"
+    assert "ug:3" in [d["chave"] for d in corpo["recortesDisponiveis"]]
+
+
+def test_usuario_do_legislativo_no_bf(repo, lock, jobs):
+    """Scenario: usuário do Legislativo no BF"""
+    cliente = _cliente(repo, lock, jobs, ["legislativo"], anexo="BF", resultado=_resultado_bf())
+    corpo = _get(cliente, "BF").json()
+    assert corpo["recorte"] == "poder:legislativo"
+    assert [d["chave"] for d in corpo["recortesDisponiveis"]] == ["poder:legislativo", "ug:4"]
+
+
+@pytest.mark.parametrize("recorte", ["ug:4", "consolidado"])
+def test_executivo_pede_a_camara_no_bf(repo, lock, jobs, recorte):
+    """Scenario: Executivo pede a Câmara (BF)"""
+    cliente = _cliente(repo, lock, jobs, ["executivo"], anexo="BF", resultado=_resultado_bf())
+    r = _get(cliente, "BF", f"&recorte={recorte}")
+    assert r.status_code == 403 and "matriz" not in r.text
+
+
+def test_bf_recorte_inexistente_e_malformado(repo, lock, jobs):
+    """Scenario: recorte inexistente / malformado (BF)"""
+    cliente = _cliente(repo, lock, jobs, ["consolidado"], anexo="BF", resultado=_resultado_bf())
+    assert _get(cliente, "BF", "&recorte=ug:99").status_code == 404
+    assert _get(cliente, "BF", "&recorte=99").status_code == 422
+
+
+def test_bf_cache_anterior_a_change(repo, lock, jobs):
+    """Scenario: cache anterior à change (BF)"""
+    antigo = {k: v for k, v in _resultado_bf().items() if k != "recortes"}
+    cliente = _cliente(repo, lock, jobs, ["consolidado"], anexo="BF", resultado=antigo)
     assert _get(cliente, "BF").status_code == 200
+    assert _get(cliente, "BF", "&recorte=ug:1").status_code == 409
+
+
+AVISO = ("Recorte por poder/órgão: o SICONFI não informa a unidade gestora. "
+         "Para emitir por unidade gestora, processe com SIAFIC.")
+
+
+@pytest.mark.parametrize("anexo", ["BO", "BF"])
+def test_aviso_de_recorte_ente_com_siafic_pela_msc(repo, lock, jobs, anexo):
+    """Scenario: ente com SIAFIC pela MSC"""
+    from app.routes.dependencias import FontePedido
+
+    resultado = _resultado_bo_por_po() if anexo == "BO" else _resultado_bf_por_po()
+    cliente = _cliente(repo, lock, jobs, ["consolidado"], anexo=anexo, resultado=resultado,
+                       fonte=FontePedido("siconfi", "token_ps"))
+    corpo = _get(cliente, anexo).json()
+    assert {"po:10131", "po:20231"} <= {d["chave"] for d in corpo["recortesDisponiveis"]}
+    assert corpo["avisoRecorte"] == AVISO
+
+
+@pytest.mark.parametrize("fonte,resultado", [
+    ("sem_token", _resultado_bo_por_po),       # ente CSV: o hub não resolve o token
+    ("publicsoft", _resultado_bo_por_po),      # leitura pela fonte SIAFIC
+    ("siconfi_com_token", _resultado_bo),      # recortes `ug:`: nada a avisar
+])
+def test_sem_aviso_de_recorte(repo, lock, jobs, fonte, resultado):
+    """Scenario: ente CSV pela MSC"""
+    from app.routes.dependencias import FontePedido
+
+    pedido = {"sem_token": FontePedido("siconfi"), "publicsoft": FontePedido("publicsoft", "t"),
+              "siconfi_com_token": FontePedido("siconfi", "t")}[fonte]
+    corpo = _get(_cliente(repo, lock, jobs, ["consolidado"], resultado=resultado(),
+                          fonte=pedido)).json()
+    assert "avisoRecorte" not in corpo
 
 
 def test_cache_anterior_a_change(repo, lock, jobs):

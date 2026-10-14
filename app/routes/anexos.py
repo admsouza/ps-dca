@@ -27,7 +27,7 @@ from app.routes.dependencias import (
     unidade_autorizada,
     usuario_id,
 )
-from app.services.pipeline import apuracao, completo, notificacao
+from app.services.pipeline import anterior, apuracao, completo, notificacao
 from app.services.pipeline import cache as cache_service
 from app.services.pipeline import resumo as resumo_service
 from app.services.pipeline.registry import ANEXOS, AnexoDesconhecido, validar_anexo
@@ -103,15 +103,24 @@ def _erro_422(detalhe: str) -> HTTPException:
     return HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detalhe)
 
 
+class AnteriorDaUnidade(BaseModel):
+    """Origem da coluna anterior de uma unidade (`ug:`/`po:`); `valores` só no `manual`."""
+
+    origem: str
+    valores: dict[str, str] | None = None
+
+
 class CorpoAnterior(BaseModel):
     """Mapa manual do exercício anterior e override G8 do atual. Vai no corpo, nunca na query."""
 
     origem_exercicio_anterior: str | None = None
     valores_anteriores: dict[str, str] | None = None
     valores_sem_mapeamento: dict[str, str] | None = None
+    anterior_por_recorte: dict[str, AnteriorDaUnidade] | None = None
 
 
-ORIGENS_BP = ("publicado_siconfi", "msce_exercicio_anterior")
+ORIGENS_BP = ("publicado_siconfi", anterior.OrigemAnterior.MSCE.value,
+              anterior.OrigemAnterior.PROCESSADO.value)
 
 
 VISOES_BP = ("isolado", "consolidado")
@@ -148,7 +157,7 @@ def _na_visao(resultado: dict, visao: str) -> dict:
 def _recorte(
     anexo: Annotated[str, Depends(_anexo_valido)],
     recorte: Annotated[str | None, Query(
-        description="BO/BP: `consolidado`, `poder:executivo`, `poder:legislativo`, "
+        description="BO/BP/BF: `consolidado`, `poder:executivo`, `poder:legislativo`, "
                     "`poder:executivo+legislativo`, `ug:<id>` ou `po:<código>`. Omitido, vale o "
                     "padrão do poder do usuário.")] = None,
 ) -> str | None:
@@ -156,10 +165,23 @@ def _recorte(
     if recorte is None:
         return None
     if anexo not in apuracao.RECORTAVEIS:
-        raise _erro_422("recorte só é aceito no BO e no BP")
+        raise _erro_422("recorte só é aceito no BO, no BP e no BF")
     if not recortes.valida(recorte):
         raise _erro_422("recorte inválido")
     return recorte
+
+
+AVISO_RECORTE_PO = ("Recorte por poder/órgão: o SICONFI não informa a unidade gestora. "
+                    "Para emitir por unidade gestora, processe com SIAFIC.")
+
+
+def _aviso_recorte(resultado: dict, fonte: FontePedido | None) -> dict:
+    """Calculado na leitura, sem estado no cache: fonte SICONFI, `token_ps` resolvido (ente com
+    SIAFIC) e recortes `po:`. Ente sem token (CSV, hub fora) e fonte SIAFIC não têm aviso."""
+    por_po = any(chave.startswith("po:") for chave in resultado.get("recortes") or {})
+    if fonte is not None and fonte.nome == "siconfi" and fonte.token and por_po:
+        return {"avisoRecorte": AVISO_RECORTE_PO}
+    return {}
 
 
 def _no_recorte(resultado: dict, pedido: str | None, poderes: tuple[str, ...]) -> dict:
@@ -214,8 +236,8 @@ def _parametros_bf(
         raise _erro_422("origem_exercicio_anterior inválida")
     if anexo != "BF":
         return {}
-    if origem == "msce_exercicio_anterior":
-        return {"origem_anterior": "msce_exercicio_anterior"}
+    if origem in (anterior.OrigemAnterior.MSCE, anterior.OrigemAnterior.PROCESSADO):
+        return {"origem_anterior": origem}
     if origem:
         raise _erro_422("origem_exercicio_anterior inválida")
     return {}
@@ -235,8 +257,8 @@ def _parametros_do_corpo(corpo: CorpoAnterior, exercicio: int, anexo: str = "BF"
         if origem not in ORIGENS_BP:
             raise _erro_422("origem_exercicio_anterior inválida")
         return {"origem_anterior": origem}
-    if origem == "msce_exercicio_anterior":
-        return {"origem_anterior": "msce_exercicio_anterior"}
+    if origem in (anterior.OrigemAnterior.MSCE, anterior.OrigemAnterior.PROCESSADO):
+        return {"origem_anterior": origem}
     if origem != "manual":
         raise _erro_422("origem_exercicio_anterior inválida")
     valores = {
@@ -262,6 +284,31 @@ def _parametros_g8_do_corpo(corpo: CorpoAnterior) -> dict:
     except ValueError as erro:
         raise _erro_422(str(erro)) from erro
     return {"valores_sem_mapeamento": valores}
+
+
+def _parametros_por_unidade(corpo: CorpoAnterior, anexo: str, exercicio: int) -> dict:
+    """`anterior_por_recorte` validado: chave de grupo, origem e manual inválidos são `422`."""
+    try:
+        escolhas = anterior.validar_escolhas(anexo, exercicio, corpo.anterior_por_recorte)
+    except ValueError as erro:
+        raise _erro_422(str(erro)) from erro
+    return {"anterior_por_recorte": escolhas}
+
+
+def _exigir_n1(repo, ente: str, exercicio: int, anexo: str, parametros: dict) -> None:
+    """`processado` pedido agora (consolidado ou unidade) sem N−1 `ok` com o recorte: `409`."""
+    pedidos = [(chave, escolha["origem"])
+               for chave, escolha in (parametros.get("anterior_por_recorte") or {}).items()]
+    pedidos.append((recortes.CONSOLIDADO, parametros.get("origem_anterior")))
+    if not any(origem == anterior.OrigemAnterior.PROCESSADO for _, origem in pedidos):
+        return
+    n1 = anterior.ler_n1(repo, ente, exercicio, anexo)
+    try:
+        for chave, origem in pedidos:
+            if origem == anterior.OrigemAnterior.PROCESSADO:
+                anterior.exigir(n1, chave)
+    except anterior.ProcessadoSemAnterior as erro:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=str(erro)) from erro
 
 
 async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo,
@@ -307,13 +354,15 @@ async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo
     if resposta.status == 200:
         motivos = resposta.motivos_desatualizado or []
         resultado = resposta.resultado
+        aviso = {}
         if anexo in apuracao.RECORTAVEIS:
+            aviso = _aviso_recorte(resultado, fonte)
             # Sem `poderes` no estado a autorização não rodou: nenhum recorte (fail closed).
             resultado = _no_recorte(resultado, recorte, getattr(request.state, "poderes", ()))
         if visao:
             resultado = _na_visao(resultado, visao)
         return JSONResponse(status_code=200, content={
-            **resultado, "desatualizado": bool(motivos),
+            **resultado, **aviso, "desatualizado": bool(motivos),
             "motivos_desatualizado": motivos,
         })
 
@@ -540,6 +589,9 @@ async def reprocessar_anexo(
             parametros = {**parametros, **_parametros_do_corpo(corpo, exercicio, anexo)}
         if "valores_sem_mapeamento" in corpo.model_fields_set:
             parametros = {**parametros, **_parametros_g8_do_corpo(corpo)}
+        if corpo.anterior_por_recorte:
+            parametros = {**parametros, **_parametros_por_unidade(corpo, anexo, exercicio)}
+    _exigir_n1(repo, ente, exercicio, anexo, parametros)
     return await _decidir(request, ente, exercicio, anexo, repo,
                           forcar=True, solicitante=solicitante, parametros=parametros,
                           fonte=fonte)

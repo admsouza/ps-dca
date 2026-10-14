@@ -11,7 +11,8 @@ from __future__ import annotations
 
 import hashlib
 import logging
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Collection, Sequence
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, NamedTuple
 
@@ -106,15 +107,21 @@ class _NoEscopo:
 
     def __getattr__(self, nome: str):
         """O que a fonte sabe fazer além de `registros`. O estorno vem de `estorno` quando houver;
-        senão da fonte bruta — o SICONFI não o tem, e o BF não abate."""
-        if nome.startswith("estorno_") and self._estorno is not None:
-            return getattr(self._estorno, nome)
-        return getattr(self._bruta, nome)
+        senão da fonte bruta — o SICONFI não o tem, e o BF não abate. O estorno é memorizado no
+        escopo, como a MSC: uma chamada por exercício e tipo, qualquer que seja o nº de recortes."""
+        if not nome.startswith("estorno_"):
+            return getattr(self._bruta, nome)
+        from app.infra.msc.escopo import obter_ou_buscar
+
+        origem = self._estorno if self._estorno is not None else self._bruta
+        consultar = getattr(origem, nome)
+        return lambda exercicio: obter_ou_buscar(
+            f"estorno:{self._nome}:{nome}:{exercicio}", lambda: consultar(exercicio))
 
 
-# Anexos apurados também por recorte (change `pipeline-dca-por-unidade-gestora`). O BF fica fora:
-# os estornos de receita/despesa extra são do ente, sem UG.
-RECORTAVEIS = ("BO", "BP")
+# Anexos apurados também por recorte (changes `pipeline-dca-por-unidade-gestora` e
+# `bf-por-unidade-gestora`).
+RECORTAVEIS = ("BO", "BP", "BF")
 
 
 class Recorte(NamedTuple):
@@ -135,25 +142,45 @@ class _Repasse:
 
 
 class _Observada(_Repasse):
-    """Repassa os registros e anota as unidades que aparecem: `{unidade: (nome, {poder_orgao})}`."""
+    """Repassa os registros e anota as unidades de cada exercício:
+    `{ano: {unidade: (nome, {poder_orgao})}}`."""
 
-    def __init__(self, fonte) -> None:
+    def __init__(self, fonte, exercicio: int) -> None:
         super().__init__(fonte)
-        self.unidades: dict[str, tuple[str, set[str]]] = {}
+        self._exercicio = exercicio
+        self.por_exercicio: dict[int, dict[str, tuple[str, set[str]]]] = {}
 
-    def registros(self, *args, **kwargs):
+    def registros(self, ente, ano, *args, **kwargs):
         from app.domain.recorte import unidade
 
-        lidos = self._fonte.registros(*args, **kwargs)
+        lidos = self._fonte.registros(ente, ano, *args, **kwargs)
+        unidades = self.por_exercicio.setdefault(ano, {})
         for registro in lidos:
-            nome, poderes = self.unidades.setdefault(
+            nome, poderes = unidades.setdefault(
                 unidade(registro), (registro.nome_unidade_gestora, set()))
             poderes.add(registro.poder_orgao)
         return lidos
 
+    @property
+    def tipo(self) -> str:
+        """`ug` se algum registro do exercício atual traz a UG; senão `po`. Quem decide é o
+        exercício atual: N−1 lido pela base oficial (CSV) não vira unidade `po:` num job por UG."""
+        atual = self.por_exercicio.get(self._exercicio, {})
+        return "ug" if any(u.startswith("ug:") for u in atual) else "po"
+
+    @property
+    def unidades(self) -> dict[str, tuple[str, set[str]]]:
+        """`{unidade: (nome, {poder_orgao})}` do tipo do job, de todos os exercícios lidos."""
+        saida: dict[str, tuple[str, set[str]]] = {}
+        for unidades in self.por_exercicio.values():
+            for chave, (nome, poderes) in unidades.items():
+                if chave.startswith(f"{self.tipo}:"):
+                    saida.setdefault(chave, (nome, set()))[1].update(poderes)
+        return saida
+
 
 class _Filtrada(_Repasse):
-    """Só os registros das `unidades` do recorte.
+    """Só os registros das `unidades` do recorte — e, no BF, só o estorno delas.
 
     ponytail: filtra a lista inteira a cada leitura — O(registros × recortes). Particionar uma vez
     por leitura se o job de um ente grande pesar.
@@ -168,38 +195,165 @@ class _Filtrada(_Repasse):
 
         return [r for r in self._fonte.registros(*args, **kwargs) if unidade(r) in self._unidades]
 
+    def __getattr__(self, nome: str):
+        consultar = super().__getattr__(nome)
+        if not nome.startswith("estorno_"):
+            return consultar
+        return lambda exercicio: self._do_recorte(consultar(exercicio))
 
-def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, **extras) -> Any:
+    def _do_recorte(self, estorno):
+        """`ug:` pela instituição; `po:` pelas instituições do `poderOrgao`."""
+        from dataclasses import replace
+
+        from app.infra.msc.publicsoft import EstornoSemPoderOrgao
+
+        por_unidade: dict[str, Decimal] = {}
+        for unidade in self._unidades:
+            if unidade.startswith("ug:"):
+                if unidade in estorno.por_unidade:
+                    por_unidade[unidade] = estorno.por_unidade[unidade]
+            elif estorno.poder_orgao is None:
+                if estorno.total > 0:
+                    raise EstornoSemPoderOrgao("estorno sem poder/órgão")
+            else:
+                por_unidade.update({u: v for u, v in estorno.por_unidade.items()
+                                    if estorno.poder_orgao.get(u) == unidade[3:]})
+        return replace(estorno, total=sum(por_unidade.values(), Decimal("0")),
+                       por_unidade=por_unidade)
+
+
+def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=None, anexo: str = "",
+                 escolhas: dict | None = None, agora: Collection[str] = (), **extras) -> Any:
     """O consolidado de hoje e, em `.recortes`, cada grupo de poder e cada unidade.
 
     Cada recorte é o mesmo `apurar` sobre a fonte filtrada: dentro do `escopo()` do job a leitura já
-    está memorizada, então nada volta à fonte. No BP, fora do consolidado, a coluna anterior é a
-    MSC do recorte — a DCA publicada só existe consolidada.
+    está memorizada, então nada volta à fonte. No BP e no BF, fora do consolidado, a coluna anterior
+    é da unidade (`pipeline-anterior-por-recorte`): `escolhas` (`{unidade: {origem, valores?}}`) ou,
+    sem escolha, o processado de N−1 em `repo` ou a MSC de N−1. `agora` são as unidades que o pedido
+    escolheu neste job. O grupo soma as colunas das unidades. A DCA publicada só existe consolidada.
 
     ponytail: unidade que só existe no ano anterior não vira recorte quando o consolidado do BP usa
-    o publicado (ela nunca é lida). Ler a MSC anterior para descobri-la se aparecer o caso.
+    o publicado ou o processado (ela nunca é lida). Ler a MSC anterior para descobri-la se
+    aparecer o caso.
     """
-    from app.domain import recorte as dominio
+    from dataclasses import replace
 
-    observada = _Observada(fonte)
+    from app.domain import recorte as dominio
+    from app.services.pipeline import anterior as ant
+    from app.services.pipeline.resultado import para_dados
+
+    escolhas = escolhas or {}
+    por_unidade = "anterior" in _aceitos_por(apurar, {"anterior": None})     # BF e BP
+    n1 = ant.ler_n1(repo, ente, exercicio, anexo) if por_unidade else None
+    consolidado_n1 = None
+    if por_unidade and extras.get("anterior") == ant.OrigemAnterior.PROCESSADO:
+        consolidado_n1 = ant.exigir(n1, dominio.CONSOLIDADO)
+        extras["anterior_pronto"] = ant.pronto(consolidado_n1)
+
+    observada = _Observada(fonte, exercicio)
     resultado = apurar(ente, exercicio, fonte=observada, **extras)
-    extras_recorte = {**extras, **_aceitos_por(apurar, {"anterior": "msce_exercicio_anterior"})}
-    extras_recorte.pop("dca", None)
+    if consolidado_n1 is not None:
+        resultado.procedencia = replace(
+            resultado.procedencia,
+            anterior_processado=ant.procedencia_do_processado(n1, consolidado_n1))
+    # O que foi digitado para o ente (anterior manual, G8) vale só no consolidado.
+    extras_recorte = {**extras, **_aceitos_por(apurar, {"anterior": "msce_exercicio_anterior",
+                                                        "g8_so_no_consolidado": True})}
+    for digitado in ("dca", "valores_anteriores", "valores_sem_mapeamento", "anterior_pronto"):
+        extras_recorte.pop(digitado, None)
 
     # Unidade com mais de um PO não pertence a um poder só: fica fora dos grupos.
-    poder_orgao = {u: next(iter(pos)) if len(pos) == 1 else ""
-                   for u, (_, pos) in observada.unidades.items()}
+    unidades = observada.unidades
+    poder_orgao = {u: next(iter(pos)) if len(pos) == 1 else "" for u, (_, pos) in unidades.items()}
+    # Grupo sem unidade (ex.: ente sem registro da Câmara): nada a emitir.
+    membros_de = {chave: membros for chave, membros in dominio.recortes(poder_orgao).items()
+                  if membros}
+
+    def apurar_recorte(chave: str, **kwargs) -> Any:
+        return apurar(ente, exercicio, fonte=_Filtrada(observada, membros_de[chave]), **kwargs)
+
+    def da_unidade(chave: str) -> Any:
+        if not por_unidade:
+            return apurar_recorte(chave, **extras_recorte)
+        escolha = escolhas.get(chave)
+        origem, aviso = ant.resolver(chave, escolha, chave in agora, n1)
+        kwargs = dict(extras_recorte)
+        retrato = None
+        if origem is ant.OrigemAnterior.PROCESSADO:
+            retrato = ant.recorte_de(n1, chave)
+            kwargs.update(anterior=origem.value, anterior_pronto=ant.pronto(retrato))
+        elif origem is ant.OrigemAnterior.MANUAL:
+            kwargs.update(anterior=origem.value, valores_anteriores=escolha["valores"])
+        r = apurar_recorte(chave, **kwargs)
+        # BP: a unidade sem MSC em N−1, num job que leu N−1, sai em zero (PO 2026-10-13).
+        zero = _aceitos_por(apurar, {"zero_sem_anterior": True})
+        leu_n1 = observada.por_exercicio.get(exercicio - 1)
+        if (origem is ant.OrigemAnterior.MSCE and zero and leu_n1
+                and r.diagnostico.sem_dados_exercicio_anterior):
+            r = apurar_recorte(chave, **kwargs, **zero)
+        r.procedencia = replace(
+            r.procedencia, escolha_anterior=dict(escolha) if escolha else None,
+            anterior_processado=(ant.procedencia_do_processado(n1, retrato) if retrato else None))
+        if aviso:
+            r.diagnostico.avisos_anterior = [aviso]
+        return r
+
+    feitos = {chave: da_unidade(chave) for chave in membros_de if chave not in dominio.GRUPOS}
+
+    def do_grupo(chave: str) -> Any:
+        if not por_unidade:
+            return apurar_recorte(chave, **extras_recorte)
+        soma = ant.somar([ant.pronto(para_dados(feitos[u]), "_anterior")
+                          for u in sorted(membros_de[chave])])
+        r = apurar_recorte(chave, **{**extras_recorte,
+                                     "anterior": ant.OrigemAnterior.PROCESSADO.value,
+                                     "anterior_pronto": soma})
+        r.procedencia = replace(r.procedencia, origem_exercicio_anterior=ant.SOMA_DAS_UNIDADES)
+        r.diagnostico.sem_dados_exercicio_anterior = any(
+            feitos[u].diagnostico.sem_dados_exercicio_anterior for u in membros_de[chave])
+        return r
+
     resultado.recortes = {
         chave: Recorte(
             tipo=dominio.tipo(chave),
-            rotulo=_rotulo(chave, observada.unidades),
+            rotulo=_rotulo(chave, unidades),
             poder_orgao="" if chave in dominio.GRUPOS else poder_orgao[chave],
-            resultado=apurar(ente, exercicio, fonte=_Filtrada(fonte, membros), **extras_recorte),
+            resultado=do_grupo(chave) if chave in dominio.GRUPOS else feitos[chave],
         )
-        for chave, membros in dominio.recortes(poder_orgao).items()
-        if membros         # grupo sem unidade (ex.: ente sem registro da Câmara): nada a emitir
+        for chave in membros_de
     }
+    if sem_unidade := _estorno_sem_unidade(fonte, observada, resultado.procedencia):
+        resultado.diagnostico.estorno_sem_unidade = sem_unidade
+    if ignoradas := [c for c in sorted(agora) if c in escolhas and c not in feitos]:
+        resultado.diagnostico.avisos_anterior = [
+            f"{c}: unidade ausente no job, escolha ignorada" for c in ignoradas]
     return resultado
+
+
+def _estorno_sem_unidade(fonte, observada: _Observada, procedencia) -> list[dict]:
+    """Estorno que entra no total do consolidado e não cai em nenhuma unidade (só BF).
+
+    Por UG: instituição sem registro na MSC do exercício. Por PO: `poderOrgao` nulo, ou PO sem
+    registro no exercício. Declarado, nunca rateado. Lê o relatório já memorizado no escopo.
+    """
+    saida = []
+    for tipo in ("receita", "despesa"):
+        nome = f"estorno_{tipo}_extra"
+        for ano in getattr(procedencia, nome, None) or {}:
+            estorno = getattr(fonte, nome)(int(ano))
+            vistas = observada.por_exercicio.get(int(ano), {})
+            for unidade, valor in estorno.por_unidade.items():
+                if observada.tipo == "ug":
+                    sem = unidade not in vistas
+                elif estorno.poder_orgao is None:   # `ps-erp` antigo: os `po:` já saem não apurados
+                    sem = False
+                else:
+                    po = estorno.poder_orgao.get(unidade)
+                    sem = po is None or f"po:{po}" not in vistas
+                if sem and valor:
+                    saida.append({"exercicio": int(ano), "tipo": tipo, "unidade": unidade,
+                                  "valor": format(valor, ".2f")})
+    return saida
 
 
 def _rotulo(chave: str, unidades: dict[str, tuple[str, set[str]]]) -> str:
@@ -239,8 +393,11 @@ def mapa_vigente(exercicio: int, anexo: str = "BO", repo_vigencias=None):
 
 
 def apurador(anexo: str = "BO", *, fonte_nome: str | None = None, token: str | None = None,
-             repo_vigencias=None, parametros: dict | None = None) -> Callable[[int, int], Any]:
+             repo_vigencias=None, parametros: dict | None = None,
+             repo=None) -> Callable[[int, int], Any]:
     """A função `(ente, exercicio) -> Resultado` que o worker executa.
+
+    `repo` é o cache dos resultados: o BF e o BP leem dele o processado de N−1 por unidade.
 
     A versão de regras **não** sai daqui: ela depende do exercício, e quem precisa dela antes de
     apurar (a rota, para decidir invalidação) chama `versao_regras(exercicio)`.
@@ -256,11 +413,14 @@ def apurador(anexo: str = "BO", *, fonte_nome: str | None = None, token: str | N
     apurar = _servico_de(descricao.codigo)
     # `fonte` do pedido já virou `dados`; repassá-la colidiria com o `fonte=` do serviço.
     extras = _aceitos_por(apurar, {k: v for k, v in (parametros or {}).items() if k != "fonte"})
+    por_unidade = {"repo": repo, "anexo": descricao.codigo,
+                   "escolhas": (parametros or {}).get("anterior_por_recorte"),
+                   "agora": (parametros or {}).get("anterior_agora") or ()}
 
     def _apurar(ente: int, exercicio: int):
         mapa = mapa_vigente(exercicio, descricao.codigo, repo_vigencias)
         if descricao.codigo in RECORTAVEIS:
-            return com_recortes(apurar, ente, exercicio, dados, mapa=mapa, **extras)
+            return com_recortes(apurar, ente, exercicio, dados, mapa=mapa, **por_unidade, **extras)
         return apurar(ente, exercicio, fonte=dados, mapa=mapa, **extras)
 
     return _apurar

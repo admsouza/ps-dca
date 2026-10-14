@@ -23,7 +23,7 @@ cada recorte:
 
 O tipo de unidade SHALL ser:
 
-- `UG` quando algum registro trouxer a unidade gestora. É o caso da fonte PublicSoft com a base por UG.
+- `UG` quando algum registro **do exercício atual** trouxer a unidade gestora. É o caso da fonte PublicSoft com a base por UG.
 - `PO` nos demais casos: SICONFI, ou PublicSoft cuja base por UG responde `422` (MSC importada por CSV).
 
 A unidade cujos registros têm mais de um `poder_orgao`, ou nenhum, não entra em grupo de poder.
@@ -42,6 +42,11 @@ registros já lidos no job. O dado da MSC NÃO DEVE ser persistido; só os resul
 #### Scenario: ente sem UG
 - **WHEN** o BO de Cuitegi 2025 é processado com `use_siconfi=true`
 - **THEN** o cache guarda `consolidado`, os grupos de poder e um recorte `po:<código>` por `poder_orgao` presente
+
+#### Scenario: N−1 sem UG num job por UG
+- **GIVEN** 2025 lido com UG e 2024 lido pela base oficial (`422`, CSV)
+- **THEN** só existem recortes `ug:`, e nenhum `po:` aparece por causa de 2024. O tipo de unidade é decidido pelo exercício atual
+- **AND** a coluna anterior de cada UG sai em zero (conta sem escrituração), com `sem_dados_exercicio_anterior`
 
 #### Scenario: grupo sem unidade
 - **GIVEN** um ente sem nenhum registro com `poder_orgao` `20231`

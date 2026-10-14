@@ -57,6 +57,15 @@ Specs em vigor: `dca/base-canonica-regras`, `dca/balanco-orcamentario`,
 
 **Change ativa, fase PLAN/ARCH (proposal aprovada 2026-10-09):** `pipeline-dca-por-unidade-gestora` — BO e BP: o job apura consolidado, grupos de poder e cada unidade — UG (base `unidades-gestoras` do `ps-erp`) ou, em ente sem UG (CSV ou SICONFI), PO — e a leitura escolhe `?recorte=` sem reprocessar; recorte = mesmo serviço sobre fonte filtrada; BP fora do consolidado com anterior da MSCE; UGs visíveis pelo poder do usuário no hub (depende de `poderes` em `/internal/authorize`, change `CH-46` do `regras-rgf-api`). BF em standby (estornos sem UG). PO 2026-10-09.
 
+**Change ativa, fase VERIFY (aprovada 2026-10-13; código no working tree, suíte 810 passed; falta a medição ao vivo em Cuitegi):** `bf-por-unidade-gestora` — **vem primeiro.** Tira o BF do standby. O estorno de GRE/GDE já vem por instituição (`totaisPorUnidadeGestora` do `ps-erp`, chave `ID_INSTITUICAO` = UG). Cada recorte abate de `L27`/`L60` a soma do estorno das suas unidades; o `po:` usa o `poderOrgao`, da change `relatorio-estorno-poder-orgao` do `ps-erp`. Uma chamada por exercício. O estorno sem unidade (UG sem MSC, ou `poderOrgao` nulo) fica em `diagnostico.estorno_sem_unidade`. O anterior manual e o G8 valem só no consolidado, e as unidades usam a MSC de N−1 (UG nova: zero + aviso). Ente com SIAFIC processado pela MSC (SICONFI) emite por PO, com `avisoRecorte`. Front: `dca-bf-e-anterior-por-recorte` (fatia 1).
+
+**Change ativa, fase VERIFY (aprovada 2026-10-13; código no working tree, suíte 810 passed; falta a medição ao vivo em Cuitegi):** `pipeline-anterior-por-recorte` — **depois do BF por UG.** Coluna do exercício anterior de BF e BP por unidade, com a origem escolhida por UG:
+- `processado_exercicio_anterior`: coluna atual do mesmo recorte no cache de N−1;
+- `msce_exercicio_anterior`: MSC da fonte do pedido, PublicSoft por UG no `ug:` e SICONFI no `po:`, nunca a DCA publicada;
+- `manual`: no BF e, como novidade, no BP, com as chaves `P:`/`FP:`/`C:`/`S:<fonte>`.
+
+Padrão: `processado` se o cache de N−1 tiver o recorte, senão `msce`. Toda escolha explícita fica gravada na procedência e é reaplicada, inclusive no percurso. O grupo de poder soma as unidades. O consolidado ganha `processado` e mantém o padrão de hoje. N−1 de outra fonte é aceito e declarado em `anterior_processado.fonte`. O cache continua sem chave por fonte. Front: `dca-bf-e-anterior-por-recorte` (fatia 2).
+
 **Change ativa, em implementação:** `dca-regra-na-celula` — `GET /dca/{anexo}/regra` e diálogo no BF.
 Anexo sem projeção registrada responde 404. Não arquivada.
 
@@ -105,6 +114,7 @@ Não reexecutado nesta revisão (os cenários seguem cobertos por teste):
 
 Pendências que **não** voltaram a ser change:
 
+- **`pipeline-fonte-matriz-csv`** (PO 2026-10-13, a abrir): hoje "Matriz CSV" no dialog da DCA envia `use_siconfi=false`, o hub responde `siafic_disponivel=false` e a rota devolve `409`. Replicar o RREO, que lê a base CSV externa do `ps-erp` (`base-demonstrativos-csv-externo`, JWT + `X-Unidade-Id`). Enquanto isso, o front desabilita "Matriz CSV" no DCA (`dca-bf-e-anterior-por-recorte`);
 - as 10 decisões de `docs/decisoes-bf-para-po-2026-09-18.md`;
 - as divergências contra o BF publicado pelos entes;
 - o critério de identificação da MSC de encerramento na periodicidade mensal

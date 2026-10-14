@@ -5,6 +5,7 @@ from decimal import Decimal
 
 import pytest
 
+from app.infra.msc.publicsoft import Estorno
 from tests.bf.conftest import ENTE, EXERCICIO, FontePorOrigem, fonte_com
 from tests.bo.conftest import registro
 
@@ -39,19 +40,19 @@ class _ComEstorno(_SoMes1):
         self.receitas = receitas
         self.despesas = despesas
 
-    def estorno_receita_extra(self, exercicio: int) -> Decimal:
-        return self._total(self.receitas, exercicio)
+    def estorno_receita_extra(self, exercicio: int) -> Estorno:
+        return self._estorno(self.receitas, exercicio)
 
-    def estorno_despesa_extra(self, exercicio: int) -> Decimal:
-        return self._total(self.despesas, exercicio)
+    def estorno_despesa_extra(self, exercicio: int) -> Estorno:
+        return self._estorno(self.despesas, exercicio)
 
     @staticmethod
-    def _total(valores: dict[int, Decimal], exercicio: int) -> Decimal:
+    def _estorno(valores: dict[int, Decimal], exercicio: int) -> Estorno:
         if exercicio not in valores:
             from app.infra.msc.publicsoft import EstornoIndisponivel
 
             raise EstornoIndisponivel(exercicio)
-        return valores[exercicio]
+        return Estorno(valores[exercicio], {}, {})
 
 
 def _valor(resultado, codigo: str, coluna: str):

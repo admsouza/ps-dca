@@ -62,6 +62,9 @@ dependem do sinal do conjunto.
 - Combinação arbitrária de unidades, por exemplo Prefeitura + Fundo de Saúde sem os demais fundos.
   O PO decidiu em 2026-10-09 que as peças são consolidado, poder ou uma unidade.
 - BF, que fica em standby: os estornos de receita e despesa extra são relatórios do ente, sem UG.
+  *(2026-10-13: premissa revista. O relatório já traz `totaisPorUnidadeGestora`, e o BF por recorte
+  segue na change `bf-por-unidade-gestora`. A coluna anterior por recorte segue em
+  `pipeline-anterior-por-recorte`.)*
 - `I-C` a `I-HI`, DVP e DFC. Cada um nasce com recorte na própria change.
 - Filtro por poder no BF e nos demais anexos.
 - PDF e XLSX.

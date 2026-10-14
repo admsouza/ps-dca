@@ -140,8 +140,8 @@ def test_bp_fora_do_consolidado_usa_msce_do_ano_anterior():
 
 
 def test_anexo_fora_do_recorte_nao_ganha_recortes():
-    """Scenario: anexo sem recorte — o BF segue como hoje."""
-    assert "BF" not in apuracao.RECORTAVEIS and set(apuracao.RECORTAVEIS) == {"BO", "BP"}
+    """Scenario: anexo sem recorte — só BO, BP e BF (change `bf-por-unidade-gestora`)."""
+    assert set(apuracao.RECORTAVEIS) == {"BO", "BP", "BF"}
 
 
 def test_serializacao_dos_recortes():
@@ -160,3 +160,21 @@ def test_grupo_sem_unidade_nao_e_apurado():
     fonte = FonteFake({5: [_ug(saldo("521110000", "10.00", natureza_receita="1100.00.00"),
                                "1", "10131")], 6: []})
     assert set(_bo(fonte).recortes) == {"poder:executivo", "poder:executivo+legislativo", "ug:1"}
+
+
+def test_n_menos_1_sem_ug_nao_vira_unidade_po_num_job_por_ug():
+    """Scenario: N−1 sem UG num job por UG"""
+    from app.services.bp.quadro_principal import apurar
+
+    fonte = FontePorAno({
+        EXERCICIO: {1: [_ug(fp("111110100", "100.00", "F"), "1", "10131")]},
+        EXERCICIO - 1: {1: [fp("111110100", "70.00", "F")._replace(poder_orgao="10131")]},
+    })
+    resultado = apuracao.com_recortes(apurar, ENTE, EXERCICIO, fonte,
+                                      anterior="msce_exercicio_anterior")
+
+    assert set(resultado.recortes) == {"poder:executivo", "poder:executivo+legislativo", "ug:1"}
+    ug = resultado.recortes["ug:1"].resultado
+    # A coluna anterior zerada da UG é do BF (`test_bf_estorno_por_unidade`); o BP, sem nenhuma
+    # leitura, deixa a coluna não apurada e sinaliza.
+    assert ug.diagnostico.sem_dados_exercicio_anterior is True

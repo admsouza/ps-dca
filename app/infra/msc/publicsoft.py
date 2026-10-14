@@ -19,7 +19,8 @@ from __future__ import annotations
 import logging
 import os
 from collections.abc import Sequence
-from decimal import Decimal
+from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation
 from http import HTTPStatus
 from urllib.parse import urlsplit, urlunsplit
 
@@ -50,7 +51,21 @@ CAMINHO_ESTORNO_DESPESA = "/contabilidade-tools/relatorios-gerenciais/estorno-de
 
 
 class EstornoIndisponivel(RuntimeError):
-    """O relatório não trouxe `totalGeral`. O bruto da MSC não pode sair como líquido."""
+    """O relatório não trouxe `totalGeral` ou `totaisPorUnidadeGestora`. O bruto da MSC não pode
+    sair como líquido."""
+
+
+class EstornoSemPoderOrgao(EstornoIndisponivel):
+    """Recorte por PO e relatório sem o campo `poderOrgao` (`ps-erp` anterior à change)."""
+
+
+@dataclass(frozen=True)
+class Estorno:
+    """Estorno de um exercício: total do ente e, por instituição, o valor e o poder/órgão."""
+
+    total: Decimal
+    por_unidade: dict[str, Decimal]               # "ug:<idInstituicao>"
+    poder_orgao: dict[str, str | None] | None     # None = campo ausente; valor None = sem PO
 
 
 def _impressoes(headers: dict | None) -> dict[str, str]:
@@ -85,9 +100,10 @@ class PublicSoftMSC:
         self._url_saldos = url_saldos
         self._timeout = timeout
         self._responsavel = responsavel
-        # A base por UG responde 422 a ente sem UG (MSC importada por CSV). Uma tentativa por
-        # instância — uma por job —, depois a base oficial direto: o recorte desse ente é por PO.
-        self._sem_ug = False
+        # A base por UG responde 422 a ente sem UG (MSC importada por CSV), e pode ser só em um
+        # exercício (N−1 em CSV). Uma tentativa por exercício e instância — uma por job —, depois a
+        # base oficial direto: o recorte desse exercício é por PO.
+        self._sem_ug: set[int] = set()
 
     def registros(self, ente: int, ano: int, mes: int, classe: int,
                   matriz: Matriz = Matriz.CONSOLIDADA,
@@ -113,7 +129,8 @@ class PublicSoftMSC:
         """Base por UG (`/unidades-gestoras`, sem filtro); a oficial se o ente não tem UG."""
         import requests
 
-        if not self._sem_ug:
+        ano = params["anReferencia"]
+        if ano not in self._sem_ug:
             try:
                 return self._http(f"{self._url_saldos}/unidades-gestoras", params=params,
                                   headers=self._cabecalhos(), timeout=self._timeout) or {}
@@ -121,8 +138,9 @@ class PublicSoftMSC:
                 resposta = erro.response
                 if resposta is None or resposta.status_code != HTTPStatus.UNPROCESSABLE_ENTITY:
                     raise
-                logger.warning("PublicSoft sem base por UG (422) | recorte por poder/órgão")
-                self._sem_ug = True
+                logger.warning("PublicSoft sem base por UG (422) | ano=%s | recorte por "
+                               "poder/órgão", ano)
+                self._sem_ug.add(ano)
         return self._http(self._url_saldos, params=params, headers=self._cabecalhos(),
                           timeout=self._timeout) or {}
 
@@ -134,25 +152,44 @@ class PublicSoftMSC:
         """
         return COMPETENCIA_13 if matriz is Matriz.ENCERRAMENTO else mes
 
-    def estorno_receita_extra(self, exercicio: int) -> Decimal:
-        """`totalGeral` do estorno de receita. SICONFI não tem este método."""
-        return self._total_geral(CAMINHO_ESTORNO_RECEITA, exercicio, "estorno de receita extra")
+    def estorno_receita_extra(self, exercicio: int) -> Estorno:
+        """Estorno de receita. SICONFI não tem este método."""
+        return self._estorno(CAMINHO_ESTORNO_RECEITA, exercicio, "estorno de receita extra")
 
-    def estorno_despesa_extra(self, exercicio: int) -> Decimal:
-        """`totalGeral` do estorno de despesa. Sai só de L60, junto com o de receita."""
-        return self._total_geral(CAMINHO_ESTORNO_DESPESA, exercicio, "estorno de despesa extra")
+    def estorno_despesa_extra(self, exercicio: int) -> Estorno:
+        """Estorno de despesa. Sai só de L60, junto com o de receita."""
+        return self._estorno(CAMINHO_ESTORNO_DESPESA, exercicio, "estorno de despesa extra")
 
-    def _total_geral(self, caminho: str, exercicio: int, nome: str) -> Decimal:
+    def _estorno(self, caminho: str, exercicio: int, nome: str) -> Estorno:
         resposta = self._http(
             self._url_relatorio(caminho),
             params={"exercicio": exercicio, "tipo": "sintetico"},
             headers=self._cabecalhos(),
             timeout=self._timeout,
         ) or {}
-        bruto = (resposta.get("data") or {}).get("totalGeral")
-        if bruto is None:
-            raise EstornoIndisponivel(f"{nome} sem totalGeral no exercício {exercicio}")
-        return Decimal(str(bruto))
+        dados = resposta.get("data") or {}
+        total, itens_ = dados.get("totalGeral"), dados.get("totaisPorUnidadeGestora")
+        if total is None or itens_ is None:
+            raise EstornoIndisponivel(f"{nome} sem totalGeral ou totaisPorUnidadeGestora "
+                                      f"no exercício {exercicio}")
+        por_unidade: dict[str, Decimal] = {}
+        for item in itens_:
+            if item.get("idInstituicao") is None or item.get("valor") is None:
+                raise EstornoIndisponivel(f"{nome} com item sem idInstituicao ou valor "
+                                          f"no exercício {exercicio}")
+            chave = f"ug:{item['idInstituicao']}"
+            try:
+                valor = Decimal(str(item["valor"]))
+            except InvalidOperation as erro:
+                raise EstornoIndisponivel(f"{nome} com valor inválido em {chave} "
+                                          f"no exercício {exercicio}") from erro
+            por_unidade[chave] = por_unidade.get(chave, Decimal("0")) + valor
+        poder_orgao = None
+        if any("poderOrgao" in item for item in itens_):
+            poder_orgao = {f"ug:{item['idInstituicao']}":
+                           None if item.get("poderOrgao") is None else str(item["poderOrgao"])
+                           for item in itens_}
+        return Estorno(Decimal(str(total)), por_unidade, poder_orgao)
 
     def _url_relatorio(self, caminho: str) -> str:
         marca = "/contabilidade-tools/"

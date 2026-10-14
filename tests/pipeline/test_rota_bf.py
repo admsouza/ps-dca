@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
 
 ENTE = "2611606"
@@ -57,11 +57,15 @@ def cliente(monkeypatch):
         async def enfileirar(self, **_):
             return "job-1"
 
+    def _autorizada(request: Request) -> str:
+        request.state.poderes = ("consolidado",)   # BF também lê por recorte (fail closed)
+        return ENTE
+
     def _montar(repo):
         app = FastAPI()
         app.include_router(rotas.router)
         app.dependency_overrides[repositorio] = lambda: repo
-        app.dependency_overrides[unidade_autorizada] = lambda: ENTE
+        app.dependency_overrides[unidade_autorizada] = _autorizada
         app.state.portas = {"fila_async": FilaFake, "lock": None, "jobs": None,
                             "repo_vigencias": None, "base_url": ""}
         return TestClient(app, raise_server_exceptions=False)

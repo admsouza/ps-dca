@@ -84,3 +84,26 @@ def test_siconfi_nao_tem_ug():
     registro = normalizar({"conta_contabil": "111110100", "natureza_conta": "D",
                            "valor": "1.00", "poder_orgao": "20231"})
     assert (registro.unidade_gestora, registro.nome_unidade_gestora) == ("", "")
+
+
+def test_422_so_em_n_menos_1_mantem_a_ug_do_exercicio_atual():
+    """Scenario: N−1 sem UG num job por UG — o recuo vale por exercício, uma tentativa cada."""
+    urls = []
+
+    def http(url, params=None, headers=None, timeout=None):
+        urls.append((params["anReferencia"], url.endswith("/unidades-gestoras")))
+        if url.endswith("/unidades-gestoras") and params["anReferencia"] == 2024:
+            raise _erro(422)
+        ug = {"idUnidadeGestora": 3} if url.endswith("/unidades-gestoras") else {}
+        return {"data": [{"codConta": "111110100", "naturezaConta": "D", "valor": "10.00",
+                          "poderOrgao": "10131", **ug}]}
+
+    fonte = _publicsoft(http)
+    antes = fonte.registros(ente=2505204, ano=2024, mes=12, classe=1)
+    atuais = [_ler(fonte, classe)[0] for classe in (1, 2, 5)]
+    fonte.registros(ente=2505204, ano=2024, mes=12, classe=2)
+
+    assert antes[0].unidade_gestora == ""
+    assert [r.unidade_gestora for r in atuais] == ["3", "3", "3"]
+    assert urls == [(2024, True), (2024, False), (2025, True), (2025, True), (2025, True),
+                    (2024, False)]
