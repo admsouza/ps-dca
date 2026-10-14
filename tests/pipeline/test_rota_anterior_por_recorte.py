@@ -283,7 +283,8 @@ def test_percurso_nao_aceita_anterior_por_recorte(api):
                             json={"anterior_por_recorte": {"ug:1": {"origem": MSCE}}})
 
     assert resposta.status_code == 202
-    assert set(fila.percursos[0]) == {"forcar", "solicitado_por", "origem_bp", "solicitante_email"}
+    assert set(fila.percursos[0]) == {"fonte", "forcar", "solicitado_por", "origem_bp",
+                                     "solicitante_email"}
 
 
 def test_percurso_reaplica_as_escolhas_gravadas():

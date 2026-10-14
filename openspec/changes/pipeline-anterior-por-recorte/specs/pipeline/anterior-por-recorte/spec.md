@@ -92,16 +92,6 @@ aceito quando o recorte existe nele.
 - **WHEN** chega `POST /dca/BF/reprocessar` de 2025 com `{"ug:3": {"origem": "processado_exercicio_anterior"}}`
 - **THEN** `409` "processe 2024 antes", sem job
 
-#### Scenario: processado do BP no percurso sem N−1
-- **GIVEN** o BP de 2024 sem cache `ok`
-- **WHEN** chega `POST /batch-jobs` com `origem_exercicio_anterior=processado_exercicio_anterior`
-- **THEN** a resposta é `409` "processe 2024 antes", sem job, como na rota do anexo
-
-#### Scenario: a origem do percurso não vaza para o BF
-- **GIVEN** `POST /batch-jobs` com `origem_exercicio_anterior=processado_exercicio_anterior`
-- **WHEN** o percurso apura o BF
-- **THEN** o BF usa a sua própria origem (gravada ou padrão); a da query vale só para o BP
-
 #### Scenario: processado gravado sem N−1
 - **GIVEN** `ug:3` com `processado` gravado num processamento anterior, e o BF de 2024 sem cache `ok`
 - **WHEN** o BF de 2025 é reprocessado para outra UG, ou pelo percurso

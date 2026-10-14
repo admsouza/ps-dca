@@ -422,6 +422,7 @@ async def processar_percurso(
         description="Origem da coluna anterior do BP; só vale para ele. Omitida: o manual salvo "
                     "ou MSC.",
     )] = None,
+    fonte: Annotated[FontePedido | None, Depends(fonte_do_pedido)] = None,
     solicitante: Annotated[int | None, Depends(usuario_id)] = None,
 ):
     if origem_bp not in (None, *ORIGENS_BP):
@@ -429,11 +430,13 @@ async def processar_percurso(
     _exigir_n1(repo, ente, exercicio, "BP", {"origem_anterior": origem_bp})
     portas = request.app.state.portas
     fila = portas["fila_async"]()
+    # A fonte do front (SIAFIC/MSC), como no anexo: sem ela o percurso apurava sempre pela padrão.
+    nome_fonte = fonte.nome if fonte is not None else config().fonte_padrao
 
     def versao_de(anexo: str) -> str:
         return cache_service.versao_do_pedido(
             apuracao.versao_regras(exercicio, anexo, portas.get("repo_vigencias")), anexo,
-            completo.pedido_do_percurso(repo.obter(ente, exercicio, anexo), config().fonte_padrao,
+            completo.pedido_do_percurso(repo.obter(ente, exercicio, anexo), nome_fonte,
                                         anexo, origem_bp),
         )
 
@@ -451,8 +454,10 @@ async def processar_percurso(
 
     job_id = job_manager.novo_id()
     completo.registrar(portas["jobs"], job_id, ente=ente, exercicio=exercicio, percurso=percurso)
+    if fonte is not None and fonte.token:        # cifrado no Redis; nunca no payload da fila
+        credencial.guardar(portas["cofre"], job_id=job_id, token=fonte.token)
     try:
-        fila.enfileirar_percurso(ente, exercicio, job_id,
+        fila.enfileirar_percurso(ente, exercicio, job_id, fonte=nome_fonte,
                                  forcar=forcar, solicitado_por=solicitante, origem_bp=origem_bp,
                                  solicitante_email=email_do_solicitante(request))
         if getattr(fila, "pendente", None) is not None:
@@ -467,7 +472,7 @@ async def processar_percurso(
     await _notificar_recebida(
         request, ente, exercicio,
         [no.anexo for no in completo.implementados(percurso) if no.estado == completo.A_APURAR],
-        percurso=True, forcar=forcar, fonte=config().fonte_padrao,
+        percurso=True, forcar=forcar, fonte=nome_fonte,
     )
     raiz = str(request.base_url).rstrip("/")
     logger.info("percurso enfileirado | ente=%s exercicio=%s job=%s forcar=%s anexos=%s",

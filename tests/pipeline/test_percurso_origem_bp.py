@@ -36,8 +36,14 @@ class FilaFake:
 
 @pytest.fixture
 def api(repo, lock, jobs, notificador):
+    from app.core.config import config
     from app.routes import anexos as rotas
-    from app.routes.dependencias import repositorio, unidade_autorizada
+    from app.routes.dependencias import (
+        FontePedido,
+        fonte_do_pedido,
+        repositorio,
+        unidade_autorizada,
+    )
 
     fila = FilaFake()
     app = FastAPI()
@@ -48,6 +54,8 @@ def api(repo, lock, jobs, notificador):
         return ENTE
 
     app.dependency_overrides[unidade_autorizada] = autorizada
+    # A fonte padrão, como antes da fonte no percurso; `_com_fonte` troca.
+    app.dependency_overrides[fonte_do_pedido] = lambda: FontePedido(config().fonte_padrao)
     app.state.portas = {"fila_async": lambda: fila, "lock": lock, "jobs": jobs,
                         "repo_vigencias": None, "base_url": "", "notificador": notificador}
     return TestClient(app, raise_server_exceptions=False), fila
@@ -93,7 +101,7 @@ def test_percurso_envia_a_origem_pedida_ao_job(api):
 
 
 def test_percurso_sem_origem_mantem_o_padrao(api):
-    """Scenario: percurso sem origem — o BP reaplica o manual salvo ou usa o padrão (MSC)"""
+    """Scenario: percurso sem origem mantém o padrão (manual salvo ou MSC)"""
     from app.services.pipeline.completo import pedido_do_percurso
 
     cliente, fila = api
@@ -203,3 +211,32 @@ def test_worker_apura_e_grava_o_bp_na_identidade_que_a_leitura_confere(
     assert lida.status_code == 200, lida.text
     assert lida.json()["motivos_desatualizado"] == [], lida.json()["motivos_desatualizado"]
     assert fila.enfileirados == []
+
+
+def _com_fonte(api, nome: str, token: str | None = None):
+    """O app do fixture com `fonte_do_pedido` fixo (o hub não existe no teste)."""
+    from app.routes.dependencias import FontePedido, fonte_do_pedido
+
+    cliente, fila = api
+    cliente.app.dependency_overrides[fonte_do_pedido] = lambda: FontePedido(nome, token)
+    return cliente, fila
+
+
+def test_percurso_apura_pela_fonte_pedida(api, monkeypatch):
+    """Scenario: percurso usa a fonte escolhida no front (SIAFIC → publicsoft), não a padrão
+
+    Regressão (Cuitegi 2025-10-14): o percurso apurava sempre pela fonte padrão (SICONFI), com
+    recortes por PO, e a leitura pela SIAFIC via o resultado como desatualizado.
+    """
+    guardados = []
+    monkeypatch.setattr("app.infra.fila.credencial.guardar",
+                        lambda cofre, *, job_id, token: guardados.append((job_id, token)))
+    cliente, fila = _com_fonte(api, "publicsoft", "tk")
+    cliente.app.state.portas["cofre"] = object()
+
+    resposta = cliente.post(URL, headers=HDR)
+
+    assert resposta.status_code == 202, resposta.text
+    assert fila.percursos[0]["fonte"] == "publicsoft"
+    assert guardados == [(resposta.json()["batch_job_id"], "tk")]
+    assert "tk" not in str(fila.percursos[0])
