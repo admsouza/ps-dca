@@ -423,6 +423,7 @@ async def processar_percurso(
     if origem_bp not in (None, *ORIGENS_BP):
         raise _erro_422("origem_exercicio_anterior inválida")
     origem_bp = origem_bp or ORIGENS_BP[0]
+    _exigir_n1(repo, ente, exercicio, "BP", {"origem_anterior": origem_bp})
     portas = request.app.state.portas
     fila = portas["fila_async"]()
 

@@ -248,8 +248,10 @@ def test_corpo_sem_escolhas_reaplica_as_gravadas(api):
 # ─── percurso ────────────────────────────────────────────────────────────────
 
 def test_percurso_aceita_processado_para_o_bp(api):
-    """Requisito: query do percurso para o BP"""
-    cliente, fila = api(RepoFake(), "BP")
+    """Requisito: query do percurso para o BP (com o BP de N−1 `ok`; sem ele, `409`)"""
+    repo = RepoFake()
+    repo.gravar(RegistroFake("2505204", EXERCICIO - 1, "BP", status="ok", resultado={"x": 1}))
+    cliente, fila = api(repo, "BP")
 
     resposta = cliente.post(
         f"/batch-jobs?anReferencia={EXERCICIO}&origem_exercicio_anterior={PROCESSADO}",

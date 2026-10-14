@@ -92,7 +92,8 @@ def pedido_do_percurso(registro, fonte: str, anexo: str = "",
     Rota e worker gravam e conferem a mesma. Sem a fonte, o `GET` seguinte — que sempre manda a
     sua — veria todo anexo do percurso como desatualizado. `origem_bp` só pesa no BP.
     """
-    pedido = {"fonte": fonte, **({"origem_anterior": origem_bp} if origem_bp else {})}
+    so_bp = origem_bp if anexo == "BP" else None    # no BF, `processado` exigiria o N−1 do BF
+    pedido = {"fonte": fonte, **({"origem_anterior": so_bp} if so_bp else {})}
     return parametros_efetivos(pedido, registro, anexo)
 
 

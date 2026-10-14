@@ -16,6 +16,7 @@ ENTE = "2505204"
 EXERCICIO = 2025
 HDR = {"Authorization": "Bearer t", "X-Unidade-Id": ENTE}
 MSC, PUBLICADO = "msce_exercicio_anterior", "publicado_siconfi"
+PROCESSADO = "processado_exercicio_anterior"
 URL = f"/batch-jobs?anReferencia={EXERCICIO}&id_ente={ENTE}"
 
 
@@ -125,15 +126,40 @@ def test_bp_em_cache_pela_outra_origem_entra_a_apurar(api, repo):
     assert {n["anexo"]: n["estado"] for n in mesma.json()["anexos"]}["BP"] == "em_cache"
 
 
-def test_bo_e_bf_nao_dependem_da_origem_do_bp():
-    """Requisito: BO e BF — identidade e resultado inalterados."""
+@pytest.mark.parametrize("origem", [MSC, PUBLICADO, PROCESSADO])
+def test_bo_e_bf_nao_dependem_da_origem_do_bp(origem):
+    """Requisito: BO e BF — identidade e resultado inalterados.
+
+    Regressão (Cuitegi 2025-10-14): `processado` do BP vazava para o BF, que falhava com
+    "processe 2024 antes" sem o usuário ter escolhido nada no BF.
+    """
     from app.services.pipeline.completo import pedido_do_percurso
 
     for anexo in ("BO", "BF", ""):
-        assert pedido_do_percurso(None, "siconfi", anexo, MSC) == pedido_do_percurso(
+        assert pedido_do_percurso(None, "siconfi", anexo, origem) == pedido_do_percurso(
             None, "siconfi", anexo)
-    assert pedido_do_percurso(None, "siconfi", "BP", MSC)["origem_anterior"] == MSC
+    assert pedido_do_percurso(None, "siconfi", "BP", origem)["origem_anterior"] == origem
     assert pedido_do_percurso(None, "siconfi", "BP")["origem_anterior"] == PUBLICADO
+
+
+def test_percurso_processado_sem_n1_do_bp_recusa_com_409(api):
+    """Scenario: processado explícito sem N−1 — no percurso, `409` antes de enfileirar"""
+    cliente, fila = api
+    resposta = cliente.post(f"{URL}&origem_exercicio_anterior={PROCESSADO}", headers=HDR)
+
+    assert resposta.status_code == 409
+    assert resposta.json()["detail"] == f"processe {EXERCICIO - 1} antes"
+    assert fila.percursos == []
+
+
+def test_percurso_processado_com_n1_do_bp_enfileira(api, repo):
+    """Scenario: processado no percurso com o BP de N−1 `ok` enfileira"""
+    cliente, fila = api
+    repo.gravar(RegistroFake(ENTE, EXERCICIO - 1, "BP", status="ok", resultado={"x": 1}))
+    resposta = cliente.post(f"{URL}&origem_exercicio_anterior={PROCESSADO}", headers=HDR)
+
+    assert resposta.status_code == 202, resposta.text
+    assert fila.percursos[0]["origem_bp"] == PROCESSADO
 
 
 def test_worker_apura_e_grava_o_bp_na_identidade_que_a_leitura_confere(
