@@ -190,4 +190,4 @@ estável mas ilegível para quem digita e para o front.
   da change de UG.
 - **N−1 em cache `desatualizado`** (regra antiga). Ele é usado assim mesmo, por ser um retrato, e a
   procedência mostra a `versao_regras`. Confirmar com o PO.
-- **Manual no consolidado do BP:** fora, até o PO pedir.
+- **Manual no consolidado do BP:** entrou (PO 2026-10-14), com padrão MSC, como no BF.

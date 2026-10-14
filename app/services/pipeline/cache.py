@@ -118,7 +118,7 @@ def _sufixo_das_escolhas(escolhas: dict[str, dict]) -> str:
     return "ar-" + hashlib.sha256(pares.encode("utf-8")).hexdigest()[:16]
 
 
-ORIGEM_PADRAO_BP = "publicado_siconfi"
+ORIGEM_PADRAO_BP = "msce_exercicio_anterior"     # o mesmo padrão do BF
 
 
 def parametros_efetivos(pedido: dict | None, registro, anexo: str = "") -> dict:
@@ -126,7 +126,7 @@ def parametros_efetivos(pedido: dict | None, registro, anexo: str = "") -> dict:
 
     Consolidado do BF: `msce` explícita não reaproveita mapa do anterior; `processado` e `manual`
     valem o que veio; pedido sem origem reaplica `procedencia.valores_anteriores` da linha, quando
-    houver. Consolidado do BP: origem sempre explícita, padrão `publicado_siconfi`, sem mapa salvo.
+    houver. Consolidado do BP: o mesmo, mas a origem resolvida vai sempre explícita (padrão MSC).
 
     O mapa G8 do atual é independente disso (D2): pedido com a chave `valores_sem_mapeamento`
     vale o que veio (vazio limpa); pedido sem a chave reaplica `procedencia.valores_sem_mapeamento`.
@@ -134,7 +134,7 @@ def parametros_efetivos(pedido: dict | None, registro, anexo: str = "") -> dict:
     Por unidade (`anterior_por_recorte`): vale a gravada nos recortes, com o pedido por cima.
     """
     pedido = dict(pedido or {})
-    saida = (_parametros_bp(pedido) if anexo == "BP"
+    saida = (_parametros_bp(pedido, registro) if anexo == "BP"
              else _parametros_consolidado(pedido, registro))
     saida.update(_por_unidade(pedido, registro))
     return saida
@@ -165,15 +165,22 @@ def _parametros_consolidado(pedido: dict, registro) -> dict:
     return saida
 
 
-def _parametros_bp(pedido: dict) -> dict:
+def _parametros_bp(pedido: dict, registro) -> dict:
     """BP: a origem da coluna anterior é sempre explícita (D2 de `bp-anterior-publicado-siconfi`).
 
-    Omitida, vale o padrão `publicado_siconfi`. Sem isso o mesmo resultado teria duas identidades
-    (`-` e `publicado_siconfi`) e a leitura o marcaria `pedido` sem motivo. Não há mapa salvo a
-    reaplicar: a escolha vem sempre do pedido.
+    Omitida, reaplica o manual salvo na linha ou vale o padrão MSC, como no BF. Explícita nos dois
+    casos: sem isso o mesmo resultado teria duas identidades e a leitura o marcaria `pedido`.
+    `publicado_siconfi` segue aceito pela API, mas o front não o oferece mais.
     """
-    origem = pedido.get("origem_anterior") or ORIGEM_PADRAO_BP
-    saida = {"origem_anterior": origem, "anterior": origem}
+    origem = pedido.get("origem_anterior")
+    if origem == "manual":
+        saida = _manual(pedido.get("valores_anteriores") or {})
+    elif origem:
+        saida = {"origem_anterior": origem, "anterior": origem}
+    else:
+        salvos = _mapa_salvo(registro)
+        saida = (_manual(salvos) if salvos
+                 else {"origem_anterior": ORIGEM_PADRAO_BP, "anterior": ORIGEM_PADRAO_BP})
     if pedido.get("fonte"):
         saida["fonte"] = pedido["fonte"]
     return saida

@@ -226,7 +226,8 @@ def _parametros_bf(
     g8_json: Annotated[str | None, Query(alias="valores_sem_mapeamento")] = None,
 ) -> dict:
     """Origem na query. Os mapas em si não entram aqui: query com eles responde `400`."""
-    if valores_json is not None or g8_json is not None or (anexo == "BF" and origem == "manual"):
+    if valores_json is not None or g8_json is not None or (anexo in ("BF", "BP")
+                                                           and origem == "manual"):
         raise HTTPException(status.HTTP_400_BAD_REQUEST,
                             detail="valores_anteriores/valores_sem_mapeamento não é aceito na "
                                    "query")
@@ -253,17 +254,19 @@ def _parametros_do_corpo(corpo: CorpoAnterior, exercicio: int, anexo: str = "BF"
     from app.services.bf.informados import validar_valores_anteriores
 
     origem = corpo.origem_exercicio_anterior
-    if anexo == "BP":
-        if origem not in ORIGENS_BP:
-            raise _erro_422("origem_exercicio_anterior inválida")
-        return {"origem_anterior": origem}
-    if origem in (anterior.OrigemAnterior.MSCE, anterior.OrigemAnterior.PROCESSADO):
+    aceitas = ORIGENS_BP if anexo == "BP" else (anterior.OrigemAnterior.MSCE,
+                                                anterior.OrigemAnterior.PROCESSADO)
+    if origem in aceitas:
         return {"origem_anterior": origem}
     if origem != "manual":
         raise _erro_422("origem_exercicio_anterior inválida")
     valores = {
         str(codigo): str(valor) for codigo, valor in (corpo.valores_anteriores or {}).items()
     }
+    if anexo == "BP":
+        from app.services.bp.informados import validar_valores_anteriores
+        if not valores:
+            raise _erro_422("manual exige valores")
     try:
         validar_valores_anteriores(exercicio, valores)
     except ValueError as erro:                   # `LinhaDesconhecida` é `ValueError`
@@ -416,13 +419,13 @@ async def processar_percurso(
     forcar: Annotated[bool, Query(description="Reapura todos, ignorando cache válido.")] = False,
     origem_bp: Annotated[str | None, Query(
         alias="origem_exercicio_anterior",
-        description="Origem da coluna anterior do BP; só vale para ele. Padrão: publicado_siconfi.",
+        description="Origem da coluna anterior do BP; só vale para ele. Omitida: o manual salvo "
+                    "ou MSC.",
     )] = None,
     solicitante: Annotated[int | None, Depends(usuario_id)] = None,
 ):
     if origem_bp not in (None, *ORIGENS_BP):
         raise _erro_422("origem_exercicio_anterior inválida")
-    origem_bp = origem_bp or ORIGENS_BP[0]
     _exigir_n1(repo, ente, exercicio, "BP", {"origem_anterior": origem_bp})
     portas = request.app.state.portas
     fila = portas["fila_async"]()

@@ -93,10 +93,13 @@ def test_percurso_envia_a_origem_pedida_ao_job(api):
 
 
 def test_percurso_sem_origem_mantem_o_padrao(api):
-    """Scenario: percurso sem origem mantém o padrão"""
+    """Scenario: percurso sem origem — o BP reaplica o manual salvo ou usa o padrão (MSC)"""
+    from app.services.pipeline.completo import pedido_do_percurso
+
     cliente, fila = api
     assert cliente.post(URL, headers=HDR).status_code == 202
-    assert fila.percursos[0]["origem_bp"] == PUBLICADO
+    assert fila.percursos[0]["origem_bp"] is None
+    assert pedido_do_percurso(None, "siconfi", "BP")["origem_anterior"] == MSC
 
 
 @pytest.mark.parametrize("origem", ["manual", "qualquer"])
@@ -139,7 +142,7 @@ def test_bo_e_bf_nao_dependem_da_origem_do_bp(origem):
         assert pedido_do_percurso(None, "siconfi", anexo, origem) == pedido_do_percurso(
             None, "siconfi", anexo)
     assert pedido_do_percurso(None, "siconfi", "BP", origem)["origem_anterior"] == origem
-    assert pedido_do_percurso(None, "siconfi", "BP")["origem_anterior"] == PUBLICADO
+    assert pedido_do_percurso(None, "siconfi", "BP")["origem_anterior"] == MSC
 
 
 def test_percurso_processado_sem_n1_do_bp_recusa_com_409(api):

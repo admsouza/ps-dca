@@ -28,7 +28,10 @@ Validação, antes do job (`422`):
 - fonte que não tem 4 dígitos;
 - valor não decimal.
 
-O manual NÃO DEVE valer para o consolidado do BP.
+O manual SHALL valer também para o consolidado do BP, como no BF (PO 2026-10-14): no corpo do
+`reprocessar` (`origem_exercicio_anterior: manual` + `valores_anteriores`), com a mesma validação, e
+reaplicado num pedido sem origem. O padrão do consolidado passa a ser `msce_exercicio_anterior`;
+`publicado_siconfi` segue aceito pela API, mas o front não o oferece.
 
 Base normativa: IPC 04, coluna "Exercício Anterior".
 
@@ -42,8 +45,13 @@ Base normativa: IPC 04, coluna "Exercício Anterior".
 - **THEN** `L5` anterior fica não apurada, com o motivo "não informado"
 
 #### Scenario: manual no consolidado
-- **WHEN** chega `origem_exercicio_anterior=manual` para o consolidado do BP
-- **THEN** `422`
+- **WHEN** chega no corpo `origem_exercicio_anterior=manual` com `valores_anteriores` válidos para o consolidado do BP
+- **THEN** o job apura o consolidado com os valores; sem valores, `422`; na query, `400`
+
+#### Scenario: pedido sem origem no BP
+- **GIVEN** o consolidado do BP gravado em manual
+- **WHEN** chega uma leitura ou percurso sem `origem_exercicio_anterior`
+- **THEN** o manual salvo é reaplicado; sem manual salvo, vale `msce_exercicio_anterior`
 
 #### Scenario: totalizadora informada
 - **WHEN** o manual traz `P:<codigo de totalizadora>`

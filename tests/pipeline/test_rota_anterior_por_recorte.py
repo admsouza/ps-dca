@@ -126,12 +126,26 @@ def test_manual_do_bf_recusa_codigo_inexistente(api):
     assert resposta.status_code == 422 and fila.chamadas == []
 
 
-def test_manual_no_consolidado_do_bp_responde_422(api):
-    """Scenario: manual no consolidado"""
+def test_manual_no_consolidado_do_bp_enfileira_com_os_valores(api):
+    """Scenario: manual no consolidado do BP — como no BF"""
     cliente, fila = api(RepoFake(), "BP")
 
     resposta = _reprocessar(cliente, "BP", {"origem_exercicio_anterior": MANUAL,
                                             "valores_anteriores": VALIDOS["BP"]})
+
+    assert resposta.status_code == 202, resposta.text
+    parametros = fila.chamadas[0]
+    assert parametros["origem_anterior"] == parametros["anterior"] == MANUAL
+    assert parametros["valores_anteriores"] == VALIDOS["BP"]
+
+
+@pytest.mark.parametrize("valores", [{}, {"P:L2": "1.00"}, {"X:L3": "1.00"}])
+def test_manual_no_consolidado_do_bp_recusa_valores_invalidos(api, valores):
+    """Scenario: manual no consolidado do BP com valores inválidos — `422`, sem job"""
+    cliente, fila = api(RepoFake(), "BP")
+
+    resposta = _reprocessar(cliente, "BP", {"origem_exercicio_anterior": MANUAL,
+                                            "valores_anteriores": valores})
 
     assert resposta.status_code == 422 and fila.chamadas == []
 

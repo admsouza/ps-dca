@@ -24,12 +24,12 @@ def test_origens_nao_se_misturam_no_cache(pedido, repo, fila):
     from tests.pipeline.conftest import EXERCICIO as X
     from tests.pipeline.conftest import VERSAO_REGRAS, RegistroFake
 
-    repo.gravar(RegistroFake(E, X, "BP", status="ok", resultado={"publicado": 1},
+    repo.gravar(RegistroFake(E, X, "BP", status="ok", resultado={"msc": 1},
                              versao_regras=versao_do_pedido(
-                                 VERSAO_REGRAS, "BP", _parametros("publicado_siconfi"))))
+                                 VERSAO_REGRAS, "BP", _parametros("msce_exercicio_anterior"))))
 
-    msc = pedido(anexo="BP", parametros=_parametros("msce_exercicio_anterior"))
-    assert (msc.status, msc.motivos_desatualizado) == (200, ["pedido"])
+    publicado = pedido(anexo="BP", parametros=_parametros("publicado_siconfi"))
+    assert (publicado.status, publicado.motivos_desatualizado) == (200, ["pedido"])
 
     omitida = pedido(anexo="BP", parametros=_parametros(None))
     assert (omitida.status, omitida.motivos_desatualizado) == (200, [])
@@ -44,14 +44,14 @@ def test_origem_omitida_e_explicitada_em_rota_worker_e_percurso():
 
     da_rota = parametros_efetivos({**_parametros_bf("BP", None, None, None), "fonte": "siconfi"},
                                   None, "BP")
-    assert da_rota["origem_anterior"] == "publicado_siconfi"
-    assert da_rota["anterior"] == "publicado_siconfi"      # o que o worker repassa ao serviço
+    assert da_rota["origem_anterior"] == "msce_exercicio_anterior"   # padrão, como no BF
+    assert da_rota["anterior"] == "msce_exercicio_anterior"  # o que o worker repassa ao serviço
 
     no_worker = versao_do_pedido(VERSAO, "BP", da_rota)    # job individual: params da rota
     no_percurso = versao_do_pedido(VERSAO, "BP", {
         **parametros_efetivos({}, None, "BP"), **pedido_do_percurso(None, "siconfi", "BP")})
     assert no_worker == no_percurso
-    assert versao_do_pedido(VERSAO, "BP", _parametros("msce_exercicio_anterior")) != no_percurso
+    assert versao_do_pedido(VERSAO, "BP", _parametros("publicado_siconfi")) != no_percurso
 
 
 def test_bf_nao_muda_de_comportamento():
@@ -65,8 +65,8 @@ def test_bf_nao_muda_de_comportamento():
     assert pedido_do_percurso(None, "siconfi") == {"fonte": "siconfi"}
 
 
-def test_rota_aceita_as_duas_origens_e_recusa_o_resto():
-    """Requisito: origem inválida no BP — `422`; `manual` é do BF."""
+def test_rota_aceita_as_origens_e_recusa_o_resto():
+    """Requisito: origem inválida no BP — `422`; `manual` só no corpo, como no BF."""
     from fastapi import HTTPException
 
     from app.routes.anexos import CorpoAnterior, _parametros_bf, _parametros_do_corpo
@@ -75,15 +75,38 @@ def test_rota_aceita_as_duas_origens_e_recusa_o_resto():
         "origem_anterior": "publicado_siconfi"}
     assert _parametros_bf("BP", "msce_exercicio_anterior", None, None) == {
         "origem_anterior": "msce_exercicio_anterior"}
-    for invalida in ("manual", "qualquer"):
-        with pytest.raises(HTTPException) as erro:
-            _parametros_bf("BP", invalida, None, None)
-        assert erro.value.status_code == 422
+    with pytest.raises(HTTPException) as erro:
+        _parametros_bf("BP", "qualquer", None, None)
+    assert erro.value.status_code == 422
+    with pytest.raises(HTTPException) as erro:
+        _parametros_bf("BP", "manual", None, None)
+    assert erro.value.status_code == 400
     corpo = CorpoAnterior(origem_exercicio_anterior="publicado_siconfi")
     assert _parametros_do_corpo(corpo, 2025, "BP") == {"origem_anterior": "publicado_siconfi"}
+    manual = CorpoAnterior(origem_exercicio_anterior="manual",
+                           valores_anteriores={"P:L3": "1.00"})
+    assert _parametros_do_corpo(manual, 2025, "BP") == {
+        "origem_anterior": "manual", "anterior": "manual", "valores_anteriores": {"P:L3": "1.00"}}
     with pytest.raises(HTTPException) as erro:
         _parametros_do_corpo(CorpoAnterior(origem_exercicio_anterior="manual"), 2025, "BP")
     assert erro.value.status_code == 422
+
+
+def test_pedido_sem_origem_reaplica_o_manual_salvo_do_bp():
+    """Scenario: manual do consolidado do BP reaplicado num pedido sem origem (leitura, percurso)"""
+    from app.services.pipeline.cache import parametros_efetivos
+    from tests.pipeline.conftest import ENTE as E
+    from tests.pipeline.conftest import EXERCICIO as X
+    from tests.pipeline.conftest import RegistroFake
+
+    salvo = RegistroFake(E, X, "BP", procedencia={"origem_exercicio_anterior": "manual",
+                                                  "valores_anteriores": {"P:L3": "1.00"}})
+    assert parametros_efetivos({"fonte": "siconfi"}, salvo, "BP") == {
+        "origem_anterior": "manual", "anterior": "manual",
+        "valores_anteriores": {"P:L3": "1.00"}, "fonte": "siconfi"}
+    explicita = parametros_efetivos({"origem_anterior": "msce_exercicio_anterior"}, salvo, "BP")
+    assert explicita == {"origem_anterior": "msce_exercicio_anterior",
+                         "anterior": "msce_exercicio_anterior"}
 
 
 def test_apurador_do_bp_repassa_a_origem_ao_servico():
