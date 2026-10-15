@@ -24,9 +24,8 @@ TABELA_DE_VERSAO = "alembic_version_dca"
 PREFIXO_TABELAS = "dca_"
 LOCK = (43812, 1001)
 
-# Tabelas de versão dos irmãos: nunca tocadas, e a genérica não pode conter marcador da DCA.
+# A tabela de versão genérica não pode conter marcador da DCA.
 TABELA_GENERICA = "alembic_version"
-DOS_IRMAOS = ("alembic_version_rreo", "alembic_version_rgf")
 
 
 class HistoricoForaDaTabela(RuntimeError):

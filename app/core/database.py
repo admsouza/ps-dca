@@ -42,15 +42,6 @@ def sessao() -> Session:
     return _Sessao()
 
 
-def obter_sessao():
-    """Dependência do FastAPI. Fecha a sessão mesmo quando a rota levanta."""
-    db = sessao()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 def ping() -> bool:
     """Verificação de dependência para o startup do worker."""
     from sqlalchemy import text

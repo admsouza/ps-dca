@@ -111,61 +111,6 @@ class CofreRedis:
         return bruto.decode("utf-8") if bruto else None
 
 
-class FilaArq:
-    """Enfileira no `arq`, na fila própria da DCA. Um job só, parametrizado por anexo (P4)."""
-
-    def __init__(self, pool, fila: str | None = None) -> None:
-        self._pool = pool
-        self._fila = fila or chaves.FILA
-
-    def enfileirar(self, ente: str, exercicio: int, anexo: str, job_id: str,
-                   **parametros) -> None:
-        import asyncio
-
-        from app.services.pipeline.registry import anexo as descrever
-
-        corrotina = self._pool.enqueue_job(
-            descrever(anexo).job,
-            _job_id=job_id,
-            _queue_name=self._fila,
-            job_id=job_id,
-            ente=ente,
-            exercicio=exercicio,
-            anexo=anexo,
-            **parametros,
-        )
-        # A rota é async e o service é síncrono: quem chama de dentro do loop usa
-        # `FilaArqAsync.enfileirar`. Aqui cobrimos o caso do CLI e de scripts.
-        try:
-            asyncio.get_running_loop()
-        except RuntimeError:
-            asyncio.run(corrotina)
-        else:
-            raise RuntimeError(
-                "FilaArq.enfileirar chamada de dentro de um event loop — use FilaArqAsync"
-            )
-
-
-    def enfileirar_percurso(self, ente: str, exercicio: int, job_id: str, **parametros) -> None:
-        """Job do percurso completo: um para todos os anexos, sem `anexo` no payload."""
-        import asyncio
-
-        from app.services.pipeline.registry import JOB_COMPLETO
-
-        corrotina = self._pool.enqueue_job(
-            JOB_COMPLETO, _job_id=job_id, _queue_name=self._fila,
-            job_id=job_id, ente=ente, exercicio=exercicio, **parametros,
-        )
-        try:
-            asyncio.get_running_loop()
-        except RuntimeError:
-            asyncio.run(corrotina)
-        else:
-            raise RuntimeError(
-                "FilaArq.enfileirar_percurso chamada de dentro de um event loop — use FilaArqAsync"
-            )
-
-
 class FilaArqAsync:
     """Mesma fila, para quem já está no event loop da API.
 

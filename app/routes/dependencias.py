@@ -199,14 +199,6 @@ def email_do_solicitante(request: Request) -> str | None:
     return email if "@" in email else None
 
 
-def token_da_fonte(request: Request) -> str | None:
-    """Token da fonte para o job, quando vem por via server-to-server.
-
-    Nunca de browser: `recusar_credencial_de_fonte` barra `x-authorization` e `token_ps` antes.
-    """
-    return getattr(request.state, "token_fonte", None)
-
-
 def portas(request: Request) -> dict:
     """Repositório, fila, lock, jobs e cache — montados no lifespan, reusados por requisição."""
     return request.app.state.portas

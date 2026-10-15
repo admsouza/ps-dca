@@ -37,7 +37,6 @@ class Config:
         self.db_max_overflow = _int("DB_MAX_OVERFLOW", 10)
         self.db_echo = _bool("DB_ECHO")
         self.db_connect_timeout = _int("DB_CONNECT_TIMEOUT", 10)
-        self.run_migrations = _bool("RUN_MIGRATIONS")
         self.alembic_lock_timeout = _int("ALEMBIC_LOCK_TIMEOUT_SECONDS", 120)
 
         # Redis — instância comum. `REDIS_PREFIX` nomeia o cache de MSC e é compartilhado de
@@ -67,12 +66,6 @@ class Config:
 
         # Fontes
         self.fonte_padrao = os.getenv("DATA_SOURCE", "siconfi")
-        self.siconfi_url = os.getenv("SICONFI_API_URL",
-                                     "https://apidatalake.tesouro.gov.br/ords/siconfi")
-        self.siconfi_timeout = _int("SICONFI_TIMEOUT", 30)
-        self.publicsoft_url = os.getenv("PUBLICSOFT_API_URL", "")
-        self.publicsoft_timeout = _int("PUBLICSOFT_TIMEOUT", 120)
-        self.publicsoft_ssl_verify = _bool("PUBLICSOFT_SSL_VERIFY")
 
         # Operação
         self.discord_webhook = os.getenv("DISCORD_WEBHOOK_URL", "")
