@@ -299,6 +299,30 @@ def _parametros_por_unidade(corpo: CorpoAnterior, anexo: str, exercicio: int) ->
     return {"anterior_por_recorte": escolhas}
 
 
+def _exigir_poder_nas_unidades(request: Request, repo, ente: str, exercicio: int, anexo: str,
+                               chaves: list[str]) -> None:
+    """Cada chave de `anterior_por_recorte` precisa ser visível ao usuário (A01), como na leitura.
+
+    `po:` vale pelo próprio código; `ug:` pelo `poderOrgao` gravado em N, ou em N−1. Sem poder
+    resolvido (`""`), só `consolidado` passa. Tudo ou nada: roda antes de qualquer job.
+    """
+    poderes = getattr(request.state, "poderes", ())
+    if recortes.CONSOLIDADO in poderes:
+        return
+    gravados: dict = {}
+    for ano in (exercicio - 1, exercicio):       # N por último: vence N−1
+        registro = repo.obter(ente, ano, anexo)
+        # Só resultado `ok`, como no resumo: cache em erro/processando não resolve poder.
+        if registro is not None and registro.status == "ok":
+            gravados |= (registro.resultado or {}).get("recortes") or {}
+    unidades = {c: c[3:] if c.startswith("po:") else gravados.get(c, {}).get("poderOrgao", "")
+                for c in chaves}
+    visiveis = recortes.visiveis(chaves, unidades, poderes)
+    for chave in chaves:
+        if chave not in visiveis:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail=f"sem acesso à unidade {chave}")
+
+
 def _exigir_n1(repo, ente: str, exercicio: int, anexo: str, parametros: dict) -> None:
     """`processado` pedido agora (consolidado ou unidade) sem N−1 `ok` com o recorte: `409`."""
     pedidos = [(chave, escolha["origem"])
@@ -605,6 +629,8 @@ async def reprocessar_anexo(
             parametros = {**parametros, **_parametros_g8_do_corpo(corpo)}
         if corpo.anterior_por_recorte:
             parametros = {**parametros, **_parametros_por_unidade(corpo, anexo, exercicio)}
+            _exigir_poder_nas_unidades(request, repo, ente, exercicio, anexo,
+                                       list(corpo.anterior_por_recorte))
     _exigir_n1(repo, ente, exercicio, anexo, parametros)
     return await _decidir(request, ente, exercicio, anexo, repo,
                           forcar=True, solicitante=solicitante, parametros=parametros,

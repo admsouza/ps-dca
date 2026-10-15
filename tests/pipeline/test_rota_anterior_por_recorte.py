@@ -53,14 +53,14 @@ def api(monkeypatch, jobs, notificador):
     monkeypatch.setattr("app.auth.autorizacao.verificar_jwt",
                         lambda _t: {"sub": "u@x", "unidade": "x"})
 
-    def _montar(repo: RepoFake, anexo: str):
+    def _montar(repo: RepoFake, anexo: str, poderes: tuple[str, ...] = ("consolidado",)):
         fila = FilaFake()
         app = FastAPI()
         app.include_router(rotas.router)
         app.dependency_overrides[repositorio] = lambda: repo
 
         def autorizada(request: Request) -> str:
-            request.state.poderes = ("consolidado",)
+            request.state.poderes = poderes
             return ENTES[anexo]
 
         app.dependency_overrides[unidade_autorizada] = autorizada
@@ -353,3 +353,143 @@ def test_manual_recusa_valor_nao_finito_ou_fora_de_escala(api, anexo, valor):
 
     assert resposta.status_code == 422
     assert fila.chamadas == []
+
+
+# ─── autorização por poder (`pipeline-anterior-autorizacao-por-poder`) ───────
+
+PREFEITURA, CAMARA = "ug:10", "ug:20"
+MANUAL_BP = {"origem": MANUAL, "valores": {"P:L3": "1.00"}}
+
+
+def _cache_com_unidades(ano: int = EXERCICIO) -> RepoFake:
+    return RepoFake([RegistroFake(ENTES["BP"], ano, "BP", resultado={"recortes": {
+        PREFEITURA: {"poderOrgao": "10131", "rotulo": "Prefeitura", "resultado": {}},
+        CAMARA: {"poderOrgao": "20231", "rotulo": "Câmara", "resultado": {}}}})])
+
+
+def _sem_efeito(repo: RepoFake, fila: FilaFake) -> None:
+    assert fila.chamadas == [] and repo.gravacoes == []
+
+
+def test_unidade_do_proprio_poder(api):
+    """Scenario: Unidade do próprio poder"""
+    repo = _cache_com_unidades()
+    cliente, fila = api(repo, "BP", ("executivo",))
+
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {PREFEITURA: {"origem": MSCE}}})
+
+    assert resposta.status_code == 202
+    assert fila.chamadas[0]["anterior_por_recorte"] == {PREFEITURA: {"origem": MSCE}}
+
+
+def test_unidade_de_outro_poder(api):
+    """Scenario: Unidade de outro poder"""
+    repo = _cache_com_unidades()
+    cliente, fila = api(repo, "BP", ("executivo",))
+
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {CAMARA: MANUAL_BP}})
+
+    assert resposta.status_code == 403
+    assert resposta.json()["detail"] == f"sem acesso à unidade {CAMARA}"
+    _sem_efeito(repo, fila)
+
+
+def test_pedido_misto_e_tudo_ou_nada(api):
+    """Scenario: Pedido misto é tudo ou nada"""
+    repo = _cache_com_unidades()
+    cliente, fila = api(repo, "BP", ("executivo",))
+
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {
+        PREFEITURA: {"origem": MSCE}, CAMARA: {"origem": MSCE}}})
+
+    assert resposta.status_code == 403
+    _sem_efeito(repo, fila)
+
+
+def test_poder_orgao_pelo_codigo(api):
+    """Scenario: Poder/Órgão pelo código"""
+    repo = _cache_com_unidades()
+    cliente, fila = api(repo, "BP", ("executivo",))
+
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {"po:20231": {"origem": MSCE}}})
+
+    assert resposta.status_code == 403
+    _sem_efeito(repo, fila)
+
+
+def test_po_do_proprio_poder_passa(api):
+    """Requisito: `po:` resolve pelo próprio código"""
+    cliente, fila = api(_cache_com_unidades(), "BP", ("executivo",))
+
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {"po:10131": {"origem": MSCE}}})
+
+    assert resposta.status_code == 202
+
+
+def test_consolidado_escolhe_qualquer_unidade(api):
+    """Scenario: Consolidado escolhe qualquer unidade"""
+    cliente, fila = api(_cache_com_unidades(), "BP", ("consolidado",))
+
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {
+        CAMARA: MANUAL_BP, "ug:999": {"origem": MSCE}}})
+
+    assert resposta.status_code == 202
+    assert set(fila.chamadas[0]["anterior_por_recorte"]) == {CAMARA, "ug:999"}
+
+
+def test_ug_desconhecida(api):
+    """Scenario: UG desconhecida"""
+    repo = _cache_com_unidades()
+    cliente, fila = api(repo, "BP", ("executivo",))
+
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {"ug:999": {"origem": MSCE}}})
+
+    assert resposta.status_code == 403
+    _sem_efeito(repo, fila)
+
+
+def test_unidade_resolvida_pelo_cache_de_n1(api):
+    """Requisito: `ug:` sem poder no cache de N usa o de N−1"""
+    cliente, fila = api(_cache_com_unidades(EXERCICIO - 1), "BP", ("executivo",))
+
+    ok = _reprocessar(cliente, "BP", {"anterior_por_recorte": {PREFEITURA: {"origem": MSCE}}})
+    negado = _reprocessar(cliente, "BP", {"anterior_por_recorte": {CAMARA: {"origem": MSCE}}})
+
+    assert (ok.status_code, negado.status_code) == (202, 403)
+
+
+@pytest.mark.parametrize("anexo", ["BF", "BP"])
+@pytest.mark.parametrize("poderes", [(), ("judiciario",)])
+def test_sem_poder_util_recusa_qualquer_escolha(api, anexo, poderes):
+    """Requisito: sem `poderes` no estado, todo `anterior_por_recorte` recebe `403`"""
+    repo = RepoFake()
+    cliente, fila = api(repo, anexo, poderes)
+
+    resposta = _reprocessar(cliente, anexo, {"anterior_por_recorte": {"ug:3": {"origem": MSCE}}})
+
+    assert resposta.status_code == 403
+    _sem_efeito(repo, fila)
+
+
+def test_formato_invalido_vem_antes_do_poder(api):
+    """Requisito: a validação de formato (`422`) vem antes da de poder"""
+    cliente, fila = api(_cache_com_unidades(), "BP", ("executivo",))
+
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {
+        CAMARA: {"origem": MANUAL}}})
+
+    assert resposta.status_code == 422 and fila.chamadas == []
+
+
+@pytest.mark.parametrize("status", ["erro", "processando"])
+def test_cache_nao_ok_nao_resolve_poder(api, status):
+    """Requisito: só resultado `ok` resolve o poder da `ug:`; senão só `consolidado` passa."""
+    unidades = {PREFEITURA: {"poderOrgao": "10131", "rotulo": "Prefeitura", "resultado": {}}}
+    repo = RepoFake([RegistroFake(ENTES["BP"], EXERCICIO, "BP", status=status,
+                                  resultado={"recortes": unidades})])
+    cliente, fila = api(repo, "BP", ("executivo",))
+
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {PREFEITURA: {"origem": MSCE}}})
+
+    assert resposta.status_code == 403
+    _sem_efeito(repo, fila)

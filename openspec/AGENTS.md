@@ -81,7 +81,14 @@ devedor/credor do PCASP) antes de qualquer novo teste.
 R$ 387.665,33 e `L57` (X) = R$ 520.551,46. Não reutiliza as 15 contas da change bloqueada.
 Aguardando aprovação do PO e o fechamento de D1 (competência), D2 (valor por linha) e D3 (contas).
 
-**Change ativa, fase SPEC (proposta 2026-10-15):** `pipeline-resumo-com-unidades` — `GET /dca/resumo`
+**Change ativa, fase SPEC (proposta 2026-10-15), bugfix de segurança (A01):**
+`pipeline-anterior-autorizacao-por-poder` — `anterior_por_recorte` no `reprocessar` de BF/BP passa a
+exigir que cada unidade esteja no poder do usuário (mesma regra de `recortes.visiveis`, fail closed,
+`403` tudo ou nada). Hoje só o ente é conferido. Aguardando PO: D1 (origem do consolidado exige
+`consolidado`?).
+
+**Change ativa, fase VERIFY (código no working tree, 824 passed; implementação autorizada pelo dev
+em 2026-10-15, aprovação formal do PO pendente):** `pipeline-resumo-com-unidades` — `GET /dca/resumo`
 traz as unidades (`ug:`/`po:`) de BF e BP, com visibilidade por poder, para o front montar a
 configuração da coluna anterior sem `GET /dca/BF` (que enfileira job quando não há cache). Decisões
 contábeis em aberto, sem código: D1 (consolidado × unidades) e D2 (PO = soma das UGs de N−1).
