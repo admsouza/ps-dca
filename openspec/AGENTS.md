@@ -81,6 +81,12 @@ devedor/credor do PCASP) antes de qualquer novo teste.
 R$ 387.665,33 e `L57` (X) = R$ 520.551,46. Não reutiliza as 15 contas da change bloqueada.
 Aguardando aprovação do PO e o fechamento de D1 (competência), D2 (valor por linha) e D3 (contas).
 
+**Change ativa, fase SPEC (proposta 2026-10-15):** `pipeline-resumo-com-unidades` — `GET /dca/resumo`
+traz as unidades (`ug:`/`po:`) de BF e BP, com visibilidade por poder, para o front montar a
+configuração da coluna anterior sem `GET /dca/BF` (que enfileira job quando não há cache). Decisões
+contábeis em aberto, sem código: D1 (consolidado × unidades) e D2 (PO = soma das UGs de N−1).
+Front: `dca-dados-exercicio-anterior`.
+
 **Change ativa, em implementação:** `bf-estorno-receita-extra` — na PublicSoft, `L27` e `L60`
 saem líquidas (movimento MSC − `totalGeral` do estorno de receita extra do exercício da coluna).
 SICONFI permanece o movimento da MSC. PO aprovou em 2026-10-05.

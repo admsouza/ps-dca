@@ -15,9 +15,11 @@ from __future__ import annotations
 
 from typing import Any, Protocol
 
+from app.domain import recorte as recortes
 from app.services.pipeline.registry import ANEXOS, REGISTRY
 
 SEM_CACHE = "sem_cache"
+COM_UNIDADES = ("BF", "BP")      # só estes anexos trazem `recortes`
 
 
 class Repo(Protocol):
@@ -55,13 +57,29 @@ def _entrada(anexo: str, registro, implementado: bool) -> dict:
     }
 
 
-def resumir(*, ente: str, exercicio: int, repo: Repo) -> list[dict]:
+def _unidades(registro, poderes: tuple[str, ...]) -> list[dict]:
+    """`ug:`/`po:` do resultado `ok` que o usuário vê, como na leitura do anexo. Sem `ok`, sem
+    recortes gravados ou sem poderes: `[]`. O rótulo é o gravado."""
+    ok = registro is not None and registro.status == "ok"
+    gravados = (registro.resultado or {}).get("recortes") if ok else None
+    unidades = {c: r["poderOrgao"] for c, r in (gravados or {}).items()
+                if c not in recortes.GRUPOS}
+    return [{"chave": c, "tipo": recortes.tipo(c), "rotulo": gravados[c]["rotulo"]}
+            for c in recortes.visiveis(unidades, unidades, poderes)]
+
+
+def resumir(*, ente: str, exercicio: int, repo: Repo,
+            poderes: tuple[str, ...] = ()) -> list[dict]:
     """Uma entrada por anexo, na ordem canônica, sempre com os oito."""
     por_anexo = {r.anexo: r for r in repo.listar(ente, exercicio)}
     tem_servico = {a.codigo: a.servico is not None for a in REGISTRY}
 
-    return [
+    entradas = [
         _entrada(codigo, por_anexo[codigo], tem_servico[codigo]) if codigo in por_anexo
         else _entrada_vazia(codigo, tem_servico[codigo])
         for codigo in ANEXOS
     ]
+    for entrada in entradas:
+        if entrada["anexo"] in COM_UNIDADES:
+            entrada["recortes"] = _unidades(por_anexo.get(entrada["anexo"]), poderes)
+    return entradas

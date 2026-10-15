@@ -83,6 +83,7 @@ class EntradaResumo(BaseModel):
     versao_regras: str | None = None
     erro_detalhe: str | None = None
     implementado: bool = False
+    recortes: list[dict[str, str]] | None = None   # só BF e BP
 
 
 def _anexo_valido(anexo: Annotated[str, Path(description=f"Um de: {', '.join(ANEXOS)}")]) -> str:
@@ -489,6 +490,7 @@ async def processar_percurso(
 @router.get(
     "/dca/resumo",
     response_model=list[EntradaResumo],
+    response_model_exclude_unset=True,           # `recortes` só no BF e no BP
     summary="Estado dos anexos de um ente e exercício",
     description="Responde `200` mesmo sem nenhuma apuração. Só metadados, e nunca inicia cálculo.",
 )
@@ -496,8 +498,11 @@ def resumo(
     ente: Annotated[str, Depends(unidade_autorizada)],
     exercicio: Annotated[int, Depends(_exercicio)],
     repo: Annotated[Any, Depends(repositorio)],
+    request: Request,
 ) -> list[dict]:
-    return resumo_service.resumir(ente=ente, exercicio=exercicio, repo=repo)
+    # Sem `poderes` no estado a autorização não rodou: nenhuma unidade (fail closed).
+    return resumo_service.resumir(ente=ente, exercicio=exercicio, repo=repo,
+                                  poderes=getattr(request.state, "poderes", ()))
 
 
 async def _auditor_regra(

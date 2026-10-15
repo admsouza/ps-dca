@@ -289,3 +289,68 @@ def test_unidade_autorizada_guarda_os_poderes(monkeypatch):
 
     r = TestClient(app).get(f"/p?id_ente={ENTE}", headers={"Authorization": "Bearer t"})
     assert r.json() == {"poderes": ["executivo"]}
+
+
+# ─── Resumo com as unidades de BF e BP (change `pipeline-resumo-com-unidades`) ─────────────────
+
+def _bf_com_unidades() -> dict:
+    """Cuitegi: 4 UGs (3 do Executivo, a Câmara no Legislativo), grupos gravados e consolidado."""
+    def no(rotulo: str, po: str) -> dict:
+        return {"rotulo": rotulo, "poderOrgao": po, "resultado": {}}
+
+    unidades = {"ug:1": no("Prefeitura", "10131"), "ug:2": no("FMAS", "10131"),
+                "ug:3": no("FMS", "10131"), "ug:4": no("Câmara Municipal de Cuitegi", "20231")}
+    grupos = {c: {"rotulo": c, "resultado": {}} for c in
+              ("poder:executivo", "poder:legislativo", "poder:executivo+legislativo")}
+    return {"matriz": {}, "recortes": {**grupos, **unidades}}
+
+
+def _resumo(cliente):
+    return cliente.get(f"/dca/resumo?anReferencia={EXERCICIO}&id_ente={ENTE}",
+                       headers={"Authorization": "Bearer t", "X-Unidade-Id": ENTE})
+
+
+def _entrada(r, anexo: str) -> dict:
+    assert r.status_code == 200
+    return next(e for e in r.json() if e["anexo"] == anexo)
+
+
+def test_resumo_traz_unidades_do_bf(repo, lock, jobs):
+    """Scenario: unidades do BF"""
+    r = _resumo(_cliente(repo, lock, jobs, ["consolidado"], "BF", _bf_com_unidades()))
+    assert _entrada(r, "BF")["recortes"] == [
+        {"chave": "ug:1", "tipo": "ug", "rotulo": "Prefeitura"},
+        {"chave": "ug:2", "tipo": "ug", "rotulo": "FMAS"},
+        {"chave": "ug:3", "tipo": "ug", "rotulo": "FMS"},
+        {"chave": "ug:4", "tipo": "ug", "rotulo": "Câmara Municipal de Cuitegi"}]
+
+
+def test_resumo_unidades_do_bp_e_demais_anexos_sem_a_chave(repo, lock, jobs):
+    """Scenario: unidades do BF (BP) e demais campos inalterados"""
+    cliente = _cliente(repo, lock, jobs, ["consolidado"], "BP", _bf_com_unidades())
+    repo.gravar(RegistroFake(ENTE, EXERCICIO, "BO", status="ok", resultado=_bf_com_unidades()))
+    r = _resumo(cliente)
+    assert len(_entrada(r, "BP")["recortes"]) == 4
+    assert "recortes" not in _entrada(r, "BO")
+    assert "recortes" not in _entrada(r, "I-AB")
+
+
+def test_resumo_visibilidade_por_poder(repo, lock, jobs):
+    """Scenario: visibilidade por poder"""
+    r = _resumo(_cliente(repo, lock, jobs, ["executivo"], "BF", _bf_com_unidades()))
+    assert [u["chave"] for u in _entrada(r, "BF")["recortes"]] == ["ug:1", "ug:2", "ug:3"]
+
+
+def test_resumo_sem_poderes_nao_traz_unidades(repo, lock, jobs):
+    """Scenario: visibilidade por poder (fail closed: sem poderes no estado, nenhum recorte)"""
+    r = _resumo(_cliente(repo, lock, jobs, [], "BF", _bf_com_unidades()))
+    assert _entrada(r, "BF")["recortes"] == []
+
+
+def test_resumo_sem_unidades_gravadas_ou_em_erro(repo, lock, jobs):
+    """Scenario: bootstrap sem cache (BF/BP sem resultado ok ou anterior aos recortes)"""
+    cliente = _cliente(repo, lock, jobs, ["consolidado"], "BF", {"matriz": {}})
+    repo.gravar(RegistroFake(ENTE, EXERCICIO, "BP", status="erro", resultado=_bf_com_unidades()))
+    r = _resumo(cliente)
+    assert _entrada(r, "BF")["recortes"] == []
+    assert _entrada(r, "BP")["recortes"] == []

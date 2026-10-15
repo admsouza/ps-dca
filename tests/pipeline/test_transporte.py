@@ -164,6 +164,7 @@ def test_bootstrap_sem_nenhum_cache(repo, fila):
     assert [e["anexo"] for e in resumo] == list(ANEXOS)
     assert {e["status"] for e in resumo} == {"sem_cache"}
     assert fila.enfileirados == [], "o resumo enfileirou job"
+    assert [e["recortes"] for e in resumo if e["anexo"] in ("BF", "BP")] == [[], []]
 
 
 def test_metadados_sem_payload(repo, fila):
