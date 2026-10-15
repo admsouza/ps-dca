@@ -110,15 +110,15 @@ def test_bf_deixa_de_aparecer_como_anexo_sem_servico():
 
 
 def test_valores_na_query_sao_recusados():
-    """Scenario: mapa na query é recusado."""
+    """Scenario: mapa e origem na query são recusados (o consolidado não tem origem própria)."""
     from fastapi import HTTPException
 
     from app.routes.anexos import _parametros_bf
 
     assert _parametros_bf("BF", None, None) == {}
-    assert _parametros_bf("BF", "msce_exercicio_anterior", None) == {
-        "origem_anterior": "msce_exercicio_anterior",
-    }
+    with pytest.raises(HTTPException) as erro:
+        _parametros_bf("BF", "msce_exercicio_anterior", None)
+    assert erro.value.status_code == 400
     with pytest.raises(HTTPException) as erro:
         _parametros_bf("BF", "manual", '{"L2": "1.00"}')
     assert erro.value.status_code == 400

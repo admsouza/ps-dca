@@ -116,7 +116,7 @@ async def apurar_completo(ctx: dict, *, job_id: str, ente: str, exercicio: int,
             # A mesma identidade que a rota confere: sem a fonte, o `GET` seguinte veria o anexo
             # como desatualizado (`pipeline-visualizar-sem-reprocessar`, D3).
             registro = repo.obter(ente, exercicio, anexo)
-            return completo.pedido_do_percurso(registro, fonte, anexo, parametros.get("origem_bp"))
+            return completo.pedido_do_percurso(registro, fonte, anexo)
 
         def versao_de(anexo: str) -> str:
             return versao_do_pedido(

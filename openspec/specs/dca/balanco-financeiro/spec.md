@@ -283,20 +283,16 @@ publicado nem estimada.
 
 ### Requirement: Coluna do exercício anterior com origem escolhida por quem apura
 
-A coluna do exercício anterior SHALL aceitar duas origens:
+A origem da coluna do exercício anterior do BF SHALL ser escolhida separadamente para cada unidade
+`ug:` ou `po:` pela capability `pipeline/anterior-por-recorte`: resultado processado de N−1, MSC de
+N−1 ou valores manuais da própria unidade (`pipeline-consolidado-anterior-soma-unidades`). O
+consolidado SHALL ser a soma dessas colunas resolvidas e NÃO DEVE ter origem ou mapa manual
+próprios.
 
-1. **`MSCE` do exercício anterior** (padrão, enquanto não houver mapa salvo) — apurada pelas mesmas regras do IPC 06.
-2. **Preenchimento manual**, linha a linha, informado por quem apura.
-
-A segunda existe porque o ente pode ter publicado o exercício anterior com números que a matriz daquele ano não reproduz: medido em Recife, `L17` e `L50` de 2024 saem 628.456.869,17 da MSC contra **0,00** publicado.
-
-O mapa informado SHALL ser gravado em `procedencia.valores_anteriores` da linha de cache do BF. Pedido seguinte do mesmo ente e exercício **sem** origem SHALL reaplicar esse mapa: a coluna do exercício anterior sai dele, e o exercício corrente é recalculado na MSC. A procedência SHALL continuar declarando `manual`.
-
-Só a origem explícita `msce_exercicio_anterior` SHALL deixar de reaplicar o mapa e SHALL removê-lo da procedência. Ausência de origem NÃO DEVE ser lida como MSC quando há mapa salvo.
-
-A procedência SHALL declarar a origem usada. No modo manual, linha não informada SHALL ser `None` com motivo — nunca zero. Linha informada que o IPC 06 não declara SHALL ser recusada antes de apurar, e o mapa já salvo NÃO DEVE ser substituído. A coluna do exercício **atual** NÃO DEVE aceitar preenchimento manual.
-
-Falha do job NÃO DEVE apagar `procedencia.valores_anteriores` já gravado.
+O mapa manual de uma unidade SHALL ser gravado na procedência do recorte correspondente. Pedido
+seguinte sem escolha explícita para a unidade SHALL reaplicar a escolha gravada ou usar o padrão da
+capability. Linha manual não informada permanece não apurada; a coluna atual não aceita preenchimento
+manual. Falha do job NÃO DEVE apagar a escolha gravada.
 
 No Manual, o bloco `(I)` SHALL ser derivado do anexo quando houver `A:…`; totalizadoras SHALL ser preenchidas pela calculation (Requirement *Totalizadoras Manual pela calculation*). Chaves `(I)` no mapa, se o anexo informou, SHALL ser ignoradas em favor do derivado.
 
@@ -307,40 +303,18 @@ No Manual, o bloco `(I)` SHALL ser derivado do anexo quando houver `A:…`; tota
 - **THEN** `exercicio_anterior` vem da matriz do exercício anterior, pelas mesmas regras
 - **AND** a procedência declara `msce_exercicio_anterior`
 
-#### Scenario: coluna anterior preenchida manualmente
+#### Scenario: manual de uma UG participa do consolidado
 
-- **GIVEN** o corpo com `L17` = `628456869.17` para Recife (`2611606`), exercício 2025
-- **WHEN** a apuração corre no modo manual
-- **THEN** `exercicio_anterior` de `L17` é `628456869.17`
-- **AND** as linhas não informadas saem `None`, com `não informado` no diagnóstico
-- **AND** a procedência declara `manual` e `valores_anteriores` contém `L17`
+- **GIVEN** uma UG do BF com coluna anterior manual válida e as demais com suas origens resolvidas
+- **WHEN** o BF é apurado
+- **THEN** o consolidado soma o manual dessa UG com as colunas das demais unidades
+- **AND** não existe mapa manual próprio do consolidado
 
-#### Scenario: processamento seguinte reaplica o mapa salvo
+#### Scenario: mapa manual no topo é recusado
 
-- **GIVEN** a procedência do BF de Recife/2025 já contém `L17` = `628456869.17`
-- **WHEN** um `GET /dca/BF`, um reprocessamento ou o percurso completo roda sem origem e sem mapa
-- **THEN** `exercicio_anterior` de `L17` continua `628456869.17`
-- **AND** a procedência continua `manual`
-
-#### Scenario: MSC explícita remove o mapa
-
-- **GIVEN** um mapa manual já salvo
-- **WHEN** a apuração é pedida com `origem_exercicio_anterior=msce_exercicio_anterior`
-- **THEN** a coluna anterior sai da MSC do exercício anterior
-- **AND** `procedencia.valores_anteriores` deixa de existir
-- **AND** a procedência declara `msce_exercicio_anterior`
-
-#### Scenario: linha informada fora do IPC 06
-
-- **WHEN** o preenchimento manual traz um código que a base canônica não declara
-- **THEN** a apuração é recusada, nomeando o código
-- **AND** o mapa já salvo permanece
-
-#### Scenario: job que falha conserva o mapa
-
-- **GIVEN** um mapa manual já salvo
-- **WHEN** um job posterior do BF termina em erro
-- **THEN** `procedencia.valores_anteriores` continua o mapa anterior
+- **WHEN** o BF recebe `origem_exercicio_anterior=manual` ou `valores_anteriores` no topo do pedido
+- **THEN** o pedido é recusado antes do job
+- **AND** o cliente deve informar o manual dentro de `anterior_por_recorte` para cada unidade afetada
 
 ### Requirement: Classes da MSC lidas pelo Balanço Financeiro
 

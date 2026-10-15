@@ -349,34 +349,46 @@ def test_superavit_do_grupo_une_as_fontes_das_unidades():
     assert _cel(grupo, "Total", ANTERIOR, SUPERAVIT) == D("9.00")
 
 
-# ─── consolidado ─────────────────────────────────────────────────────────────
+# ─── consolidado = soma das unidades (`pipeline-consolidado-anterior-soma-unidades`) ──────────
 
-def test_consolidado_processado_usa_o_consolidado_de_n1():
-    """Scenario: consolidado processado"""
+def test_consolidado_nao_tem_origem_propria_mesmo_pedindo_processado():
+    """Scenario: Cuitegi consolidado pela soma dos POs (processado é ignorado no topo)
+    Scenario: consolidado do BP usa somente as unidades"""
     n1 = _n1(N1)
     r = _bp(_fonte(N), _cache(n1), anterior=PROCESSADO)
 
-    assert _cel(r, "L3") == D("100.00") and _cel(r, "L3", ATUAL) == D("140.00")   # 70 + 30 de N−1
-    assert r.procedencia.origem_exercicio_anterior == PROCESSADO
-    assert r.procedencia.anterior_processado["exercicio"] == EXERCICIO - 1
-    assert r.diagnostico.conferencia_publicado is None
-    assert _cel(r, "L3") == D(n1.resultado["matriz"][_linha(r, "L3")][ATUAL])
+    assert _cel(r, "L3") == D("100.00")          # soma das unidades, não o consolidado de N−1
+    assert r.procedencia.origem_exercicio_anterior == "soma_das_unidades"
+    assert r.procedencia.anterior_processado is None
+    assert r.procedencia.escolha_anterior is None
 
 
-def test_consolidado_processado_sem_n1_falha():
-    with pytest.raises(ProcessadoSemAnterior, match="processe 2024 antes"):
-        _bp(_fonte(N), RepoFake(), anterior=PROCESSADO)
+def test_consolidado_e_a_soma_das_unidades_com_origens_mistas():
+    """Scenario: origens diferentes entram na mesma soma
+    Scenario: manual por unidade substitui manual consolidado"""
+    escolhas = {"ug:1": {"origem": MANUAL, "valores": {"P:L3": "11.00"}}, "ug:4": {"origem": MSCE}}
+    r = _bp(_fonte(N, N1), _repo_com_n1(), escolhas=escolhas, agora=("ug:1", "ug:4"))
+
+    soma = D(_cel(r.recortes["ug:1"].resultado, "L3")) + D(_cel(r.recortes["ug:4"].resultado, "L3"))
+    assert _cel(r, "L3") == soma == D("41.00")
+    assert r.procedencia.origem_exercicio_anterior == "soma_das_unidades"
 
 
-def test_consolidado_com_as_origens_de_hoje_e_bit_a_bit():
-    """Scenario: consolidado sem mudança"""
+def test_consolidado_atual_nao_muda_com_a_soma_das_unidades():
+    """Scenario: exercício atual permanece igual"""
     fonte = _fonte(N, N1)
-    com = para_dados(_bp(fonte, _repo_com_n1()))
-    sem = para_dados(apurar_bp(ENTE, EXERCICIO, fonte, anterior=MSCE))
-    for corpo in (com, sem):
-        corpo.pop("recortes", None)
-        corpo["diagnostico"].pop("duracao_ms")
-    assert com == sem
+    com = _bp(fonte, _repo_com_n1())
+    sem = apurar_bp(ENTE, EXERCICIO, fonte, anterior=MSCE)
+
+    assert _cel(com, "L3", ATUAL) == _cel(sem, "L3", ATUAL)
+
+
+def test_consolidado_sem_nenhuma_unidade_falha():
+    """Scenario: nenhuma unidade emitida"""
+    from app.services.pipeline.anterior import ParcelaSemUnidade
+
+    with pytest.raises(ParcelaSemUnidade):
+        _bp(_fonte({}), RepoFake())
 
 
 # ─── BP: po: pela MSC, nunca pelo publicado; N−1 de outra fonte ──────────────
@@ -391,32 +403,35 @@ class _DcaEspia:
 
 
 def test_po_em_msce_le_a_msc_e_nunca_o_publicado():
-    """Scenario: PO pela MSC do SICONFI"""
+    """Scenario: PO pela MSC do SICONFI; o consolidado não lê mais o publicado"""
     def po(valor: str, codigo: str):
         return fp(CAIXA, valor, "F")._replace(poder_orgao=codigo)
 
     dca = _DcaEspia()
     fonte = _fonte({1: [po("100.00", "10131"), po("40.00", "20231")]},
                    {1: [po("70.00", "10131"), po("30.00", "20231")]})
-    r = _bp(fonte, RepoFake(), anterior="publicado_siconfi", dca=dca)
+    r = _bp(fonte, RepoFake(), dca=dca)
 
     assert set(r.recortes) >= {"po:10131", "po:20231"}
     assert _cel(r.recortes["po:20231"].resultado, "L3") == D("30.00")
     assert r.recortes["po:20231"].resultado.procedencia.origem_exercicio_anterior == MSCE
-    assert dca.chamadas == 1                    # só o consolidado
+    assert dca.chamadas == 0                    # consolidado não tem origem própria
 
 
-def test_n1_processado_por_outra_fonte_e_aceito_no_consolidado_e_nas_unidades_que_casam():
-    """Scenario: N−1 processado por outra fonte"""
+def test_n1_processado_por_unidade_que_casa_soma_no_consolidado():
+    """Scenario: N−1 processado, por unidade — o consolidado soma o resultado"""
     def po(valor: str, codigo: str):
         return fp(CAIXA, valor, "F")._replace(poder_orgao=codigo)
 
     fonte = _fonte({1: [po("100.00", "10131")]}, {1: [po("70.00", "10131")]})
-    r = _bp(fonte, _repo_com_n1(), anterior=PROCESSADO)
+    n1 = _n1({1: [po("70.00", "10131")]})
+    r = _bp(fonte, _cache(n1), escolhas={"po:10131": {"origem": PROCESSADO}},
+            agora=("po:10131",))
 
-    assert r.procedencia.anterior_processado["fonte"] == "publicsoft"
-    assert r.recortes["po:10131"].resultado.procedencia.origem_exercicio_anterior == MSCE
+    assert r.recortes["po:10131"].resultado.procedencia.anterior_processado["fonte"] == "publicsoft"
     assert _cel(r.recortes["po:10131"].resultado, "L3") == D("70.00")
+    assert r.procedencia.origem_exercicio_anterior == "soma_das_unidades"
+    assert _cel(r, "L3") == D("70.00")
 
 
 # ─── BF ──────────────────────────────────────────────────────────────────────
@@ -489,16 +504,17 @@ def test_bf_unidade_ausente_em_n1_usa_msce_com_zero_e_aviso():
     assert ug3.diagnostico.sem_dados_exercicio_anterior is True
 
 
-def test_bf_consolidado_processado_usa_o_consolidado_de_n1():
-    """Scenario: consolidado processado — BF"""
+def test_bf_consolidado_e_a_soma_das_unidades():
+    """Scenario: consolidado pela soma dos POs/UGs — BF, sem origem própria"""
     fonte = _fonte_bf()
     repo = _bf_n1(fonte)
-    r = _bf(fonte, repo, anterior=PROCESSADO)
-    n1 = _por_codigo(repo.obter("2611606", EXERCICIO - 1, "BF").resultado)
+    r = _bf(fonte, repo, anterior=PROCESSADO)      # pedido ignorado: o topo nunca tem origem
 
     linha = next(i.id for i in r.mapa.linhas if i.quadro == PRINCIPAL and i.codigo == "L27")
-    assert str(r.matriz[linha][ANTERIOR]) == n1[(PRINCIPAL, "L27")][ATUAL]
-    assert r.procedencia.origem_exercicio_anterior == PROCESSADO
+    soma = sum((u.resultado.matriz[linha][ANTERIOR] for u in r.recortes.values()
+               if u.tipo in ("ug", "po")), D("0.00"))
+    assert r.matriz[linha][ANTERIOR] == soma
+    assert r.procedencia.origem_exercicio_anterior == "soma_das_unidades"
 
 
 def test_bf_grupo_somado_e_igual_ao_grupo_filtrado_em_msce():
@@ -514,13 +530,19 @@ def test_bf_grupo_somado_e_igual_ao_grupo_filtrado_em_msce():
 
 
 def test_bf_origem_manual_por_unidade():
+    """Scenario: manual de uma UG participa do consolidado"""
     escolhas = {"ug:3": {"origem": MANUAL, "valores": {"L27": "5.00"}}}
-    ug3 = _bf(_fonte_bf(), RepoFake(), escolhas=escolhas, agora=("ug:3",)).recortes[
-        "ug:3"].resultado
+    r = _bf(_fonte_bf(), RepoFake(), escolhas=escolhas, agora=("ug:3",))
+    ug3 = r.recortes["ug:3"].resultado
 
     assert _cel(ug3, "L27") == D("5.00")
     assert ug3.procedencia.valores_anteriores == {"L27": "5.00"}
     assert ug3.procedencia.escolha_anterior == escolhas["ug:3"]
+    linha = next(i.id for i in r.mapa.linhas if i.quadro == PRINCIPAL and i.codigo == "L27")
+    soma = sum((u.resultado.matriz[linha][ANTERIOR] for u in r.recortes.values()
+               if u.tipo in ("ug", "po")), D("0.00"))
+    assert r.matriz[linha][ANTERIOR] == soma
+    assert r.procedencia.escolha_anterior is None
 
 
 def test_celula_nao_apurada_na_unidade_deixa_a_fonte_e_o_total_do_grupo_nao_apurados():

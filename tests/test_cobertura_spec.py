@@ -28,8 +28,10 @@ CENARIOS_ESPERADOS = {
     # + 3 da persistência do mapa manual (`bf-anterior-manual-persistido`)
     # + 7 do Manual que alimenta (I) (`bf-manual-anexo-alimenta-receita-i`)
     # + 5 do completar G8, mantendo o total sem parcela (`bf-completar-nao-apuradas-g8`)
-    # + 1 de L61 nos dois exercícios (soma dos débitos de period_change).
-    "dca/balanco-financeiro": 65,
+    # + 1 de L61 nos dois exercícios (soma dos débitos de period_change)
+    # − 3 do mapa manual do consolidado, substituído pelo manual por unidade
+    # (`pipeline-consolidado-anterior-soma-unidades`).
+    "dca/balanco-financeiro": 62,
     # 12 da fonte por demonstrativo + 3 da competência de encerramento por API.
     "dca/fonte-msc": 15,
     # 63 da plataforma + 9 da entrada do BF no pipeline (`bf-no-pipeline`)
@@ -39,12 +41,16 @@ CENARIOS_ESPERADOS = {
     # + 6 das notificações no padrão RREO/RGF (`pipeline-notificacao-discord-padrao`).
     "pipeline/plataforma": 89,
     # 11 do percurso completo (`pipeline-completo-dca`) + 2 da notificação por anexo
-    # (`pipeline-notificacao-discord-padrao`) + 4 da origem do BP (`pipeline-percurso-origem-bp`).
-    "pipeline/processamento-completo": 17,
+    # (`pipeline-notificacao-discord-padrao`) + 3 do consolidado pela soma das unidades
+    # (`pipeline-consolidado-anterior-soma-unidades`, substitui os 4 de
+    # `pipeline-percurso-origem-bp`).
+    "pipeline/processamento-completo": 16,
     # 16 da apuração do BP (`bp-apuracao-f1`) + 7 da origem publicada
     # (`bp-anterior-publicado-siconfi`)
-    # + 4 do espelho do I-AB, − 1 da exclusão intra revogada (`bp-espelho-iab`).
-    "dca/balanco-patrimonial": 36,
+    # + 4 do espelho do I-AB, − 1 da exclusão intra revogada (`bp-espelho-iab`)
+    # − 4 da origem publicada do consolidado, + 3 do consolidado pela soma das unidades
+    # (`pipeline-consolidado-anterior-soma-unidades`).
+    "dca/balanco-patrimonial": 32,
 }
 
 # Capabilities cuja fase TEST já começou — só delas se exige teste por cenário.

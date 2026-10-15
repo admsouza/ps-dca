@@ -2,6 +2,8 @@
 
 > Comportamento acordado e em vigor. Consolidado da change `pipeline-completo-dca`,
 > arquivada em 2026-10-01.
+> A origem própria do BP no percurso (`pipeline-percurso-origem-bp`) foi substituída pela soma
+> das unidades por `pipeline-consolidado-anterior-soma-unidades`.
 > Alterações entram por nova change, nunca por edição direta deste arquivo.
 
 ## Purpose
@@ -165,35 +167,31 @@ laranja com falha. Anexo pulado por já estar em voo NÃO DEVE gerar mensagem pr
 - **THEN** o título começa com `⚠️`, o corpo é `Fila concluída com 1 falha(s).` e a cor é laranja
 - **AND** o campo `Erros` traz `**BF:** fonte fora do ar`
 
-### Requirement: Percurso respeita a origem da coluna anterior do BP
+### Requirement: Percurso deriva a coluna anterior do consolidado
 
-`POST /batch-jobs` SHALL aceitar `origem_exercicio_anterior` (`publicado_siconfi` |
-`msce_exercicio_anterior`), aplicado **só** ao Balanço Patrimonial; omitido, vale
-`publicado_siconfi`. A decisão de cache do percurso (rota) e a apuração e gravação do BP (worker)
-SHALL usar a mesma identidade de pedido, com essa origem. Origem inválida SHALL responder `422` sem
-enfileirar job. BO e BF NÃO DEVEM mudar de identidade nem de resultado.
+`POST /batch-jobs` SHALL processar BF e BP sem origem própria do consolidado. Para cada unidade, o
+percurso SHALL reaplicar a escolha gravada ou o padrão de `pipeline/anterior-por-recorte`; depois,
+SHALL formar o consolidado pela soma das unidades.
 
-#### Scenario: percurso grava o BP pela origem pedida
+O campo legado `origem_exercicio_anterior` NÃO DEVE ser aceito para BF ou BP e SHALL responder `422`
+antes de criar o percurso. A identidade do pedido não deve mais variar por origem do consolidado.
 
-- **GIVEN** `POST /batch-jobs` com `origem_exercicio_anterior=msce_exercicio_anterior`
-- **WHEN** o percurso conclui
-- **THEN** o BP gravado declara `origem_exercicio_anterior: msce_exercicio_anterior`
-- **AND** a leitura do BP com a mesma origem responde `desatualizado: false`, sem enfileirar job
+#### Scenario: percurso soma as escolhas gravadas
 
-#### Scenario: percurso sem origem mantém o padrão
+- **GIVEN** unidades com escolhas anteriores gravadas em origens diferentes
+- **WHEN** `POST /batch-jobs` é executado sem origem consolidada
+- **THEN** BF e BP reaplicam as escolhas de cada unidade
+- **AND** cada consolidado declara `soma_das_unidades`
 
-- **WHEN** `POST /batch-jobs` chega sem `origem_exercicio_anterior`
-- **THEN** o BP é apurado pelo publicado, como antes
+#### Scenario: percurso recusa origem consolidada
 
-#### Scenario: cache do BP em outra origem entra a apurar
+- **WHEN** `POST /batch-jobs` recebe `origem_exercicio_anterior`
+- **THEN** responde `422`
+- **AND** nenhum job de anexo é enfileirado
 
-- **GIVEN** o BP em cache válido pela origem publicado
-- **WHEN** o percurso sem `forcar` é pedido com `msce_exercicio_anterior`
-- **THEN** o BP aparece no percurso como `a_apurar`
-- **AND** BO e BF com cache válido continuam `em_cache`
+#### Scenario: falha de atribuição não publica parcial
 
-#### Scenario: origem inválida no percurso
-
-- **WHEN** `POST /batch-jobs` chega com `origem_exercicio_anterior=manual`
-- **THEN** a resposta é `422`
-- **AND** nenhum job é enfileirado
+- **GIVEN** uma contribuição anterior sem recorte no BF ou no BP
+- **WHEN** o percurso alcança o anexo
+- **THEN** esse anexo termina em `erro`, sem cache `ok` parcial
+- **AND** o percurso mantém o tratamento de falha por anexo já vigente

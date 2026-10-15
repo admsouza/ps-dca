@@ -3,6 +3,8 @@
 > Comportamento acordado e em vigor. Consolidado das changes `plataforma-pipeline-dca`,
 > `2026-09-18-bf-no-pipeline`, `vigencia-por-anexo` e `bf-anterior-manual-persistido`,
 > arquivado em 2026-10-01, e `pipeline-visualizar-sem-reprocessar`, arquivada em 2026-10-07.
+> O mapa manual do BF passou a ser por unidade, e o consolidado deixou de ter origem própria,
+> por `pipeline-consolidado-anterior-soma-unidades`.
 > Alterações entram por nova change, nunca por edição direta deste arquivo.
 
 ## Purpose
@@ -670,9 +672,11 @@ acrescentar vocabulário alheio a ele.
 
 ### Requirement: A origem da coluna do exercício anterior integra a identidade do resultado
 
-A identidade do resultado cacheado SHALL incluir a **origem da coluna do exercício anterior** e,
-quando ela for o preenchimento manual, a identidade do conjunto informado. Dois pedidos que
-diferem nisso SHALL ser resultados distintos e NÃO DEVEM compartilhar entrada de cache.
+A identidade do resultado cacheado SHALL incluir a **origem da coluna do exercício anterior por
+unidade** (`anterior_por_recorte`) e, quando ela for o preenchimento manual, a identidade do
+conjunto informado. Dois pedidos que diferem nisso SHALL ser resultados distintos e NÃO DEVEM
+compartilhar entrada de cache. O consolidado não contribui origem própria para a identidade
+(`pipeline-consolidado-anterior-soma-unidades`).
 
 Sem isso, um resultado com a coluna preenchida à mão seria servido a quem pediu a coluna apurada da
 matriz — e a diferença não apareceria em `versao_api` nem em `versao_regras`, que não mudam.
@@ -773,32 +777,40 @@ mapa inalterado — sem erro e sem efeito, que é a forma mais cara de não faze
 - **THEN** o nível vem da transcrição do IPC 06
 - **AND** o `documento` da vigência é o do próprio anexo
 
-### Requirement: Mapa manual do BF não viaja na query e não depende do cliente repeti-lo
+### Requirement: Mapa manual por unidade não viaja na query; consolidado não aceita mapa próprio
 
-A gravação do mapa do exercício anterior SHALL ser um `POST` com o mapa no corpo JSON. `valores_anteriores` na query SHALL ser recusado com `400`, sem enfileirar job e sem alterar a linha de cache.
+A gravação do mapa manual do exercício anterior SHALL ser feita por unidade (`ug:`/`po:`), dentro
+de `anterior_por_recorte`, só no corpo JSON do `POST /dca/{BF|BP}/reprocessar`.
+`origem_exercicio_anterior` e `valores_anteriores` na query, ou no topo do corpo, SHALL ser
+recusados antes de enfileirar job ou alterar a linha de cache
+(`pipeline-consolidado-anterior-soma-unidades`): o consolidado não tem mapa próprio.
 
-`GET /dca/BF`, `POST /dca/BF/reprocessar` sem corpo e `POST /batch-jobs` SHALL reaplicar o mapa já gravado na procedência quando a origem não vier explícita. NÃO DEVEM exigir que o cliente reenvie o mapa.
+`GET /dca/{anexo}`, `POST /dca/{anexo}/reprocessar` sem corpo e `POST /batch-jobs` SHALL reaplicar
+a escolha já gravada por unidade quando o pedido não trouxer escolha explícita para ela. NÃO DEVEM
+exigir que o cliente reenvie o mapa.
 
 A autorização SHALL ser a mesma das demais rotas de anexo. O mapa NÃO DEVE aparecer em log.
 
 #### Scenario: mapa no corpo é gravado
 
-- **WHEN** `POST /dca/BF/reprocessar` traz `origem_exercicio_anterior=manual` e `valores_anteriores` no corpo, para um ente autorizado
+- **GIVEN** uma unidade `ug:` do BF com manual válido em `anterior_por_recorte`
+- **WHEN** `POST /dca/BF/reprocessar` é enviado, para um ente autorizado
 - **THEN** a resposta é `202`
-- **AND** ao fim do job a procedência guarda o mapa
+- **AND** ao fim do job a procedência do recorte guarda o mapa
 
 #### Scenario: mapa na query é recusado
 
-- **WHEN** `GET /dca/BF` ou `POST /dca/BF/reprocessar` traz `valores_anteriores` na query
+- **WHEN** `GET /dca/BF` ou `POST /dca/BF/reprocessar` traz `origem_exercicio_anterior` ou
+  `valores_anteriores` na query
 - **THEN** a resposta é `400`
 - **AND** nenhum job é enfileirado
 - **AND** a linha de cache não muda
 
 #### Scenario: percurso completo reaplica o mapa
 
-- **GIVEN** o BF do ente com mapa manual na procedência
-- **WHEN** `POST /batch-jobs` roda sem origem
-- **THEN** o desfecho do `BF` conserva a coluna do exercício anterior do mapa salvo
+- **GIVEN** uma unidade do BF com mapa manual na procedência do recorte
+- **WHEN** `POST /batch-jobs` roda sem escolha explícita para ela
+- **THEN** o desfecho do `BF` conserva a coluna anterior dessa unidade, do mapa salvo
 
 #### Scenario: ente não autorizado
 

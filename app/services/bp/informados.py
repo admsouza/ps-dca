@@ -15,6 +15,7 @@ from decimal import Decimal
 from app.domain.bo.modelo import MapaBO
 from app.infra.regras.carregador import carregar_em_cache
 from app.services.bf.informados import decimal_informado
+from app.services.bp.fontes import fonte_oficial
 
 QUADROS = {"P": "QUADRO_PRINCIPAL", "FP": "ATIVOS_PASSIVOS_FINANCEIROS",
            "C": "CONTAS_COMPENSACAO"}
@@ -35,6 +36,8 @@ def partir(valores: dict[str, str]) -> tuple[dict[tuple[str, str], Decimal], dic
         if prefixo == PREFIXO_FONTE:
             if not _FONTE.fullmatch(codigo):
                 raise ValueError(f"fonte de {chave} deve ter 4 dígitos")
+            if not fonte_oficial(codigo):
+                raise ValueError(f"fonte de {chave} não existe no catálogo oficial")
             fontes[codigo] = valor
         elif prefixo in QUADROS and codigo:
             folhas[(QUADROS[prefixo], codigo)] = valor

@@ -85,6 +85,14 @@ class EntradaResumo(BaseModel):
     implementado: bool = False
     recortes: list[dict[str, str]] | None = None   # só BF e BP
 
+class FonteRecursoResposta(BaseModel):
+    codigo: str
+    nome: str
+
+
+class CatalogoFontesResposta(BaseModel):
+    fontes: list[FonteRecursoResposta]
+
 
 def _anexo_valido(anexo: Annotated[str, Path(description=f"Um de: {', '.join(ANEXOS)}")]) -> str:
     try:
@@ -112,16 +120,17 @@ class AnteriorDaUnidade(BaseModel):
 
 
 class CorpoAnterior(BaseModel):
-    """Mapa manual do exercício anterior e override G8 do atual. Vai no corpo, nunca na query."""
+    """Escolha por unidade e override G8 do atual. Vai no corpo, nunca na query.
+
+    `origem_exercicio_anterior`/`valores_anteriores` no topo são campos legados do consolidado
+    (`pipeline-consolidado-anterior-soma-unidades`): o consolidado não tem origem própria, e o
+    pedido com eles responde `422` antes do job.
+    """
 
     origem_exercicio_anterior: str | None = None
     valores_anteriores: dict[str, str] | None = None
     valores_sem_mapeamento: dict[str, str] | None = None
     anterior_por_recorte: dict[str, AnteriorDaUnidade] | None = None
-
-
-ORIGENS_BP = ("publicado_siconfi", anterior.OrigemAnterior.MSCE.value,
-              anterior.OrigemAnterior.PROCESSADO.value)
 
 
 VISOES_BP = ("isolado", "consolidado")
@@ -226,53 +235,15 @@ def _parametros_bf(
     valores_json: Annotated[str | None, Query(alias="valores_anteriores")] = None,
     g8_json: Annotated[str | None, Query(alias="valores_sem_mapeamento")] = None,
 ) -> dict:
-    """Origem na query. Os mapas em si não entram aqui: query com eles responde `400`."""
+    """G8 na query, exercício atual (`400` se vier com valores). O consolidado não tem origem
+    própria (`pipeline-consolidado-anterior-soma-unidades`): `origem_exercicio_anterior` em BF/BP
+    responde `400`, legado ou não."""
     if valores_json is not None or g8_json is not None or (anexo in ("BF", "BP")
-                                                           and origem == "manual"):
+                                                           and origem is not None):
         raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                            detail="valores_anteriores/valores_sem_mapeamento não é aceito na "
-                                   "query")
-    if anexo == "BP":
-        if origem in (None, *ORIGENS_BP):
-            return {"origem_anterior": origem} if origem else {}
-        raise _erro_422("origem_exercicio_anterior inválida")
-    if anexo != "BF":
-        return {}
-    if origem in (anterior.OrigemAnterior.MSCE, anterior.OrigemAnterior.PROCESSADO):
-        return {"origem_anterior": origem}
-    if origem:
-        raise _erro_422("origem_exercicio_anterior inválida")
+                            detail="origem_exercicio_anterior/valores_anteriores/"
+                                   "valores_sem_mapeamento não é aceito na query")
     return {}
-
-
-def _parametros_do_corpo(corpo: CorpoAnterior, exercicio: int, anexo: str = "BF") -> dict:
-    """Manual no corpo, ou MSC explícita. Valor não-numérico e código fora do IPC 06 são `422`.
-
-    A recusa é do serviço, que já percorre o mapa informado para conferir os códigos: validar o
-    valor aqui também significaria converter cada um duas vezes, e a segunda conversão é a que
-    vale.
-    """
-    from app.services.bf.informados import validar_valores_anteriores
-
-    origem = corpo.origem_exercicio_anterior
-    aceitas = ORIGENS_BP if anexo == "BP" else (anterior.OrigemAnterior.MSCE,
-                                                anterior.OrigemAnterior.PROCESSADO)
-    if origem in aceitas:
-        return {"origem_anterior": origem}
-    if origem != "manual":
-        raise _erro_422("origem_exercicio_anterior inválida")
-    valores = {
-        str(codigo): str(valor) for codigo, valor in (corpo.valores_anteriores or {}).items()
-    }
-    if anexo == "BP":
-        from app.services.bp.informados import validar_valores_anteriores
-        if not valores:
-            raise _erro_422("manual exige valores")
-    try:
-        validar_valores_anteriores(exercicio, valores)
-    except ValueError as erro:                   # `LinhaDesconhecida` é `ValueError`
-        raise _erro_422(str(erro)) from erro
-    return {"origem_anterior": "manual", "anterior": "manual", "valores_anteriores": valores}
 
 
 def _parametros_g8_do_corpo(corpo: CorpoAnterior) -> dict:
@@ -324,10 +295,9 @@ def _exigir_poder_nas_unidades(request: Request, repo, ente: str, exercicio: int
 
 
 def _exigir_n1(repo, ente: str, exercicio: int, anexo: str, parametros: dict) -> None:
-    """`processado` pedido agora (consolidado ou unidade) sem N−1 `ok` com o recorte: `409`."""
+    """`processado` pedido agora, por unidade, sem N−1 `ok` com o recorte: `409`."""
     pedidos = [(chave, escolha["origem"])
                for chave, escolha in (parametros.get("anterior_por_recorte") or {}).items()]
-    pedidos.append((recortes.CONSOLIDADO, parametros.get("origem_anterior")))
     if not any(origem == anterior.OrigemAnterior.PROCESSADO for _, origem in pedidos):
         return
     n1 = anterior.ler_n1(repo, ente, exercicio, anexo)
@@ -442,17 +412,16 @@ async def processar_percurso(
     exercicio: Annotated[int, Depends(_exercicio)],
     repo: Annotated[Any, Depends(repositorio)],
     forcar: Annotated[bool, Query(description="Reapura todos, ignorando cache válido.")] = False,
-    origem_bp: Annotated[str | None, Query(
-        alias="origem_exercicio_anterior",
-        description="Origem da coluna anterior do BP; só vale para ele. Omitida: o manual salvo "
-                    "ou MSC.",
+    origem_exercicio_anterior: Annotated[str | None, Query(
+        description="Legado, não aceito: o consolidado não tem origem própria "
+                    "(`pipeline-consolidado-anterior-soma-unidades`).",
     )] = None,
     fonte: Annotated[FontePedido | None, Depends(fonte_do_pedido)] = None,
     solicitante: Annotated[int | None, Depends(usuario_id)] = None,
 ):
-    if origem_bp not in (None, *ORIGENS_BP):
-        raise _erro_422("origem_exercicio_anterior inválida")
-    _exigir_n1(repo, ente, exercicio, "BP", {"origem_anterior": origem_bp})
+    if origem_exercicio_anterior is not None:
+        raise _erro_422("origem_exercicio_anterior não é mais aceito — o consolidado não tem "
+                        "origem própria")
     portas = request.app.state.portas
     fila = portas["fila_async"]()
     # A fonte do front (SIAFIC/MSC), como no anexo: sem ela o percurso apurava sempre pela padrão.
@@ -461,8 +430,7 @@ async def processar_percurso(
     def versao_de(anexo: str) -> str:
         return cache_service.versao_do_pedido(
             apuracao.versao_regras(exercicio, anexo, portas.get("repo_vigencias")), anexo,
-            completo.pedido_do_percurso(repo.obter(ente, exercicio, anexo), nome_fonte,
-                                        anexo, origem_bp),
+            completo.pedido_do_percurso(repo.obter(ente, exercicio, anexo), nome_fonte, anexo),
         )
 
     try:
@@ -483,7 +451,7 @@ async def processar_percurso(
         credencial.guardar(portas["cofre"], job_id=job_id, token=fonte.token)
     try:
         fila.enfileirar_percurso(ente, exercicio, job_id, fonte=nome_fonte,
-                                 forcar=forcar, solicitado_por=solicitante, origem_bp=origem_bp,
+                                 forcar=forcar, solicitado_por=solicitante,
                                  solicitante_email=email_do_solicitante(request))
         if getattr(fila, "pendente", None) is not None:
             await fila.pendente
@@ -510,6 +478,30 @@ async def processar_percurso(
                                    calculado_em=no.calculado_em) for no in percurso],
     )
 
+
+def _usuario_autenticado(
+    authorization: Annotated[str | None, Header()] = None,
+) -> None:
+    from app.routes.dependencias import _claims
+
+    token = (authorization or "").removeprefix("Bearer ").strip()
+    _claims(token or None)
+
+
+@router.get(
+    "/dca/fontes-recursos",
+    response_model=CatalogoFontesResposta,
+    summary="Catálogo oficial de fontes de recursos",
+    description="Classificação pública da STN; não lê MSC, cache ou fila.",
+)
+def catalogo_fontes_recursos(
+    _: Annotated[None, Depends(_usuario_autenticado)] = None,
+) -> dict:
+    from app.services.bp.fontes import fontes_oficiais
+
+    return {"fontes": [
+        {"codigo": fonte.codigo, "nome": fonte.nome} for fonte in fontes_oficiais()
+    ]}
 
 @router.get(
     "/dca/resumo",
@@ -623,8 +615,9 @@ async def reprocessar_anexo(
     solicitante: Annotated[int | None, Depends(usuario_id)] = None,
 ):
     if corpo is not None:
-        if corpo.origem_exercicio_anterior:
-            parametros = {**parametros, **_parametros_do_corpo(corpo, exercicio, anexo)}
+        if corpo.origem_exercicio_anterior or corpo.valores_anteriores:
+            raise _erro_422("origem_exercicio_anterior/valores_anteriores do consolidado não são "
+                            "mais aceitos — escolha a origem por unidade em anterior_por_recorte")
         if "valores_sem_mapeamento" in corpo.model_fields_set:
             parametros = {**parametros, **_parametros_g8_do_corpo(corpo)}
         if corpo.anterior_por_recorte:

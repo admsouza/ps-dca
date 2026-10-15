@@ -128,11 +128,13 @@ def test_mapa_vazio_limpa_o_override():
 
 
 def test_independente_de_origem_exercicio_anterior():
+    """Requisito: o G8 reaplica independente do mapa manual legado do consolidado, que não existe
+    mais (`pipeline-consolidado-anterior-soma-unidades`)."""
     from app.services.pipeline.cache import parametros_efetivos
 
     registro = _Registro({"origem_exercicio_anterior": "manual",
                           "valores_anteriores": {"L17": "1.00"},
                           "valores_sem_mapeamento": {"L22": L22}})
     efetivo = parametros_efetivos({}, registro)
-    assert efetivo["valores_anteriores"] == {"L17": "1.00"}
+    assert "valores_anteriores" not in efetivo
     assert efetivo["valores_sem_mapeamento"] == {"L22": L22}

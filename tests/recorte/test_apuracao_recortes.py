@@ -119,7 +119,8 @@ class _DcaVazia:
 
 
 def test_bp_fora_do_consolidado_usa_msce_do_ano_anterior():
-    """Scenario: consolidado pelo publicado, UG pela MSC"""
+    """Scenario: o consolidado não tem origem própria — pedido legado é ignorado, UG pela MSC
+    (`pipeline-consolidado-anterior-soma-unidades`)"""
     from app.services.bp.quadro_principal import apurar
 
     fonte = FontePorAno({
@@ -129,7 +130,7 @@ def test_bp_fora_do_consolidado_usa_msce_do_ano_anterior():
     resultado = apuracao.com_recortes(apurar, ENTE, EXERCICIO, fonte,
                                       anterior="publicado_siconfi", dca=_DcaVazia())
 
-    assert resultado.procedencia.origem_exercicio_anterior == "publicado_siconfi"
+    assert resultado.procedencia.origem_exercicio_anterior == "soma_das_unidades"
     ug = resultado.recortes["ug:1"].resultado
     assert ug.procedencia.origem_exercicio_anterior == "msce_exercicio_anterior"
     assert ug.diagnostico.conferencia_publicado is None

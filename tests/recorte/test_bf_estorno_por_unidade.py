@@ -6,6 +6,8 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+import pytest
+
 from app.infra.msc.publicsoft import Estorno
 from app.services.pipeline import apuracao
 from tests.bf.conftest import ENTE, EXERCICIO, FontePorOrigem, fonte_com
@@ -136,23 +138,32 @@ def test_totalizadora_acompanha_o_abatimento_na_unidade():
 
 
 def test_consolidado_abate_o_total_geral():
-    """Scenario: consolidado inalterado"""
+    """Scenario: consolidado inalterado — exercício atual
+
+    O consolidado não lê mais o exercício anterior diretamente
+    (`pipeline-consolidado-anterior-soma-unidades`): o estorno de N−1 vive na procedência de cada
+    unidade, não na do consolidado."""
     resultado = _bf(_fonte_ug())
     assert _celula(resultado, "L27") == D("184.00")
-    assert resultado.procedencia.estorno_receita_extra == {"2025": "16.00", "2024": "2.00"}
+    assert resultado.procedencia.estorno_receita_extra == {"2025": "16.00"}
 
 
 def test_consolidado_bit_a_bit():
-    """Scenario: consolidado inalterado — igual à apuração sem recortes"""
+    """Scenario: consolidado inalterado — coluna atual igual à apuração sem recortes
+
+    A coluna anterior deixou de ser bit a bit igual (vira soma das unidades); só o atual e o G8
+    são comparados aqui, como pede `pipeline-consolidado-anterior-soma-unidades`."""
     from app.services.bf.quadro_principal import apurar
     from app.services.pipeline.resultado import para_dados
 
     com = para_dados(_bf(_fonte_ug()))
     sem = para_dados(apurar(ENTE, EXERCICIO, _fonte_ug()))
-    com.pop("recortes")
-    for corpo in (com, sem):
-        corpo["diagnostico"].pop("duracao_ms")
-    assert com == sem
+    for linha in com["linhas"]:
+        celulas_com = com["matriz"][linha["rule_id"]]
+        celulas_sem = sem["matriz"][linha["rule_id"]]
+        for coluna, valor in celulas_com.items():
+            if coluna.endswith("_atual"):
+                assert valor == celulas_sem[coluna], (linha["codigo"], coluna)
 
 
 def test_particao_do_estorno_por_ug():
@@ -163,6 +174,21 @@ def test_particao_do_estorno_por_ug():
     sem = sum(D(s["valor"]) for s in resultado.diagnostico.estorno_sem_unidade
               if (s["exercicio"], s["tipo"]) == (2025, "receita"))
     assert abatido + sem == D(resultado.procedencia.estorno_receita_extra["2025"]) == D("116.00")
+
+
+def test_contribuicao_sem_unidade_na_coluna_anterior_falha():
+    """Scenario: contribuição sem UG ou PO
+    Scenario: falha de atribuição não publica parcial
+    (`pipeline-consolidado-anterior-soma-unidades`): sem unidade no exercício ATUAL é só
+    diagnóstico (fora de escopo); no exercício ANTERIOR, o job falha."""
+    from app.services.pipeline.anterior import ParcelaSemUnidade
+
+    fonte = _ComEstorno(_ug_origens(), {
+        2025: _estorno(RECEITA_2025),
+        2024: _estorno({**RECEITA_2024, "ug:9": ("3.00", "10131")})})
+
+    with pytest.raises(ParcelaSemUnidade):
+        _bf(fonte)
 
 
 def test_estorno_de_ug_sem_registro_vai_para_o_diagnostico():
@@ -237,11 +263,14 @@ def test_g8_so_no_consolidado():
     assert ug.procedencia.valores_sem_mapeamento is None
 
 
-def test_anterior_manual_so_no_consolidado():
-    """Scenario: anterior manual fora do consolidado"""
+def test_topo_nao_aceita_mais_manual_proprio():
+    """Requisito: o consolidado não tem origem própria (`pipeline-consolidado-anterior-soma-
+    unidades`): o legado `anterior=manual`/`valores_anteriores` do topo é ignorado, e sai da soma
+    das unidades."""
     resultado = _bf(_fonte_ug(), anterior="manual", valores_anteriores={"L27": "999.00"})
     ug = resultado.recortes["ug:1"].resultado
-    assert _celula(resultado, "L27", "exercicio_anterior") == D("999.00")
+    assert _celula(resultado, "L27", "exercicio_anterior") != D("999.00")
+    assert resultado.procedencia.origem_exercicio_anterior == "soma_das_unidades"
     assert _celula(ug, "L27", "exercicio_anterior") == D("48.00")
     assert ug.procedencia.origem_exercicio_anterior == "msce_exercicio_anterior"
     assert ug.procedencia.valores_anteriores is None

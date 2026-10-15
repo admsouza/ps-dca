@@ -84,17 +84,14 @@ def montar_percurso(*, ente: str, exercicio: int, repo, lock, jobs,
     return percurso
 
 
-def pedido_do_percurso(registro, fonte: str, anexo: str = "",
-                       origem_bp: str | None = None) -> dict:
-    """Identidade de pedido do percurso: a fonte padrão, mais o que o BF reaplica do registro e a
-    origem padrão do BP.
+def pedido_do_percurso(registro, fonte: str, anexo: str = "") -> dict:
+    """Identidade de pedido do percurso: a fonte padrão, mais o que o BF e o BP reaplicam do
+    registro (G8 e escolhas por unidade). O consolidado não tem origem própria.
 
     Rota e worker gravam e conferem a mesma. Sem a fonte, o `GET` seguinte — que sempre manda a
-    sua — veria todo anexo do percurso como desatualizado. `origem_bp` só pesa no BP.
+    sua — veria todo anexo do percurso como desatualizado.
     """
-    so_bp = origem_bp if anexo == "BP" else None    # no BF, `processado` exigiria o N−1 do BF
-    pedido = {"fonte": fonte, **({"origem_anterior": so_bp} if so_bp else {})}
-    return parametros_efetivos(pedido, registro, anexo)
+    return parametros_efetivos({"fonte": fonte}, registro, anexo)
 
 
 def implementados(percurso: list[NoPercurso]) -> list[NoPercurso]:

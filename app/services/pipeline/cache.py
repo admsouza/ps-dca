@@ -75,27 +75,21 @@ class Fila(Protocol):
 
 
 def identidade_do_pedido(*, anexo: str, competencia: int = 12,
-                         origem_anterior: str = "", valores_anteriores=None,
                          valores_sem_mapeamento=None, fonte: str = "",
                          anterior_por_recorte: dict | None = None, **_ignorados) -> str:
     """O que, além de ente/exercício/anexo, distingue dois resultados do mesmo demonstrativo.
 
     `versao_api` e `versao_regras` invalidam o cache quando **código** ou **regra** mudam. Há
-    escolhas que mudam o **valor** sem mudar nenhum dos dois: a competência apurada e, no BF, a
-    origem da coluna do exercício anterior — apurada da matriz do ano anterior ou informada à mão.
-    Sem entrar na identidade, um resultado com a coluna preenchida manualmente seria servido a quem
-    pediu a coluna apurada, e a diferença não apareceria em lugar nenhum.
+    escolhas que mudam o **valor** sem mudar nenhum dos dois: a competência apurada e, no BF e no
+    BP, a origem por unidade da coluna do exercício anterior — o consolidado não tem origem própria
+    (`pipeline-consolidado-anterior-soma-unidades`), e sai sempre da soma das unidades.
 
     `anterior_por_recorte` (`{unidade: {origem, valores?}}`) entra por último, como `ar-<hash>`, e
     só com escolha explícita: a origem que o padrão resolve não é escolha, e fica de fora.
     """
     import hashlib
 
-    partes = [validar_anexo(anexo), f"c{int(competencia)}", origem_anterior or "-"]
-    if valores_anteriores:
-        pares = ";".join(f"{codigo}={valor}"
-                         for codigo, valor in sorted(valores_anteriores.items()))
-        partes.append(hashlib.sha256(pares.encode("utf-8")).hexdigest()[:16])
+    partes = [validar_anexo(anexo), f"c{int(competencia)}"]
     if valores_sem_mapeamento:
         pares = ";".join(f"{codigo}={valor}"
                          for codigo, valor in sorted(valores_sem_mapeamento.items()))
@@ -118,15 +112,11 @@ def _sufixo_das_escolhas(escolhas: dict[str, dict]) -> str:
     return "ar-" + hashlib.sha256(pares.encode("utf-8")).hexdigest()[:16]
 
 
-ORIGEM_PADRAO_BP = "msce_exercicio_anterior"     # o mesmo padrão do BF
-
-
 def parametros_efetivos(pedido: dict | None, registro, anexo: str = "") -> dict:
-    """O que o anexo vai apurar: a origem do consolidado e as escolhas por unidade.
+    """O que o anexo vai apurar: o G8 do consolidado e as escolhas por unidade.
 
-    Consolidado do BF: `msce` explícita não reaproveita mapa do anterior; `processado` e `manual`
-    valem o que veio; pedido sem origem reaplica `procedencia.valores_anteriores` da linha, quando
-    houver. Consolidado do BP: o mesmo, mas a origem resolvida vai sempre explícita (padrão MSC).
+    O consolidado não tem origem própria (`pipeline-consolidado-anterior-soma-unidades`): a coluna
+    anterior dele é sempre a soma das colunas resolvidas das unidades, abaixo.
 
     O mapa G8 do atual é independente disso (D2): pedido com a chave `valores_sem_mapeamento`
     vale o que veio (vazio limpa); pedido sem a chave reaplica `procedencia.valores_sem_mapeamento`.
@@ -134,24 +124,7 @@ def parametros_efetivos(pedido: dict | None, registro, anexo: str = "") -> dict:
     Por unidade (`anterior_por_recorte`): vale a gravada nos recortes, com o pedido por cima.
     """
     pedido = dict(pedido or {})
-    saida = (_parametros_bp(pedido, registro) if anexo == "BP"
-             else _parametros_consolidado(pedido, registro))
-    saida.update(_por_unidade(pedido, registro))
-    return saida
-
-
-def _parametros_consolidado(pedido: dict, registro) -> dict:
-    origem = pedido.get("origem_anterior") or ""
-    if origem == "msce_exercicio_anterior":
-        saida = {}
-    elif origem == "processado_exercicio_anterior":
-        saida = {"origem_anterior": origem, "anterior": origem}
-    elif origem == "manual":
-        saida = _manual(pedido.get("valores_anteriores") or {})
-    else:
-        salvos = _mapa_salvo(registro)
-        saida = _manual(salvos) if salvos else {}
-
+    saida: dict = {}
     if "valores_sem_mapeamento" in pedido:
         g8 = pedido["valores_sem_mapeamento"]
         if g8:
@@ -162,27 +135,7 @@ def _parametros_consolidado(pedido: dict, registro) -> dict:
             saida["valores_sem_mapeamento"] = g8_salvo
     if pedido.get("fonte"):
         saida["fonte"] = pedido["fonte"]
-    return saida
-
-
-def _parametros_bp(pedido: dict, registro) -> dict:
-    """BP: a origem da coluna anterior é sempre explícita (D2 de `bp-anterior-publicado-siconfi`).
-
-    Omitida, reaplica o manual salvo na linha ou vale o padrão MSC, como no BF. Explícita nos dois
-    casos: sem isso o mesmo resultado teria duas identidades e a leitura o marcaria `pedido`.
-    `publicado_siconfi` segue aceito pela API, mas o front não o oferece mais.
-    """
-    origem = pedido.get("origem_anterior")
-    if origem == "manual":
-        saida = _manual(pedido.get("valores_anteriores") or {})
-    elif origem:
-        saida = {"origem_anterior": origem, "anterior": origem}
-    else:
-        salvos = _mapa_salvo(registro)
-        saida = (_manual(salvos) if salvos
-                 else {"origem_anterior": ORIGEM_PADRAO_BP, "anterior": ORIGEM_PADRAO_BP})
-    if pedido.get("fonte"):
-        saida["fonte"] = pedido["fonte"]
+    saida.update(_por_unidade(pedido, registro))
     return saida
 
 
@@ -224,19 +177,6 @@ def escolhas_do_resultado(resultado) -> dict[str, dict]:
         if escolha:
             saida[unidade] = dict(escolha)
     return saida
-
-
-def _manual(valores) -> dict:
-    return {"origem_anterior": "manual", "anterior": "manual", "valores_anteriores": dict(valores)}
-
-
-def _mapa_salvo(registro) -> dict[str, str]:
-    procedencia = getattr(registro, "procedencia", None) or {}
-    if (not isinstance(procedencia, dict)
-            or procedencia.get("origem_exercicio_anterior") != "manual"):
-        return {}
-    valores = procedencia.get("valores_anteriores")
-    return {str(c): str(v) for c, v in valores.items()} if isinstance(valores, dict) else {}
 
 
 def _g8_salvo(registro) -> dict[str, str]:

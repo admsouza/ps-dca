@@ -25,8 +25,6 @@ from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from enum import StrEnum
-from functools import cache
-from pathlib import Path
 
 from app.domain.bo.matriz import apurar as apurar_matriz
 from app.domain.bo.matriz import ordem_topologica
@@ -35,6 +33,7 @@ from app.domain.bo.saldo import _casa, saldo_da_conta
 from app.infra.msc.fonte import COMPETENCIA_DE_ENCERRAMENTO, fonte_de
 from app.infra.pcasp.natureza import do_pcasp
 from app.infra.regras.carregador import carregar_em_cache
+from app.services.bp.fontes import rotulo_fonte
 from app.services.bp.informados import partir as _partir_informados
 from app.services.bp.publicado import DirecaoDoPublicado, registros_publicados, totais_fp
 
@@ -55,7 +54,6 @@ QUADRO_FP = "ATIVOS_PASSIVOS_FINANCEIROS"
 NAO_PUBLICADO = "total F/P não publicado no I-AB"
 QUADRO_SUPERAVIT = "SUPERAVIT_DEFICIT"
 CONTAS_SUPERAVIT = ("821110100", "821110200")
-_RAIZ = Path(__file__).resolve().parents[3]
 
 
 class Anterior(StrEnum):
@@ -473,7 +471,7 @@ def _superavit(mapa: MapaBO, matriz: dict, atual: list[Registro],
         linhas_fonte.append(total._replace(
             id=f"bp.superavit_deficit.{codigo}",
             codigo=codigo,
-            rotulo=_rotulo_fonte(codigo),
+            rotulo=rotulo_fonte(codigo),
             bloqueio="",
             ordem=len(linhas_fonte) + 1,
             nivel=2,
@@ -519,21 +517,6 @@ def _saldos_por_fonte(registros: list[Registro]) -> dict[str, Decimal]:
     return saldos
 
 
-@cache
-def _nomes_stn(arquivo: str) -> dict[str, str]:
-    nomes: dict[str, str] = {}
-    for linha in (_RAIZ / arquivo).read_text(encoding="utf-8").splitlines():
-        if not linha.startswith("|"):
-            continue
-        celulas = [c.strip() for c in linha.strip("|").split("|")]
-        if celulas[0].isdigit():
-            nomes[celulas[0]] = celulas[1]
-    return nomes
-
-
-def _rotulo_fonte(codigo: str) -> str:
-    nome = _nomes_stn("docs/contas-stn/fonte-recursos.md").get(codigo[1:4], codigo[1:4])
-    return f"{nome} - Exercícios Anteriores" if codigo.startswith("2") else nome
 
 
 def _equilibrio(mapa: MapaBO, matriz: dict) -> dict[str, Decimal]:

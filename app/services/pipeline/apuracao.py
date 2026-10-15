@@ -230,11 +230,13 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
     está memorizada, então nada volta à fonte. No BP e no BF, fora do consolidado, a coluna anterior
     é da unidade (`pipeline-anterior-por-recorte`): `escolhas` (`{unidade: {origem, valores?}}`) ou,
     sem escolha, o processado de N−1 em `repo` ou a MSC de N−1. `agora` são as unidades que o pedido
-    escolheu neste job. O grupo soma as colunas das unidades. A DCA publicada só existe consolidada.
+    escolheu neste job.
 
-    ponytail: unidade que só existe no ano anterior não vira recorte quando o consolidado do BP usa
-    o publicado ou o processado (ela nunca é lida). Ler a MSC anterior para descobri-la se
-    aparecer o caso.
+    O consolidado não tem origem própria (`pipeline-consolidado-anterior-soma-unidades`): como o
+    grupo de poder, a coluna anterior dele é a soma das colunas já resolvidas das unidades do job.
+
+    ponytail: unidade que só existe no ano anterior não vira recorte (ela nunca é lida). Ler a MSC
+    anterior para descobri-la se aparecer o caso.
     """
     from dataclasses import replace
 
@@ -245,22 +247,21 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
     escolhas = escolhas or {}
     por_unidade = "anterior" in _aceitos_por(apurar, {"anterior": None})     # BF e BP
     n1 = ant.ler_n1(repo, ente, exercicio, anexo) if por_unidade else None
-    consolidado_n1 = None
-    if por_unidade and extras.get("anterior") == ant.OrigemAnterior.PROCESSADO:
-        consolidado_n1 = ant.exigir(n1, dominio.CONSOLIDADO)
-        extras["anterior_pronto"] = ant.pronto(consolidado_n1)
+    # Origem própria do consolidado (`anterior`/`anterior_pronto`/`valores_anteriores`/`dca`) não é
+    # mais aceita: a primeira passada só observa os registros e apura o exercício atual, em MSCE —
+    # a mais barata, e nunca lê N−1 nem o publicado (a coluna sai da soma das unidades, abaixo).
+    extras_base = extras
+    if por_unidade:
+        extras_base = {k: v for k, v in extras.items()
+                      if k not in ("anterior", "anterior_pronto", "valores_anteriores", "dca")}
+        extras_base["anterior"] = ant.OrigemAnterior.MSCE.value
 
     observada = _Observada(fonte, exercicio)
-    resultado = apurar(ente, exercicio, fonte=observada, **extras)
-    if consolidado_n1 is not None:
-        resultado.procedencia = replace(
-            resultado.procedencia,
-            anterior_processado=ant.procedencia_do_processado(n1, consolidado_n1))
-    # O que foi digitado para o ente (anterior manual, G8) vale só no consolidado.
-    extras_recorte = {**extras, **_aceitos_por(apurar, {"anterior": "msce_exercicio_anterior",
-                                                        "g8_so_no_consolidado": True})}
-    for digitado in ("dca", "valores_anteriores", "valores_sem_mapeamento", "anterior_pronto"):
-        extras_recorte.pop(digitado, None)
+    resultado = apurar(ente, exercicio, fonte=observada, **extras_base)
+    # O que foi digitado para o ente (G8) vale só no consolidado.
+    extras_recorte = {**extras_base, **_aceitos_por(apurar, {"anterior": "msce_exercicio_anterior",
+                                                             "g8_so_no_consolidado": True})}
+    extras_recorte.pop("valores_sem_mapeamento", None)
 
     # Unidade com mais de um PO não pertence a um poder só: fica fora dos grupos.
     unidades = observada.unidades
@@ -299,6 +300,8 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
         return r
 
     feitos = {chave: da_unidade(chave) for chave in membros_de if chave not in dominio.GRUPOS}
+    if por_unidade and not feitos:
+        raise ant.ParcelaSemUnidade(f"{anexo}: exercício sem nenhuma unidade ug:/po: a consolidar")
 
     def do_grupo(chave: str) -> Any:
         if not por_unidade:
@@ -313,6 +316,18 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
             feitos[u].diagnostico.sem_dados_exercicio_anterior for u in membros_de[chave])
         return r
 
+    if por_unidade:
+        # O consolidado é mais um grupo, de todas as unidades do job: nunca lê N−1 nem manual
+        # próprios (`pipeline-consolidado-anterior-soma-unidades`).
+        soma = ant.somar([ant.pronto(para_dados(feitos[u]), "_anterior") for u in sorted(feitos)])
+        resultado = apurar(ente, exercicio, fonte=observada,
+                          **{**extras_base, "anterior": ant.OrigemAnterior.PROCESSADO.value,
+                             "anterior_pronto": soma})
+        resultado.procedencia = replace(resultado.procedencia,
+                                        origem_exercicio_anterior=ant.SOMA_DAS_UNIDADES)
+        resultado.diagnostico.sem_dados_exercicio_anterior = any(
+            feitos[u].diagnostico.sem_dados_exercicio_anterior for u in feitos)
+
     resultado.recortes = {
         chave: Recorte(
             tipo=dominio.tipo(chave),
@@ -322,7 +337,19 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
         )
         for chave in membros_de
     }
-    if sem_unidade := _estorno_sem_unidade(fonte, observada, resultado.procedencia):
+    # Os anos do próprio consolidado (atual) mais o anterior, quando houver unidade (ele não lê
+    # mais N−1 diretamente, então o próprio ano some da procedência se ninguém pedir `processado`).
+    anos_estorno = set(getattr(resultado.procedencia, "estorno_receita_extra", None) or {}) | set(
+        getattr(resultado.procedencia, "estorno_despesa_extra", None) or {})
+    if por_unidade:
+        anos_estorno.add(str(exercicio - 1))
+    sem_unidade = _estorno_sem_unidade(fonte, observada, anos_estorno)
+    # Só a coluna anterior (ano = exercício − 1) é escopo desta change: o atual é diagnóstico, como
+    # antes (`bf-por-unidade-gestora`).
+    if por_unidade and any(s["exercicio"] == exercicio - 1 for s in sem_unidade):
+        raise ant.ParcelaSemUnidade(
+            f"{anexo}: contribuição da coluna anterior sem unidade ({len(sem_unidade)})")
+    if sem_unidade:
         resultado.diagnostico.estorno_sem_unidade = sem_unidade
     if ignoradas := [c for c in sorted(agora) if c in escolhas and c not in feitos]:
         resultado.diagnostico.avisos_anterior = [
@@ -330,17 +357,21 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
     return resultado
 
 
-def _estorno_sem_unidade(fonte, observada: _Observada, procedencia) -> list[dict]:
+def _estorno_sem_unidade(fonte, observada: _Observada, anos) -> list[dict]:
     """Estorno que entra no total do consolidado e não cai em nenhuma unidade (só BF).
 
     Por UG: instituição sem registro na MSC do exercício. Por PO: `poderOrgao` nulo, ou PO sem
-    registro no exercício. Declarado, nunca rateado. Lê o relatório já memorizado no escopo.
+    registro no exercício. Declarado, nunca rateado. Lê o relatório já memorizado no escopo —
+    fonte sem o relatório (`estorno_*` ausente) não é checada.
     """
     saida = []
     for tipo in ("receita", "despesa"):
         nome = f"estorno_{tipo}_extra"
-        for ano in getattr(procedencia, nome, None) or {}:
-            estorno = getattr(fonte, nome)(int(ano))
+        consultar = getattr(fonte, nome, None)
+        if consultar is None:
+            continue
+        for ano in anos:
+            estorno = consultar(int(ano))
             vistas = observada.por_exercicio.get(int(ano), {})
             for unidade, valor in estorno.por_unidade.items():
                 if observada.tipo == "ug":

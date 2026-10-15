@@ -7,8 +7,6 @@ números plausíveis e errados — sem exceção, sem log, sem célula não apur
 """
 from __future__ import annotations
 
-from decimal import Decimal
-
 import pytest
 
 from app.infra.msc.fonte import Matriz, TipoSaldo
@@ -88,13 +86,18 @@ def test_bo_mantem_a_ordem_que_ja_publicava():
 
 
 def test_origens_diferentes_da_coluna_anterior_nao_se_misturam():
-    """Scenario: origens diferentes não se misturam no cache"""
+    """Scenario: origens diferentes não se misturam no cache
+
+    A origem da coluna anterior é por unidade (`anterior_por_recorte`); o consolidado não tem mais
+    origem própria (`pipeline-consolidado-anterior-soma-unidades`)."""
     from app.services.pipeline.cache import identidade_do_pedido
 
-    msce = identidade_do_pedido(anexo="BF", competencia=12, origem_anterior="msce",
-                                valores_anteriores=None)
-    manual = identidade_do_pedido(anexo="BF", competencia=12, origem_anterior="manual",
-                                  valores_anteriores={"L2": Decimal("1.00")})
+    msce = identidade_do_pedido(
+        anexo="BF", competencia=12,
+        anterior_por_recorte={"ug:1": {"origem": "msce_exercicio_anterior"}})
+    manual = identidade_do_pedido(
+        anexo="BF", competencia=12,
+        anterior_por_recorte={"ug:1": {"origem": "manual", "valores": {"L2": "1.00"}}})
     assert msce != manual
 
 
@@ -102,10 +105,12 @@ def test_dois_preenchimentos_manuais_sao_resultados_diferentes():
     """Scenario: dois preenchimentos manuais diferentes são resultados diferentes"""
     from app.services.pipeline.cache import identidade_do_pedido
 
-    um = identidade_do_pedido(anexo="BF", competencia=12, origem_anterior="manual",
-                              valores_anteriores={"L2": Decimal("1.00")})
-    outro = identidade_do_pedido(anexo="BF", competencia=12, origem_anterior="manual",
-                                 valores_anteriores={"L2": Decimal("2.00")})
+    um = identidade_do_pedido(
+        anexo="BF", competencia=12,
+        anterior_por_recorte={"ug:1": {"origem": "manual", "valores": {"L2": "1.00"}}})
+    outro = identidade_do_pedido(
+        anexo="BF", competencia=12,
+        anterior_por_recorte={"ug:1": {"origem": "manual", "valores": {"L2": "2.00"}}})
     assert um != outro
 
 

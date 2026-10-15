@@ -107,22 +107,17 @@ def test_padrao_limpa_a_escolha_gravada():
     assert "anterior_por_recorte" not in efetivo
 
 
-def test_o_bf_reaplica_as_escolhas_dos_recortes_junto_do_mapa_do_consolidado():
+def test_o_bf_reaplica_as_escolhas_dos_recortes_ignorando_o_mapa_legado_do_consolidado():
+    """Requisito: o consolidado não tem origem própria: procedência legada no registro não é
+    reaplicada (`pipeline-consolidado-anterior-soma-unidades`)."""
     registro = _gravado({"ug:3": _escolha(MSCE)}, "BF")
     registro.procedencia = {"origem_exercicio_anterior": "manual",
                             "valores_anteriores": {"L2": "1.00"}}
 
     efetivo = parametros_efetivos({}, registro, "BF")
 
-    assert efetivo["valores_anteriores"] == {"L2": "1.00"}
+    assert "valores_anteriores" not in efetivo
     assert efetivo["anterior_por_recorte"] == {"ug:3": _escolha(MSCE)}
-
-
-@pytest.mark.parametrize("anexo", ["BP", "BF"])
-def test_consolidado_processado_no_pedido(anexo):
-    efetivo = parametros_efetivos({"origem_anterior": PROCESSADO}, None, anexo)
-
-    assert efetivo["origem_anterior"] == efetivo["anterior"] == PROCESSADO
 
 
 # ─── ler depois de reprocessar ───────────────────────────────────────────────

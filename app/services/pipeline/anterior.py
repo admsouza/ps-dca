@@ -29,6 +29,12 @@ class ProcessadoSemAnterior(Exception):
     """`processado_exercicio_anterior` pedido e N−1 sem resultado `ok` (ou sem o recorte)."""
 
 
+class ParcelaSemUnidade(Exception):
+    """Contribuição que afeta a coluna anterior do consolidado sem pertencer a um recorte
+    `ug:`/`po:`, ou job sem nenhuma unidade emitida (`pipeline-consolidado-anterior-soma-
+    unidades`): falha segura, nenhum resultado parcial é publicado como `ok`."""
+
+
 class N1(NamedTuple):
     exercicio: int           # o exercício anterior
     registro: Any            # linha do cache, só quando `ok` e com resultado

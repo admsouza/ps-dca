@@ -109,12 +109,25 @@ def test_corpo_invalido_responde_422_sem_job(api, anexo, escolhas):
 
 def test_manual_do_bp_recusa_totalizadora_prefixo_e_codigo(api):
     """Scenario: totalizadora no manual"""
-    for valores in ({"P:L2": "1.00"}, {"X:L3": "1.00"}, {"P:L999": "1.00"}, {"S:15": "1.00"}):
+    for valores in ({"P:L2": "1.00"}, {"X:L3": "1.00"}, {"P:L999": "1.00"}, {"S:15": "1.00"},
+                    {"S:1999": "1.00"}, {"S:3621": "1.00"}):
         cliente, fila = api(RepoFake(), "BP")
         resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {
             "ug:3": {"origem": MANUAL, "valores": valores}}})
         assert resposta.status_code == 422, valores
         assert fila.chamadas == []
+
+
+def test_manual_do_bp_aceita_fonte_oficial(api):
+    """Scenario: fonte oficial é aceita"""
+    cliente, fila = api(RepoFake(), "BP")
+    valores = {"S:1621": "20000.00"}
+
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {
+        "ug:3": {"origem": MANUAL, "valores": valores}}})
+
+    assert resposta.status_code == 202, resposta.text
+    assert fila.chamadas[0]["anterior_por_recorte"]["ug:3"]["valores"] == valores
 
 
 def test_manual_do_bf_recusa_codigo_inexistente(api):
@@ -126,26 +139,24 @@ def test_manual_do_bf_recusa_codigo_inexistente(api):
     assert resposta.status_code == 422 and fila.chamadas == []
 
 
-def test_manual_no_consolidado_do_bp_enfileira_com_os_valores(api):
-    """Scenario: manual no consolidado do BP — como no BF"""
-    cliente, fila = api(RepoFake(), "BP")
+@pytest.mark.parametrize("anexo", ["BF", "BP"])
+def test_manual_no_consolidado_e_recusado(api, anexo):
+    """Scenario: mapa manual consolidado é recusado — `pipeline-consolidado-anterior-soma-unidades`
+    Scenario: mapa manual no topo é recusado"""
+    cliente, fila = api(RepoFake(), anexo)
 
-    resposta = _reprocessar(cliente, "BP", {"origem_exercicio_anterior": MANUAL,
-                                            "valores_anteriores": VALIDOS["BP"]})
+    resposta = _reprocessar(cliente, anexo, {"origem_exercicio_anterior": MANUAL,
+                                             "valores_anteriores": VALIDOS[anexo]})
 
-    assert resposta.status_code == 202, resposta.text
-    parametros = fila.chamadas[0]
-    assert parametros["origem_anterior"] == parametros["anterior"] == MANUAL
-    assert parametros["valores_anteriores"] == VALIDOS["BP"]
+    assert resposta.status_code == 422 and fila.chamadas == []
 
 
-@pytest.mark.parametrize("valores", [{}, {"P:L2": "1.00"}, {"X:L3": "1.00"}])
-def test_manual_no_consolidado_do_bp_recusa_valores_invalidos(api, valores):
-    """Scenario: manual no consolidado do BP com valores inválidos — `422`, sem job"""
-    cliente, fila = api(RepoFake(), "BP")
+@pytest.mark.parametrize("anexo", ["BF", "BP"])
+def test_origem_propria_no_corpo_e_recusada(api, anexo):
+    """Scenario: origem própria no corpo é recusada"""
+    cliente, fila = api(RepoFake(), anexo)
 
-    resposta = _reprocessar(cliente, "BP", {"origem_exercicio_anterior": MANUAL,
-                                            "valores_anteriores": valores})
+    resposta = _reprocessar(cliente, anexo, {"origem_exercicio_anterior": MSCE})
 
     assert resposta.status_code == 422 and fila.chamadas == []
 
@@ -175,13 +186,13 @@ def test_processado_explicito_de_unidade_que_n1_nao_tem_responde_409(api):
 
 
 @pytest.mark.parametrize("anexo", ["BF", "BP"])
-def test_consolidado_processado_sem_n1_responde_409(api, anexo):
+def test_consolidado_processado_no_corpo_e_recusado(api, anexo):
+    """Requisito: origem própria do consolidado não é mais aceita, nem para exigir N−1"""
     cliente, fila = api(RepoFake(), anexo)
 
     resposta = _reprocessar(cliente, anexo, {"origem_exercicio_anterior": PROCESSADO})
 
-    assert resposta.status_code == 409
-    assert resposta.json()["detail"].startswith("processe 2024 antes")
+    assert resposta.status_code == 422
     assert fila.chamadas == []
 
 
@@ -215,35 +226,26 @@ def test_unidade_inexistente_nao_barra_a_rota(api):
 
 
 @pytest.mark.parametrize("anexo", ["BF", "BP"])
-def test_consolidado_processado_no_corpo(api, anexo):
-    """Scenario: consolidado processado"""
-    cliente, fila = api(_n1_de(anexo), anexo)
-
-    resposta = _reprocessar(cliente, anexo, {"origem_exercicio_anterior": PROCESSADO})
-
-    assert resposta.status_code == 202
-    assert fila.chamadas[0]["origem_anterior"] == PROCESSADO == fila.chamadas[0]["anterior"]
-
-
-@pytest.mark.parametrize("anexo", ["BF", "BP"])
-def test_consolidado_processado_na_query_da_leitura_nao_exige_n1(api, anexo):
+def test_consolidado_na_query_da_leitura_responde_400(api, anexo):
+    """Requisito: legado na query responde `400`, como os demais mapas do consolidado"""
     cliente, fila = api(RepoFake(), anexo)
 
     resposta = cliente.get(
         f"/dca/{anexo}?anReferencia={EXERCICIO}&origem_exercicio_anterior={PROCESSADO}",
         headers=HDR)
 
-    assert resposta.status_code == 202
-    assert fila.chamadas[0]["origem_anterior"] == PROCESSADO
+    assert resposta.status_code == 400
+    assert fila.chamadas == []
 
 
-def test_leitura_recusa_origem_desconhecida(api):
-    cliente, _ = api(RepoFake(), "BP")
+def test_leitura_recusa_origem_na_query(api):
+    cliente, fila = api(RepoFake(), "BP")
 
     resposta = cliente.get(f"/dca/BP?anReferencia={EXERCICIO}&origem_exercicio_anterior=x",
                            headers=HDR)
 
-    assert resposta.status_code == 422
+    assert resposta.status_code == 400
+    assert fila.chamadas == []
 
 
 def test_corpo_sem_escolhas_reaplica_as_gravadas(api):
@@ -261,18 +263,16 @@ def test_corpo_sem_escolhas_reaplica_as_gravadas(api):
 
 # ─── percurso ────────────────────────────────────────────────────────────────
 
-def test_percurso_aceita_processado_para_o_bp(api):
-    """Requisito: query do percurso para o BP (com o BP de N−1 `ok`; sem ele, `409`)"""
-    repo = RepoFake()
-    repo.gravar(RegistroFake("2505204", EXERCICIO - 1, "BP", status="ok", resultado={"x": 1}))
-    cliente, fila = api(repo, "BP")
+def test_percurso_recusa_origem_consolidada_do_bp(api):
+    """Requisito: percurso recusa origem consolidada"""
+    cliente, fila = api(RepoFake(), "BP")
 
     resposta = cliente.post(
         f"/batch-jobs?anReferencia={EXERCICIO}&origem_exercicio_anterior={PROCESSADO}",
         headers=HDR)
 
-    assert resposta.status_code == 202
-    assert fila.percursos[0]["origem_bp"] == PROCESSADO
+    assert resposta.status_code == 422
+    assert fila.percursos == []
 
 
 def test_percurso_nao_aceita_anterior_por_recorte(api):
@@ -283,17 +283,17 @@ def test_percurso_nao_aceita_anterior_por_recorte(api):
                             json={"anterior_por_recorte": {"ug:1": {"origem": MSCE}}})
 
     assert resposta.status_code == 202
-    assert set(fila.percursos[0]) == {"fonte", "forcar", "solicitado_por", "origem_bp",
-                                     "solicitante_email"}
+    assert set(fila.percursos[0]) == {"fonte", "forcar", "solicitado_por", "solicitante_email"}
 
 
 def test_percurso_reaplica_as_escolhas_gravadas():
-    """Scenario: escolha gravada é reaplicada — pelo percurso"""
+    """Scenario: escolha gravada é reaplicada — pelo percurso
+    Scenario: percurso soma as escolhas gravadas"""
     gravado = RegistroFake(ENTES["BP"], EXERCICIO, "BP", resultado={"recortes": {
         "ug:3": {"resultado": {"procedencia": {
             "escolha_anterior": {"origem": MANUAL, "valores": {"P:L3": "1.00"}}}}}}})
 
-    pedido = pedido_do_percurso(gravado, "publicsoft", "BP", MSCE)
+    pedido = pedido_do_percurso(gravado, "publicsoft", "BP")
 
     assert pedido["anterior_por_recorte"] == {"ug:3": {"origem": MANUAL,
                                                        "valores": {"P:L3": "1.00"}}}
@@ -321,15 +321,14 @@ def test_n1_some_entre_a_rota_e_o_job_termina_em_erro(monkeypatch):
 
 
 @pytest.mark.parametrize("anexo", ["BF", "BP"])
-def test_processado_na_query_do_reprocessar_sem_corpo_e_sem_n1_responde_409(api, anexo):
+def test_processado_na_query_do_reprocessar_responde_400(api, anexo):
     cliente, fila = api(RepoFake(), anexo)
 
     resposta = cliente.post(
         f"/dca/{anexo}/reprocessar?anReferencia={EXERCICIO}&origem_exercicio_anterior={PROCESSADO}",
         headers=HDR)
 
-    assert resposta.status_code == 409
-    assert resposta.json()["detail"].startswith("processe 2024 antes")
+    assert resposta.status_code == 400
     assert fila.chamadas == []
 
 
