@@ -16,6 +16,7 @@ from __future__ import annotations
 from typing import Any, Protocol
 
 from app.domain import recorte as recortes
+from app.services.pipeline.cache import escolhas_gravadas
 from app.services.pipeline.registry import ANEXOS, REGISTRY
 
 SEM_CACHE = "sem_cache"
@@ -64,8 +65,21 @@ def _unidades(registro, poderes: tuple[str, ...]) -> list[dict]:
     gravados = (registro.resultado or {}).get("recortes") if ok else None
     unidades = {c: r["poderOrgao"] for c, r in (gravados or {}).items()
                 if c not in recortes.GRUPOS}
-    return [{"chave": c, "tipo": recortes.tipo(c), "rotulo": gravados[c]["rotulo"]}
+    escolhas = escolhas_gravadas(registro) if registro is not None else {}
+    return [{"chave": c, "tipo": recortes.tipo(c), "rotulo": gravados[c]["rotulo"],
+             **_anterior(escolhas.get(c))}
             for c in recortes.visiveis(unidades, unidades, poderes)]
+
+
+def _anterior(escolha: dict | None) -> dict:
+    """A escolha que a apuração aplica na unidade. Ausente = automática (padrão do pipeline).
+
+    Sem ela o front só teria a preferência do navegador, que some entre sessões e passa a
+    contradizer a coluna servida (a escolha vive na procedência, não no `sessionStorage`).
+    """
+    if not escolha:
+        return {}
+    return {"anterior": {"origem": escolha["origem"], "manual": bool(escolha.get("valores"))}}
 
 
 def resumir(*, ente: str, exercicio: int, repo: Repo,

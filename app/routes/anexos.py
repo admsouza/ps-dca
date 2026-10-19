@@ -83,7 +83,8 @@ class EntradaResumo(BaseModel):
     versao_regras: str | None = None
     erro_detalhe: str | None = None
     implementado: bool = False
-    recortes: list[dict[str, str]] | None = None   # só BF e BP
+    # Só BF e BP. `anterior` (`{origem, manual}`) vem só na unidade com escolha gravada.
+    recortes: list[dict[str, Any]] | None = None
 
 class FonteRecursoResposta(BaseModel):
     codigo: str

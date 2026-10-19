@@ -354,3 +354,17 @@ def test_resumo_sem_unidades_gravadas_ou_em_erro(repo, lock, jobs):
     r = _resumo(cliente)
     assert _entrada(r, "BF")["recortes"] == []
     assert _entrada(r, "BP")["recortes"] == []
+
+
+def test_resumo_traz_a_escolha_gravada_da_unidade(repo, lock, jobs):
+    """Scenario: escolha gravada da unidade no resumo"""
+    cliente = _cliente(repo, lock, jobs, ["consolidado"], "BF", _bf_com_unidades())
+    repo.gravar(RegistroFake(
+        ENTE, EXERCICIO, "BF", status="ok", resultado=_bf_com_unidades(),
+        procedencia={"anterior_por_recorte": {
+            "ug:1": {"origem": "manual", "valores": {"L2": "10.00"}},
+            "ug:2": {"origem": "msce_exercicio_anterior"}}}))
+    por_chave = {u["chave"]: u for u in _entrada(_resumo(cliente), "BF")["recortes"]}
+    assert por_chave["ug:1"]["anterior"] == {"origem": "manual", "manual": True}
+    assert por_chave["ug:2"]["anterior"] == {"origem": "msce_exercicio_anterior", "manual": False}
+    assert "anterior" not in por_chave["ug:3"]           # sem escolha = automática

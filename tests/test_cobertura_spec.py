@@ -39,6 +39,8 @@ CENARIOS_ESPERADOS = {
     # + 4 do mapa manual persistido (`bf-anterior-manual-persistido`)
     # + 3 de visualizar sem reprocessar (`pipeline-visualizar-sem-reprocessar`)
     # + 6 das notificações no padrão RREO/RGF (`pipeline-notificacao-discord-padrao`).
+    # `dca-anterior-edicao-na-celula` soma +1 (escolha gravada no resumo) quando for mesclada:
+    # a spec em vigor é a de `openspec/specs/`, e o delta da change ativa não entra na contagem.
     "pipeline/plataforma": 89,
     # 11 do percurso completo (`pipeline-completo-dca`) + 2 da notificação por anexo
     # (`pipeline-notificacao-discord-padrao`) + 3 do consolidado pela soma das unidades
