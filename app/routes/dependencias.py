@@ -38,6 +38,8 @@ from app.core.config import config
 
 logger = logging.getLogger(__name__)
 
+MODULO = "dca"
+
 
 async def unidade_autorizada(
     request: Request,
@@ -70,16 +72,24 @@ async def unidade_autorizada(
     hub = AutorizadorHub()
     if hub.configurado and sub:
         try:
-            request.state.poderes = await hub.autorizar(sub, ente)
+            autorizacao = await hub.autorizar(sub, ente)
         except SemAcessoAUnidade as erro:
             raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(erro)) from erro
         except HubIndisponivel as erro:
             # Fail closed: hub fora do ar não libera acesso.
             raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE,
                                 detail="serviço de autorização indisponível") from erro
+        if MODULO not in autorizacao.modulos:
+            # Esconder o menu no front não é controle de acesso: o módulo vale na API.
+            raise HTTPException(status.HTTP_403_FORBIDDEN,
+                                detail=f"usuário sem o módulo {MODULO} nesta unidade")
+        request.state.poderes = autorizacao.poderes
+        request.state.modulos = autorizacao.modulos
+        request.state.ugs = autorizacao.ugs
     else:
         _autorizar_pelo_token(claims, ente)
         request.state.poderes = ("consolidado",)   # modo local: só development/test/local
+        request.state.ugs = ()
 
     request.state.claims = claims
     request.state.ente = ente

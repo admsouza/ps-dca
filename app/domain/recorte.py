@@ -73,14 +73,23 @@ def recortes(unidades: Mapping[str, str]) -> dict[str, set[str]]:
 
 
 def visiveis(chaves: Iterable[str], unidades: Mapping[str, str],
-             poderes: Iterable[str]) -> list[str]:
-    """As chaves que o usuário pode ler, em ordem de apresentação."""
+             poderes: Iterable[str], ugs: Iterable[str] = ()) -> list[str]:
+    """As chaves que o usuário pode ler, em ordem de apresentação.
+
+    `ugs` vazio = sem restrição por UG (só o poder decide). Preenchido, só passam as unidades
+    autorizadas; `consolidado` e grupos exigem **todas** as unidades que somam autorizadas — do
+    contrário o total entregaria o valor da UG negada.
+    """
     poderes = set(poderes)
     if CONSOLIDADO in poderes:
         permitidas = set(chaves)
     else:
         permitidas = {chave for chave, exigidos in GRUPOS.items() if set(exigidos) <= poderes}
         permitidas |= {u for u, po in unidades.items() if _poder(po) in poderes}
+    autorizadas = {f"ug:{u}" for u in ugs}
+    if autorizadas:
+        somadas = recortes(unidades) | {CONSOLIDADO: set(unidades)}
+        permitidas = {c for c in permitidas if somadas.get(c, {c}) <= autorizadas}
     return sorted((c for c in chaves if c in permitidas), key=_ordem)
 
 

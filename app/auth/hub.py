@@ -13,6 +13,7 @@ Falha de rede vira `503`, nunca `200`: indisponibilidade do hub não pode virar 
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 
 from app.core.config import config
 
@@ -23,6 +24,20 @@ CAMINHO = "/internal/authorize"
 CAMINHO_TENANT = "/internal/resolve-tenant"
 # Vocabulário de `usuario_poder` no hub. Valor fora dele não concede nada.
 PODERES = ("consolidado", "executivo", "judiciario", "legislativo")
+
+
+@dataclass(frozen=True)
+class Autorizacao:
+    """O que o hub concede ao usuário em um ente.
+
+    `ugs` vazio = sem restrição por UG (usuário legado, `adm_sistema`, ente sem UG): é o que o hub
+    devolve a quem não tem UG cadastrada, e tratar `()` como "nenhuma UG" revogaria o acesso de
+    todos na implantação.
+    """
+
+    poderes: tuple[str, ...]
+    modulos: tuple[str, ...]
+    ugs: tuple[str, ...]
 
 
 class HubIndisponivel(RuntimeError):
@@ -54,11 +69,12 @@ class AutorizadorHub:
     def configurado(self) -> bool:
         return bool(self._base and self._secret)
 
-    async def autorizar(self, sub: str, cod_ibge: str) -> tuple[str, ...]:
-        """Confirma o vínculo e devolve os poderes do usuário (`regras-rgf-api` CH-46).
+    async def autorizar(self, sub: str, cod_ibge: str) -> Autorizacao:
+        """Confirma o vínculo e devolve poderes (CH-46), módulos (CH-47) e UGs (CH-49).
 
-        Hub anterior à CH-46, sem o campo, devolve `()`: BO e BP respondem `403` até o hub subir —
-        fail closed, nunca o consolidado por omissão.
+        Hub anterior à CH-46, sem `poderes`, devolve `()`: BO e BP respondem `403` até o hub subir —
+        fail closed, nunca o consolidado por omissão. `modulos` ausente também nega (sem `dca`).
+        `ugs` ausente é hub anterior à CH-49: sem restrição por UG, como hoje.
         """
         if not self.configurado:
             raise HubIndisponivel("AUTH_API_URL/S2S_API_SECRET não configurados")
@@ -75,8 +91,12 @@ class AutorizadorHub:
         if codigo != 200:
             # 401 e 5xx são problema **nosso** com o hub, não do requisitante.
             raise HubIndisponivel(f"hub respondeu {codigo}")
-        poderes = (resposta.get("corpo") or {}).get("poderes") or []
-        return tuple(p for p in poderes if p in PODERES)
+        corpo = resposta.get("corpo") or {}
+        return Autorizacao(
+            poderes=tuple(p for p in corpo.get("poderes") or [] if p in PODERES),
+            modulos=tuple(str(m) for m in corpo.get("modulos") or []),
+            ugs=tuple(dict.fromkeys(str(u) for u in corpo.get("ugs") or [])),
+        )
 
     async def resolver_token(self, sub: str, cod_ibge: str) -> str:
         """`token_ps` da unidade — `POST /internal/resolve-tenant`, o contrato do RGF e do RREO.

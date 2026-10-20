@@ -195,26 +195,29 @@ def _aviso_recorte(resultado: dict, fonte: FontePedido | None) -> dict:
     return {}
 
 
-def _no_recorte(resultado: dict, pedido: str | None, poderes: tuple[str, ...]) -> dict:
+def _no_recorte(resultado: dict, pedido: str | None, poderes: tuple[str, ...],
+                ugs: tuple[str, ...] = ()) -> dict:
     """O corpo do recorte pedido — ou do padrão do poder —, com os recortes visíveis.
 
     Busca por chave no que o worker gravou: nada é somado nem calculado aqui. Sem `consolidado`,
-    nenhum valor de recorte não visível sai na resposta, nem o consolidado do ente.
+    nenhum valor de recorte não visível sai na resposta, nem o consolidado do ente. Com `ugs`, o
+    padrão é o primeiro recorte visível quando o do poder soma UG não autorizada.
     """
     chave = pedido or recortes.padrao(poderes)
     if chave is None:
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="sem poder para ler este anexo")
     gravados = resultado.get("recortes")
     if gravados is None:                         # cache anterior à change
-        if chave == recortes.CONSOLIDADO and recortes.CONSOLIDADO in poderes:
+        if chave == recortes.CONSOLIDADO and recortes.CONSOLIDADO in poderes and not ugs:
             return resultado
         raise HTTPException(status.HTTP_409_CONFLICT,
                             detail="reprocesse o anexo para emitir por recorte")
+    poder_orgao = {c: r["poderOrgao"] for c, r in gravados.items() if c not in recortes.GRUPOS}
+    disponiveis = recortes.visiveis([recortes.CONSOLIDADO, *gravados], poder_orgao, poderes, ugs)
+    if pedido is None and ugs and disponiveis and chave not in disponiveis:
+        chave = disponiveis[0]
     if chave != recortes.CONSOLIDADO and chave not in gravados:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"recorte {chave} não apurado")
-
-    poder_orgao = {c: r["poderOrgao"] for c, r in gravados.items() if c not in recortes.GRUPOS}
-    disponiveis = recortes.visiveis([recortes.CONSOLIDADO, *gravados], poder_orgao, poderes)
     if chave not in disponiveis:
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="sem acesso a este recorte")
 
@@ -279,7 +282,8 @@ def _exigir_poder_nas_unidades(request: Request, repo, ente: str, exercicio: int
     resolvido (`""`), só `consolidado` passa. Tudo ou nada: roda antes de qualquer job.
     """
     poderes = getattr(request.state, "poderes", ())
-    if recortes.CONSOLIDADO in poderes:
+    ugs = getattr(request.state, "ugs", ())
+    if recortes.CONSOLIDADO in poderes and not ugs:
         return
     gravados: dict = {}
     for ano in (exercicio - 1, exercicio):       # N por último: vence N−1
@@ -289,7 +293,7 @@ def _exigir_poder_nas_unidades(request: Request, repo, ente: str, exercicio: int
             gravados |= (registro.resultado or {}).get("recortes") or {}
     unidades = {c: c[3:] if c.startswith("po:") else gravados.get(c, {}).get("poderOrgao", "")
                 for c in chaves}
-    visiveis = recortes.visiveis(chaves, unidades, poderes)
+    visiveis = recortes.visiveis(chaves, unidades, poderes, ugs)
     for chave in chaves:
         if chave not in visiveis:
             raise HTTPException(status.HTTP_403_FORBIDDEN, detail=f"sem acesso à unidade {chave}")
@@ -357,7 +361,8 @@ async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo
         if anexo in apuracao.RECORTAVEIS:
             aviso = _aviso_recorte(resultado, fonte)
             # Sem `poderes` no estado a autorização não rodou: nenhum recorte (fail closed).
-            resultado = _no_recorte(resultado, recorte, getattr(request.state, "poderes", ()))
+            resultado = _no_recorte(resultado, recorte, getattr(request.state, "poderes", ()),
+                                    getattr(request.state, "ugs", ()))
         if visao:
             resultado = _na_visao(resultado, visao)
         return JSONResponse(status_code=200, content={
@@ -519,7 +524,8 @@ def resumo(
 ) -> list[dict]:
     # Sem `poderes` no estado a autorização não rodou: nenhuma unidade (fail closed).
     return resumo_service.resumir(ente=ente, exercicio=exercicio, repo=repo,
-                                  poderes=getattr(request.state, "poderes", ()))
+                                  poderes=getattr(request.state, "poderes", ()),
+                                  ugs=getattr(request.state, "ugs", ()))
 
 
 async def _auditor_regra(

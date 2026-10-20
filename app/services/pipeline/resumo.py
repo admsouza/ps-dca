@@ -58,7 +58,7 @@ def _entrada(anexo: str, registro, implementado: bool) -> dict:
     }
 
 
-def _unidades(registro, poderes: tuple[str, ...]) -> list[dict]:
+def _unidades(registro, poderes: tuple[str, ...], ugs: tuple[str, ...] = ()) -> list[dict]:
     """`ug:`/`po:` do resultado `ok` que o usuário vê, como na leitura do anexo. Sem `ok`, sem
     recortes gravados ou sem poderes: `[]`. O rótulo é o gravado."""
     ok = registro is not None and registro.status == "ok"
@@ -68,7 +68,7 @@ def _unidades(registro, poderes: tuple[str, ...]) -> list[dict]:
     escolhas = escolhas_gravadas(registro) if registro is not None else {}
     return [{"chave": c, "tipo": recortes.tipo(c), "rotulo": gravados[c]["rotulo"],
              **_anterior(escolhas.get(c))}
-            for c in recortes.visiveis(unidades, unidades, poderes)]
+            for c in recortes.visiveis(unidades, unidades, poderes, ugs)]
 
 
 def _anterior(escolha: dict | None) -> dict:
@@ -83,7 +83,7 @@ def _anterior(escolha: dict | None) -> dict:
 
 
 def resumir(*, ente: str, exercicio: int, repo: Repo,
-            poderes: tuple[str, ...] = ()) -> list[dict]:
+            poderes: tuple[str, ...] = (), ugs: tuple[str, ...] = ()) -> list[dict]:
     """Uma entrada por anexo, na ordem canônica, sempre com os oito."""
     por_anexo = {r.anexo: r for r in repo.listar(ente, exercicio)}
     tem_servico = {a.codigo: a.servico is not None for a in REGISTRY}
@@ -95,5 +95,5 @@ def resumir(*, ente: str, exercicio: int, repo: Repo,
     ]
     for entrada in entradas:
         if entrada["anexo"] in COM_UNIDADES:
-            entrada["recortes"] = _unidades(por_anexo.get(entrada["anexo"]), poderes)
+            entrada["recortes"] = _unidades(por_anexo.get(entrada["anexo"]), poderes, ugs)
     return entradas

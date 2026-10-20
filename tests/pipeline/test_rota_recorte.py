@@ -264,8 +264,8 @@ def test_hub_devolve_poderes():
         return asyncio.run(AutorizadorHub(base_url="http://hub", secret="s",
                                           http=http).autorizar("u@x", ENTE))
 
-    assert com({"authorized": True, "poderes": ["legislativo", "xpto"]}) == ("legislativo",)
-    assert com({"authorized": True}) == ()
+    assert com({"authorized": True, "poderes": ["legislativo", "xpto"]}).poderes == ("legislativo",)
+    assert com({"authorized": True}).poderes == ()
 
 
 def test_unidade_autorizada_guarda_os_poderes(monkeypatch):
@@ -276,7 +276,8 @@ def test_unidade_autorizada_guarda_os_poderes(monkeypatch):
         configurado = True
 
         async def autorizar(self, sub, ente):
-            return ("executivo",)
+            from app.auth.hub import Autorizacao
+            return Autorizacao(("executivo",), ("dca",), ())
 
     monkeypatch.setattr(dependencias, "AutorizadorHub", Hub)
     monkeypatch.setattr(dependencias, "_claims", lambda token: {"sub": "u@x"})
