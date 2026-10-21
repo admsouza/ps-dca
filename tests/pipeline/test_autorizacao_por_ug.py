@@ -22,6 +22,7 @@ from tests.pipeline.test_rota_anterior_por_recorte import (  # noqa: F401  (fixt
     MANUAL_BP,
     PREFEITURA,
     _cache_com_unidades,
+    _n1_com,
     _reprocessar,
     api,
 )
@@ -274,6 +275,7 @@ def test_anterior_por_recorte_de_ug_nao_autorizada(api):  # noqa: F811
     repo.gravar(RegistroFake("2505204", EXERCICIO, "BP", resultado={"recortes": {
         PREFEITURA: {"poderOrgao": "10131", "rotulo": "P", "resultado": {}},
         outra: {"poderOrgao": "10131", "rotulo": "F", "resultado": {}}}}))
+    repo.gravar(_n1_com(PREFEITURA, outra))
     _com_ugs(cliente, ["executivo"], [PREFEITURA[3:]])
 
     ok = _reprocessar(cliente, "BP", {"anterior_por_recorte": {PREFEITURA: MANUAL_BP}})

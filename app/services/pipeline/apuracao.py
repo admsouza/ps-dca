@@ -279,8 +279,7 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
         if not por_unidade:
             return apurar_recorte(chave, **extras_recorte)
         escolha = escolhas.get(chave)
-        origem, aviso = ant.resolver(chave, escolha, chave in agora, n1,
-                                     exigir_processado=repo is not None)
+        origem, aviso = ant.resolver(chave, escolha, n1, exigir_processado=repo is not None)
         kwargs = dict(extras_recorte)
         if chave in valores_atuais_por_recorte:
             kwargs.update(_aceitos_por(apurar, {"valores_atuais":

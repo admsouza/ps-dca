@@ -185,7 +185,7 @@ def test_processado_explicito_sem_n1_responde_409_sem_job(api, anexo):
         "ug:3": {"origem": PROCESSADO}}})
 
     assert resposta.status_code == 409
-    assert resposta.json()["detail"] == "Processe 2024 ou use Manual."
+    assert resposta.json()["detail"] == "ug:3: Processe 2024 ou use Manual."
     assert fila.chamadas == []
 
 
@@ -196,6 +196,24 @@ def test_processado_explicito_de_unidade_que_n1_nao_tem_responde_409(api):
         "ug:99": {"origem": PROCESSADO}}})
 
     assert resposta.status_code == 409 and fila.chamadas == []
+
+
+def test_unidade_fora_do_pedido_sem_n1_responde_409_sem_job(api):
+    """Scenario: padrão sem Processado orienta a correção
+
+    Pelo pedido que cobre só uma unidade: as outras caem no padrão Processado e, sem N−1, o job
+    inteiro morria depois do `202`.
+    """
+    repo = RepoFake([RegistroFake(ENTES["BP"], EXERCICIO, "BP", resultado={"recortes": {
+        "ug:10": {"resultado": {}}, "ug:20": {"resultado": {}}}})])
+    cliente, fila = api(repo, "BP")
+
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {
+        "ug:10": {"origem": MANUAL, "valores": {"P:L3": "1.00"}}}})
+
+    assert resposta.status_code == 409
+    assert resposta.json()["detail"] == "ug:20: Processe 2024 ou use Manual."
+    assert fila.chamadas == []
 
 
 @pytest.mark.parametrize("anexo", ["BF", "BP"])
@@ -266,7 +284,7 @@ def test_corpo_sem_escolhas_reaplica_as_gravadas(api):
     """Scenario: escolha gravada é reaplicada"""
     gravado = RegistroFake(ENTES["BP"], EXERCICIO, "BP", resultado={"recortes": {
         "ug:3": {"resultado": {"procedencia": {"escolha_anterior": {"origem": MSCE}}}}}})
-    cliente, fila = api(RepoFake([gravado]), "BP")
+    cliente, fila = api(RepoFake([gravado, _n1_com("ug:3")]), "BP")
 
     resposta = _reprocessar(cliente, "BP", {})
 
@@ -374,10 +392,17 @@ PREFEITURA, CAMARA = "ug:10", "ug:20"
 MANUAL_BP = {"origem": MANUAL, "valores": {"P:L3": "1.00"}}
 
 
+def _n1_com(*chaves: str, ano: int = EXERCICIO - 1) -> RegistroFake:
+    """N−1 `ok` com os recortes informados: sem ele, a unidade sem Manual é `409`."""
+    return RegistroFake(ENTES["BP"], ano, "BP",
+                        resultado={"recortes": {c: {"resultado": {}} for c in chaves}})
+
+
 def _cache_com_unidades(ano: int = EXERCICIO) -> RepoFake:
     return RepoFake([RegistroFake(ENTES["BP"], ano, "BP", resultado={"recortes": {
         PREFEITURA: {"poderOrgao": "10131", "rotulo": "Prefeitura", "resultado": {}},
-        CAMARA: {"poderOrgao": "20231", "rotulo": "Câmara", "resultado": {}}}})])
+        CAMARA: {"poderOrgao": "20231", "rotulo": "Câmara", "resultado": {}}}}),
+        _n1_com(PREFEITURA, CAMARA, ano=ano - 1)])
 
 
 def _sem_efeito(repo: RepoFake, fila: FilaFake) -> None:

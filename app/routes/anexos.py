@@ -321,18 +321,38 @@ def _exigir_poder_nas_unidades(request: Request, repo, ente: str, exercicio: int
 
 
 def _exigir_n1(repo, ente: str, exercicio: int, anexo: str, parametros: dict) -> None:
-    """`processado` pedido agora, por unidade, sem N−1 `ok` com o recorte: `409`."""
-    pedidos = [(chave, escolha["origem"])
-               for chave, escolha in (parametros.get("anterior_por_recorte") or {}).items()]
-    if not any(origem == anterior.OrigemAnterior.PROCESSADO for _, origem in pedidos):
+    """Unidade que o job apuraria em `processado` sem N−1 `ok` com o recorte: `409`, sem job.
+
+    Vale para toda unidade conhecida, não só para as do pedido: o padrão é Processado, e quem
+    ficou de fora do pedido derrubava o job inteiro depois do `202` (`ProcessadoSemAnterior` no
+    worker). As unidades vêm do último resultado `ok` de N, que é o que o frontend tem em tela.
+
+    ponytail: unidade que exista na MSC e ainda não esteja no cache de N escapa daqui e só falha
+    no worker. Ler a MSC na rota para fechar o caso custaria o job inteiro antes de enfileirar.
+    """
+    escolhas = cache_service.parametros_efetivos(
+        parametros, repo.obter(ente, exercicio, anexo), anexo,
+    ).get("anterior_por_recorte") or {}
+    chaves = set(escolhas) | _unidades_gravadas(repo, ente, exercicio, anexo)
+    if not chaves:
         return
-    n1 = anterior.ler_n1(repo, ente, exercicio, anexo)
-    try:
-        for chave, origem in pedidos:
-            if origem == anterior.OrigemAnterior.PROCESSADO:
-                anterior.exigir(n1, chave)
-    except anterior.ProcessadoSemAnterior as erro:
-        raise HTTPException(status.HTTP_409_CONFLICT, detail=str(erro)) from erro
+    faltam = anterior.faltam_processado(
+        anterior.ler_n1(repo, ente, exercicio, anexo), chaves, escolhas,
+    )
+    if faltam:
+        raise HTTPException(status.HTTP_409_CONFLICT,
+                            detail=anterior.mensagem_sem_processado(exercicio - 1, faltam))
+
+
+def _unidades_gravadas(repo, ente: str, exercicio: int, anexo: str) -> set[str]:
+    """Os recortes `ug:`/`po:` do último resultado `ok` de N — grupos e consolidado não têm
+    origem própria (`pipeline-consolidado-anterior-soma-unidades`)."""
+    registro = repo.obter(ente, exercicio, anexo)
+    if registro is None or registro.status != "ok":
+        return set()
+    gravados = (registro.resultado or {}).get("recortes") or {}
+    return {c for c in gravados
+            if c.startswith(("ug:", "po:")) and c not in recortes.GRUPOS}
 
 
 async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo,

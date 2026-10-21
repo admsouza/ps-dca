@@ -7,6 +7,7 @@ casa por (quadro, código). O grupo de poder não tem origem: soma as unidades.
 from __future__ import annotations
 
 import re
+from collections.abc import Collection
 from decimal import Decimal
 from enum import StrEnum
 from typing import Any, NamedTuple
@@ -65,19 +66,31 @@ def recorte_de(n1: N1, chave: str) -> dict | None:
     return gravado["resultado"] if gravado else None
 
 
-def _mensagem_sem_processado(exercicio: int) -> str:
-    return f"Processe {exercicio} ou use Manual."
+def mensagem_sem_processado(exercicio: int, chaves: Collection[str] = ()) -> str:
+    """Sem a unidade na mensagem o usuário não sabe para onde mandar o Manual."""
+    unidades = ", ".join(sorted(chaves))
+    return f"{unidades}: Processe {exercicio} ou use Manual." if unidades else (
+        f"Processe {exercicio} ou use Manual.")
 
 
 def exigir(n1: N1, chave: str) -> dict:
     """O recorte de N−1 para uma escolha pedida agora: sem ele, o erro do pedido."""
     dados = recorte_de(n1, chave)
     if dados is None:
-        raise ProcessadoSemAnterior(_mensagem_sem_processado(n1.exercicio))
+        raise ProcessadoSemAnterior(mensagem_sem_processado(n1.exercicio, [chave]))
     return dados
 
 
-def resolver(chave: str, escolha: dict | None, agora: bool,
+def faltam_processado(n1: N1, chaves: Collection[str], escolhas: dict[str, dict]) -> list[str]:
+    """As unidades que cairiam em Processado sem N−1 ter o recorte — as que exigem Manual."""
+    return sorted(
+        chave for chave in chaves
+        if (escolhas.get(chave) or {}).get("origem") != OrigemAnterior.MANUAL
+        and recorte_de(n1, chave) is None
+    )
+
+
+def resolver(chave: str, escolha: dict | None,
              n1: N1, exigir_processado: bool = True) -> tuple[OrigemAnterior, str | None]:
     """A origem resolvida da unidade e o aviso que o diagnóstico registra, se houver.
 
@@ -92,7 +105,7 @@ def resolver(chave: str, escolha: dict | None, agora: bool,
         if recorte_de(n1, chave) is not None:
             return OrigemAnterior.PROCESSADO, None
         if exigir_processado:
-            raise ProcessadoSemAnterior(_mensagem_sem_processado(n1.exercicio))
+            raise ProcessadoSemAnterior(mensagem_sem_processado(n1.exercicio, [chave]))
         motivo = n1.motivo or ("exercício anterior sem resultado processado" if origem else None)
         return OrigemAnterior.MSCE, f"{chave}: {motivo}" if motivo else None
     return origem, None

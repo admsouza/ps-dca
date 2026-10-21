@@ -164,8 +164,8 @@ def parametros_efetivos(pedido: dict | None, registro, anexo: str = "") -> dict:
 def _por_unidade(pedido: dict, registro) -> dict:
     """`anterior_por_recorte`: o gravado nos recortes, com o pedido por cima (`padrao` limpa).
 
-    `anterior_agora` são as unidades que o pedido escolheu — só elas viram erro quando o
-    `processado` não encontra N−1; o gravado cai em `msce`.
+    `anterior_agora` são as unidades que o pedido escolheu — serve ao aviso de escolha ignorada
+    quando a unidade não existe no job. Sem N−1 processado, qualquer unidade sem Manual é erro.
     """
     escolhas = escolhas_gravadas(registro)
     pedidas = pedido.get("anterior_por_recorte") or {}
