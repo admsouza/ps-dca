@@ -76,7 +76,8 @@ class Fila(Protocol):
 
 def identidade_do_pedido(*, anexo: str, competencia: int = 12,
                          valores_sem_mapeamento=None, fonte: str = "",
-                         anterior_por_recorte: dict | None = None, **_ignorados) -> str:
+                         anterior_por_recorte: dict | None = None,
+                         valores_atuais_por_recorte: dict | None = None, **_ignorados) -> str:
     """O que, além de ente/exercício/anexo, distingue dois resultados do mesmo demonstrativo.
 
     `versao_api` e `versao_regras` invalidam o cache quando **código** ou **regra** mudam. Há
@@ -98,6 +99,8 @@ def identidade_do_pedido(*, anexo: str, competencia: int = 12,
         partes.append(f"f={fonte}")      # SICONFI e PublicSoft dão números diferentes
     if anterior_por_recorte:
         partes.append(_sufixo_das_escolhas(anterior_por_recorte))
+    if valores_atuais_por_recorte:
+        partes.append(_sufixo_dos_valores_atuais(valores_atuais_por_recorte))
     return ":".join(partes)
 
 
@@ -110,6 +113,16 @@ def _sufixo_das_escolhas(escolhas: dict[str, dict]) -> str:
             (escolha.get("valores") or {}).items()))
         for unidade, escolha in sorted(escolhas.items()))
     return "ar-" + hashlib.sha256(pares.encode("utf-8")).hexdigest()[:16]
+
+
+def _sufixo_dos_valores_atuais(valores: dict[str, dict]) -> str:
+    import hashlib
+
+    pares = ";".join(
+        f"{unidade}=" + ",".join(f"{codigo}={valor}" for codigo, valor in sorted(mapa.items()))
+        for unidade, mapa in sorted(valores.items())
+    )
+    return "ca-" + hashlib.sha256(pares.encode("utf-8")).hexdigest()[:16]
 
 
 def parametros_efetivos(pedido: dict | None, registro, anexo: str = "") -> dict:
@@ -136,6 +149,15 @@ def parametros_efetivos(pedido: dict | None, registro, anexo: str = "") -> dict:
     if pedido.get("fonte"):
         saida["fonte"] = pedido["fonte"]
     saida.update(_por_unidade(pedido, registro))
+    atuais = _valores_atuais_gravados(registro)
+    if "valores_atuais_por_recorte" in pedido:
+        for unidade, valores in pedido["valores_atuais_por_recorte"].items():
+            if valores:
+                atuais[unidade] = dict(valores)
+            else:
+                atuais.pop(unidade, None)
+    if atuais:
+        saida["valores_atuais_por_recorte"] = atuais
     return saida
 
 
@@ -193,6 +215,16 @@ def _g8_salvo(registro) -> dict[str, str]:
     return {str(c): str(v) for c, v in valores.items()} if isinstance(valores, dict) else {}
 
 
+def _valores_atuais_gravados(registro) -> dict[str, dict[str, str]]:
+    procedencia = getattr(registro, "procedencia", None) or {}
+    valores = (procedencia.get("valores_atuais_por_recorte")
+               if isinstance(procedencia, dict) else None)
+    if not isinstance(valores, dict):
+        return {}
+    return {str(unidade): {str(c): str(v) for c, v in mapa.items()}
+            for unidade, mapa in valores.items() if isinstance(mapa, dict) and mapa}
+
+
 def versao_do_pedido(versao_regras: str, anexo: str, parametros: dict | None) -> str:
     """Versão de cache com a identidade do pedido. Rota e worker têm de gravar a mesma:
     sem o sufixo, a leitura seguinte não reconhece o cache e enfileira de novo."""
@@ -211,9 +243,12 @@ def versao_apos_apurar(versao_regras: str, dados: dict) -> str:
     regras, separador, pedido = versao_regras.partition("|")
     if not separador:
         return versao_regras
-    partes = [p for p in pedido.split(":") if not p.startswith("ar-")]
+    partes = [p for p in pedido.split(":")
+              if not p.startswith("ar-") and not p.startswith("ca-")]
     if escolhas := escolhas_do_resultado(dados):
         partes.append(_sufixo_das_escolhas(escolhas))
+    if atuais := dados.get("procedencia", {}).get("valores_atuais_por_recorte"):
+        partes.append(_sufixo_dos_valores_atuais(atuais))
     return f"{regras}|{':'.join(partes)}"
 
 

@@ -115,7 +115,9 @@ def para_dados(resultado) -> dict:
             # Campos que só alguns demonstrativos produzem. Publicados quando existem, em vez de
             # listados aqui um a um: o serializador não deve aprender o vocabulário de cada norma.
             **_especificos(procedencia, ("origens_por_linha", "origem_exercicio_anterior",
-                                         "valores_anteriores", "estorno_receita_extra",
+                                         "valores_anteriores", "valores_atuais",
+                                         "valores_atuais_por_recorte", "valores_sem_mapeamento",
+                                         "estorno_receita_extra",
                                          "estorno_despesa_extra", "anterior_processado")),
         },
         "diagnostico": {

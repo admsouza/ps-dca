@@ -59,5 +59,12 @@ def validar_valores_anteriores(exercicio: int, valores: dict[str, str]) -> None:
             raise ValueError(f"linha {codigo} de {quadro} é totalizadora: informe as folhas")
 
 
+def validar_valores_atuais(exercicio: int, valores: dict[str, str]) -> None:
+    """O atual aceita somente folhas de Contas de Compensação (`C:`)."""
+    if any(not chave.startswith("C:") for chave in valores):
+        raise ValueError("valores atuais aceitam somente Contas de Compensação: use somente C:")
+    validar_valores_anteriores(exercicio, valores)
+
+
 def mapa_bp(exercicio: int) -> MapaBO:
     return carregar_em_cache(exercicio, demonstrativo="bp")

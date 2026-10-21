@@ -132,6 +132,7 @@ class CorpoAnterior(BaseModel):
     valores_anteriores: dict[str, str] | None = None
     valores_sem_mapeamento: dict[str, str] | None = None
     anterior_por_recorte: dict[str, AnteriorDaUnidade] | None = None
+    valores_atuais_por_recorte: dict[str, dict[str, str]] | None = None
 
 
 VISOES_BP = ("isolado", "consolidado")
@@ -272,6 +273,26 @@ def _parametros_por_unidade(corpo: CorpoAnterior, anexo: str, exercicio: int) ->
     except ValueError as erro:
         raise _erro_422(str(erro)) from erro
     return {"anterior_por_recorte": escolhas}
+
+
+def _parametros_atuais_por_unidade(corpo: CorpoAnterior, anexo: str, exercicio: int) -> dict:
+    """Compensação atual validada integralmente antes de qualquer autorização ou job."""
+    if anexo != "BP":
+        raise _erro_422("valores_atuais_por_recorte só é aceito no BP")
+    from app.services.bp.informados import validar_valores_atuais
+
+    saida = {}
+    for chave, valores in (corpo.valores_atuais_por_recorte or {}).items():
+        if (not recortes.valida(chave) or not chave.startswith(("ug:", "po:"))
+                or not chave.partition(":")[2]):
+            raise _erro_422(f"valores_atuais_por_recorte aceita só ug:<id> e po:<código>: {chave}")
+        normalizados = {str(codigo): str(valor) for codigo, valor in valores.items()}
+        try:
+            validar_valores_atuais(exercicio, normalizados)
+        except ValueError as erro:
+            raise _erro_422(str(erro)) from erro
+        saida[chave] = normalizados
+    return {"valores_atuais_por_recorte": saida}
 
 
 def _exigir_poder_nas_unidades(request: Request, repo, ente: str, exercicio: int, anexo: str,
@@ -631,6 +652,10 @@ async def reprocessar_anexo(
             parametros = {**parametros, **_parametros_por_unidade(corpo, anexo, exercicio)}
             _exigir_poder_nas_unidades(request, repo, ente, exercicio, anexo,
                                        list(corpo.anterior_por_recorte))
+        if "valores_atuais_por_recorte" in corpo.model_fields_set:
+            parametros = {**parametros, **_parametros_atuais_por_unidade(corpo, anexo, exercicio)}
+            _exigir_poder_nas_unidades(request, repo, ente, exercicio, anexo,
+                                       list(corpo.valores_atuais_por_recorte or {}))
     _exigir_n1(repo, ente, exercicio, anexo, parametros)
     return await _decidir(request, ente, exercicio, anexo, repo,
                           forcar=True, solicitante=solicitante, parametros=parametros,

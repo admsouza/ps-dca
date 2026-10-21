@@ -51,6 +51,7 @@ TODAS_BLOQUEADAS = "todas as parcelas são não apuráveis"
 FP_PUBLICADO = {"L2": "AtivoFinanceiro", "L3": "AtivoPermanente",
                 "L5": "PassivoFinanceiro", "L6": "PassivoPermanente"}
 QUADRO_FP = "ATIVOS_PASSIVOS_FINANCEIROS"
+QUADRO_COMPENSACAO = "CONTAS_COMPENSACAO"
 NAO_PUBLICADO = "total F/P não publicado no I-AB"
 QUADRO_SUPERAVIT = "SUPERAVIT_DEFICIT"
 CONTAS_SUPERAVIT = ("821110100", "821110200")
@@ -88,6 +89,8 @@ class Procedencia:
     origem_exercicio_anterior: str = Anterior.PUBLICADO.value
     # Mapa informado, como chegou: o pedido seguinte reaplica (`pipeline-anterior-por-recorte`).
     valores_anteriores: dict[str, str] | None = None
+    valores_atuais: dict[str, str] | None = None
+    valores_atuais_por_recorte: dict[str, dict[str, str]] | None = None
     escolha_anterior: dict | None = None        # escolha explícita da unidade; `null` = padrão
     anterior_processado: dict | None = None     # de que resultado de N−1 veio a coluna
 
@@ -142,6 +145,8 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
            anterior: Anterior = Anterior.PUBLICADO, dca=None,
            anterior_pronto: dict | None = None,
            valores_anteriores: dict[str, str] | None = None,
+           valores_atuais: dict[str, str] | None = None,
+           atual_pronto: dict | None = None,
            zero_sem_anterior: bool = False) -> Resultado:
     """Apura os quatro quadros do BP, nas duas colunas.
 
@@ -184,6 +189,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
 
     def apurar_visao(m: MapaBO) -> tuple[_Coluna, _Coluna, dict]:
         atual = _apurar_exercicio(m, registros_atual, direcao, COLUNA_ATUAL)
+        _aplicar_compensacao_atual(m, atual, valores_atuais, atual_pronto)
         if anterior is Anterior.MSCE:
             anterior_ = _apurar_exercicio(m, registros_anterior, direcao, COLUNA_ANTERIOR,
                                           zero_se_vazio=zero_sem_anterior)
@@ -235,6 +241,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
             classes=origem.classes,
             origem_exercicio_anterior=anterior.value,
             valores_anteriores=informado,
+            valores_atuais=dict(valores_atuais) if valores_atuais else None,
         ),
         diagnostico=Diagnostico(
             nao_apuradas=atual.nao_apuradas + coluna_anterior.nao_apuradas,
@@ -356,6 +363,32 @@ def _totalizar(mapa: MapaBO, folhas: dict[tuple[str, str], Decimal],
             por_id[rule_id] = sum(parcelas, Decimal("0.00"))
     return {(linha.quadro, linha.codigo): {COLUNA_ANTERIOR: por_id[linha.id]}
             for linha in mapa.linhas if linha.id in por_id}
+
+
+def _aplicar_compensacao_atual(mapa: MapaBO, coluna: _Coluna,
+                               valores: dict[str, str] | None,
+                               pronto: dict | None) -> None:
+    """Troca somente a Compensação atual pelo manual individual ou pela soma dos individuais."""
+    if valores is None and pronto is None:
+        return
+    if pronto is None:
+        folhas, _ = _partir_informados(valores or {})
+        celulas = _totalizar(mapa, folhas)
+        motivo = NAO_INFORMADO
+    else:
+        celulas = pronto["matriz"]
+        motivo = "não informado em todos os recortes individuais"
+
+    ids = {linha.id for linha in mapa.linhas if linha.quadro == QUADRO_COMPENSACAO}
+    coluna.nao_apuradas = [n for n in coluna.nao_apuradas
+                           if not (n.rule_id in ids and n.coluna == COLUNA_ATUAL)]
+    for linha in mapa.linhas:
+        if linha.id not in ids:
+            continue
+        celula = celulas.get((linha.quadro, linha.codigo))
+        coluna.valores[linha.id] = None if celula is None else celula.get(COLUNA_ANTERIOR)
+        if coluna.valores[linha.id] is None:
+            coluna.nao_apuradas.append(NaoApurada(linha.id, COLUNA_ATUAL, "-", motivo))
 
 
 def _coluna_pronta(mapa: MapaBO, celulas: dict, ausente: str) -> _Coluna:

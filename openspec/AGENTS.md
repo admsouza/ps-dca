@@ -48,6 +48,13 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 ## Change ativa
 
+**Change ativa, fase VERIFY (proposal/spec aprovadas pelo PO em 2026-10-21):**
+`bp-compensacao-atual-manual-por-recorte` — a coluna atual das Contas de Compensação
+do BP deixa de ser apurada pela matriz e passa a ser informada nas folhas de cada `ug:`/`po:`.
+Grupos de poder e consolidado são somente leitura e somam os individuais; vazio permanece `None` e
+`0,00` informado permanece zero. Front coordenado:
+`front-declaracoes/dca-bp-compensacao-atual-manual-por-recorte`.
+
 **Change ativa, fase VERIFY (aprovada 2026-10-21; código e suítes concluídos):**
 `dca-anterior-processado-manual` — Processado passa a ser o padrão da coluna anterior de BF/BP e
 Manual a única alternativa pública. Escolhas novas de MSCE são recusadas e preferências antigas

@@ -223,7 +223,8 @@ class _Filtrada(_Repasse):
 
 
 def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=None, anexo: str = "",
-                 escolhas: dict | None = None, agora: Collection[str] = (), **extras) -> Any:
+                 escolhas: dict | None = None, agora: Collection[str] = (),
+                 valores_atuais_por_recorte: dict | None = None, **extras) -> Any:
     """O consolidado de hoje e, em `.recortes`, cada grupo de poder e cada unidade.
 
     Cada recorte é o mesmo `apurar` sobre a fonte filtrada: dentro do `escopo()` do job a leitura já
@@ -245,6 +246,7 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
     from app.services.pipeline.resultado import para_dados
 
     escolhas = escolhas or {}
+    valores_atuais_por_recorte = valores_atuais_por_recorte or {}
     por_unidade = "anterior" in _aceitos_por(apurar, {"anterior": None})     # BF e BP
     n1 = ant.ler_n1(repo, ente, exercicio, anexo) if por_unidade else None
     # Origem própria do consolidado (`anterior`/`anterior_pronto`/`valores_anteriores`/`dca`) não é
@@ -280,6 +282,9 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
         origem, aviso = ant.resolver(chave, escolha, chave in agora, n1,
                                      exigir_processado=repo is not None)
         kwargs = dict(extras_recorte)
+        if chave in valores_atuais_por_recorte:
+            kwargs.update(_aceitos_por(apurar, {"valores_atuais":
+                                                valores_atuais_por_recorte[chave]}))
         retrato = None
         if origem is ant.OrigemAnterior.PROCESSADO:
             retrato = ant.recorte_de(n1, chave)
@@ -309,9 +314,12 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
             return apurar_recorte(chave, **extras_recorte)
         soma = ant.somar([ant.pronto(para_dados(feitos[u]), "_anterior")
                           for u in sorted(membros_de[chave])])
+        atual = ant.somar([ant.pronto(para_dados(feitos[u]))
+                           for u in sorted(membros_de[chave])])
         r = apurar_recorte(chave, **{**extras_recorte,
                                      "anterior": ant.OrigemAnterior.PROCESSADO.value,
-                                     "anterior_pronto": soma})
+                                     "anterior_pronto": soma,
+                                     **_aceitos_por(apurar, {"atual_pronto": atual})})
         r.procedencia = replace(r.procedencia, origem_exercicio_anterior=ant.SOMA_DAS_UNIDADES)
         r.diagnostico.sem_dados_exercicio_anterior = any(
             feitos[u].diagnostico.sem_dados_exercicio_anterior for u in membros_de[chave])
@@ -321,11 +329,18 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
         # O consolidado é mais um grupo, de todas as unidades do job: nunca lê N−1 nem manual
         # próprios (`pipeline-consolidado-anterior-soma-unidades`).
         soma = ant.somar([ant.pronto(para_dados(feitos[u]), "_anterior") for u in sorted(feitos)])
+        atual = ant.somar([ant.pronto(para_dados(feitos[u])) for u in sorted(feitos)])
         resultado = apurar(ente, exercicio, fonte=observada,
                           **{**extras_base, "anterior": ant.OrigemAnterior.PROCESSADO.value,
-                             "anterior_pronto": soma})
-        resultado.procedencia = replace(resultado.procedencia,
-                                        origem_exercicio_anterior=ant.SOMA_DAS_UNIDADES)
+                             "anterior_pronto": soma,
+                             **_aceitos_por(apurar, {"atual_pronto": atual})})
+        mudancas = {"origem_exercicio_anterior": ant.SOMA_DAS_UNIDADES}
+        if hasattr(resultado.procedencia, "valores_atuais_por_recorte"):
+            mudancas["valores_atuais_por_recorte"] = {
+                chave: dict(valores_atuais_por_recorte[chave])
+                for chave in sorted(feitos) if chave in valores_atuais_por_recorte
+            }
+        resultado.procedencia = replace(resultado.procedencia, **mudancas)
         resultado.diagnostico.sem_dados_exercicio_anterior = any(
             feitos[u].diagnostico.sem_dados_exercicio_anterior for u in feitos)
 
@@ -447,7 +462,9 @@ def apurador(anexo: str = "BO", *, fonte_nome: str | None = None, token: str | N
     extras = _aceitos_por(apurar, {k: v for k, v in (parametros or {}).items() if k != "fonte"})
     por_unidade = {"repo": repo, "anexo": descricao.codigo,
                    "escolhas": (parametros or {}).get("anterior_por_recorte"),
-                   "agora": (parametros or {}).get("anterior_agora") or ()}
+                   "agora": (parametros or {}).get("anterior_agora") or (),
+                   "valores_atuais_por_recorte":
+                       (parametros or {}).get("valores_atuais_por_recorte")}
 
     def _apurar(ente: int, exercicio: int):
         mapa = mapa_vigente(exercicio, descricao.codigo, repo_vigencias)
