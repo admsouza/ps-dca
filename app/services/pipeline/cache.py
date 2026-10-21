@@ -163,7 +163,7 @@ def escolhas_gravadas(registro) -> dict[str, dict]:
     procedencia = getattr(registro, "procedencia", None)
     topo = procedencia.get("anterior_por_recorte") if isinstance(procedencia, dict) else None
     if topo:
-        return {unidade: dict(escolha) for unidade, escolha in topo.items()}
+        return _sem_msce_legada(topo)
     return escolhas_do_resultado(getattr(registro, "resultado", None))
 
 
@@ -176,7 +176,13 @@ def escolhas_do_resultado(resultado) -> dict[str, dict]:
         escolha = procedencia.get("escolha_anterior")
         if escolha:
             saida[unidade] = dict(escolha)
-    return saida
+    return _sem_msce_legada(saida)
+
+
+def _sem_msce_legada(escolhas: dict[str, dict]) -> dict[str, dict]:
+    """MSCE gravada antes desta change equivale ao novo padrão Processado."""
+    return {unidade: dict(escolha) for unidade, escolha in escolhas.items()
+            if escolha.get("origem") != "msce_exercicio_anterior"}
 
 
 def _g8_salvo(registro) -> dict[str, str]:

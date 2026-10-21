@@ -78,8 +78,8 @@ def test_reaplica_as_escolhas_gravadas_nas_procedencias_dos_recortes():
 
     efetivo = parametros_efetivos({"fonte": "publicsoft"}, registro, "BP")
 
-    assert efetivo["anterior_por_recorte"] == {"ug:3": _escolha(MANUAL, **{"P:L3": "1.00"}),
-                                               "ug:5": _escolha(MSCE)}
+    assert efetivo["anterior_por_recorte"] == {
+        "ug:3": _escolha(MANUAL, **{"P:L3": "1.00"})}
     assert "anterior_agora" not in efetivo
 
 
@@ -92,8 +92,7 @@ def test_pedido_vale_sobre_o_gravado_e_so_o_pedido_e_agora():
     efetivo = parametros_efetivos(pedido, registro, "BP")
 
     assert efetivo["anterior_por_recorte"] == {
-        "ug:1": _escolha(MANUAL, **{"P:L3": "1.00"}), "ug:3": _escolha(PROCESSADO),
-        "ug:5": _escolha(MSCE)}
+        "ug:1": _escolha(MANUAL, **{"P:L3": "1.00"}), "ug:3": _escolha(PROCESSADO)}
     assert efetivo["anterior_agora"] == ["ug:1", "ug:3"]
 
 
@@ -117,7 +116,16 @@ def test_o_bf_reaplica_as_escolhas_dos_recortes_ignorando_o_mapa_legado_do_conso
     efetivo = parametros_efetivos({}, registro, "BF")
 
     assert "valores_anteriores" not in efetivo
-    assert efetivo["anterior_por_recorte"] == {"ug:3": _escolha(MSCE)}
+    assert "anterior_por_recorte" not in efetivo
+
+
+def test_escolha_antiga_de_msce_volta_ao_padrao_processado():
+    """Scenario: escolha antiga de MSCE não mantém fallback oculto."""
+    registro = _gravado({"ug:3": _escolha(MSCE)})
+
+    efetivo = parametros_efetivos({}, registro, "BP")
+
+    assert "anterior_por_recorte" not in efetivo
 
 
 # ─── ler depois de reprocessar ───────────────────────────────────────────────

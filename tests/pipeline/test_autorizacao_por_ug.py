@@ -19,7 +19,7 @@ from tests.pipeline import test_rota_recorte as rota
 from tests.pipeline.conftest import ENTE, EXERCICIO, JobsFake, LockFake, RegistroFake, RepoFake
 from tests.pipeline.test_rota_anterior_por_recorte import (  # noqa: F401  (fixture `api`)
     CAMARA,
-    MSCE,
+    MANUAL_BP,
     PREFEITURA,
     _cache_com_unidades,
     _reprocessar,
@@ -276,12 +276,12 @@ def test_anterior_por_recorte_de_ug_nao_autorizada(api):  # noqa: F811
         outra: {"poderOrgao": "10131", "rotulo": "F", "resultado": {}}}}))
     _com_ugs(cliente, ["executivo"], [PREFEITURA[3:]])
 
-    ok = _reprocessar(cliente, "BP", {"anterior_por_recorte": {PREFEITURA: {"origem": MSCE}}})
+    ok = _reprocessar(cliente, "BP", {"anterior_por_recorte": {PREFEITURA: MANUAL_BP}})
     assert ok.status_code == 202
     antes = (len(fila.chamadas), len(repo.gravacoes))
 
     negado = _reprocessar(cliente, "BP", {"anterior_por_recorte": {
-        PREFEITURA: {"origem": MSCE}, outra: {"origem": MSCE}}})
+        PREFEITURA: MANUAL_BP, outra: MANUAL_BP}})
     assert negado.status_code == 403
     assert (len(fila.chamadas), len(repo.gravacoes)) == antes
 
@@ -290,7 +290,7 @@ def test_consolidado_com_ugs_restritas_nao_escolhe_qualquer_unidade(api):  # noq
     cliente, fila = api(_cache_com_unidades(), "BP", ("consolidado",))
     _com_ugs(cliente, ["consolidado"], [PREFEITURA[3:]])
 
-    r = _reprocessar(cliente, "BP", {"anterior_por_recorte": {CAMARA: {"origem": MSCE}}})
+    r = _reprocessar(cliente, "BP", {"anterior_por_recorte": {CAMARA: MANUAL_BP}})
     assert r.status_code == 403 and fila.chamadas == []
 
 

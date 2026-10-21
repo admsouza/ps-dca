@@ -107,6 +107,19 @@ def test_corpo_invalido_responde_422_sem_job(api, anexo, escolhas):
     assert fila.chamadas == []
 
 
+@pytest.mark.parametrize("anexo", ["BF", "BP"])
+def test_msce_deixa_de_ser_escolha_publica(api, anexo):
+    """Scenario: MSCE deixa de ser escolha pública."""
+    cliente, fila = api(RepoFake(), anexo)
+
+    resposta = _reprocessar(cliente, anexo, {"anterior_por_recorte": {
+        "ug:3": {"origem": MSCE}}})
+
+    assert resposta.status_code == 422
+    assert "Processado ou Manual" in resposta.json()["detail"]
+    assert fila.chamadas == []
+
+
 def test_manual_do_bp_recusa_totalizadora_prefixo_e_codigo(api):
     """Scenario: totalizadora no manual"""
     for valores in ({"P:L2": "1.00"}, {"X:L3": "1.00"}, {"P:L999": "1.00"}, {"S:15": "1.00"},
@@ -172,7 +185,7 @@ def test_processado_explicito_sem_n1_responde_409_sem_job(api, anexo):
         "ug:3": {"origem": PROCESSADO}}})
 
     assert resposta.status_code == 409
-    assert resposta.json()["detail"].startswith("processe 2024 antes")
+    assert resposta.json()["detail"] == "Processe 2024 ou use Manual."
     assert fila.chamadas == []
 
 
@@ -202,8 +215,8 @@ def test_consolidado_processado_no_corpo_e_recusado(api, anexo):
 def test_escolhas_validas_chegam_ao_job(api, anexo):
     """Scenario: origens diferentes no mesmo job"""
     cliente, fila = api(_n1_de(anexo), anexo)
-    escolhas = {"ug:1": {"origem": PROCESSADO}, "ug:3": {"origem": MSCE},
-                "ug:4": {"origem": MANUAL, "valores": VALIDOS[anexo]},
+    escolhas = {"ug:1": {"origem": PROCESSADO},
+                "ug:3": {"origem": MANUAL, "valores": VALIDOS[anexo]},
                 "ug:99": {"origem": "padrao"}}
 
     resposta = _reprocessar(cliente, anexo, {"anterior_por_recorte": escolhas})
@@ -211,16 +224,17 @@ def test_escolhas_validas_chegam_ao_job(api, anexo):
     assert resposta.status_code == 202
     enviado = fila.chamadas[0]
     assert enviado["anterior_por_recorte"] == {
-        "ug:1": {"origem": PROCESSADO}, "ug:3": {"origem": MSCE},
-        "ug:4": {"origem": MANUAL, "valores": VALIDOS[anexo]}}
-    assert enviado["anterior_agora"] == ["ug:1", "ug:3", "ug:4", "ug:99"]
+        "ug:1": {"origem": PROCESSADO},
+        "ug:3": {"origem": MANUAL, "valores": VALIDOS[anexo]}}
+    assert enviado["anterior_agora"] == ["ug:1", "ug:3", "ug:99"]
 
 
 def test_unidade_inexistente_nao_barra_a_rota(api):
     """Scenario: unidade inexistente — o aviso é do job"""
     cliente, fila = api(RepoFake(), "BP")
 
-    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {"ug:99": {"origem": MSCE}}})
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {
+        "ug:99": {"origem": MANUAL, "valores": VALIDOS["BP"]}}})
 
     assert resposta.status_code == 202
 
@@ -257,7 +271,7 @@ def test_corpo_sem_escolhas_reaplica_as_gravadas(api):
     resposta = _reprocessar(cliente, "BP", {})
 
     assert resposta.status_code == 202
-    assert fila.chamadas[0]["anterior_por_recorte"] == {"ug:3": {"origem": MSCE}}
+    assert "anterior_por_recorte" not in fila.chamadas[0]
     assert "anterior_agora" not in fila.chamadas[0]
 
 
@@ -317,7 +331,7 @@ def test_n1_some_entre_a_rota_e_o_job_termina_em_erro(monkeypatch):
 
     gravado = repo.obter(ENTES["BP"], EXERCICIO, "BP")
     assert gravado.status == "erro" and gravado.resultado is None
-    assert "processe 2024 antes" in gravado.erro_detalhe
+    assert "Processe 2024 ou use Manual" in gravado.erro_detalhe
 
 
 @pytest.mark.parametrize("anexo", ["BF", "BP"])
@@ -375,10 +389,10 @@ def test_unidade_do_proprio_poder(api):
     repo = _cache_com_unidades()
     cliente, fila = api(repo, "BP", ("executivo",))
 
-    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {PREFEITURA: {"origem": MSCE}}})
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {PREFEITURA: MANUAL_BP}})
 
     assert resposta.status_code == 202
-    assert fila.chamadas[0]["anterior_por_recorte"] == {PREFEITURA: {"origem": MSCE}}
+    assert fila.chamadas[0]["anterior_por_recorte"] == {PREFEITURA: MANUAL_BP}
 
 
 def test_unidade_de_outro_poder(api):
@@ -399,7 +413,7 @@ def test_pedido_misto_e_tudo_ou_nada(api):
     cliente, fila = api(repo, "BP", ("executivo",))
 
     resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {
-        PREFEITURA: {"origem": MSCE}, CAMARA: {"origem": MSCE}}})
+        PREFEITURA: MANUAL_BP, CAMARA: MANUAL_BP}})
 
     assert resposta.status_code == 403
     _sem_efeito(repo, fila)
@@ -410,7 +424,7 @@ def test_poder_orgao_pelo_codigo(api):
     repo = _cache_com_unidades()
     cliente, fila = api(repo, "BP", ("executivo",))
 
-    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {"po:20231": {"origem": MSCE}}})
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {"po:20231": MANUAL_BP}})
 
     assert resposta.status_code == 403
     _sem_efeito(repo, fila)
@@ -420,7 +434,7 @@ def test_po_do_proprio_poder_passa(api):
     """Requisito: `po:` resolve pelo próprio código"""
     cliente, fila = api(_cache_com_unidades(), "BP", ("executivo",))
 
-    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {"po:10131": {"origem": MSCE}}})
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {"po:10131": MANUAL_BP}})
 
     assert resposta.status_code == 202
 
@@ -430,7 +444,7 @@ def test_consolidado_escolhe_qualquer_unidade(api):
     cliente, fila = api(_cache_com_unidades(), "BP", ("consolidado",))
 
     resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {
-        CAMARA: MANUAL_BP, "ug:999": {"origem": MSCE}}})
+        CAMARA: MANUAL_BP, "ug:999": MANUAL_BP}})
 
     assert resposta.status_code == 202
     assert set(fila.chamadas[0]["anterior_por_recorte"]) == {CAMARA, "ug:999"}
@@ -441,7 +455,7 @@ def test_ug_desconhecida(api):
     repo = _cache_com_unidades()
     cliente, fila = api(repo, "BP", ("executivo",))
 
-    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {"ug:999": {"origem": MSCE}}})
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {"ug:999": MANUAL_BP}})
 
     assert resposta.status_code == 403
     _sem_efeito(repo, fila)
@@ -451,8 +465,8 @@ def test_unidade_resolvida_pelo_cache_de_n1(api):
     """Requisito: `ug:` sem poder no cache de N usa o de N−1"""
     cliente, fila = api(_cache_com_unidades(EXERCICIO - 1), "BP", ("executivo",))
 
-    ok = _reprocessar(cliente, "BP", {"anterior_por_recorte": {PREFEITURA: {"origem": MSCE}}})
-    negado = _reprocessar(cliente, "BP", {"anterior_por_recorte": {CAMARA: {"origem": MSCE}}})
+    ok = _reprocessar(cliente, "BP", {"anterior_por_recorte": {PREFEITURA: MANUAL_BP}})
+    negado = _reprocessar(cliente, "BP", {"anterior_por_recorte": {CAMARA: MANUAL_BP}})
 
     assert (ok.status_code, negado.status_code) == (202, 403)
 
@@ -464,7 +478,8 @@ def test_sem_poder_util_recusa_qualquer_escolha(api, anexo, poderes):
     repo = RepoFake()
     cliente, fila = api(repo, anexo, poderes)
 
-    resposta = _reprocessar(cliente, anexo, {"anterior_por_recorte": {"ug:3": {"origem": MSCE}}})
+    resposta = _reprocessar(cliente, anexo, {"anterior_por_recorte": {
+        "ug:3": {"origem": MANUAL, "valores": VALIDOS[anexo]}}})
 
     assert resposta.status_code == 403
     _sem_efeito(repo, fila)
@@ -488,7 +503,7 @@ def test_cache_nao_ok_nao_resolve_poder(api, status):
                                   resultado={"recortes": unidades})])
     cliente, fila = api(repo, "BP", ("executivo",))
 
-    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {PREFEITURA: {"origem": MSCE}}})
+    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {PREFEITURA: MANUAL_BP}})
 
     assert resposta.status_code == 403
     _sem_efeito(repo, fila)

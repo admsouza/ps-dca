@@ -277,7 +277,8 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
         if not por_unidade:
             return apurar_recorte(chave, **extras_recorte)
         escolha = escolhas.get(chave)
-        origem, aviso = ant.resolver(chave, escolha, chave in agora, n1)
+        origem, aviso = ant.resolver(chave, escolha, chave in agora, n1,
+                                     exigir_processado=repo is not None)
         kwargs = dict(extras_recorte)
         retrato = None
         if origem is ant.OrigemAnterior.PROCESSADO:

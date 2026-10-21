@@ -209,8 +209,8 @@ def test_bf_cache_anterior_a_change(repo, lock, jobs):
     assert _get(cliente, "BF", "&recorte=ug:1").status_code == 409
 
 
-AVISO = ("Recorte por poder/órgão: o SICONFI não informa a unidade gestora. "
-         "Para emitir por unidade gestora, processe com SIAFIC.")
+AVISO = ("O SICONFI agrupa os dados por Poder/Órgão. "
+         "Use o SIAFIC para emitir por unidade gestora.")
 
 
 @pytest.mark.parametrize("anexo", ["BO", "BF"])
@@ -367,5 +367,5 @@ def test_resumo_traz_a_escolha_gravada_da_unidade(repo, lock, jobs):
             "ug:2": {"origem": "msce_exercicio_anterior"}}}))
     por_chave = {u["chave"]: u for u in _entrada(_resumo(cliente), "BF")["recortes"]}
     assert por_chave["ug:1"]["anterior"] == {"origem": "manual", "manual": True}
-    assert por_chave["ug:2"]["anterior"] == {"origem": "msce_exercicio_anterior", "manual": False}
+    assert "anterior" not in por_chave["ug:2"]          # MSCE legada volta ao padrão
     assert "anterior" not in por_chave["ug:3"]           # sem escolha = automática

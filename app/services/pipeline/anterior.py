@@ -65,27 +65,34 @@ def recorte_de(n1: N1, chave: str) -> dict | None:
     return gravado["resultado"] if gravado else None
 
 
+def _mensagem_sem_processado(exercicio: int) -> str:
+    return f"Processe {exercicio} ou use Manual."
+
+
 def exigir(n1: N1, chave: str) -> dict:
     """O recorte de N−1 para uma escolha pedida agora: sem ele, o erro do pedido."""
     dados = recorte_de(n1, chave)
     if dados is None:
-        raise ProcessadoSemAnterior(f"processe {n1.exercicio} antes")
+        raise ProcessadoSemAnterior(_mensagem_sem_processado(n1.exercicio))
     return dados
 
 
 def resolver(chave: str, escolha: dict | None, agora: bool,
-             n1: N1) -> tuple[OrigemAnterior, str | None]:
+             n1: N1, exigir_processado: bool = True) -> tuple[OrigemAnterior, str | None]:
     """A origem resolvida da unidade e o aviso que o diagnóstico registra, se houver.
 
-    Escolha explícita vale; sem ela, o padrão é o processado quando N−1 o tem, senão a MSC.
-    `processado` pedido agora sem N−1 é erro; o gravado cai em MSC com o motivo.
+    Processado é o padrão e Manual a única alternativa pública. `exigir_processado=False` existe
+    só para a chamada direta do serviço (CLI/testes sem repositório), que não tem cache de N−1.
+    MSCE gravada por versão antiga é tratada como o novo padrão, nunca como fallback oculto.
     """
     origem = OrigemAnterior(escolha["origem"]) if escolha else None
+    if origem is OrigemAnterior.MSCE:
+        origem = OrigemAnterior.PROCESSADO
     if origem in (None, OrigemAnterior.PROCESSADO):
         if recorte_de(n1, chave) is not None:
             return OrigemAnterior.PROCESSADO, None
-        if origem is not None and agora:
-            raise ProcessadoSemAnterior(f"processe {n1.exercicio} antes")
+        if exigir_processado:
+            raise ProcessadoSemAnterior(_mensagem_sem_processado(n1.exercicio))
         motivo = n1.motivo or ("exercício anterior sem resultado processado" if origem else None)
         return OrigemAnterior.MSCE, f"{chave}: {motivo}" if motivo else None
     return origem, None
@@ -185,10 +192,10 @@ def validar_escolhas(anexo: str, exercicio: int, escolhas: dict[str, Any]) -> di
                 raise ValueError(f"{chave}: manual exige valores")
             _validar_manual(anexo, exercicio, escolha.valores)
             saida[chave] = {"origem": origem, "valores": dict(escolha.valores)}
-        elif origem in (OrigemAnterior.PROCESSADO, OrigemAnterior.MSCE):
+        elif origem == OrigemAnterior.PROCESSADO:
             saida[chave] = {"origem": origem}
         else:
-            raise ValueError(f"{chave}: origem desconhecida: {origem}")
+            raise ValueError(f"{chave}: escolha Processado ou Manual")
     return saida
 
 

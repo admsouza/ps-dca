@@ -182,8 +182,8 @@ def _recorte(
     return recorte
 
 
-AVISO_RECORTE_PO = ("Recorte por poder/órgão: o SICONFI não informa a unidade gestora. "
-                    "Para emitir por unidade gestora, processe com SIAFIC.")
+AVISO_RECORTE_PO = ("O SICONFI agrupa os dados por Poder/Órgão. "
+                    "Use o SIAFIC para emitir por unidade gestora.")
 
 
 def _aviso_recorte(resultado: dict, fonte: FontePedido | None) -> dict:

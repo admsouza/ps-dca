@@ -48,6 +48,12 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 ## Change ativa
 
+**Change ativa, fase VERIFY (aprovada 2026-10-21; código e suítes concluídos):**
+`dca-anterior-processado-manual` — Processado passa a ser o padrão da coluna anterior de BF/BP e
+Manual a única alternativa pública. Escolhas novas de MSCE são recusadas e preferências antigas
+voltam ao padrão. O arquivamento aguarda a consolidação da change-base
+`pipeline-anterior-por-recorte`, ainda ativa.
+
 Em **2026-10-01** as seis changes já implementadas foram conferidas contra o código e arquivadas.
 Specs em vigor: `dca/base-canonica-regras`, `dca/balanco-orcamentario`,
 `dca/balanco-financeiro` (64 cenários), `dca/balanco-patrimonial` (36), `dca/fonte-msc`, `pipeline/plataforma` (80) e
