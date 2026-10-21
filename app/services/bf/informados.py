@@ -9,7 +9,7 @@ from __future__ import annotations
 from decimal import Decimal, InvalidOperation
 
 from app.domain.bo.modelo import MapaBO
-from app.infra.regras.carregador import carregar
+from app.infra.regras.carregador import carregar_em_cache
 
 QUADRO_PRINCIPAL = "QUADRO_PRINCIPAL"
 QUADRO_ANEXO = "QUADRO_ANEXO"
@@ -66,7 +66,7 @@ def mapa_bf(exercicio: int) -> MapaBO:
     Separá-los em dois serviços duplicaria a leitura da MSC: as mesmas classes, o mesmo ente, o
     mesmo exercício, para produzir dois pedaços do mesmo demonstrativo.
     """
-    return carregar(exercicio=exercicio, demonstrativo="bf")
+    return carregar_em_cache(exercicio, demonstrativo="bf")
 
 
 def partir_informados(informados: dict[str, Decimal]):

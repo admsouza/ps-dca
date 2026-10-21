@@ -19,7 +19,7 @@ from app.domain.bo.modelo import MapaBO, NaoApurada, Registro, Residuo
 from app.domain.bo.saldo import atende
 from app.infra.msc.fonte import COMPETENCIA_DE_ENCERRAMENTO, fonte_de
 from app.infra.pcasp.natureza import do_pcasp
-from app.infra.regras.carregador import carregar
+from app.infra.regras.carregador import carregar_em_cache
 
 DEMONSTRATIVO = "BO"
 # A competência é parâmetro, não constante: há entes que prestam contas mensalmente. O padrão é o
@@ -74,7 +74,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
     """Apura o quadro principal do BO para um ente, exercício e competência."""
     inicio = time.monotonic()
 
-    mapa = mapa or carregar(exercicio=exercicio)
+    mapa = mapa or carregar_em_cache(exercicio)
     direcao = direcao or do_pcasp()
     origem = fonte_de(DEMONSTRATIVO, competencia)
 

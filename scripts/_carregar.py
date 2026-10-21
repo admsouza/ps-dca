@@ -12,6 +12,11 @@ from pathlib import Path
 
 import yaml
 
+try:  # libyaml: ~7x mais rápido que o parser puro-Python
+    from yaml import CSafeLoader as _Loader
+except ImportError:  # pragma: no cover - roda sem libyaml compilado
+    from yaml import SafeLoader as _Loader
+
 _ITEM = re.compile(r"^(\s*)-\s")
 
 
@@ -45,7 +50,7 @@ def _itens(base: Path, subdiretorio: str, chave: str) -> Iterator[tuple[dict, Pa
         return
     for arquivo in sorted(raiz.rglob("*.yaml")):
         texto = arquivo.read_text(encoding="utf-8")
-        dados = yaml.safe_load(texto) or {}
+        dados = yaml.load(texto, _Loader) or {}
         itens = dados.get(chave) or []
         posicoes = linhas_dos_itens(texto, chave)
         for indice, item in enumerate(itens):

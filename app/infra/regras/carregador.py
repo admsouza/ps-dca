@@ -18,6 +18,11 @@ from pathlib import Path
 
 import yaml
 
+try:  # libyaml: ~7x mais rápido que o parser puro-Python
+    from yaml import CSafeLoader as _Loader
+except ImportError:  # pragma: no cover - roda sem libyaml compilado
+    from yaml import SafeLoader as _Loader
+
 from app.domain.bo.modelo import (
     Coluna,
     ContaCC,
@@ -36,6 +41,10 @@ CONTAS_STN = RAIZ_REPO / "docs" / "contas-stn"
 
 class SemVigencia(LookupError):
     """Nenhuma edição cobre o exercício pedido. Não se aproxima a mais próxima."""
+
+
+def _regras(arquivo: Path) -> list[dict]:
+    return (yaml.load(arquivo.read_text(encoding="utf-8"), _Loader) or {}).get("rules", [])
 
 
 def carregar(exercicio: int, base: Path | None = None, demonstrativo: str = "bo") -> MapaBO:
@@ -58,7 +67,7 @@ def carregar(exercicio: int, base: Path | None = None, demonstrativo: str = "bo"
     linhas = tuple(
         _linha(regra)
         for arquivo in sorted((raiz / "rules" / demonstrativo).glob("*.yaml"))
-        for regra in (yaml.safe_load(arquivo.read_text(encoding="utf-8")) or {}).get("rules", [])
+        for regra in _regras(arquivo)
         if regra.get("version", {}).get("edition") == escolhida["edicao"]
     )
 
@@ -77,7 +86,7 @@ def _vigencias(raiz: Path, demonstrativo: str = "bo") -> list[dict]:
     """Edições declaradas pelas próprias regras, pelo bloco `version`."""
     vistas: dict[str, dict] = {}
     for arquivo in sorted((raiz / "rules" / demonstrativo).glob("*.yaml")):
-        for regra in (yaml.safe_load(arquivo.read_text(encoding="utf-8")) or {}).get("rules", []):
+        for regra in _regras(arquivo):
             versao = regra.get("version") or {}
             edicao = versao.get("edition")
             if not edicao or edicao in vistas:
@@ -121,7 +130,7 @@ def _hash_canonico(raiz: Path, edicao: str, tabelas: dict[str, str],
     """
     regras = []
     for arquivo in sorted((raiz / "rules" / demonstrativo).glob("*.yaml")):
-        for regra in (yaml.safe_load(arquivo.read_text(encoding="utf-8")) or {}).get("rules", []):
+        for regra in _regras(arquivo):
             if (regra.get("version") or {}).get("edition") == edicao:
                 regras.append(regra)
     conteudo = {"regras": regras, "tabelas_stn": tabelas}
@@ -133,7 +142,7 @@ def _hashes_das_tabelas(raiz: Path) -> dict[str, str]:
     meta = raiz / "sources" / "stn" / "metadata.yaml"
     if not meta.is_file():
         return {}
-    dados = yaml.safe_load(meta.read_text(encoding="utf-8")) or {}
+    dados = yaml.load(meta.read_text(encoding="utf-8"), _Loader) or {}
     return {Path(t["file"]).name: t["sha256"] for t in dados.get("tables") or []}
 
 
