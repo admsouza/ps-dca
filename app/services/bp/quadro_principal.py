@@ -152,8 +152,8 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
 
     `dca` lê o `I-AB` publicado (`.itens(ente, ano)`); sem ele, o `tt/dca` do SICONFI.
     `anterior_pronto` é a coluna anterior já pronta (`PROCESSADO`, ver `pipeline/anterior.py`);
-    `valores_anteriores`, a digitada (`MANUAL`). `zero_sem_anterior`: a unidade sem MSC em N−1,
-    num job que leu N−1, sai em zero, e não não apurada.
+    `valores_anteriores`, a digitada (`MANUAL`). `zero_sem_anterior`: a coluna anterior sai em
+    `0,00` onde faltaria dado (sem MSC em N−1, ou coluna pronta sem a célula), e não não apurada.
     """
     inicio = time.monotonic()
     anterior = Anterior(anterior)                # o job chega com string
@@ -195,7 +195,8 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
                                           zero_se_vazio=zero_sem_anterior)
         elif pronto is not None:
             anterior_ = _coluna_pronta(m, pronto["matriz"], NAO_INFORMADO
-                                       if anterior is Anterior.MANUAL else SEM_LINHA_ANTERIOR)
+                                       if anterior is Anterior.MANUAL else SEM_LINHA_ANTERIOR,
+                                       zero_sem_anterior)
         else:
             anterior_ = _apurar_publicado(m, publicado, direcao)
         matriz_ = {
@@ -391,14 +392,19 @@ def _aplicar_compensacao_atual(mapa: MapaBO, coluna: _Coluna,
             coluna.nao_apuradas.append(NaoApurada(linha.id, COLUNA_ATUAL, "-", motivo))
 
 
-def _coluna_pronta(mapa: MapaBO, celulas: dict, ausente: str) -> _Coluna:
-    """Coluna anterior pronta (processado de N−1 ou digitada), casada por quadro e código."""
+def _coluna_pronta(mapa: MapaBO, celulas: dict, ausente: str, zerar: bool = False) -> _Coluna:
+    """Coluna anterior pronta (processado de N−1 ou digitada), casada por quadro e código.
+
+    `zerar`: célula ausente vale `0,00` e não registra `NaoApurada` (sem exercício anterior).
+    """
     valores: dict[str, Decimal | None] = {}
     nao_apuradas: list[NaoApurada] = []
     for linha in mapa.linhas:
         celula = celulas.get((linha.quadro, linha.codigo))
         valores[linha.id] = None if celula is None else celula.get(COLUNA_ANTERIOR)
-        if valores[linha.id] is None:
+        if valores[linha.id] is None and zerar and celula is None:
+            valores[linha.id] = Decimal("0.00")
+        elif valores[linha.id] is None:
             motivo = ausente if celula is None else SEM_VALOR_ANTERIOR
             nao_apuradas.append(NaoApurada(linha.id, COLUNA_ANTERIOR, "-", motivo))
     return _Coluna(valores, nao_apuradas, [], False, False)

@@ -230,8 +230,8 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
     Cada recorte é o mesmo `apurar` sobre a fonte filtrada: dentro do `escopo()` do job a leitura já
     está memorizada, então nada volta à fonte. No BP e no BF, fora do consolidado, a coluna anterior
     é da unidade (`pipeline-anterior-por-recorte`): `escolhas` (`{unidade: {origem, valores?}}`) ou,
-    sem escolha, o processado de N−1 em `repo` ou a MSC de N−1. `agora` são as unidades que o pedido
-    escolheu neste job.
+    sem escolha, o processado de N−1 em `repo` ou, sem ele, a coluna em `0,00` marcada no
+    diagnóstico. `agora` são as unidades que o pedido escolheu neste job.
 
     O consolidado não tem origem própria (`pipeline-consolidado-anterior-soma-unidades`): como o
     grupo de poder, a coluna anterior dele é a soma das colunas já resolvidas das unidades do job.
@@ -279,7 +279,7 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
         if not por_unidade:
             return apurar_recorte(chave, **extras_recorte)
         escolha = escolhas.get(chave)
-        origem, aviso = ant.resolver(chave, escolha, n1, exigir_processado=repo is not None)
+        origem, aviso = ant.resolver(chave, escolha, n1)
         kwargs = dict(extras_recorte)
         if chave in valores_atuais_por_recorte:
             kwargs.update(_aceitos_por(apurar, {"valores_atuais":
@@ -290,16 +290,18 @@ def com_recortes(apurar: Callable, ente: int, exercicio: int, fonte, *, repo=Non
             kwargs.update(anterior=origem.value, anterior_pronto=ant.pronto(retrato))
         elif origem is ant.OrigemAnterior.MANUAL:
             kwargs.update(anterior=origem.value, valores_anteriores=escolha["valores"])
+        else:
+            # Sem Processado nem Manual: coluna em `0,00`, dita uma vez no diagnóstico.
+            kwargs.update(anterior=ant.OrigemAnterior.PROCESSADO.value,
+                          anterior_pronto={"matriz": {}, "fonte_vazia": Decimal("0.00")},
+                          **_aceitos_por(apurar, {"zero_sem_anterior": True}))
         r = apurar_recorte(chave, **kwargs)
-        # BP: a unidade sem MSC em N−1, num job que leu N−1, sai em zero (PO 2026-10-13).
-        zero = _aceitos_por(apurar, {"zero_sem_anterior": True})
-        leu_n1 = observada.por_exercicio.get(exercicio - 1)
-        if (origem is ant.OrigemAnterior.MSCE and zero and leu_n1
-                and r.diagnostico.sem_dados_exercicio_anterior):
-            r = apurar_recorte(chave, **kwargs, **zero)
         r.procedencia = replace(
             r.procedencia, escolha_anterior=dict(escolha) if escolha else None,
             anterior_processado=(ant.procedencia_do_processado(n1, retrato) if retrato else None))
+        if origem is ant.OrigemAnterior.SEM_ANTERIOR:
+            r.procedencia = replace(r.procedencia, origem_exercicio_anterior=origem.value)
+            r.diagnostico.sem_dados_exercicio_anterior = True
         if aviso:
             r.diagnostico.avisos_anterior = [aviso]
         return r

@@ -320,41 +320,6 @@ def _exigir_poder_nas_unidades(request: Request, repo, ente: str, exercicio: int
             raise HTTPException(status.HTTP_403_FORBIDDEN, detail=f"sem acesso à unidade {chave}")
 
 
-def _exigir_n1(repo, ente: str, exercicio: int, anexo: str, parametros: dict) -> None:
-    """Unidade que o job apuraria em `processado` sem N−1 `ok` com o recorte: `409`, sem job.
-
-    Vale para toda unidade conhecida, não só para as do pedido: o padrão é Processado, e quem
-    ficou de fora do pedido derrubava o job inteiro depois do `202` (`ProcessadoSemAnterior` no
-    worker). As unidades vêm do último resultado `ok` de N, que é o que o frontend tem em tela.
-
-    ponytail: unidade que exista na MSC e ainda não esteja no cache de N escapa daqui e só falha
-    no worker. Ler a MSC na rota para fechar o caso custaria o job inteiro antes de enfileirar.
-    """
-    escolhas = cache_service.parametros_efetivos(
-        parametros, repo.obter(ente, exercicio, anexo), anexo,
-    ).get("anterior_por_recorte") or {}
-    chaves = set(escolhas) | _unidades_gravadas(repo, ente, exercicio, anexo)
-    if not chaves:
-        return
-    faltam = anterior.faltam_processado(
-        anterior.ler_n1(repo, ente, exercicio, anexo), chaves, escolhas,
-    )
-    if faltam:
-        raise HTTPException(status.HTTP_409_CONFLICT,
-                            detail=anterior.mensagem_sem_processado(exercicio - 1, faltam))
-
-
-def _unidades_gravadas(repo, ente: str, exercicio: int, anexo: str) -> set[str]:
-    """Os recortes `ug:`/`po:` do último resultado `ok` de N — grupos e consolidado não têm
-    origem própria (`pipeline-consolidado-anterior-soma-unidades`)."""
-    registro = repo.obter(ente, exercicio, anexo)
-    if registro is None or registro.status != "ok":
-        return set()
-    gravados = (registro.resultado or {}).get("recortes") or {}
-    return {c for c in gravados
-            if c.startswith(("ug:", "po:")) and c not in recortes.GRUPOS}
-
-
 async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo,
                    forcar: bool, solicitante: int | None, parametros: dict | None = None,
                    fonte: FontePedido | None = None, visao: str | None = None,
@@ -676,7 +641,6 @@ async def reprocessar_anexo(
             parametros = {**parametros, **_parametros_atuais_por_unidade(corpo, anexo, exercicio)}
             _exigir_poder_nas_unidades(request, repo, ente, exercicio, anexo,
                                        list(corpo.valores_atuais_por_recorte or {}))
-    _exigir_n1(repo, ente, exercicio, anexo, parametros)
     return await _decidir(request, ente, exercicio, anexo, repo,
                           forcar=True, solicitante=solicitante, parametros=parametros,
                           fonte=fonte)

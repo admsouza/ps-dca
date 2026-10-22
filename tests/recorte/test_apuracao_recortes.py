@@ -118,9 +118,9 @@ class _DcaVazia:
         return []
 
 
-def test_bp_fora_do_consolidado_usa_msce_do_ano_anterior():
-    """Scenario: o consolidado não tem origem própria — pedido legado é ignorado, UG pela MSC
-    (`pipeline-consolidado-anterior-soma-unidades`)"""
+def test_bp_fora_do_consolidado_sem_n1_cai_em_zero():
+    """Scenario: o consolidado não tem origem própria — pedido legado é ignorado, e a UG sem N−1
+    processado sai em zero, nunca pela MSC de N−1 (`pipeline-consolidado-anterior-soma-unidades`)"""
     from app.services.bp.quadro_principal import apurar
 
     fonte = FontePorAno({
@@ -132,12 +132,12 @@ def test_bp_fora_do_consolidado_usa_msce_do_ano_anterior():
 
     assert resultado.procedencia.origem_exercicio_anterior == "soma_das_unidades"
     ug = resultado.recortes["ug:1"].resultado
-    assert ug.procedencia.origem_exercicio_anterior == "msce_exercicio_anterior"
+    assert ug.procedencia.origem_exercicio_anterior == "sem_anterior"
     assert ug.diagnostico.conferencia_publicado is None
     l1 = next(linha.id for linha in ug.mapa.linhas
               if linha.quadro == "QUADRO_PRINCIPAL" and linha.codigo == "L1")
     assert ug.matriz[l1] == {"exercicio_atual": Decimal("100.00"),
-                             "exercicio_anterior": Decimal("70.00")}
+                             "exercicio_anterior": Decimal("0.00")}
 
 
 def test_anexo_fora_do_recorte_nao_ganha_recortes():

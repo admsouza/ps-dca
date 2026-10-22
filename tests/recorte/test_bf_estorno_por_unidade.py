@@ -119,8 +119,7 @@ def test_ug_abate_so_o_estorno_da_unidade():
     assert _celula(r["ug:1"].resultado, "L60") == D("70.00")
     assert _celula(r["ug:3"].resultado, "L27") == D("55.00")
     assert _celula(r["ug:4"].resultado, "L27") == D("39.00")
-    assert r["ug:1"].resultado.procedencia.estorno_receita_extra == {"2025": "10.00",
-                                                                     "2024": "2.00"}
+    assert r["ug:1"].resultado.procedencia.estorno_receita_extra == {"2025": "10.00"}
 
 
 def test_grupo_de_poder_soma_as_unidades():
@@ -227,9 +226,9 @@ def test_resposta_sem_poder_orgao_deixa_os_po_nao_apurados():
     for codigo in ("L27", "L60", "L24"):
         assert _celula(po, codigo) is None
     assert _motivos(po, "L27", "exercicio_atual") == [MOTIVO_SEM_PO]
-    com_2024 = resultado.recortes["po:10131"].resultado     # o PO 20231 não tem MSC de 2024
-    assert _motivos(com_2024, "L27", "exercicio_anterior") == [MOTIVO_SEM_PO]
-    assert _celula(com_2024, "L27", "exercicio_anterior") is None
+    sem_n1 = resultado.recortes["po:10131"].resultado     # sem N−1: coluna em zero, sem não apurada
+    assert _motivos(sem_n1, "L27", "exercicio_anterior") == []
+    assert _celula(sem_n1, "L27", "exercicio_anterior") == D("0.00")
     assert _celula(resultado, "L27") == D("140.00") - D("67.00")
 
 
@@ -271,17 +270,17 @@ def test_topo_nao_aceita_mais_manual_proprio():
     ug = resultado.recortes["ug:1"].resultado
     assert _celula(resultado, "L27", "exercicio_anterior") != D("999.00")
     assert resultado.procedencia.origem_exercicio_anterior == "soma_das_unidades"
-    assert _celula(ug, "L27", "exercicio_anterior") == D("48.00")
-    assert ug.procedencia.origem_exercicio_anterior == "msce_exercicio_anterior"
+    assert _celula(ug, "L27", "exercicio_anterior") == D("0.00")
+    assert ug.procedencia.origem_exercicio_anterior == "sem_anterior"
     assert ug.procedencia.valores_anteriores is None
 
 
-def test_ug_sem_msc_no_ano_anterior_sai_em_zero_com_aviso():
-    """Scenario: UG nova"""
+def test_sem_n1_toda_unidade_sai_em_zero_com_marca():
+    """Scenario: primeira apuração sem exercício anterior conclui"""
     r = _bf(_fonte_ug()).recortes
-    assert _celula(r["ug:3"].resultado, "L27", "exercicio_anterior") == D("0.00")
-    assert r["ug:3"].resultado.diagnostico.sem_dados_exercicio_anterior is True
-    assert r["ug:1"].resultado.diagnostico.sem_dados_exercicio_anterior is False
+    for chave in ("ug:1", "ug:3", "ug:4"):
+        assert _celula(r[chave].resultado, "L27", "exercicio_anterior") == D("0.00")
+        assert r[chave].resultado.diagnostico.sem_dados_exercicio_anterior is True
 
 
 def test_bf_e_recortavel():

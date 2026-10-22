@@ -7,7 +7,6 @@ casa por (quadro, código). O grupo de poder não tem origem: soma as unidades.
 from __future__ import annotations
 
 import re
-from collections.abc import Collection
 from decimal import Decimal
 from enum import StrEnum
 from typing import Any, NamedTuple
@@ -19,15 +18,12 @@ class OrigemAnterior(StrEnum):
     PROCESSADO = "processado_exercicio_anterior"
     MSCE = "msce_exercicio_anterior"
     MANUAL = "manual"
+    SEM_ANTERIOR = "sem_anterior"       # resultado da resolução, nunca escolha do pedido
 
 
 PADRAO = "padrao"
 SOMA_DAS_UNIDADES = "soma_das_unidades"
 _UNIDADE = re.compile(r"ug:\d+|po:(\d{5})?")
-
-
-class ProcessadoSemAnterior(Exception):
-    """`processado_exercicio_anterior` pedido e N−1 sem resultado `ok` (ou sem o recorte)."""
 
 
 class ParcelaSemUnidade(Exception):
@@ -66,37 +62,12 @@ def recorte_de(n1: N1, chave: str) -> dict | None:
     return gravado["resultado"] if gravado else None
 
 
-def mensagem_sem_processado(exercicio: int, chaves: Collection[str] = ()) -> str:
-    """Sem a unidade na mensagem o usuário não sabe para onde mandar o Manual."""
-    unidades = ", ".join(sorted(chaves))
-    return f"{unidades}: Processe {exercicio} ou use Manual." if unidades else (
-        f"Processe {exercicio} ou use Manual.")
-
-
-def exigir(n1: N1, chave: str) -> dict:
-    """O recorte de N−1 para uma escolha pedida agora: sem ele, o erro do pedido."""
-    dados = recorte_de(n1, chave)
-    if dados is None:
-        raise ProcessadoSemAnterior(mensagem_sem_processado(n1.exercicio, [chave]))
-    return dados
-
-
-def faltam_processado(n1: N1, chaves: Collection[str], escolhas: dict[str, dict]) -> list[str]:
-    """As unidades que cairiam em Processado sem N−1 ter o recorte — as que exigem Manual."""
-    return sorted(
-        chave for chave in chaves
-        if (escolhas.get(chave) or {}).get("origem") != OrigemAnterior.MANUAL
-        and recorte_de(n1, chave) is None
-    )
-
-
-def resolver(chave: str, escolha: dict | None,
-             n1: N1, exigir_processado: bool = True) -> tuple[OrigemAnterior, str | None]:
+def resolver(chave: str, escolha: dict | None, n1: N1) -> tuple[OrigemAnterior, str | None]:
     """A origem resolvida da unidade e o aviso que o diagnóstico registra, se houver.
 
-    Processado é o padrão e Manual a única alternativa pública. `exigir_processado=False` existe
-    só para a chamada direta do serviço (CLI/testes sem repositório), que não tem cache de N−1.
-    MSCE gravada por versão antiga é tratada como o novo padrão, nunca como fallback oculto.
+    Processado é o padrão e Manual a única alternativa pública. Sem um nem outro a unidade fica
+    `SEM_ANTERIOR`: a coluna sai em `0,00`, nunca recusa o pedido nem cai na MSC de N−1. MSCE
+    gravada por versão antiga é tratada como o padrão, nunca como fallback oculto.
     """
     origem = OrigemAnterior(escolha["origem"]) if escolha else None
     if origem is OrigemAnterior.MSCE:
@@ -104,10 +75,8 @@ def resolver(chave: str, escolha: dict | None,
     if origem in (None, OrigemAnterior.PROCESSADO):
         if recorte_de(n1, chave) is not None:
             return OrigemAnterior.PROCESSADO, None
-        if exigir_processado:
-            raise ProcessadoSemAnterior(mensagem_sem_processado(n1.exercicio, [chave]))
         motivo = n1.motivo or ("exercício anterior sem resultado processado" if origem else None)
-        return OrigemAnterior.MSCE, f"{chave}: {motivo}" if motivo else None
+        return OrigemAnterior.SEM_ANTERIOR, f"{chave}: {motivo}" if motivo else None
     return origem, None
 
 

@@ -1,7 +1,7 @@
 """Rota e percurso com a coluna anterior por unidade (`pipeline-anterior-por-recorte`).
 
-Capability `pipeline/anterior-por-recorte`: validação do corpo (`422`), `409` do processado
-explícito, consolidado processado e o que o percurso aceita e reaplica.
+Capability `pipeline/anterior-por-recorte`: validação do corpo (`422`), a ausência de N−1 que não
+recusa o pedido, consolidado processado e o que o percurso aceita e reaplica.
 """
 from __future__ import annotations
 
@@ -174,35 +174,24 @@ def test_origem_propria_no_corpo_e_recusada(api, anexo):
     assert resposta.status_code == 422 and fila.chamadas == []
 
 
-# ─── 409 ─────────────────────────────────────────────────────────────────────
+# ─── N−1 ausente não recusa ──────────────────────────────────────────────────
 
 @pytest.mark.parametrize("anexo", ["BF", "BP"])
-def test_processado_explicito_sem_n1_responde_409_sem_job(api, anexo):
-    """Scenario: processado explícito sem N−1"""
+def test_processado_explicito_sem_n1_enfileira(api, anexo):
+    """Scenario: nenhum pedido é recusado por ausência de N−1"""
     cliente, fila = api(RepoFake(), anexo)
 
     resposta = _reprocessar(cliente, anexo, {"anterior_por_recorte": {
         "ug:3": {"origem": PROCESSADO}}})
 
-    assert resposta.status_code == 409
-    assert resposta.json()["detail"] == "ug:3: Processe 2024 ou use Manual."
-    assert fila.chamadas == []
+    assert resposta.status_code == 202
+    assert len(fila.chamadas) == 1
 
 
-def test_processado_explicito_de_unidade_que_n1_nao_tem_responde_409(api):
-    cliente, fila = api(_n1_de("BP"), "BP")
+def test_unidade_fora_do_pedido_sem_n1_enfileira(api):
+    """Scenario: Manual e zero convivem no mesmo job
 
-    resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {
-        "ug:99": {"origem": PROCESSADO}}})
-
-    assert resposta.status_code == 409 and fila.chamadas == []
-
-
-def test_unidade_fora_do_pedido_sem_n1_responde_409_sem_job(api):
-    """Scenario: padrão sem Processado orienta a correção
-
-    Pelo pedido que cobre só uma unidade: as outras caem no padrão Processado e, sem N−1, o job
-    inteiro morria depois do `202`.
+    Pelo pedido que cobre só uma unidade: a outra cai em `0,00` no job, sem recusar a rota.
     """
     repo = RepoFake([RegistroFake(ENTES["BP"], EXERCICIO, "BP", resultado={"recortes": {
         "ug:10": {"resultado": {}}, "ug:20": {"resultado": {}}}})])
@@ -211,9 +200,18 @@ def test_unidade_fora_do_pedido_sem_n1_responde_409_sem_job(api):
     resposta = _reprocessar(cliente, "BP", {"anterior_por_recorte": {
         "ug:10": {"origem": MANUAL, "valores": {"P:L3": "1.00"}}}})
 
-    assert resposta.status_code == 409
-    assert resposta.json()["detail"] == "ug:20: Processe 2024 ou use Manual."
-    assert fila.chamadas == []
+    assert resposta.status_code == 202
+    assert len(fila.chamadas) == 1
+
+
+@pytest.mark.parametrize("anexo", ["BF", "BP"])
+def test_reprocessar_sem_corpo_e_sem_n1_enfileira(api, anexo):
+    """Scenario: primeira apuração sem exercício anterior conclui"""
+    cliente, fila = api(RepoFake(), anexo)
+
+    resposta = cliente.post(f"/dca/{anexo}/reprocessar?anReferencia={EXERCICIO}", headers=HDR)
+
+    assert resposta.status_code == 202 and len(fila.chamadas) == 1
 
 
 @pytest.mark.parametrize("anexo", ["BF", "BP"])
@@ -334,7 +332,7 @@ def test_percurso_reaplica_as_escolhas_gravadas():
 
 # ─── job ─────────────────────────────────────────────────────────────────────
 
-def test_n1_some_entre_a_rota_e_o_job_termina_em_erro(monkeypatch):
+def test_n1_some_entre_a_rota_e_o_job_conclui_com_anterior_em_zero(monkeypatch):
     """Scenario: N−1 some entre a rota e o job"""
     monkeypatch.setattr(apuracao, "fonte", lambda nome=None, token=None: FontePorAno(
         {EXERCICIO: N, EXERCICIO - 1: N1}))
@@ -348,8 +346,10 @@ def test_n1_some_entre_a_rota_e_o_job_termina_em_erro(monkeypatch):
              versao_api=apuracao.VERSAO_API, versao_regras="r")
 
     gravado = repo.obter(ENTES["BP"], EXERCICIO, "BP")
-    assert gravado.status == "erro" and gravado.resultado is None
-    assert "Processe 2024 ou use Manual" in gravado.erro_detalhe
+    assert gravado.status == "ok"
+    ug1 = gravado.resultado["recortes"]["ug:1"]["resultado"]
+    assert ug1["procedencia"]["origem_exercicio_anterior"] == "sem_anterior"
+    assert ug1["diagnostico"]["sem_dados_exercicio_anterior"] is True
 
 
 @pytest.mark.parametrize("anexo", ["BF", "BP"])

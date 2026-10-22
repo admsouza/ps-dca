@@ -2,9 +2,9 @@
  "BF|consolidado|leitura": {
   "desatualizado": true,
   "diagnostico": {
-   "duracao_ms": 980,
+   "duracao_ms": 1,
    "equilibrio": {
-    "exercicio_anterior": "10.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "120.00"
    },
    "nao_apuradas": [
@@ -15,11 +15,7 @@
     "bf.quadro_principal.dispendios.l55.exercicio_atual: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
     "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
     "bf.quadro_principal.dispendios.l56.exercicio_atual: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
-    "bf.quadro_principal.ingressos.l22.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.ingressos.l23.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — não apurada no exercício anterior"
+    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)"
    ],
    "policies_nao_aplicadas": [
     "item 38 (exclusão de intraorçamentárias): a policy não declara quais códigos caracterizam a transferência intra acompanhada de execução; a interpretação por categoria 7/8 e modalidade 91 foi medida e quebra L1 e L34 em Belo Horizonte e João Pessoa (G11-a)"
@@ -1028,15 +1024,15 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l55": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l56": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l57": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "64.00"
    },
    "bf.quadro_principal.dispendios.l58": {
@@ -1048,7 +1044,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l60": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "64.00"
    },
    "bf.quadro_principal.dispendios.l61": {
@@ -1072,7 +1068,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l66": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "64.00"
    },
    "bf.quadro_principal.ingressos.l1": {
@@ -1132,15 +1128,15 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l22": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l23": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l24": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "184.00"
    },
    "bf.quadro_principal.ingressos.l25": {
@@ -1152,7 +1148,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l27": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "184.00"
    },
    "bf.quadro_principal.ingressos.l28": {
@@ -1180,7 +1176,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l33": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "184.00"
    },
    "bf.quadro_principal.ingressos.l4": {
@@ -1481,9 +1477,9 @@
  "BF|executivo+legislativo|leitura": {
   "desatualizado": true,
   "diagnostico": {
-   "duracao_ms": 928,
+   "duracao_ms": 1,
    "equilibrio": {
-    "exercicio_anterior": "10.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "120.00"
    },
    "nao_apuradas": [
@@ -1494,11 +1490,7 @@
     "bf.quadro_principal.dispendios.l55.exercicio_atual: conta - — informado só no consolidado",
     "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
     "bf.quadro_principal.dispendios.l56.exercicio_atual: conta - — informado só no consolidado",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
-    "bf.quadro_principal.ingressos.l22.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.ingressos.l23.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — não apurada no exercício anterior"
+    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)"
    ],
    "policies_nao_aplicadas": [
     "item 38 (exclusão de intraorçamentárias): a policy não declara quais códigos caracterizam a transferência intra acompanhada de execução; a interpretação por categoria 7/8 e modalidade 91 foi medida e quebra L1 e L34 em Belo Horizonte e João Pessoa (G11-a)"
@@ -2507,15 +2499,15 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l55": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l56": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l57": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "64.00"
    },
    "bf.quadro_principal.dispendios.l58": {
@@ -2527,7 +2519,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l60": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "64.00"
    },
    "bf.quadro_principal.dispendios.l61": {
@@ -2551,7 +2543,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l66": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "64.00"
    },
    "bf.quadro_principal.ingressos.l1": {
@@ -2611,15 +2603,15 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l22": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l23": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l24": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "184.00"
    },
    "bf.quadro_principal.ingressos.l25": {
@@ -2631,7 +2623,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l27": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "184.00"
    },
    "bf.quadro_principal.ingressos.l28": {
@@ -2659,7 +2651,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l33": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "184.00"
    },
    "bf.quadro_principal.ingressos.l4": {
@@ -2956,9 +2948,9 @@
  "BF|executivo|leitura": {
   "desatualizado": true,
   "diagnostico": {
-   "duracao_ms": 949,
+   "duracao_ms": 1,
    "equilibrio": {
-    "exercicio_anterior": "10.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "80.00"
    },
    "nao_apuradas": [
@@ -2969,11 +2961,7 @@
     "bf.quadro_principal.dispendios.l55.exercicio_atual: conta - — informado só no consolidado",
     "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
     "bf.quadro_principal.dispendios.l56.exercicio_atual: conta - — informado só no consolidado",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
-    "bf.quadro_principal.ingressos.l22.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.ingressos.l23.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — não apurada no exercício anterior"
+    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)"
    ],
    "policies_nao_aplicadas": [
     "item 38 (exclusão de intraorçamentárias): a policy não declara quais códigos caracterizam a transferência intra acompanhada de execução; a interpretação por categoria 7/8 e modalidade 91 foi medida e quebra L1 e L34 em Belo Horizonte e João Pessoa (G11-a)"
@@ -3982,15 +3970,15 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l55": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l56": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l57": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "65.00"
    },
    "bf.quadro_principal.dispendios.l58": {
@@ -4002,7 +3990,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l60": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "65.00"
    },
    "bf.quadro_principal.dispendios.l61": {
@@ -4026,7 +4014,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l66": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "65.00"
    },
    "bf.quadro_principal.ingressos.l1": {
@@ -4086,15 +4074,15 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l22": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l23": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l24": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "145.00"
    },
    "bf.quadro_principal.ingressos.l25": {
@@ -4106,7 +4094,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l27": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "145.00"
    },
    "bf.quadro_principal.ingressos.l28": {
@@ -4134,7 +4122,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l33": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "145.00"
    },
    "bf.quadro_principal.ingressos.l4": {
@@ -4410,7 +4398,7 @@
  "BF|legislativo|leitura": {
   "desatualizado": true,
   "diagnostico": {
-   "duracao_ms": 961,
+   "duracao_ms": 0,
    "equilibrio": {
     "exercicio_anterior": "0.00",
     "exercicio_atual": "40.00"
@@ -4423,11 +4411,7 @@
     "bf.quadro_principal.dispendios.l55.exercicio_atual: conta - — informado só no consolidado",
     "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
     "bf.quadro_principal.dispendios.l56.exercicio_atual: conta - — informado só no consolidado",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
-    "bf.quadro_principal.ingressos.l22.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.ingressos.l23.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — não apurada no exercício anterior"
+    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)"
    ],
    "policies_nao_aplicadas": [
     "item 38 (exclusão de intraorçamentárias): a policy não declara quais códigos caracterizam a transferência intra acompanhada de execução; a interpretação por categoria 7/8 e modalidade 91 foi medida e quebra L1 e L34 em Belo Horizonte e João Pessoa (G11-a)"
@@ -5436,11 +5420,11 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l55": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l56": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l57": {
@@ -5540,11 +5524,11 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l22": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l23": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l24": {
@@ -11190,9 +11174,9 @@
  "BP|consolidado|leitura": {
   "desatualizado": true,
   "diagnostico": {
-   "duracao_ms": 918,
+   "duracao_ms": 1,
    "equilibrio": {
-    "exercicio_anterior": "10.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "120.00"
    },
    "nao_apuradas": [
@@ -11203,11 +11187,7 @@
     "bf.quadro_principal.dispendios.l55.exercicio_atual: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
     "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
     "bf.quadro_principal.dispendios.l56.exercicio_atual: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
-    "bf.quadro_principal.ingressos.l22.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.ingressos.l23.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — não apurada no exercício anterior"
+    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)"
    ],
    "policies_nao_aplicadas": [
     "item 38 (exclusão de intraorçamentárias): a policy não declara quais códigos caracterizam a transferência intra acompanhada de execução; a interpretação por categoria 7/8 e modalidade 91 foi medida e quebra L1 e L34 em Belo Horizonte e João Pessoa (G11-a)"
@@ -12216,15 +12196,15 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l55": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l56": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l57": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "64.00"
    },
    "bf.quadro_principal.dispendios.l58": {
@@ -12236,7 +12216,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l60": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "64.00"
    },
    "bf.quadro_principal.dispendios.l61": {
@@ -12260,7 +12240,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l66": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "64.00"
    },
    "bf.quadro_principal.ingressos.l1": {
@@ -12320,15 +12300,15 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l22": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l23": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l24": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "184.00"
    },
    "bf.quadro_principal.ingressos.l25": {
@@ -12340,7 +12320,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l27": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "184.00"
    },
    "bf.quadro_principal.ingressos.l28": {
@@ -12368,7 +12348,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l33": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "184.00"
    },
    "bf.quadro_principal.ingressos.l4": {
@@ -12670,9 +12650,9 @@
  "BP|executivo+legislativo|leitura": {
   "desatualizado": true,
   "diagnostico": {
-   "duracao_ms": 948,
+   "duracao_ms": 1,
    "equilibrio": {
-    "exercicio_anterior": "10.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "120.00"
    },
    "nao_apuradas": [
@@ -12683,11 +12663,7 @@
     "bf.quadro_principal.dispendios.l55.exercicio_atual: conta - — informado só no consolidado",
     "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
     "bf.quadro_principal.dispendios.l56.exercicio_atual: conta - — informado só no consolidado",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
-    "bf.quadro_principal.ingressos.l22.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.ingressos.l23.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — não apurada no exercício anterior"
+    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)"
    ],
    "policies_nao_aplicadas": [
     "item 38 (exclusão de intraorçamentárias): a policy não declara quais códigos caracterizam a transferência intra acompanhada de execução; a interpretação por categoria 7/8 e modalidade 91 foi medida e quebra L1 e L34 em Belo Horizonte e João Pessoa (G11-a)"
@@ -13696,15 +13672,15 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l55": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l56": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l57": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "64.00"
    },
    "bf.quadro_principal.dispendios.l58": {
@@ -13716,7 +13692,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l60": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "64.00"
    },
    "bf.quadro_principal.dispendios.l61": {
@@ -13740,7 +13716,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l66": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "64.00"
    },
    "bf.quadro_principal.ingressos.l1": {
@@ -13800,15 +13776,15 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l22": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l23": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l24": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "184.00"
    },
    "bf.quadro_principal.ingressos.l25": {
@@ -13820,7 +13796,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l27": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "184.00"
    },
    "bf.quadro_principal.ingressos.l28": {
@@ -13848,7 +13824,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l33": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "184.00"
    },
    "bf.quadro_principal.ingressos.l4": {
@@ -14146,9 +14122,9 @@
  "BP|executivo|leitura": {
   "desatualizado": true,
   "diagnostico": {
-   "duracao_ms": 900,
+   "duracao_ms": 1,
    "equilibrio": {
-    "exercicio_anterior": "10.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "80.00"
    },
    "nao_apuradas": [
@@ -14159,11 +14135,7 @@
     "bf.quadro_principal.dispendios.l55.exercicio_atual: conta - — informado só no consolidado",
     "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
     "bf.quadro_principal.dispendios.l56.exercicio_atual: conta - — informado só no consolidado",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
-    "bf.quadro_principal.ingressos.l22.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.ingressos.l23.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — não apurada no exercício anterior"
+    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)"
    ],
    "policies_nao_aplicadas": [
     "item 38 (exclusão de intraorçamentárias): a policy não declara quais códigos caracterizam a transferência intra acompanhada de execução; a interpretação por categoria 7/8 e modalidade 91 foi medida e quebra L1 e L34 em Belo Horizonte e João Pessoa (G11-a)"
@@ -15172,15 +15144,15 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l55": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l56": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l57": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "65.00"
    },
    "bf.quadro_principal.dispendios.l58": {
@@ -15192,7 +15164,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l60": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "65.00"
    },
    "bf.quadro_principal.dispendios.l61": {
@@ -15216,7 +15188,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l66": {
-    "exercicio_anterior": "38.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "65.00"
    },
    "bf.quadro_principal.ingressos.l1": {
@@ -15276,15 +15248,15 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l22": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l23": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l24": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "145.00"
    },
    "bf.quadro_principal.ingressos.l25": {
@@ -15296,7 +15268,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l27": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "145.00"
    },
    "bf.quadro_principal.ingressos.l28": {
@@ -15324,7 +15296,7 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l33": {
-    "exercicio_anterior": "48.00",
+    "exercicio_anterior": "0.00",
     "exercicio_atual": "145.00"
    },
    "bf.quadro_principal.ingressos.l4": {
@@ -15601,7 +15573,7 @@
  "BP|legislativo|leitura": {
   "desatualizado": true,
   "diagnostico": {
-   "duracao_ms": 945,
+   "duracao_ms": 0,
    "equilibrio": {
     "exercicio_anterior": "0.00",
     "exercicio_atual": "40.00"
@@ -15614,11 +15586,7 @@
     "bf.quadro_principal.dispendios.l55.exercicio_atual: conta - — informado só no consolidado",
     "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
     "bf.quadro_principal.dispendios.l56.exercicio_atual: conta - — informado só no consolidado",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)",
-    "bf.quadro_principal.ingressos.l22.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.ingressos.l23.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l55.exercicio_anterior: conta - — não apurada no exercício anterior",
-    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — não apurada no exercício anterior"
+    "bf.quadro_principal.dispendios.l56.exercicio_anterior: conta - — linha sem conta declarada no IPC 06 — não apurável pela MSC (G8)"
    ],
    "policies_nao_aplicadas": [
     "item 38 (exclusão de intraorçamentárias): a policy não declara quais códigos caracterizam a transferência intra acompanhada de execução; a interpretação por categoria 7/8 e modalidade 91 foi medida e quebra L1 e L34 em Belo Horizonte e João Pessoa (G11-a)"
@@ -16627,11 +16595,11 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.dispendios.l55": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l56": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.dispendios.l57": {
@@ -16731,11 +16699,11 @@
     "exercicio_atual": "0.00"
    },
    "bf.quadro_principal.ingressos.l22": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l23": {
-    "exercicio_anterior": null,
+    "exercicio_anterior": "0.00",
     "exercicio_atual": null
    },
    "bf.quadro_principal.ingressos.l24": {

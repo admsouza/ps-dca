@@ -12,7 +12,6 @@ import pytest
 
 from app.services.bp.quadro_principal import apurar as apurar_bp
 from app.services.pipeline import apuracao
-from app.services.pipeline.anterior import ProcessadoSemAnterior
 from app.services.pipeline.resultado import para_dados
 from tests.bo.conftest import registro
 from tests.bp.conftest import ENTE, EXERCICIO, FontePorAno, fp
@@ -22,6 +21,7 @@ D = Decimal
 PRINCIPAL, SUPERAVIT = "QUADRO_PRINCIPAL", "SUPERAVIT_DEFICIT"
 ATUAL, ANTERIOR = "exercicio_atual", "exercicio_anterior"
 PROCESSADO, MSCE, MANUAL = ("processado_exercicio_anterior", "msce_exercicio_anterior", "manual")
+SEM_ANTERIOR = "sem_anterior"
 CALCULADO = datetime(2026, 10, 1, 12, 0, tzinfo=UTC)
 CAIXA, SALDO_FONTE = "111110100", "821110100"
 
@@ -132,42 +132,78 @@ def test_fonte_nula_quando_a_identidade_de_n1_nao_tem_f():
     assert ug1.procedencia.anterior_processado["fonte"] is None
 
 
-def test_servico_direto_sem_repositorio_preserva_msce_bit_a_bit():
-    """Scenario: padrão sem N−1 processado"""
-    fonte = _fonte(N, N1)
-    r = _bp(fonte)
+def _sem_anterior(resultado, codigo: str = "L3") -> None:
+    """A unidade em zero: célula `0,00`, sem não apurada, marcada e com a origem declarada."""
+    assert _cel(resultado, codigo) == D("0.00")
+    assert _motivos(resultado, codigo) == []
+    assert resultado.diagnostico.sem_dados_exercicio_anterior is True
+    assert resultado.procedencia.origem_exercicio_anterior == SEM_ANTERIOR
+    assert resultado.procedencia.anterior_processado is None
+
+
+def test_primeira_apuracao_sem_n1_conclui_com_anterior_em_zero():
+    """Scenario: primeira apuração sem exercício anterior conclui"""
+    r = _bp(_fonte(N, N1), RepoFake())
 
     for chave in ("ug:1", "ug:4"):
-        esperado = apurar_bp(ENTE, EXERCICIO, apuracao._Filtrada(fonte, {chave}), anterior=MSCE)
         ug = r.recortes[chave].resultado
-        assert ug.matriz == esperado.matriz
-        assert ug.procedencia.origem_exercicio_anterior == MSCE
+        _sem_anterior(ug)
+        assert _cel(ug, "L3", ATUAL) == (D("100.00") if chave == "ug:1" else D("40.00"))
+    assert _cel(r, "L3") == D("0.00") and r.diagnostico.sem_dados_exercicio_anterior is True
+    executivo = r.recortes["poder:executivo"].resultado
+    assert _cel(executivo, "L3") == D("0.00")
+    assert executivo.diagnostico.sem_dados_exercicio_anterior is True
 
 
-def test_novo_padrao_sem_n1_processado_exige_processado_ou_manual():
-    """Scenario: padrão sem Processado orienta a correção."""
-    with pytest.raises(ProcessadoSemAnterior, match="Processe 2024 ou use Manual"):
-        _bp(_fonte(N, N1), RepoFake())
+def test_manual_e_zero_convivem_no_mesmo_job():
+    """Scenario: Manual e zero convivem no mesmo job"""
+    escolhas = {"ug:1": {"origem": MANUAL, "valores": {"P:L3": "11.00"}}}
+    r = _bp(_fonte(N, N1), RepoFake(), escolhas=escolhas, agora=("ug:1",))
+
+    ug1, ug4 = r.recortes["ug:1"].resultado, r.recortes["ug:4"].resultado
+    assert _cel(ug1, "L3") == D("11.00")
+    assert ug1.procedencia.origem_exercicio_anterior == MANUAL
+    _sem_anterior(ug4)
+    assert _cel(r, "L3") == D("11.00")
+    assert _cel(r.recortes["poder:legislativo"].resultado, "L3") == D("0.00")
 
 
-def test_cache_de_n1_gravado_antes_dos_recortes_exige_novo_processamento():
+def test_n1_gravado_antes_dos_recortes_cai_em_zero():
     dados = para_dados(apurar_bp(ENTE, EXERCICIO - 1, FontePorAno({EXERCICIO - 1: N1}),
                                  anterior=MSCE))
-    with pytest.raises(ProcessadoSemAnterior, match="Processe 2024 ou use Manual"):
-        _bp(_fonte(N, N1), _cache(_n1(N1, dados=dados)))
+    r = _bp(_fonte(N, N1), _cache(_n1(N1, dados=dados)))
+
+    _sem_anterior(r.recortes["ug:1"].resultado)
 
 
-@pytest.mark.parametrize("status", ["processando", "erro"])
-def test_n1_fora_do_ok_exige_processado_ou_manual(status):
-    """Scenario: N−1 em processamento"""
-    with pytest.raises(ProcessadoSemAnterior, match="Processe 2024 ou use Manual"):
-        _bp(_fonte(N, N1), _cache(_n1(N1, status=status)))
+@pytest.mark.parametrize("status, motivo", [("processando", "em processamento"),
+                                            ("erro", "com erro")])
+def test_n1_fora_do_ok_cai_em_zero_e_diz_o_motivo(status, motivo):
+    """Scenario: exercício anterior em processamento ou com erro"""
+    r = _bp(_fonte(N, N1), _cache(_n1(N1, status=status)))
+
+    for chave in ("ug:1", "ug:4"):
+        ug = r.recortes[chave].resultado
+        _sem_anterior(ug)
+        assert ug.diagnostico.avisos_anterior == [f"{chave}: exercício anterior {motivo}"]
 
 
-def test_unidade_ausente_em_n1_exige_manual():
-    n1 = _n1(_fonte_ano({"1": "70.00"}))
-    with pytest.raises(ProcessadoSemAnterior, match="Processe 2024 ou use Manual"):
-        _bp(_fonte(N, N1), _cache(n1))
+def test_unidade_ausente_em_n1_cai_em_zero_sem_afetar_as_demais():
+    r = _bp(_fonte(N, N1), _cache(_n1(_fonte_ano({"1": "70.00"}))))
+
+    assert _cel(r.recortes["ug:1"].resultado, "L3") == D("70.00")
+    _sem_anterior(r.recortes["ug:4"].resultado)
+    assert _cel(r, "L3") == D("70.00")
+
+
+def test_msce_gravado_nao_vira_fallback():
+    """Scenario: escolha antiga de MSCE não mantém fallback oculto"""
+    escolhas = {"ug:1": {"origem": MSCE}}
+    r = _bp(_fonte(N, N1), RepoFake(), escolhas=escolhas)
+
+    ug1 = r.recortes["ug:1"].resultado
+    _sem_anterior(ug1)
+    assert ug1.procedencia.escolha_anterior == escolhas["ug:1"]
 
 
 # ─── origens mistas, escolhas ────────────────────────────────────────────────
@@ -195,23 +231,22 @@ def test_escolha_explicita_de_processado_e_gravada():
     assert r.recortes["ug:4"].resultado.procedencia.escolha_anterior is None
 
 
-def test_processado_explicito_sem_n1_falha_com_o_motivo():
+def test_processado_explicito_sem_n1_cai_em_zero_com_o_motivo():
     """Scenario: N−1 some entre a rota e o job"""
-    with pytest.raises(ProcessadoSemAnterior, match="Processe 2024 ou use Manual"):
-        _bp(_fonte(N, N1), RepoFake(), escolhas={"ug:1": {"origem": PROCESSADO}},
+    r = _bp(_fonte(N, N1), RepoFake(), escolhas={"ug:1": {"origem": PROCESSADO}},
             agora=("ug:1",))
 
+    ug1 = r.recortes["ug:1"].resultado
+    _sem_anterior(ug1)
+    assert ug1.diagnostico.avisos_anterior == ["ug:1: exercício anterior sem resultado processado"]
 
-def test_processado_explicito_com_n1_processando_falha():
-    with pytest.raises(ProcessadoSemAnterior, match="Processe 2024 ou use Manual"):
-        _bp(_fonte(N, N1), _cache(_n1(N1, status="processando")),
+
+def test_processado_explicito_com_n1_processando_cai_em_zero():
+    r = _bp(_fonte(N, N1), _cache(_n1(N1, status="processando")),
             escolhas={"ug:1": {"origem": PROCESSADO}}, agora=("ug:1",))
 
-
-def test_processado_gravado_sem_n1_exige_processado_ou_manual():
-    """Scenario: processado gravado sem N−1"""
-    with pytest.raises(ProcessadoSemAnterior, match="Processe 2024 ou use Manual"):
-        _bp(_fonte(N, N1), RepoFake(), escolhas={"ug:1": {"origem": PROCESSADO}})
+    assert r.recortes["ug:1"].resultado.diagnostico.avisos_anterior == [
+        "ug:1: exercício anterior em processamento"]
 
 
 def test_escolha_gravada_de_unidade_inexistente_e_descartada_sem_aviso():
@@ -244,24 +279,6 @@ def test_linha_sem_par_em_n1_fica_nao_apurada():
 
     assert _cel(ug1, "L3") is None
     assert _motivos(ug1, "L3") == ["sem linha no exercício anterior"]
-
-
-def test_ug_sem_msc_em_n1_sai_em_zero_com_aviso_quando_o_job_leu_n1():
-    """Scenario: UG sem MSC no ano anterior"""
-    r = _bp(_fonte(N, _fonte_ano({"1": "70.00"})))
-
-    ug4 = r.recortes["ug:4"].resultado
-    assert _cel(ug4, "L3") == D("0.00")
-    assert ug4.diagnostico.sem_dados_exercicio_anterior is True
-    assert _cel(r.recortes["ug:1"].resultado, "L3") == D("70.00")
-
-
-def test_consolidado_sem_nenhuma_leitura_de_n1_continua_nao_apurado():
-    r = _bp(_fonte(N))
-
-    assert _cel(r, "L3") is None and r.diagnostico.sem_dados_exercicio_anterior is True
-    assert _cel(r.recortes["ug:1"].resultado, "L3") is None
-    assert r.recortes["ug:1"].resultado.diagnostico.sem_dados_exercicio_anterior is True
 
 
 # ─── Superávit, visões, fonte vazia ──────────────────────────────────────────
@@ -315,12 +332,10 @@ def test_grupo_com_origens_mistas_soma_as_unidades():
     assert _cel(r.recortes["poder:legislativo"].resultado, "L3") is None
 
 
-@pytest.mark.parametrize("com_n1", [False, True])
-def test_grupo_somado_e_igual_ao_grupo_filtrado_em_msce_no_bp(com_n1):
+def test_grupo_somado_e_igual_ao_grupo_filtrado_em_msce_no_bp():
     """Scenario: aditividade"""
     fonte = _fonte(N, N1)
-    repo = _repo_com_n1() if com_n1 else None
-    r = _bp(fonte, repo)
+    r = _bp(fonte, _repo_com_n1())
     esperado = apurar_bp(ENTE, EXERCICIO, apuracao._Filtrada(fonte, {"ug:1", "ug:4"}),
                          anterior=MSCE)
 
@@ -400,19 +415,18 @@ class _DcaEspia:
         return []
 
 
-def test_po_em_msce_le_a_msc_e_nunca_o_publicado():
-    """Scenario: PO pela MSC do SICONFI; o consolidado não lê mais o publicado"""
+def test_po_sem_n1_cai_em_zero_e_nao_le_o_publicado_nem_a_msc():
+    """Scenario: PO sem exercício anterior; o consolidado não lê mais o publicado"""
     def po(valor: str, codigo: str):
         return fp(CAIXA, valor, "F")._replace(poder_orgao=codigo)
 
     dca = _DcaEspia()
     fonte = _fonte({1: [po("100.00", "10131"), po("40.00", "20231")]},
                    {1: [po("70.00", "10131"), po("30.00", "20231")]})
-    r = _bp(fonte, dca=dca)
+    r = _bp(fonte, RepoFake(), dca=dca)
 
     assert set(r.recortes) >= {"po:10131", "po:20231"}
-    assert _cel(r.recortes["po:20231"].resultado, "L3") == D("30.00")
-    assert r.recortes["po:20231"].resultado.procedencia.origem_exercicio_anterior == MSCE
+    _sem_anterior(r.recortes["po:20231"].resultado)
     assert dca.chamadas == 0                    # consolidado não tem origem própria
 
 
@@ -495,11 +509,20 @@ def test_bf_anterior_processado_traz_os_estornos_de_n1():
     assert ug1.procedencia.estorno_receita_extra == {"2025": "10.00"}     # o de N, só
 
 
-def test_bf_unidade_ausente_em_n1_exige_manual():
-    """Scenario: UG sem MSC no ano anterior — BF"""
+def test_bf_unidade_ausente_em_n1_cai_em_zero():
+    """Scenario: primeira apuração sem exercício anterior conclui — BF"""
     fonte = _fonte_bf()
-    with pytest.raises(ProcessadoSemAnterior, match="Processe 2024 ou use Manual"):
-        _bf(fonte, _bf_n1(fonte))
+    r = _bf(fonte, _bf_n1(fonte))
+
+    ug3 = r.recortes["ug:3"].resultado
+    anteriores = [(rule_id, coluna, valor) for rule_id, celulas in ug3.matriz.items()
+                  for coluna, valor in celulas.items() if coluna.endswith("_anterior")]
+    assert len(anteriores) > 80 and all(valor == D("0.00") for _, _, valor in anteriores)
+    assert not [n for n in ug3.diagnostico.nao_apuradas if n.coluna.endswith("_anterior")]
+    assert ug3.diagnostico.sem_dados_exercicio_anterior is True
+    assert ug3.procedencia.origem_exercicio_anterior == SEM_ANTERIOR
+    assert _cel(ug3, "L27") == D("0.00")
+    assert r.diagnostico.sem_dados_exercicio_anterior is True
 
 
 def test_bf_consolidado_e_a_soma_das_unidades():
@@ -515,7 +538,7 @@ def test_bf_consolidado_e_a_soma_das_unidades():
     assert r.procedencia.origem_exercicio_anterior == "soma_das_unidades"
 
 
-def test_bf_grupo_somado_e_igual_ao_grupo_filtrado_em_msce():
+def test_bf_grupo_sem_n1_soma_zero_e_a_coluna_atual_nao_muda():
     """Scenario: aditividade — BF"""
     from app.services.bf.quadro_principal import apurar
 
@@ -524,7 +547,13 @@ def test_bf_grupo_somado_e_igual_ao_grupo_filtrado_em_msce():
     esperado = apurar(2611606, EXERCICIO, apuracao._Filtrada(fonte, {"ug:1", "ug:3"}),
                       g8_so_no_consolidado=True)
 
-    assert r.recortes["poder:executivo"].resultado.matriz == esperado.matriz
+    grupo = r.recortes["poder:executivo"].resultado
+    for rule_id, celulas in grupo.matriz.items():
+        for coluna, valor in celulas.items():
+            if coluna.endswith("_anterior"):
+                assert valor == D("0.00"), (rule_id, coluna)
+            else:
+                assert valor == esperado.matriz[rule_id][coluna], (rule_id, coluna)
 
 
 def test_bf_origem_manual_por_unidade():

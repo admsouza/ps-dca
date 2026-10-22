@@ -140,11 +140,13 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
            valores_anteriores: dict[str, Decimal] | None = None,
            valores_sem_mapeamento: dict[str, Decimal] | None = None,
            g8_so_no_consolidado: bool = False,
-           anterior_pronto: dict | None = None) -> Resultado:
+           anterior_pronto: dict | None = None,
+           zero_sem_anterior: bool = False) -> Resultado:
     """Apura as 66 linhas do quadro principal, nas duas colunas.
 
     `anterior_pronto`: coluna anterior já pronta, por (quadro, código) — o `PROCESSADO`, que não lê
-    N−1 (ver `pipeline/anterior.py`).
+    N−1 (ver `pipeline/anterior.py`). `zero_sem_anterior`: a célula ausente dela vale `0,00`, sem
+    `NaoApurada` (unidade sem exercício anterior).
 
     `g8_so_no_consolidado`: recorte fora do consolidado — as linhas que o G8 completaria ficam
     não apuradas, porque o valor foi digitado para o ente."""
@@ -196,13 +198,16 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
         despesas = {**despesa_anterior, **despesas}
     elif anterior is Anterior.PROCESSADO:
         coluna_anterior = {}
-        for linha in mapa.linhas:
-            celulas = anterior_pronto["matriz"].get((linha.quadro, linha.codigo))
-            nao_apuradas += [
-                NaoApurada(linha.id, coluna, "-",
-                           SEM_LINHA_ANTERIOR if celulas is None else SEM_VALOR_ANTERIOR)
-                for coluna in _colunas_de(linha, atual)
-                if coluna.endswith(SUFIXO_ANTERIOR) and (celulas or {}).get(coluna) is None]
+        if zero_sem_anterior:                    # a ausência já está dita no diagnóstico
+            nao_apuradas = [n for n in nao_apuradas if not n.coluna.endswith(SUFIXO_ANTERIOR)]
+        else:
+            for linha in mapa.linhas:
+                celulas = anterior_pronto["matriz"].get((linha.quadro, linha.codigo))
+                nao_apuradas += [
+                    NaoApurada(linha.id, coluna, "-",
+                               SEM_LINHA_ANTERIOR if celulas is None else SEM_VALOR_ANTERIOR)
+                    for coluna in _colunas_de(linha, atual)
+                    if coluna.endswith(SUFIXO_ANTERIOR) and (celulas or {}).get(coluna) is None]
     else:
         principal, saldos_anexo = _completar_manual(mapa, principal, anexo)
         coluna_anterior = {}
@@ -234,7 +239,7 @@ def apurar(ente: int, exercicio: int, fonte, direcao=None, mapa: MapaBO | None =
             if linha.quadro == QUADRO_PRINCIPAL and linha.codigo not in principal
         ]
 
-    matriz = _montar(mapa, atual, coluna_anterior, anterior, anterior_pronto)
+    matriz = _montar(mapa, atual, coluna_anterior, anterior, anterior_pronto, zero_sem_anterior)
 
     return Resultado(
         mapa=mapa,
@@ -619,7 +624,7 @@ def _origens(mapa: MapaBO, origem) -> dict[str, str]:
 # ─── montagem das colunas e conferências ─────────────────────────────────────
 
 def _montar(mapa: MapaBO, atual: dict, anterior_valores: dict, anterior: Anterior,
-            pronto: dict | None = None) -> dict:
+            pronto: dict | None = None, zerar: bool = False) -> dict:
     """Junta as colunas do exercício e do exercício anterior, linha a linha.
 
     O par de colunas é dado pelo **sufixo** declarado na regra: `_atual` e `_anterior`. Vale para
@@ -632,7 +637,8 @@ def _montar(mapa: MapaBO, atual: dict, anterior_valores: dict, anterior: Anterio
         celulas: dict[str, Decimal | None] = {}
         for coluna in _colunas_de(linha, atual):
             if coluna.endswith(SUFIXO_ANTERIOR) and anterior is Anterior.PROCESSADO:
-                celulas[coluna] = pronto["matriz"].get((linha.quadro, linha.codigo), {}).get(coluna)
+                celulas[coluna] = pronto["matriz"].get((linha.quadro, linha.codigo), {}).get(
+                    coluna, Decimal("0.00") if zerar else None)
             elif coluna.endswith(SUFIXO_ANTERIOR):
                 par = coluna[: -len(SUFIXO_ANTERIOR)] + SUFIXO_ATUAL
                 lido = anterior_valores.get(linha.id) or {}
