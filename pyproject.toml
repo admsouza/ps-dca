@@ -47,4 +47,6 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-addopts = "-q"
+# `vivo` vai à rede (SICONFI). Fora da suíte padrão; rode com `-m vivo`.
+addopts = "-q -m 'not vivo'"
+markers = ["vivo: conferência contra dado publicado, exige rede"]

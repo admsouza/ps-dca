@@ -1,0 +1,11 @@
+# Fonte normativa da Demonstração das Variações Patrimoniais. O PDF vive em
+# docs/referencia/ipc/ e nunca é copiado para dentro de knowledge/ —
+# scripts/check_sources.py falha se isso acontecer.
+document: IPC05
+title: "IPC 05 — Metodologia para Elaboração da Demonstração das Variações Patrimoniais"
+file: "IPC05 - DVP atualizacao - 20200117.pdf"
+path: "docs/referencia/ipc/IPC05 - DVP atualizacao - 20200117.pdf"
+pages: 16
+edition: "2020-01"
+published_at: "2020-01-20"
+sha256: "7440efcc96bbdb80d982e9930c0ce53f057bd0dd767b277fa9f1f0589c5afea8"

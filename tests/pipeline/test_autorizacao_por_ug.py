@@ -311,7 +311,8 @@ def _resultado(anexo: str) -> dict:
     Sem isto o golden paga 12 apurações (3 anexos × 4 conjuntos de poderes) para comparar o mesmo
     payload. A cobertura é a mesma: entre os casos varia o poder, não o resultado apurado.
     """
-    fabrica = RESULTADOS[anexo]                 # BP e BF partem da mesma: uma apuração serve às duas
+    # BP e BF partem da mesma: uma apuração serve às duas
+    fabrica = RESULTADOS[anexo]
     if fabrica not in _APURADO:
         _APURADO[fabrica] = fabrica()
     return deepcopy(_APURADO[fabrica])

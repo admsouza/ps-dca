@@ -20,7 +20,7 @@ from app.services.pipeline.cache import escolhas_gravadas
 from app.services.pipeline.registry import ANEXOS, REGISTRY
 
 SEM_CACHE = "sem_cache"
-COM_UNIDADES = ("BF", "BP")      # só estes anexos trazem `recortes`
+COM_UNIDADES = ("BF", "BP", "I-HI")    # só estes anexos trazem `recortes`
 
 
 class Repo(Protocol):

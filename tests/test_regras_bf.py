@@ -550,10 +550,10 @@ def test_policy_sem_origem_e_rejeitada(base, validar):
 
 
 def test_dois_documentos_integros(verificar_fontes):
-    """Scenario: dois documentos íntegros — três desde o IPC 04 (`bp-apuracao-f1`)."""
+    """Scenario: dois documentos íntegros — quatro desde o IPC 05 (`dvp-quadro-principal`)."""
     rel = verificar_fontes(KNOWLEDGE)
     assert rel.exit_code == 0, mensagens(rel)
-    assert rel.contagens["documentos"] == 3
+    assert rel.contagens["documentos"] == 4
 
 
 def test_anexo_i_substituido_por_edicao_posterior(base, verificar_fontes, tmp_path):

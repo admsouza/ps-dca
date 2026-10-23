@@ -21,6 +21,12 @@ BF publicado.
 - [x] 2.2 Nova leitura MSC em `app/infra/msc/fonte.py` (`fonte_periodo`; 12 competências,
       `TipoSaldo.PERIODO`, isolada às contas de `L28`/`L61` via `app/services/bf/quadro_principal.py`)
 - [x] 2.3 `app/infra/regras/carregador.py`: lê `apenas_natureza` do YAML (`_apenas_natureza`)
+- [x] 2.3.1 `knowledge/schemas/rule.json`: propriedade `apenas_natureza` (`enum: credito|debito`).
+      Ficou de fora em 2026-10-01 e, como o schema tem `additionalProperties: false`,
+      `python -m scripts.validate_rules knowledge` saía com exit 1 em `ingressos.l27`,
+      `ingressos.l28`, `dispendios.l60` e `dispendios.l61` — gate da base canônica
+      (`openspec/project.md:78`) vermelho para todas as changes. Corrigido em 2026-10-23:
+      o comando volta a **exit 0, 0 erros, 226 regras**. Só validação; nenhum valor muda
 - [x] 2.4 `knowledge/rules/bf/quadro_principal.yaml`: `accounts` + `apenas_natureza` em `L28`
       (~l.1752) e `L61` (~l.3755); `status: review_required` mantido (ver 4.3)
 - [x] 2.5 `app/services/bf/informados.py:24`: `"L28"`, `"L61"` removidos de `CODIGOS_SEM_MAPEAMENTO`

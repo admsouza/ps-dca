@@ -83,6 +83,7 @@ regra vira `extracted` sem evidência medida.
 | `app/domain/bo/saldo.py` | alterar (nova função) |
 | `app/infra/msc/fonte.py` | alterar (nova leitura por competência) |
 | `app/infra/regras/carregador.py` | alterar (ler discriminador novo) |
+| `knowledge/schemas/rule.json` | alterar (propriedade `apenas_natureza`, `enum: credito\|debito`) |
 | `app/services/bf/informados.py` | alterar (linha 24) |
 | `tests/bf/test_l28_l61_contas_especificas.py` | criar |
 

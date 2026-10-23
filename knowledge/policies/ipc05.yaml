@@ -1,0 +1,41 @@
+# Regras gerais da Demonstração das Variações Patrimoniais — IPC 05, p. 6.
+policies:
+- policy_id: ipc05.exclusao_intra_nao_executada
+  descricao: O item 15 descreve a DVP consolidada com exclusão das contas intraorçamentárias. Essa
+    lista não entra no cálculo. Medido em 2026-10-23 contra o DCA-Anexo I-HI de João Pessoa 2025,
+    L6 fica 11.722.481.279,59 e L14 fica 9.199.369.111,48 com as contas intra dentro; a lista do
+    IPC 05 reduziria esses valores para 3.151.851.371,43 e 628.739.203,32. O mesmo fechamento,
+    sem exclusão, vale para Porto Alegre 2025 e para a coluna de 2024 dos dois entes (PO 2026-10-23).
+  aplica_a:
+    demonstrativo: DVP
+    quadro: QUADRO_PRINCIPAL
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 6
+    section: INSTRUÇÕES PARA PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '15'
+  evidence:
+    page: 6
+    text: No levantamento da DVP de um órgão ou unidade específico do ente, as operações
+      intraorçamentárias não devem ser excluídas.
+  status: extracted
+- policy_id: ipc05.intra_quinto_nivel_nao_executado
+  descricao: O item 16 manda deduzir contas intra de 5º nível = 2 criadas pelo ente. Esta policy não
+    autoriza esse filtro. As linhas executam o somatório do 2º nível, inclusive o 5º nível 2 oficial
+    e o criado pelo ente (PO 2026-10-23).
+  aplica_a:
+    demonstrativo: DVP
+    quadro: QUADRO_PRINCIPAL
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 6
+    section: INSTRUÇÕES PARA PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '16'
+  evidence:
+    page: 6
+    text: Tendo em vista a faculdade do ente público em criar detalhamentos em 5º nível além dos
+      previstos no PCASP, o ente deverá deduzir as contas de nível intraorçamentário (5º nível = 2)
+      eventualmente criadas.
+  status: extracted

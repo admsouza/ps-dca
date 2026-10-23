@@ -204,9 +204,8 @@ def test_coluna_nova_na_transcricao_entra_na_vigencia_antiga():
     da semente antiga ganha a coluna da transcrição.
     """
     from app.infra.regras.carregador import carregar
-    from app.infra.regras.vigencias import _achatar
+    from app.infra.regras.vigencias import _achatar, publicar
     from app.infra.regras.vigencias import carregar as carregar_do_banco
-    from app.infra.regras.vigencias import publicar
     from tests.pipeline.conftest import RepoVigenciasFake
 
     do_yaml = carregar(EXERCICIO)

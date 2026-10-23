@@ -141,8 +141,9 @@ def test_bp_fora_do_consolidado_sem_n1_cai_em_zero():
 
 
 def test_anexo_fora_do_recorte_nao_ganha_recortes():
-    """Scenario: anexo sem recorte — só BO, BP e BF (change `bf-por-unidade-gestora`)."""
-    assert set(apuracao.RECORTAVEIS) == {"BO", "BP", "BF"}
+    """Scenario: anexo sem recorte — só BO, BP, BF e I-HI (changes `bf-por-unidade-gestora` e
+    `dvp-por-unidade-gestora`)."""
+    assert set(apuracao.RECORTAVEIS) == {"BO", "BP", "BF", "I-HI"}
 
 
 def test_serializacao_dos_recortes():

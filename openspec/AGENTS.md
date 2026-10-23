@@ -48,6 +48,20 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 ## Change ativa
 
+**`lint-base-zero` arquivada em 2026-10-23:** `python -m ruff check .` volta a sair limpo
+(era 6 achados herdados). O gate de lint de toda change passa a ser binário — achado novo não
+se esconde mais atrás de uma linha de base escrita à mão.
+
+**Changes da DVP (fatiadas em 2026-10-23, pela complexidade de cada etapa):**
+`dvp-quadro-principal` **arquivada em 2026-10-23** (apuração consolidada em `MSCE`: 880 passed,
+`pytest -m vivo` 3 passed contra o SICONFI, ruff e `validate_rules` limpos) →
+`dvp-no-pipeline` **arquivada em 2026-10-23** (`GET /dca/I-HI`, resumo, percurso e `app/cli/dvp.py`:
+893 passed; CLI contra o SICONFI com L1 17.319.103.824,61 em 2025) →
+`dvp-por-unidade-gestora` **implementada em 2026-10-23, ainda ativa** (916 passed, `pytest -m vivo`
+3 passed). Não arquivada: falta a conferência com ente real por UG (§4.3) e o arquivamento de
+`pipeline-dca-por-unidade-gestora` e `pipeline-anterior-por-recorte`, das quais o delta de
+`pipeline/unidade-gestora` depende.
+
 **Change ativa, fase VERIFY (proposal/spec aprovadas pelo PO em 2026-10-21):**
 `bp-compensacao-atual-manual-por-recorte` — a coluna atual das Contas de Compensação
 do BP deixa de ser apurada pela matriz e passa a ser informada nas folhas de cada `ug:`/`po:`.
@@ -155,6 +169,9 @@ encerramento e a entrada do BF no pipeline continuam em `openspec/changes/archiv
 
 | Data | Change |
 |---|---|
+| 2026-10-23 | `lint-base-zero` — `python -m ruff check .` sai limpo (eram 6 achados herdados). Sem delta de spec. Gate de lint volta a ser binário. |
+| 2026-10-23 | `dvp-no-pipeline` — DVP servida pelo pipeline: `GET /dca/I-HI`, resumo `implementado: true`, percurso `BO`/`BF`/`BP`/`I-HI`, CLI `app/cli/dvp.py`. `ORDEM_POR_DOCUMENTO["IPC05"]`. `pipeline/plataforma` 89 → 95. Suíte 893 passed. |
+| 2026-10-23 | `dvp-quadro-principal` — Quadro Principal da DVP (IPC 05) no contrato de BO/BP/BF: 19 regras, sem exclusão intra, `MSCE`/abertura, classes 3 e 4. Capability `dca/demonstracao-variacoes-patrimoniais` (9 cenários). JP 2025 L1 17.319.103.824,61. Suíte 880 passed; `pytest -m vivo` 3 passed. |
 | 2026-10-08 | `bp-consolidado-sem-exclusao` — **o processamento do BP inclui todas as contas.** A visão `consolidado` deixa de executar os filtros intra-OFSS e sai igual ao `isolado` e à I-AB. Filtros `visao: consolidado` permanecem na regra. Cuitegi 2025: `L1` = `L15` = 76.314.331,92 e equilíbrio 0,00 nas duas visões. Cache antigo com exclusão vale até reprocessar. `dca/balanco-patrimonial` segue em 36 cenários. Suíte 606 passed. |
 | 2026-10-08 | `bp-visao-consolidado-isolado` — **BP emitido isolado (padrão) ou consolidado.** As 20 exclusões intra do IPC 04 voltam ao Quadro Principal como `filters` com `visao: consolidado` (`L34` exclui `2.3.2.1.2`, literal do PDF `2.3.2.0.2` inexistente no PCASP). Um processamento apura as duas visões sobre uma leitura da fonte; `GET /dca/BP?visao=` escolhe sem job; cache sem consolidado → `409`. F/P, Compensação e Superávit iguais nas duas. Cuitegi 2025: isolado = planilha; consolidado `L1` 47.083.540,63, `L15` 49.088.262,32, equilíbrio −2.004.721,69 (achado). Front: `dca-bp-visao-consolidado`; conferido no navegador pelo PO (2026-10-08). `dca/balanco-patrimonial` 27 → 36 cenários. Suíte 606 passed. |
 | 2026-10-07 | `bp-espelho-iab` — **o BP espelha o `DCA-Anexo I-AB` declarado.** Sem exclusões intra-OFSS no Quadro Principal e `L5` = `2.1`/`2.2` F + `6.3.1.1` + `6.3.1.5` + `6.3.1.7.1`. Revoga P7-a e P8-a. Cuitegi 2025 = `SICONFI_DCA_2831_ANUAL_1.xls` em centavos, equilíbrio 0,00; JP 2024/2025 = `I-AB` do `tt/dca`. |

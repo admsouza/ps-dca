@@ -57,6 +57,14 @@
         }
       }
     },
+    "apenas_natureza": {
+      "type": "string",
+      "enum": [
+        "credito",
+        "debito"
+      ],
+      "description": "Soma só os lançamentos desta natureza, sem subtrair o lado oposto (L28/L61 do BF). O carregador traduz para C/D."
+    },
     "policies": {
       "type": "array",
       "items": {

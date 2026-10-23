@@ -1447,5 +1447,138 @@
     "quadro": "SUPERAVIT_DEFICIT",
     "document": "IPC04",
     "page": 13
+  },
+  "dvp.quadro_principal.resultado.l19": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 9
+  },
+  "dvp.quadro_principal.vpa.l1": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 8
+  },
+  "dvp.quadro_principal.vpa.l2": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 8
+  },
+  "dvp.quadro_principal.vpa.l3": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 8
+  },
+  "dvp.quadro_principal.vpa.l4": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 8
+  },
+  "dvp.quadro_principal.vpa.l5": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 8
+  },
+  "dvp.quadro_principal.vpa.l6": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 8
+  },
+  "dvp.quadro_principal.vpa.l7": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 8
+  },
+  "dvp.quadro_principal.vpa.l8": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 8
+  },
+  "dvp.quadro_principal.vpd.l10": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 8
+  },
+  "dvp.quadro_principal.vpd.l11": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 8
+  },
+  "dvp.quadro_principal.vpd.l12": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 9
+  },
+  "dvp.quadro_principal.vpd.l13": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 9
+  },
+  "dvp.quadro_principal.vpd.l14": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 9
+  },
+  "dvp.quadro_principal.vpd.l15": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 9
+  },
+  "dvp.quadro_principal.vpd.l16": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 9
+  },
+  "dvp.quadro_principal.vpd.l17": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 9
+  },
+  "dvp.quadro_principal.vpd.l18": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 9
+  },
+  "dvp.quadro_principal.vpd.l9": {
+    "file": "rules/dvp/quadro_principal.yaml",
+    "demonstrativo": "DVP",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC05",
+    "page": 8
   }
 }

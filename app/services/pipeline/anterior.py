@@ -160,7 +160,7 @@ def validar_escolhas(anexo: str, exercicio: int, escolhas: dict[str, Any]) -> di
 
     Só unidades (`ug:`/`po:`): grupo e `consolidado` derivam. `padrao` limpa a escolha gravada.
     """
-    if anexo not in ("BF", "BP"):
+    if anexo not in ("BF", "BP", "I-HI"):
         raise ValueError(f"{anexo} não tem coluna anterior por unidade")
     saida: dict[str, dict] = {}
     for chave, escolha in escolhas.items():
@@ -184,6 +184,8 @@ def validar_escolhas(anexo: str, exercicio: int, escolhas: dict[str, Any]) -> di
 def _validar_manual(anexo: str, exercicio: int, valores: dict[str, str]) -> None:
     if anexo == "BP":
         from app.services.bp.informados import validar_valores_anteriores
+    elif anexo == "I-HI":
+        from app.services.dvp.informados import validar_valores_anteriores
     else:
         from app.services.bf.informados import validar_valores_anteriores
     validar_valores_anteriores(exercicio, valores)

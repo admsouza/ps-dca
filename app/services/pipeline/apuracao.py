@@ -27,6 +27,7 @@ _CODIGO_DA_APURACAO = (
     _RAIZ_APP / "services" / "bf",
     _RAIZ_APP / "services" / "bo",
     _RAIZ_APP / "services" / "bp",
+    _RAIZ_APP / "services" / "dvp",
     _RAIZ_APP / "infra" / "msc",
     _RAIZ_APP / "infra" / "siconfi",    # DCA publicada (BP, coluna anterior)
     _RAIZ_APP / "infra" / "pcasp",      # direção do saldo
@@ -121,7 +122,7 @@ class _NoEscopo:
 
 # Anexos apurados também por recorte (changes `pipeline-dca-por-unidade-gestora` e
 # `bf-por-unidade-gestora`).
-RECORTAVEIS = ("BO", "BP", "BF")
+RECORTAVEIS = ("BO", "BP", "BF", "I-HI")
 
 
 class Recorte(NamedTuple):

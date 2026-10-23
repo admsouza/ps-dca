@@ -24,8 +24,8 @@ class Anexo:
     codigo: str
     servico: str | None          # "modulo:funcao" — `None` = ainda não implementado
     job: str = JOB_APURAR
-    # Base canônica que rege o anexo: `bo` é o IPC 07, `bf` é o IPC 06. Sem isto, o carregador
-    # devolveria as regras do BO para qualquer anexo — regra errada, sem erro.
+    # Base canônica que rege o anexo: `bo` é o IPC 07, `bf` o IPC 06, `dvp` o IPC 05. Sem isto,
+    # o carregador devolveria as regras do BO para qualquer anexo — regra errada, sem erro.
     base_canonica: str = "bo"
 
 
@@ -43,7 +43,9 @@ REGISTRY: tuple[Anexo, ...] = (
     Anexo("I-E", None),
     Anexo("I-F", None),
     Anexo("I-G", None),
-    Anexo("I-HI", None),
+    # A DVP é derivada da MSC como o BP (IPC 05). Sem `base_canonica="dvp"` o carregador devolveria
+    # as regras do BO — 69 linhas do IPC 07, sem erro nenhum.
+    Anexo("I-HI", "app.services.dvp.quadro_principal:apurar", base_canonica="dvp"),
 )
 
 ANEXOS: tuple[str, ...] = tuple(a.codigo for a in REGISTRY)

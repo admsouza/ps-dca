@@ -1468,7 +1468,8 @@
    "calculado_em": null,
    "duracao_ms": null,
    "erro_detalhe": null,
-   "implementado": false,
+   "implementado": true,
+   "recortes": [],
    "status": "sem_cache",
    "versao_api": null,
    "versao_regras": null
@@ -2939,7 +2940,8 @@
    "calculado_em": null,
    "duracao_ms": null,
    "erro_detalhe": null,
-   "implementado": false,
+   "implementado": true,
+   "recortes": [],
    "status": "sem_cache",
    "versao_api": null,
    "versao_regras": null
@@ -4389,7 +4391,8 @@
    "calculado_em": null,
    "duracao_ms": null,
    "erro_detalhe": null,
-   "implementado": false,
+   "implementado": true,
+   "recortes": [],
    "status": "sem_cache",
    "versao_api": null,
    "versao_regras": null
@@ -5828,7 +5831,8 @@
    "calculado_em": null,
    "duracao_ms": null,
    "erro_detalhe": null,
-   "implementado": false,
+   "implementado": true,
+   "recortes": [],
    "status": "sem_cache",
    "versao_api": null,
    "versao_regras": null
@@ -7174,7 +7178,8 @@
    "calculado_em": null,
    "duracao_ms": null,
    "erro_detalhe": null,
-   "implementado": false,
+   "implementado": true,
+   "recortes": [],
    "status": "sem_cache",
    "versao_api": null,
    "versao_regras": null
@@ -8515,7 +8520,8 @@
    "calculado_em": null,
    "duracao_ms": null,
    "erro_detalhe": null,
-   "implementado": false,
+   "implementado": true,
+   "recortes": [],
    "status": "sem_cache",
    "versao_api": null,
    "versao_regras": null
@@ -9840,7 +9846,8 @@
    "calculado_em": null,
    "duracao_ms": null,
    "erro_detalhe": null,
-   "implementado": false,
+   "implementado": true,
+   "recortes": [],
    "status": "sem_cache",
    "versao_api": null,
    "versao_regras": null
@@ -11165,7 +11172,8 @@
    "calculado_em": null,
    "duracao_ms": null,
    "erro_detalhe": null,
-   "implementado": false,
+   "implementado": true,
+   "recortes": [],
    "status": "sem_cache",
    "versao_api": null,
    "versao_regras": null
@@ -12641,7 +12649,8 @@
    "calculado_em": null,
    "duracao_ms": null,
    "erro_detalhe": null,
-   "implementado": false,
+   "implementado": true,
+   "recortes": [],
    "status": "sem_cache",
    "versao_api": null,
    "versao_regras": null
@@ -14113,7 +14122,8 @@
    "calculado_em": null,
    "duracao_ms": null,
    "erro_detalhe": null,
-   "implementado": false,
+   "implementado": true,
+   "recortes": [],
    "status": "sem_cache",
    "versao_api": null,
    "versao_regras": null
@@ -15564,7 +15574,8 @@
    "calculado_em": null,
    "duracao_ms": null,
    "erro_detalhe": null,
-   "implementado": false,
+   "implementado": true,
+   "recortes": [],
    "status": "sem_cache",
    "versao_api": null,
    "versao_regras": null
@@ -17004,7 +17015,8 @@
    "calculado_em": null,
    "duracao_ms": null,
    "erro_detalhe": null,
-   "implementado": false,
+   "implementado": true,
+   "recortes": [],
    "status": "sem_cache",
    "versao_api": null,
    "versao_regras": null

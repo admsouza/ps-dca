@@ -1,0 +1,1039 @@
+# Quadro Principal da Demonstração das Variações Patrimoniais — IPC 05, pp. 8–9.
+# 19 linhas. A coluna Exclusões do PDF fica na evidência e não vira filtro (PO 2026-10-23).
+rules:
+- rule_id: dvp.quadro_principal.vpa.l1
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPA
+    descricao: Variações Patrimoniais Aumentativas
+  linha:
+    codigo: L1
+    descricao: VARIAÇÕES PATRIMONIAIS AUMENTATIVAS
+    nivel: 1
+    ordem: 1
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L1
+  evidence:
+    page: 8
+    text: L1 VARIAÇÕES PATRIMONIAIS AUMENTATIVAS (L2 + L3 + L4 + L5 + L6 + L7 + L8)
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dvp.quadro_principal.vpa.l2
+      sign: +
+    - rule: dvp.quadro_principal.vpa.l3
+      sign: +
+    - rule: dvp.quadro_principal.vpa.l4
+      sign: +
+    - rule: dvp.quadro_principal.vpa.l5
+      sign: +
+    - rule: dvp.quadro_principal.vpa.l6
+      sign: +
+    - rule: dvp.quadro_principal.vpa.l7
+      sign: +
+    - rule: dvp.quadro_principal.vpa.l8
+      sign: +
+- rule_id: dvp.quadro_principal.vpa.l2
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPA
+    descricao: Variações Patrimoniais Aumentativas
+  linha:
+    codigo: L2
+    descricao: Impostos, Taxas e Contribuições de Melhoria
+    nivel: 2
+    ordem: 2
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L2
+  evidence:
+    page: 8
+    text: L2 Impostos, Taxas e Contribuições de Melhoria 4.1.0.0.0.00.00
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 4.1.0.0.0.00.00
+        pattern: '41'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 4.1.0.0.0.00.00
+        pattern: '41'
+        sign: +
+- rule_id: dvp.quadro_principal.vpa.l3
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPA
+    descricao: Variações Patrimoniais Aumentativas
+  linha:
+    codigo: L3
+    descricao: Contribuições
+    nivel: 2
+    ordem: 3
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L3
+  evidence:
+    page: 8
+    text: 'L3 Contribuições 4.2.0.0.0.00.00 Exclusões: (4.2.1.1.2.00.00) (4.2.1.2.2.00.00) (4.2.1.7.2.00.00)'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 4.2.0.0.0.00.00
+        pattern: '42'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 4.2.0.0.0.00.00
+        pattern: '42'
+        sign: +
+- rule_id: dvp.quadro_principal.vpa.l4
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPA
+    descricao: Variações Patrimoniais Aumentativas
+  linha:
+    codigo: L4
+    descricao: Exploração e Venda de Bens, Serviços e Direitos
+    nivel: 2
+    ordem: 4
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L4
+  evidence:
+    page: 8
+    text: 'L4 Exploração e Venda de Bens, Serviços e Direitos 4.3.0.0.0.00.00 Exclusões: 4.3.3.1.2.00.00'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 4.3.0.0.0.00.00
+        pattern: '43'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 4.3.0.0.0.00.00
+        pattern: '43'
+        sign: +
+- rule_id: dvp.quadro_principal.vpa.l5
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPA
+    descricao: Variações Patrimoniais Aumentativas
+  linha:
+    codigo: L5
+    descricao: Variações Patrimoniais Aumentativas Financeiras
+    nivel: 2
+    ordem: 5
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L5
+  evidence:
+    page: 8
+    text: 'L5 Variações Patrimoniais Aumentativas Financeiras 4.4.0.0.0.00.00 Exclusões: 4.4.1.1.2.00.00; 4.4.2.1.2.00.00; 4.4.2.5.2.00.00'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 4.4.0.0.0.00.00
+        pattern: '44'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 4.4.0.0.0.00.00
+        pattern: '44'
+        sign: +
+- rule_id: dvp.quadro_principal.vpa.l6
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPA
+    descricao: Variações Patrimoniais Aumentativas
+  linha:
+    codigo: L6
+    descricao: Transferências e Delegações Recebidas
+    nivel: 2
+    ordem: 6
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L6
+  evidence:
+    page: 8
+    text: 'L6 Transferências e Delegações Recebidas 4.5.0.0.0.00.00 Exclusões: (4.5.1.0.0.00.00)'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 4.5.0.0.0.00.00
+        pattern: '45'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 4.5.0.0.0.00.00
+        pattern: '45'
+        sign: +
+- rule_id: dvp.quadro_principal.vpa.l7
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPA
+    descricao: Variações Patrimoniais Aumentativas
+  linha:
+    codigo: L7
+    descricao: Valorização e Ganhos com Ativos e Desincorporação de Passivos
+    nivel: 2
+    ordem: 7
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L7
+  evidence:
+    page: 8
+    text: 'L7 Valorização e Ganhos com Ativos e Desincorporação de Passivos 4.6.0.0.0.00.00 Exclusões: (4.6.5.1.2.00.00)'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 4.6.0.0.0.00.00
+        pattern: '46'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 4.6.0.0.0.00.00
+        pattern: '46'
+        sign: +
+- rule_id: dvp.quadro_principal.vpa.l8
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPA
+    descricao: Variações Patrimoniais Aumentativas
+  linha:
+    codigo: L8
+    descricao: Outras Variações Patrimoniais Aumentativas
+    nivel: 2
+    ordem: 8
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L8
+  evidence:
+    page: 8
+    text: 'L8 Outras Variações Patrimoniais Aumentativas 4.9.0.0.0.00.00 Exclusões: (4.9.2.1.2.00.00) (4.9.7.2.2.00.00) (4.9.9.1.2.00.00) (4.9.9.4.2.00.00)'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 4.9.0.0.0.00.00
+        pattern: '49'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 4.9.0.0.0.00.00
+        pattern: '49'
+        sign: +
+- rule_id: dvp.quadro_principal.vpd.l9
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPD
+    descricao: Variações Patrimoniais Diminutivas
+  linha:
+    codigo: L9
+    descricao: VARIAÇÕES PATRIMONIAIS DIMINUTIVAS
+    nivel: 1
+    ordem: 9
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L9
+  evidence:
+    page: 8
+    text: L9 VARIAÇÕES PATRIMONIAIS DIMINUTIVAS (L10 + L11 + L12 + L13 + L14 + L15 + L16 + L17 + L18)
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dvp.quadro_principal.vpd.l10
+      sign: +
+    - rule: dvp.quadro_principal.vpd.l11
+      sign: +
+    - rule: dvp.quadro_principal.vpd.l12
+      sign: +
+    - rule: dvp.quadro_principal.vpd.l13
+      sign: +
+    - rule: dvp.quadro_principal.vpd.l14
+      sign: +
+    - rule: dvp.quadro_principal.vpd.l15
+      sign: +
+    - rule: dvp.quadro_principal.vpd.l16
+      sign: +
+    - rule: dvp.quadro_principal.vpd.l17
+      sign: +
+    - rule: dvp.quadro_principal.vpd.l18
+      sign: +
+- rule_id: dvp.quadro_principal.vpd.l10
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPD
+    descricao: Variações Patrimoniais Diminutivas
+  linha:
+    codigo: L10
+    descricao: Pessoal e Encargos
+    nivel: 2
+    ordem: 10
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L10
+  evidence:
+    page: 8
+    text: 'L10 Pessoal e Encargos 3.1.0.0.0.00.00 Exclusões: (3.1.2.1.2.00.00) (3.1.2.2.2.00.00) (3.1.2.9.2.00.00)'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.1.0.0.0.00.00
+        pattern: '31'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.1.0.0.0.00.00
+        pattern: '31'
+        sign: +
+- rule_id: dvp.quadro_principal.vpd.l11
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPD
+    descricao: Variações Patrimoniais Diminutivas
+  linha:
+    codigo: L11
+    descricao: Benefícios Previdenciários e Assistenciais
+    nivel: 2
+    ordem: 11
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L11
+  evidence:
+    page: 8
+    text: L11 Benefícios Previdenciários e Assistenciais 3.2.0.0.0.00.00
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.2.0.0.0.00.00
+        pattern: '32'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.2.0.0.0.00.00
+        pattern: '32'
+        sign: +
+- rule_id: dvp.quadro_principal.vpd.l12
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPD
+    descricao: Variações Patrimoniais Diminutivas
+  linha:
+    codigo: L12
+    descricao: Uso de Bens, Serviços e Consumo de Capital Fixo
+    nivel: 2
+    ordem: 12
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L12
+  evidence:
+    page: 9
+    text: 'L12 Uso de Bens, Serviços e Consumo de Capital Fixo 3.3.0.0.0.00.00 Exclusões: 3.3.2.3.2.00.00'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.3.0.0.0.00.00
+        pattern: '33'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.3.0.0.0.00.00
+        pattern: '33'
+        sign: +
+- rule_id: dvp.quadro_principal.vpd.l13
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPD
+    descricao: Variações Patrimoniais Diminutivas
+  linha:
+    codigo: L13
+    descricao: Variações Patrimoniais Diminutivas Financeiras
+    nivel: 2
+    ordem: 13
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L13
+  evidence:
+    page: 9
+    text: 'L13 Variações Patrimoniais Diminutivas Financeiras 3.4.0.0.0.00.00 Exclusões: 3.4.1.1.2.00.00; 3.4.2.5.2.00.00'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.4.0.0.0.00.00
+        pattern: '34'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.4.0.0.0.00.00
+        pattern: '34'
+        sign: +
+- rule_id: dvp.quadro_principal.vpd.l14
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPD
+    descricao: Variações Patrimoniais Diminutivas
+  linha:
+    codigo: L14
+    descricao: Transferências e Delegações Concedidas
+    nivel: 2
+    ordem: 14
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L14
+  evidence:
+    page: 9
+    text: 'L14 Transferências e Delegações Concedidas 3.5.0.0.0.00.00 Exclusões: (3.5.1.0.0.00.00)'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.5.0.0.0.00.00
+        pattern: '35'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.5.0.0.0.00.00
+        pattern: '35'
+        sign: +
+- rule_id: dvp.quadro_principal.vpd.l15
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPD
+    descricao: Variações Patrimoniais Diminutivas
+  linha:
+    codigo: L15
+    descricao: Desvalorização e Perda de Ativos e Incorporação de Passivos
+    nivel: 2
+    ordem: 15
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L15
+  evidence:
+    page: 9
+    text: 'L15 Desvalorização e Perda de Ativos e Incorporação de Passivos 3.6.0.0.0.00.00 Exclusões: (3.6.1.4.2.00.00) (3.6.1.7.2.00.00)'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.6.0.0.0.00.00
+        pattern: '36'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.6.0.0.0.00.00
+        pattern: '36'
+        sign: +
+- rule_id: dvp.quadro_principal.vpd.l16
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPD
+    descricao: Variações Patrimoniais Diminutivas
+  linha:
+    codigo: L16
+    descricao: Tributárias
+    nivel: 2
+    ordem: 16
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L16
+  evidence:
+    page: 9
+    text: 'L16 Tributárias 3.7.0.0.0.00.00 Exclusões: (3.7.2.1.2.00.00)'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.7.0.0.0.00.00
+        pattern: '37'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.7.0.0.0.00.00
+        pattern: '37'
+        sign: +
+- rule_id: dvp.quadro_principal.vpd.l17
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPD
+    descricao: Variações Patrimoniais Diminutivas
+  linha:
+    codigo: L17
+    descricao: Custo das Mercadorias e dos Produtos Vendidos, e dos Serviços Prestados
+    nivel: 2
+    ordem: 17
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L17
+  evidence:
+    page: 9
+    text: 'L17 Custo das Mercadorias e dos Produtos Vendidos, e dos Serviços Prestados 3.8.0.0.0.00.00 Exclusões: 3.8.1.0.2.00.00; 3.8.2.0.2.00.00; 3.8.3.0.2.00.00'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.8.0.0.0.00.00
+        pattern: '38'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.8.0.0.0.00.00
+        pattern: '38'
+        sign: +
+- rule_id: dvp.quadro_principal.vpd.l18
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: VPD
+    descricao: Variações Patrimoniais Diminutivas
+  linha:
+    codigo: L18
+    descricao: Outras Variações Patrimoniais Diminutivas
+    nivel: 2
+    ordem: 18
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L18
+  evidence:
+    page: 9
+    text: 'L18 Outras Variações Patrimoniais Diminutivas 3.9.0.0.0.00.00 Exclusões: (3.9.2.1.2.00.00) (3.9.9.1.2.00.00) (3.9.9.4.2.00.00)'
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+    reason: 'Coluna Exclusões do IPC 05 permanece só na evidência. Não entra no cálculo: o I-HI fecha com o somatório do 2º nível (PO 2026-10-23).'
+  policies:
+  - ipc05.exclusao_intra_nao_executada
+  - ipc05.intra_quinto_nivel_nao_executado
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: 3.9.0.0.0.00.00
+        pattern: '39'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: 3.9.0.0.0.00.00
+        pattern: '39'
+        sign: +
+- rule_id: dvp.quadro_principal.resultado.l19
+  demonstrativo:
+    codigo: DVP
+    descricao: Demonstração das Variações Patrimoniais
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: RESULTADO
+    descricao: Resultado Patrimonial do Período
+  linha:
+    codigo: L19
+    descricao: RESULTADO PATRIMONIAL DO PERÍODO
+    nivel: 1
+    ordem: 19
+  source:
+    document: IPC05
+    document_version: 2020-01
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+    item: '22'
+    table: Quadro Principal
+    row: L19
+  evidence:
+    page: 9
+    text: L19 RESULTADO PATRIMONIAL DO PERÍODO (L1 - L9)
+  version:
+    source_document: IPC05
+    edition: 2020-01
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-23'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dvp.quadro_principal.vpa.l1
+      sign: +
+    - rule: dvp.quadro_principal.vpd.l9
+      sign: '-'

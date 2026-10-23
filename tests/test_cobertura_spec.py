@@ -41,7 +41,8 @@ CENARIOS_ESPERADOS = {
     # + 6 das notificações no padrão RREO/RGF (`pipeline-notificacao-discord-padrao`).
     # `dca-anterior-edicao-na-celula` soma +1 (escolha gravada no resumo) quando for mesclada:
     # a spec em vigor é a de `openspec/specs/`, e o delta da change ativa não entra na contagem.
-    "pipeline/plataforma": 89,
+    # + 6 da entrada da DVP no pipeline (`dvp-no-pipeline`).
+    "pipeline/plataforma": 95,
     # 11 do percurso completo (`pipeline-completo-dca`) + 2 da notificação por anexo
     # (`pipeline-notificacao-discord-padrao`) + 3 do consolidado pela soma das unidades
     # (`pipeline-consolidado-anterior-soma-unidades`, substitui os 4 de
@@ -53,6 +54,8 @@ CENARIOS_ESPERADOS = {
     # − 4 da origem publicada do consolidado, + 3 do consolidado pela soma das unidades
     # (`pipeline-consolidado-anterior-soma-unidades`).
     "dca/balanco-patrimonial": 32,
+    # 9 do Quadro Principal da DVP (`dvp-quadro-principal`).
+    "dca/demonstracao-variacoes-patrimoniais": 9,
 }
 
 # Capabilities cuja fase TEST já começou — só delas se exige teste por cenário.
@@ -61,7 +64,8 @@ CENARIOS_ESPERADOS = {
 # daqui para a frente, e cenário novo sem teste quebra o build.
 COM_TESTES = ("dca/base-canonica-regras", "dca/balanco-orcamentario",
               "dca/balanco-financeiro", "dca/fonte-msc", "pipeline/plataforma",
-              "pipeline/processamento-completo", "dca/balanco-patrimonial")
+              "pipeline/processamento-completo", "dca/balanco-patrimonial",
+              "dca/demonstracao-variacoes-patrimoniais")
 
 
 def _specs() -> dict[str, list[Path]]:

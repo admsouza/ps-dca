@@ -1,8 +1,11 @@
-"""O SSE/polling de job manda a unidade só no header `X-Unidade-Id` (util compartilhado do front)."""
+"""O SSE/polling de job manda a unidade só no header `X-Unidade-Id`.
+
+Util compartilhado do front.
+"""
 from __future__ import annotations
 
 import pytest
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.routes.dependencias import unidade_autorizada

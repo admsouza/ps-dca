@@ -119,7 +119,6 @@ def carregar(repo: RepoVigencias, anexo: str, exercicio: int) -> MapaBO:
     nenhuma regra tenha mudado.
     """
     from app.infra.regras.carregador import KNOWLEDGE, _hashes_das_tabelas
-
     from app.services.pipeline.registry import anexo as descrever
 
     vigente = resolver(repo, anexo, exercicio)
@@ -185,7 +184,8 @@ def _completar_apresentacao(linhas: tuple[Linha, ...], exercicio: int,
 
     if any(not (origem.nivel and origem.ordem) for origem in linhas) or colunas_extra:
         logger.info(
-            "vigência completada pela transcrição | nivel_ordem=%s colunas_extra=%d sem_correspondente=%d",
+            "vigência completada pela transcrição | nivel_ordem=%s colunas_extra=%d "
+            "sem_correspondente=%d",
             sum(1 for x in linhas if not (x.nivel and x.ordem)),
             colunas_extra,
             len(sem_correspondente),
