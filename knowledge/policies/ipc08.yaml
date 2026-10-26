@@ -1,0 +1,93 @@
+# Regras gerais da Demonstração dos Fluxos de Caixa — IPC 08, p. 6.
+policies:
+- policy_id: ipc08.metodo_direto
+  descricao: A DFC é elaborada pelo método direto.
+  aplica_a:
+    demonstrativo: DFC
+  source:
+    document: IPC08
+    document_version: 2020-01
+    page: 6
+    section: INSTRUÇÕES PARA PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '13'
+  evidence:
+    page: 6
+    text: A DFC é elaborada pelo método direto.
+  status: extracted
+- policy_id: ipc08.classe6_com_naturezas
+  descricao: A DFC usa contas da classe 6 (controles da execução do planejamento e orçamento),
+    com filtros pelas naturezas orçamentárias de receitas e de despesas, bem como funções e
+    subfunções. Também usa outras contas e filtros para marcar a movimentação extraorçamentária
+    que transite por Caixa e Equivalentes de Caixa. A fonte MSC desta DFC já está fechada
+    (MSCE, saldo de abertura, classes 1 a 6).
+  aplica_a:
+    demonstrativo: DFC
+  source:
+    document: IPC08
+    document_version: 2020-01
+    page: 6
+    section: INSTRUÇÕES PARA PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '14'
+  evidence:
+    page: 6
+    text: A DFC é elaborada utilizando-se contas da classe 6 (Controles da Execução do
+      Planejamento e Orçamento), com filtros pelas naturezas orçamentárias de receitas e de
+      despesas, bem como funções e subfunções.
+  status: extracted
+- policy_id: ipc08.soma_fluxos_igual_variacao_caixa
+  descricao: A soma dos três fluxos (L34) deve corresponder à diferença entre o saldo de
+    Caixa e Equivalentes de Caixa do exercício e o do exercício anterior. L36 é L34 + L35 e
+    deve corresponder ao saldo final de 1.1.1.0.0.00.00.
+  aplica_a:
+    demonstrativo: DFC
+    quadro: QUADRO_PRINCIPAL
+  source:
+    document: IPC08
+    document_version: 2020-01
+    page: 6
+    section: INSTRUÇÕES PARA PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '15'
+  evidence:
+    page: 6
+    text: A soma dos três fluxos deverá corresponder a diferença entre o saldo de Caixa e
+      Equivalentes de Caixa do exercício em relação ao saldo de Caixa e Equivalentes de
+      Caixa do exercício anterior.
+  status: extracted
+- policy_id: ipc08.retencoes_ajuste_ente
+  descricao: Esta IPC não esgota possibilidades válidas de registro para certos eventos,
+    como retenções. Conforme o momento do reconhecimento do pagamento da retenção (na
+    liquidação ou na baixa da obrigação), o ente poderá promover ajustes na DFC de modo a
+    refletir o saldo de Caixa e Equivalentes de Caixa. Não vira filtro de linha.
+  aplica_a:
+    demonstrativo: DFC
+  source:
+    document: IPC08
+    document_version: 2020-01
+    page: 6
+    section: INSTRUÇÕES PARA PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '16'
+  evidence:
+    page: 6
+    text: Esta Instrução de Procedimento Contábil não esgota possibilidades válidas de
+      registro contábil para certos eventos, como, por exemplo, retenções.
+  status: extracted
+- policy_id: ipc08.outros_campos_nao_previstos
+  descricao: Os campos Outros ingressos e Outros desembolsos (operacional, investimento e
+    financiamento) contemplam situações não previstas, cabendo a cada ente adaptá-los.
+    Geralmente são valores que não transitam pelo orçamento, mas afetam Caixa e Equivalentes
+    de Caixa. L16, L21 e L30 do Quadro Principal nascem sem columns. L11, L25 e L33 têm
+    mapeamento no quadro e executam o que o PDF lista.
+  aplica_a:
+    demonstrativo: DFC
+  source:
+    document: IPC08
+    document_version: 2020-01
+    page: 6
+    section: INSTRUÇÕES PARA PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '17'
+  evidence:
+    page: 6
+    text: Os campos “Outros ingressos” e “Outros desembolsos” (do fluxo operacional, do
+      fluxo de investimento e do fluxo de financiamento) contemplam situações não previstas,
+      cabendo a cada ente adaptá-los conforme suas necessidades.
+  status: extracted

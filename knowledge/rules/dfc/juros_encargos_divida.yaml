@@ -1,0 +1,347 @@
+# Quadro de Juros e Encargos da Dívida — IPC 08, p. 16. 4 linhas.
+rules:
+- rule_id: dfc.juros_encargos_divida.l1
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: JUROS_ENCARGOS_DIVIDA
+    descricao: Quadro de Juros e Encargos da Dívida
+  linha:
+    codigo: L1
+    descricao: Juros e Correção Monetária da Dívida Interna
+    nivel: 2
+    ordem: 1
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 16
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Juros e Encargos da Dívida
+    row: L1
+  evidence:
+    page: 16
+    text: 'L1 Juros e Correção Monetária da Dívida Interna (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.2.90.21.xx; 3.2.90.23.xx; 3.2.90.25.xx; 3.2.95.21.xx; 3.2.96.21.xx; 4.6.90.73.xx; 4.6.90.74.xx; 4.6.90.75.xx Função: 28 Subfunção: 841 e 843'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.2.90.21.xx'
+      pattern: '329021xx'
+    - literal: '3.2.90.23.xx'
+      pattern: '329023xx'
+    - literal: '3.2.90.25.xx'
+      pattern: '329025xx'
+    - literal: '3.2.95.21.xx'
+      pattern: '329521xx'
+    - literal: '3.2.96.21.xx'
+      pattern: '329621xx'
+    - literal: '4.6.90.73.xx'
+      pattern: '469073xx'
+    - literal: '4.6.90.74.xx'
+      pattern: '469074xx'
+    - literal: '4.6.90.75.xx'
+      pattern: '469075xx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '28'
+      pattern: '28'
+  - field: subfuncao
+    operator: in
+    values:
+    - literal: '841'
+      pattern: '841'
+    - literal: '843'
+      pattern: '843'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.juros_encargos_divida.l2
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: JUROS_ENCARGOS_DIVIDA
+    descricao: Quadro de Juros e Encargos da Dívida
+  linha:
+    codigo: L2
+    descricao: Juros e Correção Monetária da Dívida Externa
+    nivel: 2
+    ordem: 2
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 16
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Juros e Encargos da Dívida
+    row: L2
+  evidence:
+    page: 16
+    text: 'L2 Juros e Correção Monetária da Dívida Externa (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.2.90.21.xx; 3.2.90.23.xx; 3.2.90.25.xx; 3.2.95.21.xx; 3.2.96.21.xx; 4.6.90.73.xx; 4.6.90.74.xx; 4.6.90.75.xx Função: 28 Subfunção: 842 e 844'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.2.90.21.xx'
+      pattern: '329021xx'
+    - literal: '3.2.90.23.xx'
+      pattern: '329023xx'
+    - literal: '3.2.90.25.xx'
+      pattern: '329025xx'
+    - literal: '3.2.95.21.xx'
+      pattern: '329521xx'
+    - literal: '3.2.96.21.xx'
+      pattern: '329621xx'
+    - literal: '4.6.90.73.xx'
+      pattern: '469073xx'
+    - literal: '4.6.90.74.xx'
+      pattern: '469074xx'
+    - literal: '4.6.90.75.xx'
+      pattern: '469075xx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '28'
+      pattern: '28'
+  - field: subfuncao
+    operator: in
+    values:
+    - literal: '842'
+      pattern: '842'
+    - literal: '844'
+      pattern: '844'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.juros_encargos_divida.l3
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: JUROS_ENCARGOS_DIVIDA
+    descricao: Quadro de Juros e Encargos da Dívida
+  linha:
+    codigo: L3
+    descricao: Outros Encargos da Dívida
+    nivel: 2
+    ordem: 3
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 16
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Juros e Encargos da Dívida
+    row: L3
+  evidence:
+    page: 16
+    text: 'L3 Outros Encargos da Dívida (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.2.90.22.xx; 3.2.90.24.xx; 3.2.90.91.xx; 3.2.90.92.xx; 3.2.90.93.xx; 3.2.90.99.xx; 3.2.99.xx.xx; 3.2.xx.xx.xx Exclusões: 3.2.90.21.xx; 3.2.90.23.xx; 3.2.90.25.xx; 3.2.95.21.xx; 3.2.96.21.xx; 4.6.90.73.xx; 4.6.90.74.xx; 4.6.90.75.xx Função: 28 Subfunção: 841, 842, 843 e 844'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Função 28 e subfunções 841–844 aparecem na coluna Exclusões da p. 16. Leitura adotada: filtro de inclusão, o mesmo de L1 e L2 deste quadro. D4 medida em 5 entes (2026-10-26, docs/evidencia-dfc-d4-funcao-28.md): 98,97% a 100% do pagamento de amortização e de juros está na função 28 com subfunção 84x, logo a leitura de exclusão zeraria a linha contra o que Porto Alegre publica. As ND de L1/L2 entram em not_in.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.2.90.22.xx'
+      pattern: '329022xx'
+    - literal: '3.2.90.24.xx'
+      pattern: '329024xx'
+    - literal: '3.2.90.91.xx'
+      pattern: '329091xx'
+    - literal: '3.2.90.92.xx'
+      pattern: '329092xx'
+    - literal: '3.2.90.93.xx'
+      pattern: '329093xx'
+    - literal: '3.2.90.99.xx'
+      pattern: '329099xx'
+    - literal: '3.2.99.xx.xx'
+      pattern: '3299xxxx'
+    - literal: '3.2.xx.xx.xx'
+      pattern: '32xxxxxx'
+  - field: natureza_despesa
+    operator: not_in
+    values:
+    - literal: '3.2.90.21.xx'
+      pattern: '329021xx'
+    - literal: '3.2.90.23.xx'
+      pattern: '329023xx'
+    - literal: '3.2.90.25.xx'
+      pattern: '329025xx'
+    - literal: '3.2.95.21.xx'
+      pattern: '329521xx'
+    - literal: '3.2.96.21.xx'
+      pattern: '329621xx'
+    - literal: '4.6.90.73.xx'
+      pattern: '469073xx'
+    - literal: '4.6.90.74.xx'
+      pattern: '469074xx'
+    - literal: '4.6.90.75.xx'
+      pattern: '469075xx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '28'
+      pattern: '28'
+  - field: subfuncao
+    operator: in
+    values:
+    - literal: '841'
+      pattern: '841'
+    - literal: '842'
+      pattern: '842'
+    - literal: '843'
+      pattern: '843'
+    - literal: '844'
+      pattern: '844'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.juros_encargos_divida.l4
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: JUROS_ENCARGOS_DIVIDA
+    descricao: Quadro de Juros e Encargos da Dívida
+  linha:
+    codigo: L4
+    descricao: Total dos Juros e Encargos Da Dívida
+    nivel: 1
+    ordem: 4
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 16
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Juros e Encargos da Dívida
+    row: L4
+  evidence:
+    page: 16
+    text: 'L4 Total dos Juros e Encargos Da Dívida (L1 + L2 + L3)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dfc.juros_encargos_divida.l1
+      sign: +
+    - rule: dfc.juros_encargos_divida.l2
+      sign: +
+    - rule: dfc.juros_encargos_divida.l3
+      sign: +

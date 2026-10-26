@@ -1,0 +1,2509 @@
+# Quadro Principal da Demonstração dos Fluxos de Caixa — IPC 08, pp. 7–11.
+# 36 linhas. Exclusões do PDF entram como filters not_in. L16, L21 e L30 sem mapeamento (item 17).
+rules:
+- rule_id: dfc.quadro_principal.operacionais.l1
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L1
+    descricao: FLUXOS DE CAIXA DAS ATIVIDADES OPERACIONAIS (I)
+    nivel: 1
+    ordem: 1
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 7
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L1
+  evidence:
+    page: 7
+    text: 'L1 FLUXOS DE CAIXA DAS ATIVIDADES OPERACIONAIS (I) (L2 - L12)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dfc.quadro_principal.operacionais.l2
+      sign: +
+    - rule: dfc.quadro_principal.operacionais.l12
+      sign: '-'
+- rule_id: dfc.quadro_principal.operacionais.l2
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L2
+    descricao: Ingressos
+    nivel: 2
+    ordem: 2
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 7
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L2
+  evidence:
+    page: 7
+    text: 'L2 Ingressos (L3 + L4 + L5 + L6 + L7 + L8 + L9 + L10 + L11)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dfc.quadro_principal.operacionais.l3
+      sign: +
+    - rule: dfc.quadro_principal.operacionais.l4
+      sign: +
+    - rule: dfc.quadro_principal.operacionais.l5
+      sign: +
+    - rule: dfc.quadro_principal.operacionais.l6
+      sign: +
+    - rule: dfc.quadro_principal.operacionais.l7
+      sign: +
+    - rule: dfc.quadro_principal.operacionais.l8
+      sign: +
+    - rule: dfc.quadro_principal.operacionais.l9
+      sign: +
+    - rule: dfc.quadro_principal.operacionais.l10
+      sign: +
+    - rule: dfc.quadro_principal.operacionais.l11
+      sign: +
+- rule_id: dfc.quadro_principal.operacionais.l3
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L3
+    descricao: Impostos, Taxas e Contribuições de Melhoria
+    nivel: 3
+    ordem: 3
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 7
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L3
+  evidence:
+    page: 7
+    text: 'L3 Impostos, Taxas e Contribuições de Melhoria (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 1.1.xx.xx.xx 7.1.xx.xx.xx'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '1.1.xx.xx.xx'
+      pattern: '11xxxxxx'
+    - literal: '7.1.xx.xx.xx'
+      pattern: '71xxxxxx'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.operacionais.l4
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L4
+    descricao: Receita de Contribuições
+    nivel: 3
+    ordem: 4
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 7
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L4
+  evidence:
+    page: 7
+    text: 'L4 Receita de Contribuições (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 1.2.xx.xx.xx 7.2.xx.xx.xx'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '1.2.xx.xx.xx'
+      pattern: '12xxxxxx'
+    - literal: '7.2.xx.xx.xx'
+      pattern: '72xxxxxx'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.operacionais.l5
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L5
+    descricao: Receita Patrimonial
+    nivel: 3
+    ordem: 5
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 7
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L5
+  evidence:
+    page: 7
+    text: 'L5 Receita Patrimonial (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 1.3.xx.xx.xx 7.3.xx.xx.xx Exclusões: 1.3.21.00.1.x; 1.3.21.00.2.x; 1.3.21.00.3.x; 1.3.21.00.4.x; 7.3.21.00.31.x; 7.3.21.00.2.x; 7.3.21.00.3.x; 7.3.21.00.4.x'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Grafia do PDF diverge da tabela STN (N5). Literal preservado; pattern é a normalização em dígitos, sem corrigir o PDF.'
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '1.3.xx.xx.xx'
+      pattern: '13xxxxxx'
+    - literal: '7.3.xx.xx.xx'
+      pattern: '73xxxxxx'
+  - field: natureza_receita
+    operator: not_in
+    values:
+    - literal: '1.3.21.00.1.x'
+      pattern: '1321001x'
+    - literal: '1.3.21.00.2.x'
+      pattern: '1321002x'
+    - literal: '1.3.21.00.3.x'
+      pattern: '1321003x'
+    - literal: '1.3.21.00.4.x'
+      pattern: '1321004x'
+    - literal: '7.3.21.00.31.x'
+      pattern: '73210031x'
+    - literal: '7.3.21.00.2.x'
+      pattern: '7321002x'
+    - literal: '7.3.21.00.3.x'
+      pattern: '7321003x'
+    - literal: '7.3.21.00.4.x'
+      pattern: '7321004x'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.operacionais.l6
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L6
+    descricao: Receita Agropecuária
+    nivel: 3
+    ordem: 6
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 7
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L6
+  evidence:
+    page: 7
+    text: 'L6 Receita Agropecuária (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 1.4.xx.xx.xx 7.4.xx.xx.xx'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '1.4.xx.xx.xx'
+      pattern: '14xxxxxx'
+    - literal: '7.4.xx.xx.xx'
+      pattern: '74xxxxxx'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.operacionais.l7
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L7
+    descricao: Receita Industrial
+    nivel: 3
+    ordem: 7
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 7
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L7
+  evidence:
+    page: 7
+    text: 'L7 Receita Industrial (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 1.5.xx.xx.xx 7.5.xx.xx.xx'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '1.5.xx.xx.xx'
+      pattern: '15xxxxxx'
+    - literal: '7.5.xx.xx.xx'
+      pattern: '75xxxxxx'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.operacionais.l8
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L8
+    descricao: Receita de Serviços
+    nivel: 3
+    ordem: 8
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 7
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L8
+  evidence:
+    page: 7
+    text: 'L8 Receita de Serviços (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 1.6.xx.xx.xx 7.6.xx.xx.xx'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '1.6.xx.xx.xx'
+      pattern: '16xxxxxx'
+    - literal: '7.6.xx.xx.xx'
+      pattern: '76xxxxxx'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.operacionais.l9
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L9
+    descricao: Remuneração das Disponibilidades
+    nivel: 3
+    ordem: 9
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 7
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L9
+  evidence:
+    page: 7
+    text: 'L9 Remuneração das Disponibilidades (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 1.3.21.00.1.x; 1.3.21.00.2.x; 1.3.21.00.3.x; 1.3.21.00.4.x; 7.3.21.00.1.x; 7.3.21.00.2.x; 7.3.21.00.3.x; 7.3.21.00.4.x; 2.9.30.00.0.0; 8.9.30.00.0.0'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Grafia do PDF diverge da tabela STN (N5). Literal preservado; pattern é a normalização em dígitos, sem corrigir o PDF.'
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '1.3.21.00.1.x'
+      pattern: '1321001x'
+    - literal: '1.3.21.00.2.x'
+      pattern: '1321002x'
+    - literal: '1.3.21.00.3.x'
+      pattern: '1321003x'
+    - literal: '1.3.21.00.4.x'
+      pattern: '1321004x'
+    - literal: '7.3.21.00.1.x'
+      pattern: '7321001x'
+    - literal: '7.3.21.00.2.x'
+      pattern: '7321002x'
+    - literal: '7.3.21.00.3.x'
+      pattern: '7321003x'
+    - literal: '7.3.21.00.4.x'
+      pattern: '7321004x'
+    - literal: '2.9.30.00.0.0'
+      pattern: '293'
+    - literal: '8.9.30.00.0.0'
+      pattern: '893'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.operacionais.l10
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L10
+    descricao: Transferências recebidas
+    nivel: 3
+    ordem: 10
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L10
+  evidence:
+    page: 8
+    text: 'L10 Transferências recebidas (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 1.7.00.00.00 2.4.00.00.00'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '1.7.00.00.00'
+      pattern: '17'
+    - literal: '2.4.00.00.00'
+      pattern: '24'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.operacionais.l11
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L11
+    descricao: Outras Receitas/Ingressos Operacionais
+    nivel: 3
+    ordem: 11
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L11
+  evidence:
+    page: 8
+    text: 'L11 Outras Receitas/Ingressos Operacionais (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 1.9.xx.xx.xx; 7.9.xx.xx.xx; 2.9.20.00.x.x; 2.9.40.00.1.1; 2.9.90.00.1.1; 8.9.20.00.x.x; 8.2.12.04.1.x; 8.9.40.00.1.1; 8.9.90.00.1.1'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: review_required
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  policies:
+  - ipc08.outros_campos_nao_previstos
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '1.9.xx.xx.xx'
+      pattern: '19xxxxxx'
+    - literal: '7.9.xx.xx.xx'
+      pattern: '79xxxxxx'
+    - literal: '2.9.20.00.x.x'
+      pattern: '292000xx'
+    - literal: '2.9.40.00.1.1'
+      pattern: '29400011'
+    - literal: '2.9.90.00.1.1'
+      pattern: '29900011'
+    - literal: '8.9.20.00.x.x'
+      pattern: '892000xx'
+    - literal: '8.2.12.04.1.x'
+      pattern: '8212041x'
+    - literal: '8.9.40.00.1.1'
+      pattern: '89400011'
+    - literal: '8.9.90.00.1.1'
+      pattern: '89900011'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.operacionais.l12
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L12
+    descricao: Desembolsos
+    nivel: 2
+    ordem: 12
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L12
+  evidence:
+    page: 8
+    text: 'L12 Desembolsos (L13 + L14 + L15 + L16)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dfc.quadro_principal.operacionais.l13
+      sign: +
+    - rule: dfc.quadro_principal.operacionais.l14
+      sign: +
+    - rule: dfc.quadro_principal.operacionais.l15
+      sign: +
+    - rule: dfc.quadro_principal.operacionais.l16
+      sign: +
+- rule_id: dfc.quadro_principal.operacionais.l13
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L13
+    descricao: Pessoal e Demais Despesas
+    nivel: 3
+    ordem: 13
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L13
+  evidence:
+    page: 8
+    text: 'L13 Pessoal e Demais Despesas (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.quadro_principal.operacionais.l14
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L14
+    descricao: Juros e encargos da dívida
+    nivel: 3
+    ordem: 14
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 8
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L14
+  evidence:
+    page: 8
+    text: 'L14 Juros e encargos da dívida (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.2.90.21.xx; 3.2.90.22.xx; 3.2.90.23.xx; 3.2.90.24.xx; 3.2.90.25.xx; 3.2.95.21.xx; 3.2.96.21.xx; 4.6.90.73.xx; 4.6.90.74.xx; 4.6.90.75.xx Função: 28 Subfunção: 841, 842, 843 e 844'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.2.90.21.xx'
+      pattern: '329021xx'
+    - literal: '3.2.90.22.xx'
+      pattern: '329022xx'
+    - literal: '3.2.90.23.xx'
+      pattern: '329023xx'
+    - literal: '3.2.90.24.xx'
+      pattern: '329024xx'
+    - literal: '3.2.90.25.xx'
+      pattern: '329025xx'
+    - literal: '3.2.95.21.xx'
+      pattern: '329521xx'
+    - literal: '3.2.96.21.xx'
+      pattern: '329621xx'
+    - literal: '4.6.90.73.xx'
+      pattern: '469073xx'
+    - literal: '4.6.90.74.xx'
+      pattern: '469074xx'
+    - literal: '4.6.90.75.xx'
+      pattern: '469075xx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '28'
+      pattern: '28'
+  - field: subfuncao
+    operator: in
+    values:
+    - literal: '841'
+      pattern: '841'
+    - literal: '842'
+      pattern: '842'
+    - literal: '843'
+      pattern: '843'
+    - literal: '844'
+      pattern: '844'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.quadro_principal.operacionais.l15
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L15
+    descricao: Transferências concedidas
+    nivel: 3
+    ordem: 15
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L15
+  evidence:
+    page: 9
+    text: 'L15 Transferências concedidas (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.30.xx.xx; 3.3.30.xx.xx; 3.1.80.xx.xx; 3.3.50.xx.xx; 3.1.91.xx.xx; 3.3.91.xx.xx; 3.3.20.xx.xx; 3.3.22.xx.xx; 3.3.31.xx.xx; 3.3.32.xx.xx; 3.3.35.xx.xx; 3.3.36.xx.xx; 3.3.40.xx.xx; 3.3.41.xx.xx; 3.3.42.xx.xx; 3.3.45.xx.xx; 3.3.46.xx.xx; 4.4.40.xx.xx; 3.3.60.xx.xx; 3.3.70.xx.xx; 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 4.4.71.xx.xx; 3.3.80.xx.xx; 4.4.50.xx.xx; 4.4.20.xx.xx; 4.4.22.xx.xx; 4.4.30.xx.xx; 4.4.31.xx.xx; 4.4.32.xx.xx; 4.4.35.xx.xx; 4.4.36.xx.xx; 4.5.30.xx.xx; 4.4.41.xx.xx; 4.4.42.xx.xx; 4.4.45.xx.xx; 4.4.46.xx.xx; 4.4.70.xx.xx; 4.4.76.xx.xx; 4.4.80.xx.xx; 4.5.80.xx.xx; 4.4.91.xx.xx; 4.5.91.xx.xx; 4.5.32.xx.xx; 4.5.40.xx.xx; 4.5.42.xx.xx; 4.5.50.xx.xx; 4.4.72.xx.xx; 4.4.73.xx.xx; 4.4.74.xx.xx Exclusões: 4.5.32.66; 4.5.42.66; 4.5.50.66; 45.80.66'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo. Grafia do PDF diverge da tabela STN (N5). Literal preservado; pattern é a normalização em dígitos, sem corrigir o PDF.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.30.xx.xx'
+      pattern: '3130xxxx'
+    - literal: '3.3.30.xx.xx'
+      pattern: '3330xxxx'
+    - literal: '3.1.80.xx.xx'
+      pattern: '3180xxxx'
+    - literal: '3.3.50.xx.xx'
+      pattern: '3350xxxx'
+    - literal: '3.1.91.xx.xx'
+      pattern: '3191xxxx'
+    - literal: '3.3.91.xx.xx'
+      pattern: '3391xxxx'
+    - literal: '3.3.20.xx.xx'
+      pattern: '3320xxxx'
+    - literal: '3.3.22.xx.xx'
+      pattern: '3322xxxx'
+    - literal: '3.3.31.xx.xx'
+      pattern: '3331xxxx'
+    - literal: '3.3.32.xx.xx'
+      pattern: '3332xxxx'
+    - literal: '3.3.35.xx.xx'
+      pattern: '3335xxxx'
+    - literal: '3.3.36.xx.xx'
+      pattern: '3336xxxx'
+    - literal: '3.3.40.xx.xx'
+      pattern: '3340xxxx'
+    - literal: '3.3.41.xx.xx'
+      pattern: '3341xxxx'
+    - literal: '3.3.42.xx.xx'
+      pattern: '3342xxxx'
+    - literal: '3.3.45.xx.xx'
+      pattern: '3345xxxx'
+    - literal: '3.3.46.xx.xx'
+      pattern: '3346xxxx'
+    - literal: '4.4.40.xx.xx'
+      pattern: '4440xxxx'
+    - literal: '3.3.60.xx.xx'
+      pattern: '3360xxxx'
+    - literal: '3.3.70.xx.xx'
+      pattern: '3370xxxx'
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '4.4.71.xx.xx'
+      pattern: '4471xxxx'
+    - literal: '3.3.80.xx.xx'
+      pattern: '3380xxxx'
+    - literal: '4.4.50.xx.xx'
+      pattern: '4450xxxx'
+    - literal: '4.4.20.xx.xx'
+      pattern: '4420xxxx'
+    - literal: '4.4.22.xx.xx'
+      pattern: '4422xxxx'
+    - literal: '4.4.30.xx.xx'
+      pattern: '4430xxxx'
+    - literal: '4.4.31.xx.xx'
+      pattern: '4431xxxx'
+    - literal: '4.4.32.xx.xx'
+      pattern: '4432xxxx'
+    - literal: '4.4.35.xx.xx'
+      pattern: '4435xxxx'
+    - literal: '4.4.36.xx.xx'
+      pattern: '4436xxxx'
+    - literal: '4.5.30.xx.xx'
+      pattern: '4530xxxx'
+    - literal: '4.4.41.xx.xx'
+      pattern: '4441xxxx'
+    - literal: '4.4.42.xx.xx'
+      pattern: '4442xxxx'
+    - literal: '4.4.45.xx.xx'
+      pattern: '4445xxxx'
+    - literal: '4.4.46.xx.xx'
+      pattern: '4446xxxx'
+    - literal: '4.4.70.xx.xx'
+      pattern: '4470xxxx'
+    - literal: '4.4.76.xx.xx'
+      pattern: '4476xxxx'
+    - literal: '4.4.80.xx.xx'
+      pattern: '4480xxxx'
+    - literal: '4.5.80.xx.xx'
+      pattern: '4580xxxx'
+    - literal: '4.4.91.xx.xx'
+      pattern: '4491xxxx'
+    - literal: '4.5.91.xx.xx'
+      pattern: '4591xxxx'
+    - literal: '4.5.32.xx.xx'
+      pattern: '4532xxxx'
+    - literal: '4.5.40.xx.xx'
+      pattern: '4540xxxx'
+    - literal: '4.5.42.xx.xx'
+      pattern: '4542xxxx'
+    - literal: '4.5.50.xx.xx'
+      pattern: '4550xxxx'
+    - literal: '4.4.72.xx.xx'
+      pattern: '4472xxxx'
+    - literal: '4.4.73.xx.xx'
+      pattern: '4473xxxx'
+    - literal: '4.4.74.xx.xx'
+      pattern: '4474xxxx'
+  - field: natureza_despesa
+    operator: not_in
+    values:
+    - literal: '4.5.32.66'
+      pattern: '453266'
+    - literal: '4.5.42.66'
+      pattern: '454266'
+    - literal: '4.5.50.66'
+      pattern: '455066'
+    - literal: '45.80.66'
+      pattern: '458066'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.quadro_principal.operacionais.l16
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: OPERACIONAIS
+    descricao: Fluxos de caixa das atividades operacionais
+  linha:
+    codigo: L16
+    descricao: Outros desembolsos operacionais
+    nivel: 3
+    ordem: 16
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 9
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L16
+  evidence:
+    page: 9
+    text: 'L16 Outros desembolsos operacionais'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: review_required
+  review:
+    required: true
+    reason: 'IPC 08 item 17: campo de situações não previstas, sem conta nem natureza no quadro. Caberá a cada ente adaptar; esta linha não declara columns.'
+  policies:
+  - ipc08.outros_campos_nao_previstos
+- rule_id: dfc.quadro_principal.investimento.l17
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INVESTIMENTO
+    descricao: Fluxos de caixa das atividades de investimento
+  linha:
+    codigo: L17
+    descricao: FLUXOS DE CAIXA DAS ATIVIDADES DE INVESTIMENTO (II)
+    nivel: 1
+    ordem: 17
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L17
+  evidence:
+    page: 10
+    text: 'L17 FLUXOS DE CAIXA DAS ATIVIDADES DE INVESTIMENTO (II) (L18 - L22)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dfc.quadro_principal.investimento.l18
+      sign: +
+    - rule: dfc.quadro_principal.investimento.l22
+      sign: '-'
+- rule_id: dfc.quadro_principal.investimento.l18
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INVESTIMENTO
+    descricao: Fluxos de caixa das atividades de investimento
+  linha:
+    codigo: L18
+    descricao: Ingressos
+    nivel: 2
+    ordem: 18
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L18
+  evidence:
+    page: 10
+    text: 'L18 Ingressos (L19 + L20 + L21)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dfc.quadro_principal.investimento.l19
+      sign: +
+    - rule: dfc.quadro_principal.investimento.l20
+      sign: +
+    - rule: dfc.quadro_principal.investimento.l21
+      sign: +
+- rule_id: dfc.quadro_principal.investimento.l19
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INVESTIMENTO
+    descricao: Fluxos de caixa das atividades de investimento
+  linha:
+    codigo: L19
+    descricao: Alienação de bens
+    nivel: 3
+    ordem: 19
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L19
+  evidence:
+    page: 10
+    text: 'L19 Alienação de bens (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 2.2.xx.xx.xx; 8.2.xx.xx.xx'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '2.2.xx.xx.xx'
+      pattern: '22xxxxxx'
+    - literal: '8.2.xx.xx.xx'
+      pattern: '82xxxxxx'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.investimento.l20
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INVESTIMENTO
+    descricao: Fluxos de caixa das atividades de investimento
+  linha:
+    codigo: L20
+    descricao: Amortização de empréstimos e financiamentos concedidos
+    nivel: 3
+    ordem: 20
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L20
+  evidence:
+    page: 10
+    text: 'L20 Amortização de empréstimos e financiamentos concedidos (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 2.3.xx.xx.xx; 8.3.xx.xx.xx'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '2.3.xx.xx.xx'
+      pattern: '23xxxxxx'
+    - literal: '8.3.xx.xx.xx'
+      pattern: '83xxxxxx'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.investimento.l21
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INVESTIMENTO
+    descricao: Fluxos de caixa das atividades de investimento
+  linha:
+    codigo: L21
+    descricao: Outros ingressos de investimentos
+    nivel: 3
+    ordem: 21
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L21
+  evidence:
+    page: 10
+    text: 'L21 Outros ingressos de investimentos'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: review_required
+  review:
+    required: true
+    reason: 'IPC 08 item 17: campo de situações não previstas, sem conta nem natureza no quadro. Caberá a cada ente adaptar; esta linha não declara columns.'
+  policies:
+  - ipc08.outros_campos_nao_previstos
+- rule_id: dfc.quadro_principal.investimento.l22
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INVESTIMENTO
+    descricao: Fluxos de caixa das atividades de investimento
+  linha:
+    codigo: L22
+    descricao: Desembolsos
+    nivel: 2
+    ordem: 22
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L22
+  evidence:
+    page: 10
+    text: 'L22 Desembolsos (L23 + L24 + L25)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dfc.quadro_principal.investimento.l23
+      sign: +
+    - rule: dfc.quadro_principal.investimento.l24
+      sign: +
+    - rule: dfc.quadro_principal.investimento.l25
+      sign: +
+- rule_id: dfc.quadro_principal.investimento.l23
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INVESTIMENTO
+    descricao: Fluxos de caixa das atividades de investimento
+  linha:
+    codigo: L23
+    descricao: Aquisição de ativo não circulante
+    nivel: 3
+    ordem: 23
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L23
+  evidence:
+    page: 10
+    text: 'L23 Aquisição de ativo não circulante (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 4.4.xx.51.xx; 4.4.xx.52.xx; 4.4.xx.61.xx; 4.5.xx.61.xx; 4.5.xx.63.xx; 4.5.xx.64.xx; 4.5.xx.65.xx Exclusões: 44.32.51; 44.32.52; 45.32.61; 45.32.64; 45.32.65; 44.42.51; 44.42.52; 45.42.64; 44.50.51; 44.50.52; 44.80.51; 44.80.52; 44.91.51; 44.91.52; 45.91.61; 45.91.65'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo. Grafia do PDF diverge da tabela STN (N5). Literal preservado; pattern é a normalização em dígitos, sem corrigir o PDF.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '4.4.xx.51.xx'
+      pattern: '44xx51xx'
+    - literal: '4.4.xx.52.xx'
+      pattern: '44xx52xx'
+    - literal: '4.4.xx.61.xx'
+      pattern: '44xx61xx'
+    - literal: '4.5.xx.61.xx'
+      pattern: '45xx61xx'
+    - literal: '4.5.xx.63.xx'
+      pattern: '45xx63xx'
+    - literal: '4.5.xx.64.xx'
+      pattern: '45xx64xx'
+    - literal: '4.5.xx.65.xx'
+      pattern: '45xx65xx'
+  - field: natureza_despesa
+    operator: not_in
+    values:
+    - literal: '44.32.51'
+      pattern: '443251'
+    - literal: '44.32.52'
+      pattern: '443252'
+    - literal: '45.32.61'
+      pattern: '453261'
+    - literal: '45.32.64'
+      pattern: '453264'
+    - literal: '45.32.65'
+      pattern: '453265'
+    - literal: '44.42.51'
+      pattern: '444251'
+    - literal: '44.42.52'
+      pattern: '444252'
+    - literal: '45.42.64'
+      pattern: '454264'
+    - literal: '44.50.51'
+      pattern: '445051'
+    - literal: '44.50.52'
+      pattern: '445052'
+    - literal: '44.80.51'
+      pattern: '448051'
+    - literal: '44.80.52'
+      pattern: '448052'
+    - literal: '44.91.51'
+      pattern: '449151'
+    - literal: '44.91.52'
+      pattern: '449152'
+    - literal: '45.91.61'
+      pattern: '459161'
+    - literal: '45.91.65'
+      pattern: '459165'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.quadro_principal.investimento.l24
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INVESTIMENTO
+    descricao: Fluxos de caixa das atividades de investimento
+  linha:
+    codigo: L24
+    descricao: Concessão de empréstimos e financiamentos
+    nivel: 3
+    ordem: 24
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L24
+  evidence:
+    page: 10
+    text: 'L24 Concessão de empréstimos e financiamentos (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 4.5.xx.66.xx Exclusões: 4.4.20.xx.xx; 4.4.22.xx.xx; 4.4.30.xx.xx; 4.4.31.xx.xx; 4.4.32.xx.xx; 4.4.35.xx.xx'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '4.5.xx.66.xx'
+      pattern: '45xx66xx'
+  - field: natureza_despesa
+    operator: not_in
+    values:
+    - literal: '4.4.20.xx.xx'
+      pattern: '4420xxxx'
+    - literal: '4.4.22.xx.xx'
+      pattern: '4422xxxx'
+    - literal: '4.4.30.xx.xx'
+      pattern: '4430xxxx'
+    - literal: '4.4.31.xx.xx'
+      pattern: '4431xxxx'
+    - literal: '4.4.32.xx.xx'
+      pattern: '4432xxxx'
+    - literal: '4.4.35.xx.xx'
+      pattern: '4435xxxx'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.quadro_principal.investimento.l25
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: INVESTIMENTO
+    descricao: Fluxos de caixa das atividades de investimento
+  linha:
+    codigo: L25
+    descricao: Outros desembolsos de investimentos
+    nivel: 3
+    ordem: 25
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 10
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L25
+  evidence:
+    page: 10
+    text: 'L25 Outros desembolsos de investimentos (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 4.4.xx.xx.xx; 4.5.xx.xx.xx Exclusões: 4.4.36.xx.xx; 4.4.40.xx.xx; 4.4.41.xx.xx; 4.4.42.xx.xx; 4.4.45.xx.xx; 4.4.46.xx.xx; 4.4.50.xx.xx; 4.4.70.xx.xx; 4.4.71.xx.xx; 4.4.72.xx.xx; 4.4.73.xx.xx; 4.4.74.xx.xx; 4.4.76.xx.xx; 4.4.80.xx.xx; 4.4.91.xx.xx; 4.5.30.xx.xx; 4.5.32.xx.xx; 4.5.40.xx.xx; 4.5.42.xx.xx; 4.5.50.xx.xx; 4.5.80.xx.xx; 4.5.91.xx.xx'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  policies:
+  - ipc08.outros_campos_nao_previstos
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '4.4.xx.xx.xx'
+      pattern: '44xxxxxx'
+    - literal: '4.5.xx.xx.xx'
+      pattern: '45xxxxxx'
+  - field: natureza_despesa
+    operator: not_in
+    values:
+    - literal: '4.4.36.xx.xx'
+      pattern: '4436xxxx'
+    - literal: '4.4.40.xx.xx'
+      pattern: '4440xxxx'
+    - literal: '4.4.41.xx.xx'
+      pattern: '4441xxxx'
+    - literal: '4.4.42.xx.xx'
+      pattern: '4442xxxx'
+    - literal: '4.4.45.xx.xx'
+      pattern: '4445xxxx'
+    - literal: '4.4.46.xx.xx'
+      pattern: '4446xxxx'
+    - literal: '4.4.50.xx.xx'
+      pattern: '4450xxxx'
+    - literal: '4.4.70.xx.xx'
+      pattern: '4470xxxx'
+    - literal: '4.4.71.xx.xx'
+      pattern: '4471xxxx'
+    - literal: '4.4.72.xx.xx'
+      pattern: '4472xxxx'
+    - literal: '4.4.73.xx.xx'
+      pattern: '4473xxxx'
+    - literal: '4.4.74.xx.xx'
+      pattern: '4474xxxx'
+    - literal: '4.4.76.xx.xx'
+      pattern: '4476xxxx'
+    - literal: '4.4.80.xx.xx'
+      pattern: '4480xxxx'
+    - literal: '4.4.91.xx.xx'
+      pattern: '4491xxxx'
+    - literal: '4.5.30.xx.xx'
+      pattern: '4530xxxx'
+    - literal: '4.5.32.xx.xx'
+      pattern: '4532xxxx'
+    - literal: '4.5.40.xx.xx'
+      pattern: '4540xxxx'
+    - literal: '4.5.42.xx.xx'
+      pattern: '4542xxxx'
+    - literal: '4.5.50.xx.xx'
+      pattern: '4550xxxx'
+    - literal: '4.5.80.xx.xx'
+      pattern: '4580xxxx'
+    - literal: '4.5.91.xx.xx'
+      pattern: '4591xxxx'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.quadro_principal.financiamento.l26
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: FINANCIAMENTO
+    descricao: Fluxos de caixa das atividades de financiamento
+  linha:
+    codigo: L26
+    descricao: FLUXOS DE CAIXA DAS ATIVIDADES DE FINANCIAMENTO (III)
+    nivel: 1
+    ordem: 26
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L26
+  evidence:
+    page: 11
+    text: 'L26 FLUXOS DE CAIXA DAS ATIVIDADES DE FINANCIAMENTO (III) (L27 - L31)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dfc.quadro_principal.financiamento.l27
+      sign: +
+    - rule: dfc.quadro_principal.financiamento.l31
+      sign: '-'
+- rule_id: dfc.quadro_principal.financiamento.l27
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: FINANCIAMENTO
+    descricao: Fluxos de caixa das atividades de financiamento
+  linha:
+    codigo: L27
+    descricao: Ingressos
+    nivel: 2
+    ordem: 27
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L27
+  evidence:
+    page: 11
+    text: 'L27 Ingressos (L28 + L29)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Divergência deliberada do literal (D9, decidida pelo PO em 2026-10-26). O IPC 08
+      p. 11 grafa ''L27 Ingressos (L28 + L29)'', sem L30 — única agregadora do quadro que não soma
+      a própria linha Outros: L2 inclui L11, L12 inclui L16, L18 inclui L21, L22 inclui L25 e L31
+      inclui L33. L30 entra na soma. A homologação de Porto Alegre/RS 2025
+      (docs/entes-homologacao/porto-alegre/gabarito-dfc-2025.md) não desempata — L30 é vazia nas
+      duas colunas e L27 fecha pelas duas leituras. O literal permanece intacto em evidence.text.'
+  calculation:
+    references:
+    - rule: dfc.quadro_principal.financiamento.l28
+      sign: +
+    - rule: dfc.quadro_principal.financiamento.l29
+      sign: +
+    - rule: dfc.quadro_principal.financiamento.l30
+      sign: +
+- rule_id: dfc.quadro_principal.financiamento.l28
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: FINANCIAMENTO
+    descricao: Fluxos de caixa das atividades de financiamento
+  linha:
+    codigo: L28
+    descricao: Operações de crédito
+    nivel: 3
+    ordem: 28
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L28
+  evidence:
+    page: 11
+    text: 'L28 Operações de crédito (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 2.1.xx.xx.xx 8.1.xx.xx.xx'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '2.1.xx.xx.xx'
+      pattern: '21xxxxxx'
+    - literal: '8.1.xx.xx.xx'
+      pattern: '81xxxxxx'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.financiamento.l29
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: FINANCIAMENTO
+    descricao: Fluxos de caixa das atividades de financiamento
+  linha:
+    codigo: L29
+    descricao: Integralização do capital social de empresas dependentes
+    nivel: 3
+    ordem: 29
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L29
+  evidence:
+    page: 11
+    text: 'L29 Integralização do capital social de empresas dependentes (+) 6.2.1.2.0.00.00 (-) 6.2.1.3.0.00.00 2.9.10.xx.x.x; 8.9.10.xx.x.x'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  filters:
+  - field: natureza_receita
+    operator: in
+    values:
+    - literal: '2.9.10.xx.x.x'
+      pattern: '2910xxxx'
+    - literal: '8.9.10.xx.x.x'
+      pattern: '8910xxxx'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.1.2.0.00.00'
+        pattern: '6212'
+        sign: +
+      - literal: '6.2.1.3.0.00.00'
+        pattern: '6213'
+        sign: '-'
+- rule_id: dfc.quadro_principal.financiamento.l30
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: FINANCIAMENTO
+    descricao: Fluxos de caixa das atividades de financiamento
+  linha:
+    codigo: L30
+    descricao: Outros ingressos de financiamentos
+    nivel: 3
+    ordem: 30
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L30
+  evidence:
+    page: 11
+    text: 'L30 Outros ingressos de financiamentos'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: review_required
+  review:
+    required: true
+    reason: 'IPC 08 item 17: campo de situações não previstas, sem conta nem natureza no quadro. Caberá a cada ente adaptar; esta linha não declara columns.'
+  policies:
+  - ipc08.outros_campos_nao_previstos
+- rule_id: dfc.quadro_principal.financiamento.l31
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: FINANCIAMENTO
+    descricao: Fluxos de caixa das atividades de financiamento
+  linha:
+    codigo: L31
+    descricao: Desembolsos
+    nivel: 2
+    ordem: 31
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L31
+  evidence:
+    page: 11
+    text: 'L31 Desembolsos (L32 + L33)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dfc.quadro_principal.financiamento.l32
+      sign: +
+    - rule: dfc.quadro_principal.financiamento.l33
+      sign: +
+- rule_id: dfc.quadro_principal.financiamento.l32
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: FINANCIAMENTO
+    descricao: Fluxos de caixa das atividades de financiamento
+  linha:
+    codigo: L32
+    descricao: Amortização / Refinanciamento da dívida
+    nivel: 3
+    ordem: 32
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L32
+  evidence:
+    page: 11
+    text: 'L32 Amortização / Refinanciamento da dívida (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 4.6.xx.xx.xx Exclusões: 4.6.90.71.xx; 4.6.90.72.xx; 4.6.90.76.xx; 4.6.90.77.xx; 4.6.90.73.xx; 4.6.90.74.xx; 4.6.90.75.xx Função: 28 Subfunção: 841, 842, 843 e 844'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Função 28 e subfunções 841–844 aparecem na coluna Exclusões da p. 11. Leitura adotada: filtro de inclusão, o mesmo de L14. D4 medida em 5 entes (2026-10-26, docs/evidencia-dfc-d4-funcao-28.md): 98,97% a 100% do pagamento de amortização e de juros está na função 28 com subfunção 84x, logo a leitura de exclusão zeraria a linha contra o que Porto Alegre publica. As ND 4.6.90.71–77 entram em not_in.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '4.6.xx.xx.xx'
+      pattern: '46xxxxxx'
+  - field: natureza_despesa
+    operator: not_in
+    values:
+    - literal: '4.6.90.71.xx'
+      pattern: '469071xx'
+    - literal: '4.6.90.72.xx'
+      pattern: '469072xx'
+    - literal: '4.6.90.76.xx'
+      pattern: '469076xx'
+    - literal: '4.6.90.77.xx'
+      pattern: '469077xx'
+    - literal: '4.6.90.73.xx'
+      pattern: '469073xx'
+    - literal: '4.6.90.74.xx'
+      pattern: '469074xx'
+    - literal: '4.6.90.75.xx'
+      pattern: '469075xx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '28'
+      pattern: '28'
+  - field: subfuncao
+    operator: in
+    values:
+    - literal: '841'
+      pattern: '841'
+    - literal: '842'
+      pattern: '842'
+    - literal: '843'
+      pattern: '843'
+    - literal: '844'
+      pattern: '844'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.quadro_principal.financiamento.l33
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: FINANCIAMENTO
+    descricao: Fluxos de caixa das atividades de financiamento
+  linha:
+    codigo: L33
+    descricao: Outros desembolsos de financiamentos
+    nivel: 3
+    ordem: 33
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L33
+  evidence:
+    page: 11
+    text: 'L33 Outros desembolsos de financiamentos (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 4.6.90.71; 4.6.90.72; 4.6.90.76; 4.6.90.77'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc08.outros_campos_nao_previstos
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '4.6.90.71'
+      pattern: '469071'
+    - literal: '4.6.90.72'
+      pattern: '469072'
+    - literal: '4.6.90.76'
+      pattern: '469076'
+    - literal: '4.6.90.77'
+      pattern: '469077'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.quadro_principal.caixa.l34
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: CAIXA
+    descricao: Caixa e equivalentes de caixa
+  linha:
+    codigo: L34
+    descricao: GERAÇÃO LÍQUIDA DE CAIXA E EQUIVALENTE DE CAIXA (I+II+III)
+    nivel: 1
+    ordem: 34
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L34
+  evidence:
+    page: 11
+    text: 'L34 GERAÇÃO LÍQUIDA DE CAIXA E EQUIVALENTE DE CAIXA (I+II+III) (L1 + L17 + L26)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc08.soma_fluxos_igual_variacao_caixa
+  calculation:
+    references:
+    - rule: dfc.quadro_principal.operacionais.l1
+      sign: +
+    - rule: dfc.quadro_principal.investimento.l17
+      sign: +
+    - rule: dfc.quadro_principal.financiamento.l26
+      sign: +
+- rule_id: dfc.quadro_principal.caixa.l35
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: CAIXA
+    descricao: Caixa e equivalentes de caixa
+  linha:
+    codigo: L35
+    descricao: Caixa e equivalente de caixa inicial
+    nivel: 1
+    ordem: 35
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L35
+  evidence:
+    page: 11
+    text: 'L35 Caixa e equivalente de caixa inicial 1.1.1.0.0.00.00 (saldo inicial)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  policies:
+  - ipc08.soma_fluxos_igual_variacao_caixa
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '1.1.1.0.0.00.00'
+        pattern: '111'
+        sign: +
+        saldo: inicial
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '1.1.1.0.0.00.00'
+        pattern: '111'
+        sign: +
+        saldo: inicial
+- rule_id: dfc.quadro_principal.caixa.l36
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: QUADRO_PRINCIPAL
+    descricao: Quadro Principal
+  grupo:
+    codigo: CAIXA
+    descricao: Caixa e equivalentes de caixa
+  linha:
+    codigo: L36
+    descricao: Caixa e equivalente de caixa final
+    nivel: 1
+    ordem: 36
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 11
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro Principal
+    row: L36
+  evidence:
+    page: 11
+    text: 'L36 Caixa e equivalente de caixa final L34 + L35 (deve corresponder ao saldo final da conta 1.1.1.0.0.00.00)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Cálculo L34 + L35. O PDF exige correspondência com o saldo final de 1.1.1.0.0.00.00 (policy ipc08.soma_fluxos_igual_variacao_caixa); a conta não entra em columns.'
+  policies:
+  - ipc08.soma_fluxos_igual_variacao_caixa
+  calculation:
+    references:
+    - rule: dfc.quadro_principal.caixa.l34
+      sign: +
+    - rule: dfc.quadro_principal.caixa.l35
+      sign: +

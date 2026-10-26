@@ -1448,6 +1448,594 @@
     "document": "IPC04",
     "page": 13
   },
+  "dfc.desembolsos_pessoal_por_funcao.l1": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l10": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l11": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l12": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l13": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l14": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l15": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l16": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l17": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l18": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l19": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l2": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l20": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l21": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l22": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l23": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l24": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l25": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l26": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l27": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l28": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l29": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l3": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l4": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l5": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l6": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l7": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l8": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.desembolsos_pessoal_por_funcao.l9": {
+    "file": "rules/dfc/desembolsos_pessoal_por_funcao.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "DESEMBOLSOS_PESSOAL_POR_FUNCAO",
+    "document": "IPC08",
+    "page": 15
+  },
+  "dfc.juros_encargos_divida.l1": {
+    "file": "rules/dfc/juros_encargos_divida.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "JUROS_ENCARGOS_DIVIDA",
+    "document": "IPC08",
+    "page": 16
+  },
+  "dfc.juros_encargos_divida.l2": {
+    "file": "rules/dfc/juros_encargos_divida.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "JUROS_ENCARGOS_DIVIDA",
+    "document": "IPC08",
+    "page": 16
+  },
+  "dfc.juros_encargos_divida.l3": {
+    "file": "rules/dfc/juros_encargos_divida.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "JUROS_ENCARGOS_DIVIDA",
+    "document": "IPC08",
+    "page": 16
+  },
+  "dfc.juros_encargos_divida.l4": {
+    "file": "rules/dfc/juros_encargos_divida.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "JUROS_ENCARGOS_DIVIDA",
+    "document": "IPC08",
+    "page": 16
+  },
+  "dfc.quadro_principal.caixa.l34": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 11
+  },
+  "dfc.quadro_principal.caixa.l35": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 11
+  },
+  "dfc.quadro_principal.caixa.l36": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 11
+  },
+  "dfc.quadro_principal.financiamento.l26": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 11
+  },
+  "dfc.quadro_principal.financiamento.l27": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 11
+  },
+  "dfc.quadro_principal.financiamento.l28": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 11
+  },
+  "dfc.quadro_principal.financiamento.l29": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 11
+  },
+  "dfc.quadro_principal.financiamento.l30": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 11
+  },
+  "dfc.quadro_principal.financiamento.l31": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 11
+  },
+  "dfc.quadro_principal.financiamento.l32": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 11
+  },
+  "dfc.quadro_principal.financiamento.l33": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 11
+  },
+  "dfc.quadro_principal.investimento.l17": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 10
+  },
+  "dfc.quadro_principal.investimento.l18": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 10
+  },
+  "dfc.quadro_principal.investimento.l19": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 10
+  },
+  "dfc.quadro_principal.investimento.l20": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 10
+  },
+  "dfc.quadro_principal.investimento.l21": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 10
+  },
+  "dfc.quadro_principal.investimento.l22": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 10
+  },
+  "dfc.quadro_principal.investimento.l23": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 10
+  },
+  "dfc.quadro_principal.investimento.l24": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 10
+  },
+  "dfc.quadro_principal.investimento.l25": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 10
+  },
+  "dfc.quadro_principal.operacionais.l1": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 7
+  },
+  "dfc.quadro_principal.operacionais.l10": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 8
+  },
+  "dfc.quadro_principal.operacionais.l11": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 8
+  },
+  "dfc.quadro_principal.operacionais.l12": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 8
+  },
+  "dfc.quadro_principal.operacionais.l13": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 8
+  },
+  "dfc.quadro_principal.operacionais.l14": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 8
+  },
+  "dfc.quadro_principal.operacionais.l15": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 9
+  },
+  "dfc.quadro_principal.operacionais.l16": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 9
+  },
+  "dfc.quadro_principal.operacionais.l2": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 7
+  },
+  "dfc.quadro_principal.operacionais.l3": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 7
+  },
+  "dfc.quadro_principal.operacionais.l4": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 7
+  },
+  "dfc.quadro_principal.operacionais.l5": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 7
+  },
+  "dfc.quadro_principal.operacionais.l6": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 7
+  },
+  "dfc.quadro_principal.operacionais.l7": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 7
+  },
+  "dfc.quadro_principal.operacionais.l8": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 7
+  },
+  "dfc.quadro_principal.operacionais.l9": {
+    "file": "rules/dfc/quadro_principal.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "QUADRO_PRINCIPAL",
+    "document": "IPC08",
+    "page": 7
+  },
+  "dfc.transferencias_recebidas_concedidas.concedidas.l10": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 13
+  },
+  "dfc.transferencias_recebidas_concedidas.concedidas.l11": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 13
+  },
+  "dfc.transferencias_recebidas_concedidas.concedidas.l12": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 13
+  },
+  "dfc.transferencias_recebidas_concedidas.concedidas.l13": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 13
+  },
+  "dfc.transferencias_recebidas_concedidas.concedidas.l14": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 14
+  },
+  "dfc.transferencias_recebidas_concedidas.concedidas.l15": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 14
+  },
+  "dfc.transferencias_recebidas_concedidas.concedidas.l8": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 13
+  },
+  "dfc.transferencias_recebidas_concedidas.concedidas.l9": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 13
+  },
+  "dfc.transferencias_recebidas_concedidas.recebidas.l1": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 12
+  },
+  "dfc.transferencias_recebidas_concedidas.recebidas.l2": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 12
+  },
+  "dfc.transferencias_recebidas_concedidas.recebidas.l3": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 12
+  },
+  "dfc.transferencias_recebidas_concedidas.recebidas.l4": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 12
+  },
+  "dfc.transferencias_recebidas_concedidas.recebidas.l5": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 12
+  },
+  "dfc.transferencias_recebidas_concedidas.recebidas.l6": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 12
+  },
+  "dfc.transferencias_recebidas_concedidas.recebidas.l7": {
+    "file": "rules/dfc/transferencias_recebidas_concedidas.yaml",
+    "demonstrativo": "DFC",
+    "quadro": "TRANSFERENCIAS_RECEBIDAS_CONCEDIDAS",
+    "document": "IPC08",
+    "page": 12
+  },
   "dvp.quadro_principal.resultado.l19": {
     "file": "rules/dvp/quadro_principal.yaml",
     "demonstrativo": "DVP",

@@ -1,0 +1,13 @@
+# Fonte normativa da Demonstração dos Fluxos de Caixa. O PDF vive em
+# docs/referencia/ipc/ e nunca é copiado para dentro de knowledge/ —
+# scripts/check_sources.py falha se isso acontecer.
+document: IPC08
+title: "IPC 08 — Metodologia para Elaboração da Demonstração dos Fluxos de Caixa"
+file: "IPC08 - DFC atualizacoes final - 20200116.pdf"
+path: "docs/referencia/ipc/IPC08 - DFC atualizacoes final - 20200116.pdf"
+pages: 21
+edition: "2020-01"
+published_at: "2020-01-20"
+sha256: "fb04f03c2015ec61971fb87a1cbdd8f70c8596b7599b3f073ef61d6423442ac0"
+# Páginas 7–21 são paisagem rotacionada 90°. As pp. 1–6 são retrato, texto corrido.
+rotated_pages: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]

@@ -63,6 +63,9 @@ CENARIOS_ESPERADOS = {
     # 7 da DVP por unidade gestora (`dvp-por-unidade-gestora`). Capability em formação: os deltas
     # de `pipeline-dca-por-unidade-gestora` e `pipeline-anterior-por-recorte` entram ao arquivar.
     "pipeline/unidade-gestora": 7,
+    # 12 da transcrição dos quatro quadros + 1 da divergência D9 em L27
+    # (`ipc08-dfc-regras-canonicas`).
+    "dca/demonstracao-fluxos-caixa": 13,
 }
 
 # Capabilities cuja fase TEST já começou — só delas se exige teste por cenário.
@@ -72,7 +75,8 @@ CENARIOS_ESPERADOS = {
 COM_TESTES = ("dca/base-canonica-regras", "dca/balanco-orcamentario",
               "dca/balanco-financeiro", "dca/fonte-msc", "pipeline/plataforma",
               "pipeline/processamento-completo", "dca/balanco-patrimonial",
-              "dca/demonstracao-variacoes-patrimoniais", "dca/regra-da-celula")
+              "dca/demonstracao-variacoes-patrimoniais", "dca/regra-da-celula",
+              "dca/demonstracao-fluxos-caixa")
 
 
 def _specs() -> dict[str, list[Path]]:

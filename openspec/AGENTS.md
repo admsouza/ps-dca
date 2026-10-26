@@ -48,6 +48,25 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 ## Change ativa
 
+**`ipc08-dfc-regras-canonicas` arquivada em 2026-10-26:** 84 regras da DFC (IPC 08) no contrato
+de BO/BF/BP/DVP, quatro quadros, sem Python. Capability nova `dca/demonstracao-fluxos-caixa`.
+Código do anexo: `DFC`, não `I-E`.
+
+Cinco decisões que a **change de apuração** herda, todas já fechadas com o PO:
+
+| | Decisão | Consequência para a apuração |
+|---|---|---|
+| D2 | exclusões do PDF executam como `not_in` | medir antes de fechar, como na DVP |
+| D3/D10 | `L16`, `L21` e `L30` sem conta viram **campo informado pelo contador** | replicar `app/services/bf/informados.py`: `CODIGOS_SEM_MAPEAMENTO = {"L16","L21","L30"}` |
+| D4 | Função 28 / subfunções 841–844 é filtro de **inclusão** | medido em 5 entes (`docs/evidencia-dfc-d4-funcao-28.md`) |
+| D9 | `L27` soma `L30`, divergindo do literal do IPC 08 | primeira divergência deliberada da base; travada em teste |
+
+Homologação estrutural contra ente real:
+`docs/entes-homologacao/porto-alegre/gabarito-dfc-2025.md` — 36+14+29+4 linhas publicadas, 43
+identidades fechando em centavos. Dois achados abertos para a apuração: `L16` e `L11` concentram
+62,6% dos desembolsos e 58,4% dos ingressos, e o quadro de juros do ente não reproduz a abertura
+interna/externa por subfunção.
+
 **`lint-base-zero` arquivada em 2026-10-23:** `python -m ruff check .` volta a sair limpo
 (era 6 achados herdados). O gate de lint de toda change passa a ser binário — achado novo não
 se esconde mais atrás de uma linha de base escrita à mão.

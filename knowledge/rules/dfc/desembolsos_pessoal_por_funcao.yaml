@@ -1,0 +1,3288 @@
+# Quadro de Desembolsos de Pessoal e Demais Despesas por Função — IPC 08, p. 15. 29 linhas.
+# L1–L28 replicam as ND e as contas de L13 do Quadro Principal, filtradas pela função.
+rules:
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l1
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L1
+    descricao: Legislativa
+    nivel: 2
+    ordem: 1
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L1
+  evidence:
+    page: 15
+    text: 'L1 Legislativa (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 01'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '01'
+      pattern: '01'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l2
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L2
+    descricao: Judiciária
+    nivel: 2
+    ordem: 2
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L2
+  evidence:
+    page: 15
+    text: 'L2 Judiciária (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 02'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '02'
+      pattern: '02'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l3
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L3
+    descricao: Essencial à Justiça
+    nivel: 2
+    ordem: 3
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L3
+  evidence:
+    page: 15
+    text: 'L3 Essencial à Justiça (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 03'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '03'
+      pattern: '03'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l4
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L4
+    descricao: Administração
+    nivel: 2
+    ordem: 4
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L4
+  evidence:
+    page: 15
+    text: 'L4 Administração (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 04'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '04'
+      pattern: '04'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l5
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L5
+    descricao: Defesa Nacional
+    nivel: 2
+    ordem: 5
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L5
+  evidence:
+    page: 15
+    text: 'L5 Defesa Nacional (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 05'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '05'
+      pattern: '05'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l6
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L6
+    descricao: Segurança Pública
+    nivel: 2
+    ordem: 6
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L6
+  evidence:
+    page: 15
+    text: 'L6 Segurança Pública (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 06'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '06'
+      pattern: '06'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l7
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L7
+    descricao: Relações Exteriores
+    nivel: 2
+    ordem: 7
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L7
+  evidence:
+    page: 15
+    text: 'L7 Relações Exteriores (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 07'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '07'
+      pattern: '07'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l8
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L8
+    descricao: Assistência Social
+    nivel: 2
+    ordem: 8
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L8
+  evidence:
+    page: 15
+    text: 'L8 Assistência Social (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 08'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '08'
+      pattern: '08'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l9
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L9
+    descricao: Previdência Social
+    nivel: 2
+    ordem: 9
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L9
+  evidence:
+    page: 15
+    text: 'L9 Previdência Social (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 09'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '09'
+      pattern: '09'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l10
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L10
+    descricao: Saúde
+    nivel: 2
+    ordem: 10
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L10
+  evidence:
+    page: 15
+    text: 'L10 Saúde (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 10'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '10'
+      pattern: '10'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l11
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L11
+    descricao: Trabalho
+    nivel: 2
+    ordem: 11
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L11
+  evidence:
+    page: 15
+    text: 'L11 Trabalho (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 11'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '11'
+      pattern: '11'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l12
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L12
+    descricao: Educação
+    nivel: 2
+    ordem: 12
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L12
+  evidence:
+    page: 15
+    text: 'L12 Educação (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 12'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '12'
+      pattern: '12'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l13
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L13
+    descricao: Cultura
+    nivel: 2
+    ordem: 13
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L13
+  evidence:
+    page: 15
+    text: 'L13 Cultura (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 13'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '13'
+      pattern: '13'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l14
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L14
+    descricao: Direitos da Cidadania
+    nivel: 2
+    ordem: 14
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L14
+  evidence:
+    page: 15
+    text: 'L14 Direitos da Cidadania (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 14'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '14'
+      pattern: '14'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l15
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L15
+    descricao: Urbanismo
+    nivel: 2
+    ordem: 15
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L15
+  evidence:
+    page: 15
+    text: 'L15 Urbanismo (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 15'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '15'
+      pattern: '15'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l16
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L16
+    descricao: Habitação
+    nivel: 2
+    ordem: 16
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L16
+  evidence:
+    page: 15
+    text: 'L16 Habitação (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 16'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '16'
+      pattern: '16'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l17
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L17
+    descricao: Saneamento
+    nivel: 2
+    ordem: 17
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L17
+  evidence:
+    page: 15
+    text: 'L17 Saneamento (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 17'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '17'
+      pattern: '17'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l18
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L18
+    descricao: Gestão Ambiental
+    nivel: 2
+    ordem: 18
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L18
+  evidence:
+    page: 15
+    text: 'L18 Gestão Ambiental (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 18'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '18'
+      pattern: '18'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l19
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L19
+    descricao: Ciência e Tecnologia
+    nivel: 2
+    ordem: 19
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L19
+  evidence:
+    page: 15
+    text: 'L19 Ciência e Tecnologia (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 19'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '19'
+      pattern: '19'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l20
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L20
+    descricao: Agricultura
+    nivel: 2
+    ordem: 20
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L20
+  evidence:
+    page: 15
+    text: 'L20 Agricultura (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 20'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '20'
+      pattern: '20'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l21
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L21
+    descricao: Organização Agrária
+    nivel: 2
+    ordem: 21
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L21
+  evidence:
+    page: 15
+    text: 'L21 Organização Agrária (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 21'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '21'
+      pattern: '21'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l22
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L22
+    descricao: Indústria
+    nivel: 2
+    ordem: 22
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L22
+  evidence:
+    page: 15
+    text: 'L22 Indústria (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 22'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '22'
+      pattern: '22'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l23
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L23
+    descricao: Comércio e Serviços
+    nivel: 2
+    ordem: 23
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L23
+  evidence:
+    page: 15
+    text: 'L23 Comércio e Serviços (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 23'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '23'
+      pattern: '23'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l24
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L24
+    descricao: Comunicações
+    nivel: 2
+    ordem: 24
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L24
+  evidence:
+    page: 15
+    text: 'L24 Comunicações (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 24'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '24'
+      pattern: '24'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l25
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L25
+    descricao: Energia
+    nivel: 2
+    ordem: 25
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L25
+  evidence:
+    page: 15
+    text: 'L25 Energia (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 25'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '25'
+      pattern: '25'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l26
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L26
+    descricao: Transporte
+    nivel: 2
+    ordem: 26
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L26
+  evidence:
+    page: 15
+    text: 'L26 Transporte (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 26'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '26'
+      pattern: '26'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l27
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L27
+    descricao: Desporto e Lazer
+    nivel: 2
+    ordem: 27
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L27
+  evidence:
+    page: 15
+    text: 'L27 Desporto e Lazer (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 27'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '27'
+      pattern: '27'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l28
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L28
+    descricao: Encargos Especiais
+    nivel: 2
+    ordem: 28
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L28
+  evidence:
+    page: 15
+    text: 'L28 Encargos Especiais (+) 6.2.2.1.3.04.00 (+) 6.3.1.4.0.00.00 (+) 6.3.2.2.0.00.00 3.1.71.xx.xx; 3.1.73.xx.xx; 3.1.74.xx.xx; 3.1.90.xx.xx; 3.1.93.xx.xx; 3.1.94.xx.xx; 3.1.95.xx.xx; 3.1.96.xx.xx; 3.1.99.xx.xx; 3.3.71.xx.xx; 3.3.72.xx.xx; 3.3.73.xx.xx; 3.3.74.xx.xx; 3.3.75.xx.xx; 3.3.76.xx.xx; 3.3.90.xx.xx; 3.3.92.xx.xx; 3.3.93.xx.xx; 3.3.94.xx.xx; 3.3.95.xx.xx; 3.3.96.xx.xx; 3.3.99.xx.xx Função 28'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+    reason: 'Lista longa de naturezas: transcrição visual da página. Literal do PDF preservado, inclusive grafia com ponto ausente ou duplo.'
+  filters:
+  - field: natureza_despesa
+    operator: in
+    values:
+    - literal: '3.1.71.xx.xx'
+      pattern: '3171xxxx'
+    - literal: '3.1.73.xx.xx'
+      pattern: '3173xxxx'
+    - literal: '3.1.74.xx.xx'
+      pattern: '3174xxxx'
+    - literal: '3.1.90.xx.xx'
+      pattern: '3190xxxx'
+    - literal: '3.1.93.xx.xx'
+      pattern: '3193xxxx'
+    - literal: '3.1.94.xx.xx'
+      pattern: '3194xxxx'
+    - literal: '3.1.95.xx.xx'
+      pattern: '3195xxxx'
+    - literal: '3.1.96.xx.xx'
+      pattern: '3196xxxx'
+    - literal: '3.1.99.xx.xx'
+      pattern: '3199xxxx'
+    - literal: '3.3.71.xx.xx'
+      pattern: '3371xxxx'
+    - literal: '3.3.72.xx.xx'
+      pattern: '3372xxxx'
+    - literal: '3.3.73.xx.xx'
+      pattern: '3373xxxx'
+    - literal: '3.3.74.xx.xx'
+      pattern: '3374xxxx'
+    - literal: '3.3.75.xx.xx'
+      pattern: '3375xxxx'
+    - literal: '3.3.76.xx.xx'
+      pattern: '3376xxxx'
+    - literal: '3.3.90.xx.xx'
+      pattern: '3390xxxx'
+    - literal: '3.3.92.xx.xx'
+      pattern: '3392xxxx'
+    - literal: '3.3.93.xx.xx'
+      pattern: '3393xxxx'
+    - literal: '3.3.94.xx.xx'
+      pattern: '3394xxxx'
+    - literal: '3.3.95.xx.xx'
+      pattern: '3395xxxx'
+    - literal: '3.3.96.xx.xx'
+      pattern: '3396xxxx'
+    - literal: '3.3.99.xx.xx'
+      pattern: '3399xxxx'
+  - field: funcao
+    operator: in
+    values:
+    - literal: '28'
+      pattern: '28'
+  columns:
+    exercicio_atual:
+      label: Exercício Atual
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+    exercicio_anterior:
+      label: Exercício Anterior
+      accounts:
+      - literal: '6.2.2.1.3.04.00'
+        pattern: '6221304'
+        sign: +
+      - literal: '6.3.1.4.0.00.00'
+        pattern: '6314'
+        sign: +
+      - literal: '6.3.2.2.0.00.00'
+        pattern: '6322'
+        sign: +
+- rule_id: dfc.desembolsos_pessoal_por_funcao.l29
+  demonstrativo:
+    codigo: DFC
+    descricao: Demonstração dos Fluxos de Caixa
+  quadro:
+    codigo: DESEMBOLSOS_PESSOAL_POR_FUNCAO
+    descricao: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+  linha:
+    codigo: L29
+    descricao: Total dos Desembolsos de Pessoal e Demais Despesas por Função
+    nivel: 1
+    ordem: 29
+  source:
+    document: IPC08
+    document_version: '2020-01'
+    page: 15
+    section: REGRAS DE PREENCHIMENTO DA DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+    item: '18'
+    table: Quadro de Desembolsos de Pessoal e Demais Despesas por Função
+    row: L29
+  evidence:
+    page: 15
+    text: 'L29 Total dos Desembolsos de Pessoal e Demais Despesas por Função (L1 + L2 + … + L28)'
+  version:
+    source_document: IPC08
+    edition: '2020-01'
+    valid_from: '2020-01-20'
+    valid_until: null
+  provenance:
+    extraction_method: assisted
+    extractor_version: '1.0'
+    extracted_at: '2026-10-26'
+  status: extracted
+  review:
+    required: true
+  calculation:
+    references:
+    - rule: dfc.desembolsos_pessoal_por_funcao.l1
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l2
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l3
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l4
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l5
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l6
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l7
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l8
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l9
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l10
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l11
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l12
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l13
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l14
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l15
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l16
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l17
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l18
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l19
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l20
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l21
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l22
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l23
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l24
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l25
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l26
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l27
+      sign: +
+    - rule: dfc.desembolsos_pessoal_por_funcao.l28
+      sign: +
