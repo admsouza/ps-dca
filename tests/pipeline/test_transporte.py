@@ -6,7 +6,7 @@ recebe ao fim do job e quem pode pedir o quê.
 
 Nenhum destes testes sobe FastAPI. O que a spec fixa é a decisão de autorizar, resumir e notificar
 — a rota transporta. `autorizar` recebe a verificação de token por parâmetro (`verificar`), o que
-mantém o teste sem `jose` e sem `SECRET_KEY` e é a mesma inversão que o domínio já usa.
+mantém o teste sem `pyjwt` e sem `SECRET_KEY` e é a mesma inversão que o domínio já usa.
 
 Contrato que a F2/F3 tem de satisfazer, e que só existe aqui até ser implementado:
 

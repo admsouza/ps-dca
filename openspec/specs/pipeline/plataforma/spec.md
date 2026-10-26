@@ -5,6 +5,8 @@
 > arquivado em 2026-10-01, e `pipeline-visualizar-sem-reprocessar`, arquivada em 2026-10-07.
 > O mapa manual do BF passou a ser por unidade, e o consolidado deixou de ter origem própria,
 > por `pipeline-consolidado-anterior-soma-unidades`.
+> `pipeline-resumo-com-unidades`, arquivada em 2026-10-26: o resumo de BF e BP traz as unidades
+> visíveis ao usuário.
 > Alterações entram por nova change, nunca por edição direta deste arquivo.
 
 ## Purpose
@@ -283,10 +285,15 @@ listar os anexos na ordem canônica e SHALL trazer, por anexo, apenas metadados 
 Anexo ainda sem implementação SHALL aparecer como `sem_cache`; NÃO DEVE ser omitido. O resumo NÃO
 DEVE iniciar cálculo.
 
+As entradas de BF e BP SHALL trazer `recortes`: as unidades (`ug:`/`po:`) do resultado `ok`, com
+`chave`, `tipo` e `rotulo`, filtradas pela mesma visibilidade por poder da leitura do anexo. Sem
+resultado `ok`, `recortes` SHALL ser `[]`. Grupos de poder e consolidado NÃO DEVEM aparecer.
+
 #### Scenario: bootstrap sem nenhum cache
 
 - **WHEN** o resumo é solicitado para um ente sem nenhuma apuração
 - **THEN** a resposta é `200` com todos os anexos em `sem_cache`
+- **AND** BF e BP trazem `recortes = []`
 - **AND** nenhum job é enfileirado
 
 #### Scenario: metadados sem payload
@@ -294,6 +301,18 @@ DEVE iniciar cálculo.
 - **WHEN** o resumo é solicitado com anexos já apurados
 - **THEN** cada entrada traz status, data de cálculo, versões e duração
 - **AND** nenhuma entrada traz o resultado do demonstrativo
+
+#### Scenario: unidades do BF
+
+- **GIVEN** Cuitegi (`2505204`) 2024 com BF `ok` por SIAFIC e quatro UGs
+- **WHEN** o resumo de 2024 é solicitado por usuário que vê os dois poderes
+- **THEN** a entrada do BF traz as 4 UGs em `recortes`, sem `consolidado` e sem `poder:*`
+
+#### Scenario: visibilidade por poder
+
+- **GIVEN** o mesmo cache e um usuário só do Executivo
+- **WHEN** o resumo é solicitado
+- **THEN** a Câmara não aparece em `recortes`
 
 ### Requirement: Apuração não roda no processo da API
 

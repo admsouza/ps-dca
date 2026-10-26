@@ -27,12 +27,12 @@ plataforma = [
     "sqlalchemy>=2.0",
     "alembic>=1.14",
     "psycopg2-binary>=2.9",
-    "python-jose[cryptography]>=3.3",
+    "pyjwt>=2.15",
     "cryptography>=43.0",
 ]
 
 dev = [
-    "pytest>=8.0",
+    "pytest>=9.0.3",  # piso por PYSEC-2026-1845 (/tmp/pytest-of-{user} previsível)
     "ruff>=0.16",
     "pymupdf>=1.24",  # extração geométrica do PDF; uso manual, fora do CI
 ]

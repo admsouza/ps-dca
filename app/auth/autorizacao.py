@@ -4,7 +4,7 @@
 validaria token do hub, e toda rota daria `401`.
 
 A verificação do token entra por parâmetro (`verificar`). Duas consequências: o teste roda sem
-`jose` e sem `SECRET_KEY`, e a unidade é confrontada **com o token** — aceitar `X-Unidade-Id` sem
+`pyjwt` e sem `SECRET_KEY`, e a unidade é confrontada **com o token** — aceitar `X-Unidade-Id` sem
 confronto deixaria qualquer autenticado ler qualquer ente (OWASP A01).
 """
 from __future__ import annotations
@@ -34,13 +34,14 @@ class CredencialDeFonteRecusada(PermissionError):
 
 def verificar_jwt(token: str) -> dict | None:
     """Verificação real, com a chave do hub. `None` = inválido ou expirado."""
-    from jose import JWTError, jwt
+    import jwt
+    from jwt import PyJWTError
 
     cfg = config()
     cfg.exigir("secret_key")
     try:
         return jwt.decode(token, cfg.secret_key, algorithms=[cfg.algoritmo])
-    except JWTError as erro:
+    except PyJWTError as erro:
         logger.info("JWT inválido: %s", erro)
         return None
 

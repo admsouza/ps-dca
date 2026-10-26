@@ -57,10 +57,10 @@ se esconde mais atrás de uma linha de base escrita à mão.
 `pytest -m vivo` 3 passed contra o SICONFI, ruff e `validate_rules` limpos) →
 `dvp-no-pipeline` **arquivada em 2026-10-23** (`GET /dca/I-HI`, resumo, percurso e `app/cli/dvp.py`:
 893 passed; CLI contra o SICONFI com L1 17.319.103.824,61 em 2025) →
-`dvp-por-unidade-gestora` **implementada em 2026-10-23, ainda ativa** (916 passed, `pytest -m vivo`
-3 passed). Não arquivada: falta a conferência com ente real por UG (§4.3) e o arquivamento de
-`pipeline-dca-por-unidade-gestora` e `pipeline-anterior-por-recorte`, das quais o delta de
-`pipeline/unidade-gestora` depende.
+`dvp-por-unidade-gestora` **arquivada em 2026-10-26** (916 passed, `pytest -m vivo` 3 passed;
+João Pessoa 2025 por `po:` com diferença 0,00). A conferência por `ug:` (task 4.3) segue aberta:
+exige `token_ps`. `pipeline/unidade-gestora` continua parcial até arquivar
+`pipeline-dca-por-unidade-gestora` e `pipeline-anterior-por-recorte`.
 
 **Change ativa, fase VERIFY (proposal/spec aprovadas pelo PO em 2026-10-21):**
 `bp-compensacao-atual-manual-por-recorte` — a coluna atual das Contas de Compensação
@@ -95,9 +95,6 @@ Specs em vigor: `dca/base-canonica-regras`, `dca/balanco-orcamentario`,
 
 Padrão: `processado` se o cache de N−1 tiver o recorte, senão `msce`. Toda escolha explícita fica gravada na procedência e é reaplicada, inclusive no percurso. O grupo de poder soma as unidades. O consolidado ganha `processado` e mantém o padrão de hoje. N−1 de outra fonte é aceito e declarado em `anterior_processado.fonte`. O cache continua sem chave por fonte. Front: `dca-bf-e-anterior-por-recorte` (fatia 2).
 
-**Change ativa, em implementação:** `dca-regra-na-celula` — `GET /dca/{anexo}/regra` e diálogo no BF.
-Anexo sem projeção registrada responde 404. Não arquivada.
-
 **Change ativa, fase VERIFY, bloqueada:** `bf-l28-l61-contas-especificas` — motor, YAML e whitelist
 G8 (6→4 linhas) implementados e com suíte 100% verde, mas a medição contra o BF publicado de João
 Pessoa/2025 (2026-10-01) reprovou: `L28`/`L61` apurados com as 15 contas de classe 1 (ativo) da
@@ -115,13 +112,6 @@ Aguardando aprovação do PO e o fechamento de D1 (competência), D2 (valor por 
 exigir que cada unidade esteja no poder do usuário (mesma regra de `recortes.visiveis`, fail closed,
 `403` tudo ou nada). Hoje só o ente é conferido. Aguardando PO: D1 (origem do consolidado exige
 `consolidado`?).
-
-**Change ativa, fase VERIFY (código no working tree, 824 passed; implementação autorizada pelo dev
-em 2026-10-15, aprovação formal do PO pendente):** `pipeline-resumo-com-unidades` — `GET /dca/resumo`
-traz as unidades (`ug:`/`po:`) de BF e BP, com visibilidade por poder, para o front montar a
-configuração da coluna anterior sem `GET /dca/BF` (que enfileira job quando não há cache). Decisões
-contábeis em aberto, sem código: D1 (consolidado × unidades) e D2 (PO = soma das UGs de N−1).
-Front: `dca-dados-exercicio-anterior`.
 
 **Change ativa, em implementação:** `bf-estorno-receita-extra` — na PublicSoft, `L27` e `L60`
 saem líquidas (movimento MSC − `totalGeral` do estorno de receita extra do exercício da coluna).
@@ -169,6 +159,9 @@ encerramento e a entrada do BF no pipeline continuam em `openspec/changes/archiv
 
 | Data | Change |
 |---|---|
+| 2026-10-26 | `dvp-por-unidade-gestora` — DVP por `ug:`/`po:` no mesmo job, anterior Processado ou Manual por unidade, leitura `?recorte=` sem reprocessar. `dca/demonstracao-variacoes-patrimoniais` 9 → 16. `pipeline/unidade-gestora` nasce parcial (7 cenários). Suíte 916 passed. Conferência por `ug:` ainda aberta. |
+| 2026-10-26 | `dca-regra-na-celula` — `GET /dca/{anexo}/regra` devolve a regra da célula (contas, fontes, origem, filhas) para `auditor_mapeamentos` ou `adm_sistema`. Anexo sem projeção, linha ou coluna inexistente: `404`. Capability nova `dca/regra-da-celula` (6 cenários). |
+| 2026-10-26 | `pipeline-resumo-com-unidades` — `GET /dca/resumo` traz as unidades (`ug:`/`po:`) de BF e BP, com visibilidade por poder, sem enfileirar job. Grupos e consolidado ficam de fora. `pipeline/plataforma` 95 → 97. D1 e D2 continuam fora de escopo. |
 | 2026-10-23 | `lint-base-zero` — `python -m ruff check .` sai limpo (eram 6 achados herdados). Sem delta de spec. Gate de lint volta a ser binário. |
 | 2026-10-23 | `dvp-no-pipeline` — DVP servida pelo pipeline: `GET /dca/I-HI`, resumo `implementado: true`, percurso `BO`/`BF`/`BP`/`I-HI`, CLI `app/cli/dvp.py`. `ORDEM_POR_DOCUMENTO["IPC05"]`. `pipeline/plataforma` 89 → 95. Suíte 893 passed. |
 | 2026-10-23 | `dvp-quadro-principal` — Quadro Principal da DVP (IPC 05) no contrato de BO/BP/BF: 19 regras, sem exclusão intra, `MSCE`/abertura, classes 3 e 4. Capability `dca/demonstracao-variacoes-patrimoniais` (9 cenários). JP 2025 L1 17.319.103.824,61. Suíte 880 passed; `pytest -m vivo` 3 passed. |

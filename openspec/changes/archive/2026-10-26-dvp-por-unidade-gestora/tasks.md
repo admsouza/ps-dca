@@ -5,10 +5,10 @@ Fatia vertical: ente de homologação com base por UG, DVP por `ug:` e por `po:`
 
 ## 0. Fundação
 - [x] 0.1 `dvp-no-pipeline` arquivada em 2026-10-23, §4 verde
-- [ ] 0.2 `pipeline-dca-por-unidade-gestora` e `pipeline-anterior-por-recorte` arquivadas —
-      **ainda ativas em 2026-10-23**. O código desta change já está implementado e verde; o
-      arquivamento dela espera as duas, porque o delta de `pipeline/unidade-gestora` só é
-      mesclado quando a capability inteira fecha
+- [x] 0.2 Arquivada em 2026-10-26 por pedido explícito, com `pipeline-dca-por-unidade-gestora` e
+      `pipeline-anterior-por-recorte` ainda ativas. O delta desta change já está em
+      `openspec/specs/pipeline/unidade-gestora/spec.md`; o cabeçalho registra que as duas entram
+      depois
 - [x] 0.3 Manual por unidade e percurso por unidade **não são pergunta**: saem do comportamento de
       BP e BF (D3 e D4), verificado no código em 2026-10-23
 - [x] 0.4 PO aprovou a proposal em 2026-10-23
@@ -64,10 +64,13 @@ Fatia vertical: ente de homologação com base por UG, DVP por `ug:` e por `po:`
 - [x] 4.5 `python -m pytest -m vivo` — 3 passed: a apuração consolidada da DVP não mudou de valor
 
 ## 5. Arquivamento
-- [ ] 5.1 `tasks.md` marcado
-- [ ] 5.2 Deltas mesclados em `openspec/specs/dca/demonstracao-variacoes-patrimoniais/spec.md` e
+- [x] 5.1 `tasks.md` marcado
+- [x] 5.2 Deltas mesclados em 2026-10-26 em `openspec/specs/dca/demonstracao-variacoes-patrimoniais/spec.md` e
       `openspec/specs/pipeline/unidade-gestora/spec.md`
-- [ ] 5.2.1 `CENARIOS_ESPERADOS`: `dca/demonstracao-variacoes-patrimoniais` +7 e
-      `pipeline/unidade-gestora` +7, com o comentário da origem
-- [ ] 5.3 Pasta movida para `openspec/changes/archive/AAAA-MM-DD-dvp-por-unidade-gestora/`
-- [ ] 5.4 Tabela de change ativa em `openspec/AGENTS.md` atualizada
+- [x] 5.2.1 `CENARIOS_ESPERADOS`: `dca/demonstracao-variacoes-patrimoniais` 9 → 16 e
+      `pipeline/unidade-gestora` 7 (entrada nova), com o comentário da origem.
+      `openspec/specs/pipeline/unidade-gestora/spec.md` nasce **parcial**, só com os deltas desta
+      change — o cabeçalho registra que `pipeline-dca-por-unidade-gestora` e
+      `pipeline-anterior-por-recorte` ainda mesclam nela
+- [x] 5.3 Pasta movida para `openspec/changes/archive/2026-10-26-dvp-por-unidade-gestora/`
+- [x] 5.4 Tabela de change ativa em `openspec/AGENTS.md` atualizada

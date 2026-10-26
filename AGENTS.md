@@ -95,7 +95,9 @@ nunca `openspec/specs/`.
 Rodar **tudo**, na ordem, e reportar o resultado real:
 
 ```bash
-python -m pytest                  # suíte inteira
+# pytest/ruff não estão em requirements.txt (não vão para a imagem): extra `dev` do pyproject
+python -m pip install -r requirements.txt "pytest>=9.0.3" "ruff>=0.16"
+python -m pytest                  # suíte inteira (addopts já exclui `-m vivo`)
 python -m ruff check .            # lint (deve sair limpo)
 alembic upgrade head              # migrations; rename/drop-column: upgrade → downgrade → upgrade
 ```

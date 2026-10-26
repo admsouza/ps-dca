@@ -19,7 +19,7 @@ from tests.conftest import RAIZ_REPO
 # dependência da F2/F3 (`pyproject.toml`, extra `plataforma`).
 PROIBIDAS = frozenset({
     "requests", "pandas", "yaml", "sqlalchemy", "redis", "fastapi", "arq", "alembic",
-    "psycopg2", "uvicorn", "gunicorn", "pydantic", "jose", "cryptography",
+    "psycopg2", "uvicorn", "gunicorn", "pydantic", "jwt", "cryptography",
 })
 
 DOMINIO = RAIZ_REPO / "app" / "domain"

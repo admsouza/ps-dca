@@ -1,0 +1,70 @@
+# Lint, testes, segurança e build das imagens.
+# A suíte roda offline (nada de Postgres/Redis/rede); os testes `vivo` ficam fora por padrão
+# (addopts do pyproject). Deploy (CapRover) não está aqui — ver captain-definition-*.
+include:
+  # Jobs nativos do GitLab; rodam no tier Free (o widget de MR exige Ultimate).
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+default:
+  image: python:3.11-slim
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - .cache/pip
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PYTHONIOENCODING: "utf-8"
+
+stages:
+  - verificar
+  - seguranca
+  - build
+
+lint:
+  stage: verificar
+  script:
+    - pip install "ruff>=0.16"
+    - ruff check .
+
+testes:
+  stage: verificar
+  script:
+    - pip install -r requirements.txt "pytest>=9.0.3"
+    - pytest
+
+# CVEs nas dependências (A06). pip-audit em vez do Dependency Scanning do GitLab,
+# que é Ultimate-only. Sem exceções: qualquer CVE quebra o job.
+dependencias:
+  stage: seguranca
+  script:
+    - pip install pip-audit
+    - pip-audit -r requirements.txt
+
+.build:
+  stage: build
+  image: docker:27
+  services:
+    - docker:27-dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  script:
+    - docker build -f "$DOCKERFILE" -t "$IMAGEM:$CI_COMMIT_SHORT_SHA" -t "$IMAGEM:latest" .
+    - docker push "$IMAGEM:$CI_COMMIT_SHORT_SHA"
+    - docker push "$IMAGEM:latest"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+build:api:
+  extends: .build
+  variables:
+    DOCKERFILE: Dockerfile.api
+    IMAGEM: $CI_REGISTRY_IMAGE/api
+
+build:worker:
+  extends: .build
+  variables:
+    DOCKERFILE: Dockerfile.worker
+    IMAGEM: $CI_REGISTRY_IMAGE/worker
