@@ -30,7 +30,13 @@ def engine():
             max_overflow=cfg.db_max_overflow,
             pool_pre_ping=True,          # conexão morta por restart do banco não vira erro do job
             echo=cfg.db_echo,
-            connect_args={"connect_timeout": cfg.db_connect_timeout},
+            connect_args={
+                "connect_timeout": cfg.db_connect_timeout,
+                # lc_messages=C: com locale pt_BR o servidor emite a mensagem em CP1252
+                # anunciando client_encoding=UTF8, e o psycopg2 estoura UnicodeDecodeError
+                # antes de a exceção real chegar ao job. Independe do postgresql.conf.
+                "options": "-c lc_messages=C",
+            },
         )
     return _engine
 
