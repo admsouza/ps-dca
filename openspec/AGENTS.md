@@ -48,6 +48,18 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 ## Change ativa
 
+**Changes ativas da DFC (fase SPEC, aguardando PO) — nesta ordem:**
+
+| # | Change | Repo | Depende de |
+|---|---|---|---|
+| 3 | `dfc-informados-na-rota` | `ps-dca` | — (a rota valida os informados com a whitelist do BF e monta um nome que o apurador da DFC descarta em silêncio) |
+| 4 | `dfc-por-unidade-gestora` | `ps-dca` | `dfc-no-pipeline` |
+| 5 | `dfc-anterior-por-recorte` | `ps-dca` | 4 |
+
+No `front-declaracoes`, em paralelo: `dca-dfc-ui` (1, não depende de nada — a API já serve
+`GET /dca/DFC`), `dca-dfc-informados` (2, depende de 3) e `dca-dfc-recorte-anterior` (6, depende
+de 4 e 5). A numeração é a ordem de implementação; 1 e 3 podem correr juntas.
+
 **Backend da DFC concluído em 2026-10-27** — duas changes arquivadas no mesmo dia:
 
 `dfc-apuracao-f1` — `app/services/dfc/` apura as 84 linhas pelo motor de BO/BF/BP/DVP, mais

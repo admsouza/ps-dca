@@ -38,7 +38,8 @@ lint:
 testes:
   stage: verificar
   script:
-    - pip install -r requirements.txt "pytest>=9.0.3"
+    # httpx2 é só do TestClient (Starlette); o runtime continua em httpx (hub/perfil).
+    - pip install -r requirements.txt "pytest>=9.0.3" "httpx2>=2.0"
     - pytest
 
 # CVEs nas dependências (A06). pip-audit em vez do Dependency Scanning do GitLab,

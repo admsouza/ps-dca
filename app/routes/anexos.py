@@ -110,7 +110,7 @@ def _exercicio(
 
 
 def _erro_422(detalhe: str) -> HTTPException:
-    return HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detalhe)
+    return HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail=detalhe)
 
 
 class AnteriorDaUnidade(BaseModel):
@@ -342,7 +342,7 @@ async def _decidir(request: Request, ente: str, exercicio: int, anexo: str, repo
     except Exception as erro:
         # Sem regra vigente para o exercício não há o que apurar, e apurar por aproximação
         # publicaria número com regra de outra edição normativa.
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(erro)) from erro
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(erro)) from erro
 
     try:
         resposta = cache_service.ler_ou_enfileirar(

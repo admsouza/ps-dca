@@ -81,7 +81,7 @@ def vigente(
     try:
         return _resumir(resolver(_repo(request), anexo, an_referencia))
     except SemVigencia as erro:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(erro)) from erro
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(erro)) from erro
 
 
 @router.post(
@@ -117,7 +117,7 @@ def publicar_vigencia(
     except PublicacaoDestrutiva as erro:
         raise HTTPException(status.HTTP_409_CONFLICT, detail=str(erro)) from erro
     except ValueError as erro:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(erro)) from erro
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(erro)) from erro
 
     logger.info("mapeamento publicado | anexo=%s %s-%02d por usuario=%s",
                 anexo, corpo.ano_vigencia, corpo.mes_vigencia, solicitante)

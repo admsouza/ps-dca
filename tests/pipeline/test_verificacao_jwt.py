@@ -14,7 +14,7 @@ import pytest
 from app.auth.autorizacao import verificar_jwt
 from app.core.config import config
 
-CHAVE = "chave-de-teste-do-hub"
+CHAVE = "chave-de-teste-do-hub-32bytes!!!"
 
 
 @pytest.fixture
@@ -42,7 +42,7 @@ def test_token_valido_devolve_claims(_chave):
 
 
 def test_assinatura_de_outra_chave_e_recusada(_chave):
-    assert verificar_jwt(_token("chave-de-outro-emissor")) is None
+    assert verificar_jwt(_token("chave-de-outro-emissor-32bytes!!")) is None
 
 
 def test_token_expirado_e_recusado(_chave):

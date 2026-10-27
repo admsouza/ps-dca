@@ -95,8 +95,8 @@ nunca `openspec/specs/`.
 Comandos que existem (não inventar outros):
 
 ```bash
-# pytest/ruff não estão em requirements.txt (não vão para a imagem): extra `dev` do pyproject
-python -m pip install -r requirements.txt "pytest>=9.0.3" "ruff>=0.16"
+# pytest/ruff/httpx2 não estão em requirements.txt (não vão para a imagem): extra `dev` do pyproject
+python -m pip install -r requirements.txt "pytest>=9.0.3" "ruff>=0.16" "httpx2>=2.0"
 python -m pytest                  # suíte (addopts já exclui `-m vivo`)
 python -m ruff check .            # lint
 alembic upgrade head              # só se tocou migration; rename/drop-column: upgrade → downgrade → upgrade

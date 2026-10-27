@@ -35,6 +35,7 @@ dev = [
     "pytest>=9.0.3",  # piso por PYSEC-2026-1845 (/tmp/pytest-of-{user} previsível)
     "ruff>=0.16",
     "pymupdf>=1.24",  # extração geométrica do PDF; uso manual, fora do CI
+    "httpx2>=2.0",  # TestClient do Starlette; não vai para a imagem
 ]
 
 [tool.ruff]
