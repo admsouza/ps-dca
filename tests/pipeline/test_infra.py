@@ -166,7 +166,7 @@ def test_historico_registrado_na_tabela_errada():
 
 
 def test_guarda_nao_interpola_nome_de_tabela_no_sql():
-    """A consulta da guarda é literal. Interpolar o identificador era o finding B608 do SAST.
+    """Requisito: a consulta da guarda é literal. Interpolar o identificador era o finding B608 do SAST.
 
     `alembic/env.py` não entra na suíte: no import ele dispara a migration. A trava é no fonte,
     no mesmo estilo da varredura das revisões.
