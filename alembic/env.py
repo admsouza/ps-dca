@@ -21,7 +21,7 @@ from sqlalchemy import inspect, text
 from alembic import context
 from app.core.config import config as app_config
 from app.core.database import Base, engine
-from app.core.migrations import LOCK, TABELA_DE_VERSAO, verificar_tabela_de_versao
+from app.core.migrations import LOCK, TABELA_DE_VERSAO, TABELA_GENERICA, verificar_tabela_de_versao
 from app.infra.cache import modelo  # noqa: F401 - registra os models no metadata
 
 configuracao = context.config
@@ -43,9 +43,13 @@ class _InspetorSQLAlchemy:
         return self._inspetor.has_table(nome)
 
     def versao_em(self, nome: str) -> str | None:
+        if nome != TABELA_GENERICA:
+            raise ValueError(nome)
         if not self.tem_tabela(nome):
             return None
-        linha = self._conexao.execute(text(f"SELECT version_num FROM {nome} LIMIT 1")).first()  # noqa: S608
+        linha = self._conexao.execute(
+            text("SELECT version_num FROM alembic_version LIMIT 1")
+        ).first()
         return linha[0] if linha else None
 
 

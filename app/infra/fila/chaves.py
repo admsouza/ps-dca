@@ -68,4 +68,6 @@ def msc(ente: int | str, ano: int, mes: int, classe: int,
     }
     itens = sorted((k, _normalizar(v)) for k, v in parametros.items() if v is not None)
     base = "|".join(f"{k}:{v}" for k, v in itens)
-    return f"{PREFIXO_MSC}{hashlib.md5(base.encode('utf-8')).hexdigest()}"  # noqa: S324
+    # nosemgrep: bandit.B303-1
+    digest = hashlib.md5(base.encode("utf-8"), usedforsecurity=False).hexdigest()
+    return f"{PREFIXO_MSC}{digest}"
