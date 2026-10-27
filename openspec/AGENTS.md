@@ -48,6 +48,13 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 ## Change ativa
 
+**Change ativa, fase SPEC (proposta em 2026-10-26, aguardando PO):** `dfc-apuracao-f1` — apura as
+84 linhas da DFC pelo motor de BO/BF/BP/DVP, mais o CLI. Transporte HTTP e recorte por unidade
+ficam para `dfc-no-pipeline` e `dfc-por-unidade-gestora`. Três gaps já medidos contra Porto Alegre
+2025, não supostos: 8 agregadoras saem não apuradas porque referenciam linha sem `columns`; `L35`
+lê N em vez de N−1; `L9` sai zerada. Aceite primário é a identidade de caixa da própria MSC
+(`L34` = 68.947.215,92), não o PDF do ente — recortes diferentes.
+
 **`ipc08-dfc-regras-canonicas` arquivada em 2026-10-26:** 84 regras da DFC (IPC 08) no contrato
 de BO/BF/BP/DVP, quatro quadros, sem Python. Capability nova `dca/demonstracao-fluxos-caixa`.
 Código do anexo: `DFC`, não `I-E`.
