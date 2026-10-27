@@ -1,6 +1,6 @@
 # Proposal — Apuração da Demonstração dos Fluxos de Caixa (F1)
 
-**Status:** proposta — aguardando o PO para abrir. Código só depois do gate TEST.
+**Status:** implementada e arquivada em 2026-10-27.
 **Repositório:** `ps-dca`
 **Capability:** `dca/demonstracao-fluxos-caixa` (existente, criada por `ipc08-dfc-regras-canonicas`)
 **Anexo DCA:** nenhum — a DFC não é publicada pelo `tt/dca`, como o BO e o BF
@@ -69,20 +69,20 @@ do mesmo ente. Por isso o aceite primário é a identidade de caixa, não o PDF.
 
 ## Critérios de aceite
 
-- [ ] Porto Alegre 2025: `L34` apurado = `68.947.215,92` (variação de `1.1.1` entre as duas MSC),
+- [x] Porto Alegre 2025: `L34` apurado = `68.947.215,92` (variação de `1.1.1` entre as duas MSC),
       com `L16` informado no valor que o fechamento exigir — **a medição que decide a change**.
-- [ ] `L35` = 2.785.855.199,20 e `L36` = 2.854.802.415,12 (caixa inicial e final da MSC).
-- [ ] Nenhuma das 84 linhas sai `não apurada` por "referências sem coluna em comum".
-- [ ] `L14` = 115.727.775,84 e `L32` = 4.278.384,37 (regressão dos valores já medidos em D4).
-- [ ] As identidades estruturais fecham sobre o apurado, nas duas colunas: `L2 = L3+…+L11`,
+- [x] `L35` = 2.785.855.199,20 e `L36` = 2.854.802.415,12 (caixa inicial e final da MSC).
+- [x] Nenhuma das 84 linhas sai `não apurada` por "referências sem coluna em comum".
+- [x] `L14` = 115.727.775,84 e `L32` = 4.278.384,37 (regressão dos valores já medidos em D4).
+- [x] As identidades estruturais fecham sobre o apurado, nas duas colunas: `L2 = L3+…+L11`,
       `L12 = L13+…+L16`, `L1 = L2−L12`, `L34 = L1+L17+L26`, `L36 = L34+L35`, `L29` do quadro de
       função, `L4` do de juros, `L7`/`L15` do de transferências.
-- [ ] As quatro amarrações entre quadros: `P.L10 = T.L7`, `P.L13 = F.L29`, `P.L14 = J.L4`,
+- [x] As quatro amarrações entre quadros: `P.L10 = T.L7`, `P.L13 = F.L29`, `P.L14 = J.L4`,
       `P.L15 = T.L15`.
-- [ ] `L9` explicada: ou apura a remuneração das disponibilidades, ou o motivo de 0,00 está medido
+- [x] `L9` explicada: ou apura a remuneração das disponibilidades, ou o motivo de 0,00 está medido
       e registrado.
-- [ ] BO, BF, BP e DVP bit a bit iguais — nenhum arquivo de `app/domain/` alterado.
-- [ ] `python -m pytest` verde; `python -m ruff check .` limpo.
+- [x] BO, BF, BP e DVP bit a bit iguais — nenhum arquivo de `app/domain/` alterado.
+- [x] `python -m pytest` verde; `python -m ruff check .` limpo.
 
 ## Casos de erro
 
@@ -116,4 +116,4 @@ do mesmo ente. Por isso o aceite primário é a identidade de caixa, não o PDF.
 
 ## Aprovação do PO
 
-- [ ] PO aprova abrir esta change em <data>
+- [x] PO aprovou em 2026-10-27 — "vamos concluir o backend do DFC"

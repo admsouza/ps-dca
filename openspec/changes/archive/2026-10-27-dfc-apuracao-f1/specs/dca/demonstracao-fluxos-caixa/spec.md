@@ -35,6 +35,10 @@ agregadora que as referencia NÃO DEVE ficar não apurada por causa delas.
 - **THEN** `L16` vale `0,00` na soma de `L12`, `L12` apura, e `L16` consta como informável no
   diagnóstico
 
+#### Scenario: L16 informada entra no total
+- **WHEN** o contador informa `L16`
+- **THEN** o valor aparece em `L16` e soma em `L12`
+
 #### Scenario: código fora da whitelist é recusado
 - **WHEN** chega um valor informado para `L15`
 - **THEN** a apuração é recusada antes de ler a MSC
