@@ -164,3 +164,24 @@ def test_validador_nao_acusa_regra_da_dfc(validar):
         "juros_encargos_divida": 4,
     }
     assert rel.exit_code == 0, mensagens(rel)
+
+
+def test_desdobramento_da_natureza_de_receita():
+    """Scenario: a remuneração das disponibilidades apura"""
+    l9 = _base()["dfc.quadro_principal.operacionais.l9"]
+    por_literal = {v["literal"]: v["pattern"]
+                   for f in l9["filters"] if f["field"] == "natureza_receita"
+                   for v in f["values"]}
+    for n in "1234":
+        # o 00 do IPC ocupa a posição do desdobramento DD2; o dígito seguinte é o DD2 real
+        assert por_literal[f"1.3.21.00.{n}.x"] == f"13210{n}"
+        assert por_literal[f"7.3.21.00.{n}.x"] == f"73210{n}"
+
+
+def test_exclusao_que_nao_casa_fica_declarada():
+    """Scenario: a exclusão que não casa fica declarada"""
+    l5 = _base()["dfc.quadro_principal.operacionais.l5"]
+    assert l5["status"] == "review_required"
+    assert "7.3.21.00.31.x" in l5["review"]["blocker"]
+    literais = [v["literal"] for f in l5["filters"] for v in f["values"]]
+    assert "7.3.21.00.31.x" in literais, "o literal do PDF permanece"

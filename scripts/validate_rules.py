@@ -32,7 +32,7 @@ CAMPOS_POR_DOCUMENTO = {
     "IPC04": {"conta_contabil"},
 }
 # Documentos em que `review.blocker` é estado declarado por decisão do PO, não inconsistência.
-BLOQUEIO_DECLARADO = {"IPC06", "IPC04"}
+BLOQUEIO_DECLARADO = {"IPC06", "IPC04", "IPC08"}
 COLUNAS_POR_QUADRO_IPC06 = {
     "QUADRO_PRINCIPAL": {"exercicio_atual", "exercicio_anterior"},
     "QUADRO_ANEXO": {
@@ -426,8 +426,9 @@ def _validar_status(rel, regra, rule_id, arquivo, linha) -> None:
 
     # No IPC 07 todo bloqueio foi decidido (B1/B3/B5/B6); remanescente é inconsistência. No
     # IPC 06, `<conta de controle>` e `<contas sob demanda>` seguem sem mapeamento por decisão
-    # do PO (F1/F2); no IPC 04, `L34`, compensação e superávit por fonte (P3/P5, 2026-10-07) —
-    # ali o bloqueio é estado declarado, não erro.
+    # do PO (F1/F2); no IPC 04, `L34`, compensação e superávit por fonte (P3/P5, 2026-10-07);
+    # no IPC 08, a exclusão `7.3.21.00.31.x` de `L5`, que não casa e que o PO decidiu não
+    # adivinhar (2026-10-27) — ali o bloqueio é estado declarado, não erro.
     documento = (regra.get("source") or {}).get("document")
     if review.get("blocker") and documento not in BLOQUEIO_DECLARADO:
         rel.erro(

@@ -268,10 +268,11 @@ rules:
     extraction_method: assisted
     extractor_version: '1.0'
     extracted_at: '2026-10-26'
-  status: extracted
+  status: review_required
   review:
     required: true
-    reason: 'Grafia do PDF diverge da tabela STN (N5). Literal preservado; pattern é a normalização em dígitos, sem corrigir o PDF.'
+    reason: 'Grafia do PDF diverge da tabela STN (N5). Literal preservado; pattern é a normalização em dígitos, sem corrigir o PDF. Os desdobramentos de 1.3.2.1 e 7.3.2.1 foram corrigidos em 2026-10-27 (change dfc-naturezas-desdobramento): no IPC 08 o 00 ocupa a posição do desdobramento DD2 e o dígito seguinte é o DD2 real, logo 1.3.21.00.1.x é 1.3.2.1.01 e casa com 13210101, que a MSC entrega.'
+    blocker: 'A exclusão 7.3.21.00.31.x continua sem casar: tem dois dígitos onde as irmãs têm um, e nenhum dos quatro entes medidos tem registro que permita decidir entre ler 03+1 (prefixo 7321031) e o desdobramento 03 inteiro (732103). Decisão do PO em 2026-10-27: não casar, manter o literal e registrar. O grupo 7.3.2.1 não consta da tabela de natureza de receita da STN.'
   filters:
   - field: natureza_receita
     operator: in
@@ -284,21 +285,21 @@ rules:
     operator: not_in
     values:
     - literal: '1.3.21.00.1.x'
-      pattern: '1321001x'
+      pattern: '132101'
     - literal: '1.3.21.00.2.x'
-      pattern: '1321002x'
+      pattern: '132102'
     - literal: '1.3.21.00.3.x'
-      pattern: '1321003x'
+      pattern: '132103'
     - literal: '1.3.21.00.4.x'
-      pattern: '1321004x'
+      pattern: '132104'
     - literal: '7.3.21.00.31.x'
       pattern: '73210031x'
     - literal: '7.3.21.00.2.x'
-      pattern: '7321002x'
+      pattern: '732102'
     - literal: '7.3.21.00.3.x'
-      pattern: '7321003x'
+      pattern: '732103'
     - literal: '7.3.21.00.4.x'
-      pattern: '7321004x'
+      pattern: '732104'
   columns:
     exercicio_atual:
       label: Exercício Atual
@@ -551,27 +552,27 @@ rules:
   status: extracted
   review:
     required: true
-    reason: 'Grafia do PDF diverge da tabela STN (N5). Literal preservado; pattern é a normalização em dígitos, sem corrigir o PDF.'
+    reason: 'Grafia do PDF diverge da tabela STN (N5). Literal preservado; pattern é a normalização em dígitos, sem corrigir o PDF. Desdobramentos de 1.3.2.1 e 7.3.2.1 corrigidos em 2026-10-27 (change dfc-naturezas-desdobramento): o 00 do IPC ocupa a posição do DD2 e o dígito seguinte é o DD2 real. Medido: a linha sai de 0,00 para 776.452.523,68 em Porto Alegre 2025, e o mesmo valor deixa L5.'
   filters:
   - field: natureza_receita
     operator: in
     values:
     - literal: '1.3.21.00.1.x'
-      pattern: '1321001x'
+      pattern: '132101'
     - literal: '1.3.21.00.2.x'
-      pattern: '1321002x'
+      pattern: '132102'
     - literal: '1.3.21.00.3.x'
-      pattern: '1321003x'
+      pattern: '132103'
     - literal: '1.3.21.00.4.x'
-      pattern: '1321004x'
+      pattern: '132104'
     - literal: '7.3.21.00.1.x'
-      pattern: '7321001x'
+      pattern: '732101'
     - literal: '7.3.21.00.2.x'
-      pattern: '7321002x'
+      pattern: '732102'
     - literal: '7.3.21.00.3.x'
-      pattern: '7321003x'
+      pattern: '732103'
     - literal: '7.3.21.00.4.x'
-      pattern: '7321004x'
+      pattern: '732104'
     - literal: '2.9.30.00.0.0'
       pattern: '293'
     - literal: '8.9.30.00.0.0'
