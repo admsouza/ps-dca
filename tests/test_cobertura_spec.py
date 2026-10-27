@@ -43,7 +43,8 @@ CENARIOS_ESPERADOS = {
     # a spec em vigor é a de `openspec/specs/`, e o delta da change ativa não entra na contagem.
     # + 6 da entrada da DVP no pipeline (`dvp-no-pipeline`)
     # + 2 das unidades no resumo de BF e BP (`pipeline-resumo-com-unidades`).
-    "pipeline/plataforma": 97,
+    # + 5 da entrada da DFC no pipeline (`dfc-no-pipeline`).
+    "pipeline/plataforma": 102,
     # 11 do percurso completo (`pipeline-completo-dca`) + 2 da notificação por anexo
     # (`pipeline-notificacao-discord-padrao`) + 3 do consolidado pela soma das unidades
     # (`pipeline-consolidado-anterior-soma-unidades`, substitui os 4 de
@@ -64,8 +65,10 @@ CENARIOS_ESPERADOS = {
     # de `pipeline-dca-por-unidade-gestora` e `pipeline-anterior-por-recorte` entram ao arquivar.
     "pipeline/unidade-gestora": 7,
     # 12 da transcrição dos quatro quadros + 1 da divergência D9 em L27
-    # (`ipc08-dfc-regras-canonicas`).
-    "dca/demonstracao-fluxos-caixa": 13,
+    # (`ipc08-dfc-regras-canonicas`) + 11 da apuração (`dfc-apuracao-f1`)
+    # + 2 do desdobramento da natureza (`dfc-naturezas-desdobramento`)
+    # + 2 de `L25` residual (`dfc-l25-residual`).
+    "dca/demonstracao-fluxos-caixa": 28,
 }
 
 # Capabilities cuja fase TEST já começou — só delas se exige teste por cenário.

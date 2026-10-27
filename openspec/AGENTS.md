@@ -48,12 +48,48 @@ Domínios previstos: `dca/` (regra de anexo), `import/` (ingestão XBRL), `pipel
 
 ## Change ativa
 
-**Change ativa, fase SPEC (proposta em 2026-10-26, aguardando PO):** `dfc-apuracao-f1` — apura as
-84 linhas da DFC pelo motor de BO/BF/BP/DVP, mais o CLI. Transporte HTTP e recorte por unidade
-ficam para `dfc-no-pipeline` e `dfc-por-unidade-gestora`. Três gaps já medidos contra Porto Alegre
-2025, não supostos: 8 agregadoras saem não apuradas porque referenciam linha sem `columns`; `L35`
-lê N em vez de N−1; `L9` sai zerada. Aceite primário é a identidade de caixa da própria MSC
-(`L34` = 68.947.215,92), não o PDF do ente — recortes diferentes.
+**Backend da DFC concluído em 2026-10-27** — duas changes arquivadas no mesmo dia:
+
+`dfc-apuracao-f1` — `app/services/dfc/` apura as 84 linhas pelo motor de BO/BF/BP/DVP, mais
+`app/cli/dfc.py`. Três decisões que a medição obrigou: **D2** as agregadoras são totalizadas no
+serviço (o motor marcava 8 delas como não apuradas por referenciarem linha sem `columns`);
+**D3** `L35` lê o caixa de N−1; **D10** `L16`/`L21`/`L30` são campo informado pelo contador, no
+mecanismo do BF. Aceite: a identidade de caixa da própria MSC, não o PDF do ente.
+
+`dfc-no-pipeline` — `Anexo("DFC", ...)` no registry, entre os derivados. `GET /dca/DFC` deixou de
+responder 404; a rota e o CLI publicam o mesmo JSON. O front pode consumir.
+
+`dfc-naturezas-desdobramento` — no IPC 08 o `00` ocupa a posição do desdobramento `DD2` e o
+dígito seguinte é o `DD2` real: `1.3.21.00.1.x` é `1.3.2.1.01` e casa com `13210101`. Oito
+patterns corrigidos em `L9` (`in`) e `L5` (`not_in`), literais intactos. **É reclassificação:**
+`L9` sai de 0,00 para 776.452.523,68 em Porto Alegre e o mesmo valor deixa `L5`; `L2`, `L1` e
+`L34` não mudam um centavo. Escopo limitado aos 8 de `1.3.2.1`/`7.3.2.1` por decisão do PO — em
+`L11` a tabela da STN não confirma nenhuma leitura. `7.3.21.00.31.x` fica em `blocker`, sem
+palpite.
+
+`dfc-l25-residual` — `L25` deixa de repetir o que `L23` e `L24` já contaram. O IPC 08 filtra
+`L23` por **elemento** e `L25` por **modalidade**, e as listas se sobrepõem: a mesma aquisição
+entrava nas duas. A exclusão é **por registro** (`registros_por_regra`), nunca por subtração de
+totais — `L23` captura elemento 51 de modalidade que `L25` exclui, e subtrair deixaria `L25`
+negativa. Nenhum YAML mudou.
+
+**Cuitegi/PB é o melhor ente de homologação da DFC:** publica o demonstrativo **consolidado**, o
+mesmo recorte da MSC, em PDF com camada de texto
+(`docs/entes-homologacao/cuitegi/auditoria-dfc-2025.md`). Depois de `dfc-l25-residual`, `L23`,
+`L25`, `L22` e `L17` conferem em centavos, além de todo o bloco de receitas derivadas — inclusive
+`L9`, que valida `dfc-naturezas-desdobramento` contra dado real.
+
+`dfc-intragovernamentais` — **investigada, decidida e arquivada sem código.** "Intragovernamental"
+tem dois significados: no IPC 08 é a transferência **orçamentária** (modalidade 91, categorias 7 e
+8); no SIAFIC do ente é a **financeira** (extraorçamentária, contas `4.5.1.x`/`3.5.1.x`, idênticas
+às do BF do mesmo ente). A hipótese de seguir o ente foi implementada, medida e **revertida**:
+quebra `P.L10 = T.L7` e `P.L15 = T.L15`, perde a modalidade 91 e não cabe numa regra só.
+**PO decidiu manter o IPC 08 (A2 e A4 fecham juntas).** A apuração já estava certa pela norma.
+
+**Pendências abertas:** A3 — `L32`/`L33` em ente que classifica a amortização fora da função 28;
+só classificação, o total fecha. O resíduo de `L16` em João Pessoa caiu de −657 mi para
+−217.997.300,88 com `dfc-l25-residual` e segue sem explicação completa
+(`docs/evidencia-dfc-apuracao-f1.md`).
 
 **`ipc08-dfc-regras-canonicas` arquivada em 2026-10-26:** 84 regras da DFC (IPC 08) no contrato
 de BO/BF/BP/DVP, quatro quadros, sem Python. Capability nova `dca/demonstracao-fluxos-caixa`.
