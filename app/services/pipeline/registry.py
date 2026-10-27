@@ -14,6 +14,7 @@ from dataclasses import dataclass
 ANEXO_BO = "BO"
 ANEXO_BF = "BF"
 ANEXO_BP = "BP"
+ANEXO_DFC = "DFC"
 JOB_APURAR = "apurar_anexo"
 # Um job para o percurso inteiro — os anexos vêm do próprio registry.
 JOB_COMPLETO = "apurar_completo"
@@ -37,6 +38,9 @@ REGISTRY: tuple[Anexo, ...] = (
     # O BP pelo layout do IPC 04 (P1-a). O `I-AB` do `tt/dca` é o mesmo demonstrativo **por conta**
     # e fica reservado para o espelho: a conferência casa as duas formas (D4).
     Anexo(ANEXO_BP, "app.services.bp.quadro_principal:apurar", base_canonica="bp"),
+    # A DFC também é derivada da MSC (IPC 08) e **não** é publicada pelo `tt/dca` — por isso fica
+    # entre os derivados, e não entre os `I-*`. `I-E` é despesa por função, outro demonstrativo.
+    Anexo(ANEXO_DFC, "app.services.dfc.quadro_principal:apurar", base_canonica="dfc"),
     Anexo("I-AB", None),
     Anexo("I-C", None),
     Anexo("I-D", None),

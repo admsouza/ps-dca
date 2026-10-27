@@ -1357,122 +1357,132 @@
  "BF|consolidado|resumo": [
   {
    "anexo": "BO",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": true,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "BF",
+   "status": "ok",
    "calculado_em": true,
    "duracao_ms": null,
+   "versao_api": "0.1.0",
+   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
    "erro_detalhe": null,
    "implementado": true,
    "recortes": [
     {
      "chave": "ug:1",
-     "rotulo": "UG 1",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 1"
     },
     {
      "chave": "ug:3",
-     "rotulo": "UG 3",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 3"
     },
     {
      "chave": "ug:4",
-     "rotulo": "UG 4",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 4"
     }
-   ],
-   "status": "ok",
-   "versao_api": "0.1.0",
-   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   ]
   },
   {
    "anexo": "BP",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
+   "recortes": []
+  },
+  {
+   "anexo": "DFC",
    "status": "sem_cache",
+   "calculado_em": null,
+   "duracao_ms": null,
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "I-AB",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-C",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-D",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-E",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-F",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-G",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-HI",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   }
  ],
  "BF|executivo+legislativo|leitura": {
@@ -2829,122 +2839,132 @@
  "BF|executivo+legislativo|resumo": [
   {
    "anexo": "BO",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": true,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "BF",
+   "status": "ok",
    "calculado_em": true,
    "duracao_ms": null,
+   "versao_api": "0.1.0",
+   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
    "erro_detalhe": null,
    "implementado": true,
    "recortes": [
     {
      "chave": "ug:1",
-     "rotulo": "UG 1",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 1"
     },
     {
      "chave": "ug:3",
-     "rotulo": "UG 3",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 3"
     },
     {
      "chave": "ug:4",
-     "rotulo": "UG 4",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 4"
     }
-   ],
-   "status": "ok",
-   "versao_api": "0.1.0",
-   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   ]
   },
   {
    "anexo": "BP",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
+   "recortes": []
+  },
+  {
+   "anexo": "DFC",
    "status": "sem_cache",
+   "calculado_em": null,
+   "duracao_ms": null,
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "I-AB",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-C",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-D",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-E",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-F",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-G",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-HI",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   }
  ],
  "BF|executivo|leitura": {
@@ -4285,117 +4305,127 @@
  "BF|executivo|resumo": [
   {
    "anexo": "BO",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": true,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "BF",
+   "status": "ok",
    "calculado_em": true,
    "duracao_ms": null,
+   "versao_api": "0.1.0",
+   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
    "erro_detalhe": null,
    "implementado": true,
    "recortes": [
     {
      "chave": "ug:1",
-     "rotulo": "UG 1",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 1"
     },
     {
      "chave": "ug:3",
-     "rotulo": "UG 3",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 3"
     }
-   ],
-   "status": "ok",
-   "versao_api": "0.1.0",
-   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   ]
   },
   {
    "anexo": "BP",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
+   "recortes": []
+  },
+  {
+   "anexo": "DFC",
    "status": "sem_cache",
+   "calculado_em": null,
+   "duracao_ms": null,
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "I-AB",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-C",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-D",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-E",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-F",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-G",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-HI",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   }
  ],
  "BF|legislativo|leitura": {
@@ -5730,112 +5760,122 @@
  "BF|legislativo|resumo": [
   {
    "anexo": "BO",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": true,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "BF",
+   "status": "ok",
    "calculado_em": true,
    "duracao_ms": null,
+   "versao_api": "0.1.0",
+   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
    "erro_detalhe": null,
    "implementado": true,
    "recortes": [
     {
      "chave": "ug:4",
-     "rotulo": "UG 4",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 4"
     }
-   ],
-   "status": "ok",
-   "versao_api": "0.1.0",
-   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   ]
   },
   {
    "anexo": "BP",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
+   "recortes": []
+  },
+  {
+   "anexo": "DFC",
    "status": "sem_cache",
+   "calculado_em": null,
+   "duracao_ms": null,
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "I-AB",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-C",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-D",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-E",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-F",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-G",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-HI",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   }
  ],
  "BO|consolidado|leitura": {
@@ -7083,106 +7123,116 @@
  "BO|consolidado|resumo": [
   {
    "anexo": "BO",
+   "status": "ok",
    "calculado_em": true,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": true,
-   "status": "ok",
    "versao_api": "0.1.0",
-   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "BF",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   },
   {
    "anexo": "BP",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
+   "recortes": []
+  },
+  {
+   "anexo": "DFC",
    "status": "sem_cache",
+   "calculado_em": null,
+   "duracao_ms": null,
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "I-AB",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-C",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-D",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-E",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-F",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-G",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-HI",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   }
  ],
  "BO|executivo+legislativo|leitura": {
@@ -8425,106 +8475,116 @@
  "BO|executivo+legislativo|resumo": [
   {
    "anexo": "BO",
+   "status": "ok",
    "calculado_em": true,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": true,
-   "status": "ok",
    "versao_api": "0.1.0",
-   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "BF",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   },
   {
    "anexo": "BP",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
+   "recortes": []
+  },
+  {
+   "anexo": "DFC",
    "status": "sem_cache",
+   "calculado_em": null,
+   "duracao_ms": null,
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "I-AB",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-C",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-D",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-E",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-F",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-G",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-HI",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   }
  ],
  "BO|executivo|leitura": {
@@ -9751,106 +9811,116 @@
  "BO|executivo|resumo": [
   {
    "anexo": "BO",
+   "status": "ok",
    "calculado_em": true,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": true,
-   "status": "ok",
    "versao_api": "0.1.0",
-   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "BF",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   },
   {
    "anexo": "BP",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
+   "recortes": []
+  },
+  {
+   "anexo": "DFC",
    "status": "sem_cache",
+   "calculado_em": null,
+   "duracao_ms": null,
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "I-AB",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-C",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-D",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-E",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-F",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-G",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-HI",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   }
  ],
  "BO|legislativo|leitura": {
@@ -11077,106 +11147,116 @@
  "BO|legislativo|resumo": [
   {
    "anexo": "BO",
+   "status": "ok",
    "calculado_em": true,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": true,
-   "status": "ok",
    "versao_api": "0.1.0",
-   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "BF",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   },
   {
    "anexo": "BP",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
+   "recortes": []
+  },
+  {
+   "anexo": "DFC",
    "status": "sem_cache",
+   "calculado_em": null,
+   "duracao_ms": null,
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "I-AB",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-C",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-D",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-E",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-F",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-G",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-HI",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   }
  ],
  "BP|consolidado|leitura": {
@@ -12538,122 +12618,132 @@
  "BP|consolidado|resumo": [
   {
    "anexo": "BO",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": true,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "BF",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   },
   {
    "anexo": "BP",
+   "status": "ok",
    "calculado_em": true,
    "duracao_ms": null,
+   "versao_api": "0.1.0",
+   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
    "erro_detalhe": null,
    "implementado": true,
    "recortes": [
     {
      "chave": "ug:1",
-     "rotulo": "UG 1",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 1"
     },
     {
      "chave": "ug:3",
-     "rotulo": "UG 3",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 3"
     },
     {
      "chave": "ug:4",
-     "rotulo": "UG 4",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 4"
     }
-   ],
-   "status": "ok",
-   "versao_api": "0.1.0",
-   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   ]
+  },
+  {
+   "anexo": "DFC",
+   "status": "sem_cache",
+   "calculado_em": null,
+   "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "I-AB",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-C",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-D",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-E",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-F",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-G",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-HI",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   }
  ],
  "BP|executivo+legislativo|leitura": {
@@ -14011,122 +14101,132 @@
  "BP|executivo+legislativo|resumo": [
   {
    "anexo": "BO",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": true,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "BF",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   },
   {
    "anexo": "BP",
+   "status": "ok",
    "calculado_em": true,
    "duracao_ms": null,
+   "versao_api": "0.1.0",
+   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
    "erro_detalhe": null,
    "implementado": true,
    "recortes": [
     {
      "chave": "ug:1",
-     "rotulo": "UG 1",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 1"
     },
     {
      "chave": "ug:3",
-     "rotulo": "UG 3",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 3"
     },
     {
      "chave": "ug:4",
-     "rotulo": "UG 4",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 4"
     }
-   ],
-   "status": "ok",
-   "versao_api": "0.1.0",
-   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   ]
+  },
+  {
+   "anexo": "DFC",
+   "status": "sem_cache",
+   "calculado_em": null,
+   "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "I-AB",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-C",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-D",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-E",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-F",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-G",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-HI",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   }
  ],
  "BP|executivo|leitura": {
@@ -15468,117 +15568,127 @@
  "BP|executivo|resumo": [
   {
    "anexo": "BO",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": true,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "BF",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   },
   {
    "anexo": "BP",
+   "status": "ok",
    "calculado_em": true,
    "duracao_ms": null,
+   "versao_api": "0.1.0",
+   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
    "erro_detalhe": null,
    "implementado": true,
    "recortes": [
     {
      "chave": "ug:1",
-     "rotulo": "UG 1",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 1"
     },
     {
      "chave": "ug:3",
-     "rotulo": "UG 3",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 3"
     }
-   ],
-   "status": "ok",
-   "versao_api": "0.1.0",
-   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   ]
+  },
+  {
+   "anexo": "DFC",
+   "status": "sem_cache",
+   "calculado_em": null,
+   "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "I-AB",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-C",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-D",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-E",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-F",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-G",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-HI",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   }
  ],
  "BP|legislativo|leitura": {
@@ -16914,112 +17024,122 @@
  "BP|legislativo|resumo": [
   {
    "anexo": "BO",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": true,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "BF",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   },
   {
    "anexo": "BP",
+   "status": "ok",
    "calculado_em": true,
    "duracao_ms": null,
+   "versao_api": "0.1.0",
+   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
    "erro_detalhe": null,
    "implementado": true,
    "recortes": [
     {
      "chave": "ug:4",
-     "rotulo": "UG 4",
-     "tipo": "ug"
+     "tipo": "ug",
+     "rotulo": "UG 4"
     }
-   ],
-   "status": "ok",
-   "versao_api": "0.1.0",
-   "versao_regras": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   ]
+  },
+  {
+   "anexo": "DFC",
+   "status": "sem_cache",
+   "calculado_em": null,
+   "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": true
   },
   {
    "anexo": "I-AB",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-C",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-D",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-E",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-F",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-G",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
-   "erro_detalhe": null,
-   "implementado": false,
-   "status": "sem_cache",
    "versao_api": null,
-   "versao_regras": null
+   "versao_regras": null,
+   "erro_detalhe": null,
+   "implementado": false
   },
   {
    "anexo": "I-HI",
+   "status": "sem_cache",
    "calculado_em": null,
    "duracao_ms": null,
+   "versao_api": null,
+   "versao_regras": null,
    "erro_detalhe": null,
    "implementado": true,
-   "recortes": [],
-   "status": "sem_cache",
-   "versao_api": null,
-   "versao_regras": null
+   "recortes": []
   }
  ]
 }

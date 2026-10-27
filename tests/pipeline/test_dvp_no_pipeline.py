@@ -69,7 +69,7 @@ def test_percurso_completo_inclui_a_dvp(repo, lock, jobs):
     percurso = montar_percurso(ente=ENTE, exercicio=EXERCICIO, repo=repo, lock=lock, jobs=jobs,
                                versao_api=VERSAO_API, versao_de_regras=lambda _a: "r")
     assert [no.anexo for no in percurso if no.estado == "a_apurar"] == [
-        "BO", "BF", "BP", "I-HI"]
+        "BO", "BF", "BP", "DFC", "I-HI"]
 
 
 def test_grafia_nao_canonica():

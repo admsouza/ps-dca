@@ -225,7 +225,7 @@ def test_percurso_enfileirado(api, notificador, repo):
     recebidas = [m for m in notificador.enviadas if m.get("tipo") == "recebida"]
     assert len(recebidas) == 1
     assert recebidas[0]["percurso"] is True
-    assert recebidas[0]["anexos"] == ["BO", "BF", "BP", "I-HI"]
+    assert recebidas[0]["anexos"] == ["BO", "BF", "BP", "DFC", "I-HI"]
     assert fila.enfileirados[0][1]["solicitante_email"] == "jackson@x"
 
 

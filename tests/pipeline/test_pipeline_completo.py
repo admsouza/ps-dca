@@ -11,7 +11,7 @@ import pytest
 
 from tests.pipeline.conftest import ENTE, EXERCICIO, VERSAO_API, VERSAO_REGRAS, RegistroFake
 
-BO, BF, BP, IHI = "BO", "BF", "BP", "I-HI"
+BO, BF, BP, DFC, IHI = "BO", "BF", "BP", "DFC", "I-HI"
 HDR = {"Authorization": "Bearer t", "X-Unidade-Id": ENTE}
 
 
@@ -118,7 +118,8 @@ def test_rota_do_percurso_aceita_e_devolve_o_identificador(cliente):
     corpo = resposta.json()
     assert corpo["batch_job_id"]
     assert corpo["poll_url"].endswith(corpo["batch_job_id"])
-    assert {a["anexo"] for a in corpo["anexos"] if a["estado"] == "a_apurar"} == {BO, BF, BP, IHI}
+    a_apurar = {a["anexo"] for a in corpo["anexos"] if a["estado"] == "a_apurar"}
+    assert a_apurar == {BO, BF, BP, DFC, IHI}
 
 
 def test_nenhum_anexo_implementado(cliente, monkeypatch):
@@ -243,7 +244,8 @@ def test_um_anexo_falha_e_os_demais_concluem(repo, lock, jobs, montar, executar,
         ente=ENTE, exercicio=EXERCICIO, percurso=percurso, repo=repo, lock=lock, jobs=jobs,
         job_id="batch-1", versao_api=VERSAO_API, versao_de_regras=versao_de,
         apurador_de=_apurador_de({BO: ResultadoFake(BO), BF: RuntimeError("fonte fora do ar"),
-                                  BP: ResultadoFake(BP), IHI: ResultadoFake(IHI)}),
+                                  BP: ResultadoFake(BP), DFC: ResultadoFake(DFC),
+                                  IHI: ResultadoFake(IHI)}),
     )
 
     assert repo.obter(ENTE, EXERCICIO, BO).status == "ok"
@@ -266,11 +268,12 @@ def test_todos_os_anexos_falham(repo, lock, jobs, montar, executar, versao_de):
         job_id="batch-1", versao_api=VERSAO_API, versao_de_regras=versao_de,
         apurador_de=_apurador_de({BO: RuntimeError("falhou BO"), BF: RuntimeError("falhou BF"),
                                   BP: RuntimeError("falhou BP"),
+                                  DFC: RuntimeError("falhou DFC"),
                                   IHI: RuntimeError("falhou I-HI")}),
     )
 
     assert desfecho["status"] == "error"
-    assert desfecho["falhas"] == 4
+    assert desfecho["falhas"] == 5
     assert all(r.status == "erro" for r in repo.listar(ENTE, EXERCICIO))
 
 
@@ -301,7 +304,7 @@ def test_anexo_ja_em_andamento_e_pulado(repo, lock, jobs, montar, executar, vers
                         jobs=jobs, job_id="batch-1", apurador_de=apurador_de,
                         versao_api=VERSAO_API, versao_de_regras=versao_de)
 
-    assert apurados == [BO, BP, IHI], "o anexo em voo foi apurado de novo"
+    assert apurados == [BO, BP, DFC, IHI], "o anexo em voo foi apurado de novo"
     assert repo.obter(ENTE, EXERCICIO, BF) is None
     assert [a["status"] for a in desfecho["anexos"] if a["anexo"] == BF] == ["already_queued"]
     assert lock.dono(ENTE, EXERCICIO, BF) == "job-bf-vivo", "lock alheio foi liberado"
@@ -383,7 +386,7 @@ def test_progresso_e_legivel_durante_a_execucao(repo, lock, jobs, montar, execut
 
     # Estado visto pelo segundo anexo: o primeiro já concluiu, e o desfecho dele já aparece.
     durante_o_segundo = vistos[1]
-    assert durante_o_segundo["progresso"] == {"concluidos": 1, "total": 4}
+    assert durante_o_segundo["progresso"] == {"concluidos": 1, "total": 5}
     assert durante_o_segundo["status"] == "processing"
     assert [a["anexo"] for a in durante_o_segundo["anexos"] if a["status"] == "ok"] == [BO]
 
@@ -397,7 +400,8 @@ def test_conclusao_do_percurso_e_notificada_uma_vez(repo, lock, jobs, montar, ex
     executar(ente=ENTE, exercicio=EXERCICIO, percurso=percurso, repo=repo, lock=lock, jobs=jobs,
              job_id="batch-1", versao_api=VERSAO_API, versao_de_regras=versao_de,
              apurador_de=_apurador_de({BO: ResultadoFake(BO), BF: RuntimeError("falhou"),
-                                       BP: ResultadoFake(BP), IHI: ResultadoFake(IHI)}),
+                                       BP: ResultadoFake(BP), DFC: ResultadoFake(DFC),
+                                       IHI: ResultadoFake(IHI)}),
              notificador=notificador, solicitante="jackson@x")
 
     resumos = [m for m in notificador.enviadas if m["tipo"] == "percurso"]
@@ -406,7 +410,7 @@ def test_conclusao_do_percurso_e_notificada_uma_vez(repo, lock, jobs, montar, ex
     mensagem = resumos[0]
     assert mensagem["ente"] == ENTE
     assert mensagem["falhas"] == 1
-    assert [a["anexo"] for a in mensagem["anexos"]] == [BO, BF, BP, IHI]
+    assert [a["anexo"] for a in mensagem["anexos"]] == [BO, BF, BP, DFC, IHI]
     assert mensagem["duracao_ms"] >= 0
     assert mensagem["solicitante"] == "jackson@x"
 
@@ -421,12 +425,14 @@ def test_cada_anexo_do_percurso_tambem_notifica(repo, lock, jobs, montar, execut
     executar(ente=ENTE, exercicio=EXERCICIO, percurso=percurso, repo=repo, lock=lock, jobs=jobs,
              job_id="batch-1", versao_api=VERSAO_API, versao_de_regras=versao_de,
              apurador_de=_apurador_de({BO: ResultadoFake(BO), BP: ResultadoFake(BP),
+                                       DFC: ResultadoFake(DFC),
                                        IHI: ResultadoFake(IHI)}),
              notificador=notificador, solicitante="jackson@x", fonte="siconfi")
 
     sequencia = [(m["tipo"], m.get("anexo"), m.get("desfecho")) for m in notificador.enviadas]
     assert sequencia == [("anexo", BO, "sucesso"), ("anexo", BF, "cache"),
-                         ("anexo", BP, "sucesso"), ("anexo", IHI, "sucesso"),
+                         ("anexo", BP, "sucesso"), ("anexo", DFC, "sucesso"),
+                         ("anexo", IHI, "sucesso"),
                          ("percurso", None, "sucesso")]
     detalhe = {a["anexo"]: a["status"] for a in notificador.enviadas[-1]["anexos"]}
     assert detalhe[BF] == "em_cache"
