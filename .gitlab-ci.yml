@@ -6,6 +6,13 @@ include:
   - template: Security/SAST.gitlab-ci.yml
   - template: Security/Secret-Detection.gitlab-ci.yml
 
+# Templates acima nascem no stage `test`, que este pipeline não define.
+sast:
+  stage: seguranca
+
+secret_detection:
+  stage: seguranca
+
 default:
   image: python:3.11-slim
   cache:
