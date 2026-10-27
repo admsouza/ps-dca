@@ -92,17 +92,39 @@ nunca `openspec/specs/`.
 
 ## 5. Validação (a partir da fase IMPLEMENT)
 
-Rodar **tudo**, na ordem, e reportar o resultado real:
+Comandos que existem (não inventar outros):
 
 ```bash
 # pytest/ruff não estão em requirements.txt (não vão para a imagem): extra `dev` do pyproject
 python -m pip install -r requirements.txt "pytest>=9.0.3" "ruff>=0.16"
-python -m pytest                  # suíte inteira (addopts já exclui `-m vivo`)
-python -m ruff check .            # lint (deve sair limpo)
-alembic upgrade head              # migrations; rename/drop-column: upgrade → downgrade → upgrade
+python -m pytest                  # suíte (addopts já exclui `-m vivo`)
+python -m ruff check .            # lint
+alembic upgrade head              # só se tocou migration; rename/drop-column: upgrade → downgrade → upgrade
 ```
 
-Além dos comandos:
+TDD (§2.2) continua: o teste do cenário **roda localmente** (falha, depois passa). Isso é
+recorte pontual, não a suíte inteira.
+
+### 5.1 Loop local vs CI — não duplicar o GitLab
+
+O CI (`.gitlab-ci.yml`) é o **gate de merge**. O agente **NÃO** deve, por rotina, rodar
+localmente a suíte completa, SAST, Secret Detection nem `pip-audit`: isso já corre no
+GitLab depois do push.
+
+| situação | o que o agente roda |
+|---|---|
+| editando código | teste pontual do arquivo/caso + `ruff check` no que mudou |
+| antes do push, mudança normal | `python -m pytest` no venv (opcional se a mudança é mínima e o CI é confiável) |
+| push | GitLab decide: `lint`, `testes` (`pytest`, sem `-m vivo`), SAST, Secret Detection, `dependencias` (`pip-audit`); `build:*` só na branch default/tag |
+| Dockerfile / `requirements.txt` / imagem | o job `build:*` do CI; não inventar Compose de suíte se o repo não tiver |
+| CI vermelho | reproduzir **o job que falhou**, não o ritual inteiro |
+| migration | `alembic upgrade → downgrade → upgrade` — o CI **não** faz esse round-trip |
+| conferência viva (`-m vivo`) | local, contra o SICONFI — **não** está no CI (addopts exclui) |
+
+Ao fechar implementação, reportar o que **rodou de fato** (`N passed / M failed`, falha nova
+vs pré-existente) e o que ficou para o CI. **Não** mandar a suíte completa “por garantia”.
+
+Além do loop:
 
 - **Reconferência da spec:** percorrer os cenários do delta spec um a um e apontar onde cada
   um é coberto por teste ou por medição. Cenário sem cobertura fica declarado como pendência.
@@ -119,5 +141,6 @@ Além dos comandos:
 ## Resumo em uma frase
 
 SPEC aprovada pelo PO → design e tasks completos → **teste falhando antes do código** →
-código mínimo → review do diff → validação medida → tasks atualizadas e change arquivada.
+código mínimo → review do diff → recorte local (§5.1; suíte/SAST/`pip-audit` no GitLab) →
+tasks atualizadas e change arquivada.
 Capability nova sem spec fechada **não se escreve**.

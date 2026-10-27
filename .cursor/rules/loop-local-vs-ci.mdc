@@ -1,0 +1,14 @@
+---
+description: Loop local curto; suíte, SAST e pip-audit ficam no GitLab — não duplicar o CI
+alwaysApply: true
+---
+
+# Loop local vs CI
+
+Não duplicar o GitLab. Fonte autoritativa: `AGENTS.md` §5.1.
+
+Ao fechar implementação, reportar o que **rodou de fato**. Não mandar a suíte
+completa, SAST nem `pip-audit` “por garantia”: o job `testes` do CI já roda `pytest`.
+
+CI vermelho: reproduzir o job que falhou, não o ritual inteiro.
+`pytest -m vivo` é local (SICONFI) e não está no CI.
